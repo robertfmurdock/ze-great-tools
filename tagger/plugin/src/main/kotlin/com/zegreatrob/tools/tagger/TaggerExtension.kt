@@ -1,11 +1,11 @@
 package com.zegreatrob.tools.tagger
 
+import com.zegreatrob.tools.TaggerPlugin
 import org.ajoberstar.grgit.Grgit
 import org.ajoberstar.grgit.gradle.GrgitServiceExtension
 import org.gradle.api.Project
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskProvider
-import com.zegreatrob.tools.TaggerPlugin
 
 open class TaggerExtension(val grgitServiceExtension: GrgitServiceExtension, @Transient val rootProject: Project) {
 
@@ -21,10 +21,11 @@ open class TaggerExtension(val grgitServiceExtension: GrgitServiceExtension, @Tr
             .named("release")
 
     private fun calculateBuildVersion(grgit: Grgit, releaseBranch: String?) = grgit.calculateNextVersion() +
-        if (grgit.canRelease(releaseBranch))
+        if (grgit.canRelease(releaseBranch)) {
             ""
-        else
+        } else {
             "-SNAPSHOT"
+        }
 
     companion object {
         fun apply(rootProject: Project): TaggerExtension {

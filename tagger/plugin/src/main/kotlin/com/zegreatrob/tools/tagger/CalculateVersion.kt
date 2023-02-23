@@ -29,7 +29,7 @@ open class CalculateVersion : DefaultTask(), TaggerExtensionSyntax {
 fun Grgit.calculateNextVersion(): String {
     val description = describe {} ?: "-0.0.0"
     val (previousVersionNumber) = description.split("-")
-    if(previousVersionNumber.length == 0) {
+    if (previousVersionNumber.length == 0) {
         return "v0.0.0"
     }
     val (major, minor, patch) = previousVersionNumber.substring(1).split(".")
@@ -41,21 +41,21 @@ fun Grgit.canRelease(releaseBranch: String?): Boolean {
 
     val currentBranchStatus = runCatching { branch.status { this.name = currentBranch.name } }
         .getOrNull()
-    return if (currentBranchStatus == null)
+    return if (currentBranchStatus == null) {
         false
-    else
+    } else {
         status().isClean &&
-        currentBranchStatus.aheadCount == 0 &&
-        currentBranchStatus.behindCount == 0 &&
-        currentBranch.name == releaseBranch
+            currentBranchStatus.aheadCount == 0 &&
+            currentBranchStatus.behindCount == 0 &&
+            currentBranch.name == releaseBranch
+    }
 }
 
 fun Grgit.tagReport() = tag.list()
     .filter { it.dateTime != null }
     .groupBy { tag ->
-    "${tag.dateTime?.year} Week ${tag.weekNumber()}"
-}.toSortedMap()
-
+        "${tag.dateTime?.year} Week ${tag.weekNumber()}"
+    }.toSortedMap()
     .map {
         "${it.key} has ${it.value.size} tags [${it.value.joinToString { tag -> tag.name }}]"
     }

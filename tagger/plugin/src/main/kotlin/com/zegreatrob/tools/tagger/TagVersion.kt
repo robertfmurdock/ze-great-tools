@@ -9,15 +9,19 @@ import org.gradle.api.tasks.TaskAction
 
 interface TaggerExtensionSyntax {
     var taggerExtension: TaggerExtension
+
     @get:Internal
     val grgit get() = taggerExtension.grgitServiceExtension.service.get().grgit
+
     @get:Internal
     val releaseBranch get() = taggerExtension.releaseBranch
+
     @get:Internal
     val version get() = taggerExtension.version
 
     @Internal
     fun isSnapshot() = version.contains("SNAPSHOT")
+
     @Internal
     fun isOnReleaseBranch(grgit: Grgit, releaseBranch: String?) = grgit.branch.current().name == releaseBranch
 }

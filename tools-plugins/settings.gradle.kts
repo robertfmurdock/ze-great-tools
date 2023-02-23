@@ -1,6 +1,4 @@
-rootProject.name = "tagger"
-include("plugin")
-includeBuild("../tools-plugins")
+rootProject.name="tools-plugins"
 
 buildCache {
     local {

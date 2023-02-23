@@ -5,25 +5,25 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c93eaa29-1979-4878-b45c-c04819e6607b" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/tagger/build.gradle.kts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/tagger/plugin/src/test/kotlin/com/zegreatrob/tools/tagger/TaggerPluginTest.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/jarRepositories.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/jarRepositories.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tools-plugins/build.gradle.kts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tools-plugins/gradle.properties" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tools-plugins/gradle/libs.versions.toml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tools-plugins/settings.gradle.kts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tools-plugins/src/main/kotlin/com/zegreatrob/tools/plugins/lint.gradle.kts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tools-plugins/src/main/kotlin/com/zegreatrob/tools/plugins/publish.gradle.kts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tools-plugins/src/main/kotlin/com/zegreatrob/tools/plugins/reports.gradle.kts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tools-plugins/src/main/kotlin/com/zegreatrob/tools/plugins/versioning.gradle.kts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/gradle.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/gradle.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle.kts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tagger/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/tagger/.idea/checkstyle-idea.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/tagger/.idea/compiler.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/tagger/.idea/gradle.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/tagger/.idea/jarRepositories.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/tagger/.idea/kotlinc.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/tagger/.idea/misc.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/tagger/.idea/vcs.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/tagger/gradle/libs.versions.toml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/settings.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/settings.gradle.kts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tagger/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/tagger/build.gradle.kts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/tagger/plugin/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/tagger/plugin/build.gradle.kts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/tagger/plugin/src/functionalTest/kotlin/tagger/TaggerPluginFunctionalTest.kt" beforeDir="false" afterPath="$PROJECT_DIR$/tagger/plugin/src/functionalTest/kotlin/tagger/TaggerPluginFunctionalTest.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tagger/plugin/src/test/kotlin/tagger/TaggerPluginTest.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tagger/plugin/src/main/kotlin/com/zegreatrob/tools/tagger/CalculateVersion.kt" beforeDir="false" afterPath="$PROJECT_DIR$/tagger/plugin/src/main/kotlin/com/zegreatrob/tools/tagger/CalculateVersion.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tagger/plugin/src/main/kotlin/com/zegreatrob/tools/tagger/TagVersion.kt" beforeDir="false" afterPath="$PROJECT_DIR$/tagger/plugin/src/main/kotlin/com/zegreatrob/tools/tagger/TagVersion.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tagger/plugin/src/main/kotlin/com/zegreatrob/tools/tagger/TaggerExtension.kt" beforeDir="false" afterPath="$PROJECT_DIR$/tagger/plugin/src/main/kotlin/com/zegreatrob/tools/tagger/TaggerExtension.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tagger/settings.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/tagger/settings.gradle.kts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -64,6 +64,7 @@
     "RunOnceActivity.go.migrated.go.modules.settings": "true",
     "WebServerToolWindowFactoryState": "false",
     "go.import.settings.migrated": "true",
+    "last_opened_file_path": "/Users/robertfmurdock/git/ze-great-tools",
     "nodejs_package_manager_path": "npm",
     "project.structure.last.edited": "Modules",
     "project.structure.proportion": "0.15",
@@ -72,6 +73,25 @@
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/tools-plugins/src/main/kotlin/com/zegreatrob/tools/plugins" />
+    </key>
+  </component>
+  <component name="RubyModuleManagerSettings">
+    <option name="blackListedRootsPaths">
+      <list>
+        <option value="$PROJECT_DIR$/tools-plugins/src/main" />
+        <option value="$PROJECT_DIR$/tools-plugins" />
+        <option value="$PROJECT_DIR$/tools-plugins/build/generated-sources/kotlin-dsl-external-plugin-spec-builders/kotlin" />
+        <option value="$PROJECT_DIR$/tools-plugins/build/generated-sources/kotlin-dsl-plugins/kotlin" />
+        <option value="$PROJECT_DIR$/tools-plugins/build/generated-sources/kotlin-dsl-accessors/kotlin" />
+      </list>
+    </option>
+  </component>
   <component name="RunAnythingCache">
     <option name="myCommands">
       <command value="./gradlew check" />
@@ -161,7 +181,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1677120383944</updated>
-      <workItem from="1677120385202" duration="2956000" />
+      <workItem from="1677120385202" duration="5620000" />
     </task>
     <servers />
   </component>

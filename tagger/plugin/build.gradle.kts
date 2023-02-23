@@ -1,8 +1,10 @@
 plugins {
     `java-gradle-plugin`
     `kotlin-dsl`
-    id("org.jetbrains.kotlin.jvm") version "1.8.10"
+    id("org.jetbrains.kotlin.jvm")
     base
+    id("com.zegreatrob.tools.plugins.lint")
+    id("com.zegreatrob.tools.plugins.versioning")
 }
 
 repositories {
@@ -31,5 +33,11 @@ tasks {
     }
     named<Test>("test") {
         useJUnitPlatform()
+    }
+    formatKotlinMain {
+        exclude { spec -> spec.file.absolutePath.contains("generated-sources") }
+    }
+    lintKotlinMain {
+        exclude { spec -> spec.file.absolutePath.contains("generated-sources") }
     }
 }

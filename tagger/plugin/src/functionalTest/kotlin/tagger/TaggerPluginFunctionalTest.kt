@@ -1,13 +1,11 @@
 package tagger
 
-import org.ajoberstar.grgit.Branch
 import org.ajoberstar.grgit.Grgit
-import java.io.File
-import kotlin.test.assertTrue
-import kotlin.test.Test
 import org.gradle.testkit.runner.GradleRunner
 import org.junit.jupiter.api.io.TempDir
+import java.io.File
 import java.io.FileOutputStream
+import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class TaggerPluginFunctionalTest {
@@ -26,7 +24,7 @@ class TaggerPluginFunctionalTest {
             plugins {
                 id('com.zegreatrob.tools.tagger')
             }
-        """.trimIndent()
+            """.trimIndent()
         )
 
         initializeGitRepo()

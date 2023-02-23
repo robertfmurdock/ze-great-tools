@@ -6,6 +6,11 @@
         <compositeConfiguration>
           <compositeBuild compositeDefinitionSource="SCRIPT">
             <builds>
+              <build path="$PROJECT_DIR$/tools-plugins" name="tools-plugins">
+                <projects>
+                  <project path="$PROJECT_DIR$/tools-plugins" />
+                </projects>
+              </build>
               <build path="$PROJECT_DIR$/tagger" name="tagger">
                 <projects>
                   <project path="$PROJECT_DIR$/tagger" />
@@ -25,6 +30,7 @@
             <option value="$PROJECT_DIR$/lib" />
             <option value="$PROJECT_DIR$/tagger" />
             <option value="$PROJECT_DIR$/tagger/plugin" />
+            <option value="$PROJECT_DIR$/tools-plugins" />
           </set>
         </option>
       </GradleProjectSettings>
