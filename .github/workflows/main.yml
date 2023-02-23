@@ -16,7 +16,7 @@ jobs:
       GITHUB_TOKEN: ${{ secrets.TOOLS_PAT }}
       GRGIT_USER: ${{ secrets.TOOLS_PAT }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 0
       - name: Setup Gradle
@@ -33,7 +33,7 @@ jobs:
 #      - name: Collect Results
 #        if: ${{ always() }}
 #        run: ./gradlew collectResults
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         if: ${{ always() }}
         with:
           name: test-output
