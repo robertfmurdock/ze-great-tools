@@ -11,7 +11,7 @@ plugins {
     base
 }
 
-val tagger = project.extensions.create("tools", TaggerExtension::class, grgitService, project)
+val tagger = project.extensions.create("tagger", TaggerExtension::class, grgitService, project)
 
 tasks {
     val exportToGithub = project.findProperty("exportToGithub")
