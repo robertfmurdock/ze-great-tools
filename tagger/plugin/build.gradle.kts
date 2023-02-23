@@ -1,5 +1,6 @@
 plugins {
     `java-gradle-plugin`
+    `kotlin-dsl`
     id("org.jetbrains.kotlin.jvm") version "1.8.10"
 }
 
@@ -8,6 +9,8 @@ repositories {
 }
 
 dependencies {
+    implementation(kotlin("gradle-plugin", libs.versions.kotlin.get()))
+    implementation(libs.org.ajoberstar.grgit.gradle.plugin)
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
 }
 
