@@ -4,27 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c93eaa29-1979-4878-b45c-c04819e6607b" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/tools-plugins/build.gradle.kts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/tools-plugins/gradle.properties" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/tools-plugins/gradle/libs.versions.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/tools-plugins/settings.gradle.kts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/tools-plugins/src/main/kotlin/com/zegreatrob/tools/plugins/lint.gradle.kts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/tools-plugins/src/main/kotlin/com/zegreatrob/tools/plugins/publish.gradle.kts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/tools-plugins/src/main/kotlin/com/zegreatrob/tools/plugins/reports.gradle.kts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/tools-plugins/src/main/kotlin/com/zegreatrob/tools/plugins/versioning.gradle.kts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/gradle.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/gradle.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle.kts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/settings.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/settings.gradle.kts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tagger/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/tagger/build.gradle.kts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tagger/plugin/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/tagger/plugin/build.gradle.kts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tagger/plugin/src/functionalTest/kotlin/tagger/TaggerPluginFunctionalTest.kt" beforeDir="false" afterPath="$PROJECT_DIR$/tagger/plugin/src/functionalTest/kotlin/tagger/TaggerPluginFunctionalTest.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tagger/plugin/src/main/kotlin/com/zegreatrob/tools/tagger/CalculateVersion.kt" beforeDir="false" afterPath="$PROJECT_DIR$/tagger/plugin/src/main/kotlin/com/zegreatrob/tools/tagger/CalculateVersion.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tagger/plugin/src/main/kotlin/com/zegreatrob/tools/tagger/TagVersion.kt" beforeDir="false" afterPath="$PROJECT_DIR$/tagger/plugin/src/main/kotlin/com/zegreatrob/tools/tagger/TagVersion.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tagger/plugin/src/main/kotlin/com/zegreatrob/tools/tagger/TaggerExtension.kt" beforeDir="false" afterPath="$PROJECT_DIR$/tagger/plugin/src/main/kotlin/com/zegreatrob/tools/tagger/TaggerExtension.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tagger/settings.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/tagger/settings.gradle.kts" afterDir="false" />
-    </list>
+    <list default="true" id="c93eaa29-1979-4878-b45c-c04819e6607b" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -56,23 +36,23 @@
     <option name="showLibraryContents" value="true" />
     <option name="showVisibilityIcons" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.go.formatter.settings.were.checked": "true",
-    "RunOnceActivity.go.migrated.go.modules.settings": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "go.import.settings.migrated": "true",
-    "last_opened_file_path": "/Users/robertfmurdock/git/ze-great-tools",
-    "nodejs_package_manager_path": "npm",
-    "project.structure.last.edited": "Modules",
-    "project.structure.proportion": "0.15",
-    "project.structure.side.proportion": "0.2",
-    "ruby.rails.projectView.checked": "true",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.go.formatter.settings.were.checked&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.go.migrated.go.modules.settings&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;go.import.settings.migrated&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/Users/robertfmurdock/git/ze-great-tools&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
+    &quot;ruby.rails.projectView.checked&quot;: &quot;true&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$" />
@@ -182,6 +162,7 @@
       <option name="presentableId" value="Default" />
       <updated>1677120383944</updated>
       <workItem from="1677120385202" duration="5620000" />
+      <workItem from="1677194961205" duration="111000" />
     </task>
     <servers />
   </component>
