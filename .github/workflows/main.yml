@@ -12,9 +12,9 @@ jobs:
     concurrency:
       group: ${{ github.ref }}
     env:
-      GH_TOKEN: ${{ secrets.TOOLS_PAT }}
-      GITHUB_TOKEN: ${{ secrets.TOOLS_PAT }}
-      GRGIT_USER: ${{ secrets.TOOLS_PAT }}
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GRGIT_USER: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v3
         with:
