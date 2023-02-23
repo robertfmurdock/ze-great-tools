@@ -29,9 +29,9 @@ jobs:
         run: ./gradlew calculateVersion -PexportToGithub=true --scan
       - name: Build Coupling
         run: ./gradlew release check -Pversion=${{ env.TAGGER_VERSION }} --scan
-      - name: Collect Results
-        if: ${{ always() }}
-        run: ./gradlew collectResults
+#      - name: Collect Results
+#        if: ${{ always() }}
+#        run: ./gradlew collectResults
       - uses: actions/upload-artifact@v2
         if: ${{ always() }}
         with:
