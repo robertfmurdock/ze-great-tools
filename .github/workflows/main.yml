@@ -12,6 +12,7 @@ jobs:
     concurrency:
       group: ${{ github.ref }}
     env:
+      GH_TOKEN: ${{ secrets.TOOLS_PAT }}
       GITHUB_TOKEN: ${{ secrets.TOOLS_PAT }}
       GRGIT_USER: ${{ secrets.TOOLS_PAT }}
     steps:
