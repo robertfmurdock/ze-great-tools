@@ -12,7 +12,6 @@ jobs:
     concurrency:
       group: ${{ github.ref }}
     env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       GRGIT_USER: ${{ secrets.TOOLS_PAT }}
     steps:
       - uses: actions/checkout@v2
