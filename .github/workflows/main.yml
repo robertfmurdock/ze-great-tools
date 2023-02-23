@@ -1,0 +1,44 @@
+name: Build
+on:
+  push:
+    branches:
+      - '**'
+    tags-ignore:
+      - '**'
+jobs:
+  build-job:
+    name: "Build"
+    runs-on: ubuntu-latest
+    concurrency:
+      group: ${{ github.ref }}
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GRGIT_USER: ${{ secrets.TOOLS_PAT }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
+        with:
+          cache-read-only: ${{ github.ref != 'refs/heads/master' }}
+      - uses: testspace-com/setup-testspace@v1
+        with:
+          domain: robertfmurdock
+      - name: Generate Version
+        run: ./gradlew calculateVersion -PexportToGithub=true --scan
+      - name: Build Coupling
+        run: ./gradlew release check -Pversion=${{ env.TAGGER_VERSION }} --scan
+      - name: Collect Results
+        if: ${{ always() }}
+        run: ./gradlew collectResults
+      - uses: actions/upload-artifact@v2
+        if: ${{ always() }}
+        with:
+          name: test-output
+          path: |
+            build/test-output/
+      - name: Push result to Testspace server
+        if: always()
+        run: |
+          testspace $(find . -path *test-results* -name *.xml)

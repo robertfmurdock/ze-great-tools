@@ -1,0 +1,33 @@
+name: Gradle Update
+on:
+  schedule:
+    - cron: "0 17 * * *"
+  workflow_dispatch:
+jobs:
+  create-update-branch:
+    name: "Create Update Branch"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: '25'
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
+        with:
+          cache-read-only: true
+      - name: Update Deps
+        run: ./gradlew versionCatalogUpdate --scan
+      - name: Create Pull Request
+        id: cpr
+        uses: peter-evans/create-pull-request@v3
+        with:
+          branch: "cpr-gradle-update/${{github.job}}/${{github.run_id}}"
+          commit-message: "[create-pull-request] ${{github.workflow}}"
+          token: ${{ secrets.TOOLS_PAT }}
+      - name: Enable Pull Request Automerge
+        if: steps.cpr.outputs.pull-request-operation == 'created'
+        uses: peter-evans/enable-pull-request-automerge@v1
+        with:
+          token: ${{ secrets.TOOLS_PAT }}
+          pull-request-number: ${{ steps.cpr.outputs.pull-request-number }}
+          merge-method: rebase
