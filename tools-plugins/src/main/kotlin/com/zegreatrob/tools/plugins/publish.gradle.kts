@@ -20,12 +20,12 @@ repositories {
     mavenCentral()
 }
 
-group = "com.zegreatrob.jsmints"
+group = "com.zegreatrob.tools"
 
 afterEvaluate {
     publishing.publications.withType<MavenPublication>().forEach {
         with(it) {
-            val scmUrl = "https://github.com/robertfmurdock/jsmints"
+            val scmUrl = "https://github.com/robertfmurdock/ze-great-tools"
 
             pom.name.set(project.name)
             pom.description.set(project.name)
@@ -47,8 +47,8 @@ afterEvaluate {
             }
             pom.scm {
                 url.set(scmUrl)
-                connection.set("git@github.com:robertfmurdock/jsmints.git")
-                developerConnection.set("git@github.com:robertfmurdock/jsmints.git")
+                connection.set("git@github.com:robertfmurdock/ze-great-tools.git")
+                developerConnection.set("git@github.com:robertfmurdock/ze-great-tools.git")
             }
         }
     }
