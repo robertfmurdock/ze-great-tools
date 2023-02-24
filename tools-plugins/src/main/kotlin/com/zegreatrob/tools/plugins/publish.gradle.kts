@@ -1,6 +1,5 @@
 package com.zegreatrob.tools.plugins
 
-import gradle.kotlin.dsl.accessors._2502cef48cff830615fe1c6d6ab5e104.publish
 import gradle.kotlin.dsl.accessors._2502cef48cff830615fe1c6d6ab5e104.publishing
 import gradle.kotlin.dsl.accessors._2502cef48cff830615fe1c6d6ab5e104.signing
 import org.gradle.kotlin.dsl.creating
@@ -75,7 +74,7 @@ signing {
 }
 
 tasks {
-    publish { finalizedBy("::closeAndReleaseSonatypeStagingRepository") }
+    // publish { finalizedBy("::closeAndReleaseSonatypeStagingRepository") }
 
     val javadocJar by creating(Jar::class) {
         archiveClassifier.set("javadoc")

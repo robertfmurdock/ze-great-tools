@@ -8,6 +8,7 @@
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle.kts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/tagger/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/tagger/build.gradle.kts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools-plugins/src/main/kotlin/com/zegreatrob/tools/plugins/publish.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/tools-plugins/src/main/kotlin/com/zegreatrob/tools/plugins/publish.gradle.kts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -171,7 +172,7 @@
       <updated>1677120383944</updated>
       <workItem from="1677120385202" duration="5620000" />
       <workItem from="1677194961205" duration="524000" />
-      <workItem from="1677208567247" duration="1254000" />
+      <workItem from="1677208567247" duration="2110000" />
     </task>
     <servers />
   </component>

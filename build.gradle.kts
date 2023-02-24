@@ -20,7 +20,7 @@ tasks {
     check {
         dependsOn(provider { gradle.includedBuilds.map { it.task(":check") }.toList() })
     }
-    register("publish") {
-        dependsOn(provider { gradle.includedBuild("tagger").task(":publish") })
+    release {
+        dependsOn(provider { gradle.includedBuild("tagger").task(":release") })
     }
 }
