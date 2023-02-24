@@ -1,3 +1,6 @@
+import java.nio.charset.Charset
+import java.util.Base64
+
 plugins {
     `java-gradle-plugin`
     `kotlin-dsl`
@@ -6,6 +9,7 @@ plugins {
     id("com.zegreatrob.tools.plugins.lint")
     id("com.zegreatrob.tools.plugins.publish")
     id("com.zegreatrob.tools.plugins.versioning")
+    alias(libs.plugins.com.gradle.plugin.publish)
 }
 
 repositories {
@@ -41,4 +45,19 @@ tasks {
     lintKotlinMain {
         exclude { spec -> spec.file.absolutePath.contains("generated-sources") }
     }
+}
+
+
+signing {
+    val signingKey: String? by project
+    val signingPassword: String? by project
+
+    if (signingKey != null) {
+        val decodedKey = Base64.getDecoder().decode(signingKey).toString(Charset.defaultCharset())
+        useInMemoryPgpKeys(
+            decodedKey,
+            signingPassword
+        )
+    }
+    sign(publishing.publications)
 }
