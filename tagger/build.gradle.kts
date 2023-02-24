@@ -12,6 +12,7 @@ plugins {
 
 tasks {
     check { dependsOn(provider { (getTasksByName("check", true) - this).toList() }) }
+    register("publish"){ dependsOn(provider { (getTasksByName("publish", true) - this).toList() }) }
 }
 
 versionCatalogUpdate {
