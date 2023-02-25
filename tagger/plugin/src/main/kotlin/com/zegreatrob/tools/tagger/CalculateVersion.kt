@@ -27,13 +27,17 @@ open class CalculateVersion : DefaultTask(), TaggerExtensionSyntax {
 }
 
 fun Grgit.calculateNextVersion(): String {
-    val description = describe {} ?: "-0.0.0"
+    val description = describe {} ?: "v0.0.0"
     val (previousVersionNumber) = description.split("-")
     if (previousVersionNumber.length == 0) {
-        return "v0.0.0"
+        return "0.0.0"
     }
-    val (major, minor, patch) = previousVersionNumber.substring(1).split(".")
-    return "v$major.$minor.${patch.toInt() + 1}"
+    val (major, minor, patch) = (if (previousVersionNumber.startsWith("v")) {
+        previousVersionNumber.substring(1)
+    } else {
+        previousVersionNumber
+    }).split(".")
+    return "$major.$minor.${patch.toInt() + 1}"
 }
 
 fun Grgit.canRelease(releaseBranch: String?): Boolean {
