@@ -8,6 +8,7 @@ plugins {
     base
     id("com.zegreatrob.tools.plugins.lint")
     id("com.zegreatrob.tools.plugins.versioning")
+    id("com.zegreatrob.tools.plugins.publish")
     alias(libs.plugins.com.gradle.plugin.publish)
     signing
 }
