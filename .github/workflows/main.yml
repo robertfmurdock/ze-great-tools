@@ -33,7 +33,7 @@ jobs:
       - name: Version
         run: ./gradlew calculateVersion -PexportToGithub=true --scan
       - name: Build 🔨
-        run: ./gradlew release check -Pversion=${{ env.TAGGER_VERSION }} --scan
+        run: ./gradlew -p tagger release check -Pversion=${{ env.TAGGER_VERSION }} --scan
 #      - name: Collect Results
 #        if: ${{ always() }}
 #        run: ./gradlew collectResults
