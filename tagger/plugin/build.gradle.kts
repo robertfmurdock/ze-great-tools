@@ -1,3 +1,4 @@
+import gradle.kotlin.dsl.accessors._2502cef48cff830615fe1c6d6ab5e104.publishing
 import java.nio.charset.Charset
 import java.util.Base64
 
@@ -8,7 +9,6 @@ plugins {
     base
     id("com.zegreatrob.tools.plugins.lint")
     id("com.zegreatrob.tools.plugins.versioning")
-    id("com.zegreatrob.tools.plugins.publish")
     alias(libs.plugins.com.gradle.plugin.publish)
     signing
 }
@@ -62,4 +62,38 @@ signing {
         )
     }
     sign(publishing.publications)
+}
+
+group = "com.zegreatrob.tools"
+
+afterEvaluate {
+    publishing.publications.withType<MavenPublication>().forEach {
+        with(it) {
+            val scmUrl = "https://github.com/robertfmurdock/ze-great-tools"
+
+            pom.name.set(project.name)
+            pom.description.set(project.name)
+            pom.url.set(scmUrl)
+
+            pom.licenses {
+                license {
+                    name.set("MIT License")
+                    url.set(scmUrl)
+                    distribution.set("repo")
+                }
+            }
+            pom.developers {
+                developer {
+                    id.set("robertfmurdock")
+                    name.set("Rob Murdock")
+                    email.set("robert.f.murdock@gmail.com")
+                }
+            }
+            pom.scm {
+                url.set(scmUrl)
+                connection.set("git@github.com:robertfmurdock/ze-great-tools.git")
+                developerConnection.set("git@github.com:robertfmurdock/ze-great-tools.git")
+            }
+        }
+    }
 }
