@@ -31,7 +31,7 @@ open class TaggerExtension(val grgitServiceExtension: GrgitServiceExtension, @Tr
         fun apply(rootProject: Project): TaggerExtension {
             check(rootProject == rootProject.rootProject)
             rootProject.plugins.apply(TaggerPlugin::class.java)
-            return rootProject.extensions.getByName("tools") as TaggerExtension
+            return rootProject.extensions.getByName("tagger") as TaggerExtension
         }
     }
 }
