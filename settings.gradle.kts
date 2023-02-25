@@ -3,7 +3,6 @@ plugins {
 }
 
 rootProject.name = "ze-great-tools"
-include("lib")
 includeBuild("tools-plugins")
 includeBuild("tagger")
 

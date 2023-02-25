@@ -8,9 +8,10 @@ plugins {
     id("com.zegreatrob.tools.tagger")
     id("com.zegreatrob.tools.plugins.lint")
     id("com.zegreatrob.tools.plugins.versioning")
-    id("nl.littlerobots.version-catalog-update").version("0.7.0")
     `maven-publish`
     signing
+    alias(libs.plugins.com.github.ben.manes.versions)
+    alias(libs.plugins.nl.littlerobots.version.catalog.update)
     alias(libs.plugins.io.github.gradle.nexus.publish.plugin)
     base
 }
@@ -43,6 +44,7 @@ nexusPublishing {
 versionCatalogUpdate {
     sortByKey.set(true)
     keep {
+        keepUnusedPlugins.set(true)
         keepUnusedVersions.set(true)
         keepUnusedLibraries.set(true)
     }
