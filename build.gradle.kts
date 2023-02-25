@@ -23,6 +23,9 @@ tasks {
     release {
         dependsOn(provider { gradle.includedBuild("tagger").task(":release") })
     }
+    "versionCatalogUpdate" {
+        dependsOn(provider { gradle.includedBuilds.map { it.task(":versionCatalogUpdate") }.toList() })
+    }
 }
 
 versionCatalogUpdate {

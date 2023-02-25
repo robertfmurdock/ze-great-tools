@@ -2,6 +2,7 @@
 org-jetbrains-kotlin = "1.8.10"
 
 [libraries]
+org-ajoberstar-grgit-gradle-plugin = "org.ajoberstar.grgit:org.ajoberstar.grgit.gradle.plugin:5.0.0"
 org-apache-logging-log4j-log4j-core = "org.apache.logging.log4j:log4j-core:2.20.0"
 org-jetbrains-annotations = "org.jetbrains:annotations:13.0"
 org-jetbrains-kotlin-kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "org-jetbrains-kotlin" }
@@ -13,10 +14,10 @@ org-jetbrains-kotlin-kotlin-stdlib-common = { module = "org.jetbrains.kotlin:kot
 org-jetbrains-kotlin-kotlin-stdlib-jdk7 = { module = "org.jetbrains.kotlin:kotlin-stdlib-jdk7", version.ref = "org-jetbrains-kotlin" }
 org-jetbrains-kotlin-kotlin-stdlib-jdk8 = { module = "org.jetbrains.kotlin:kotlin-stdlib-jdk8", version.ref = "org-jetbrains-kotlin" }
 org-jetbrains-kotlin-kotlin-test-junit5 = { module = "org.jetbrains.kotlin:kotlin-test-junit5", version.ref = "org-jetbrains-kotlin" }
-org-ajoberstar-grgit-gradle-plugin = "org.ajoberstar.grgit:org.ajoberstar.grgit.gradle.plugin:5.0.0"
 
 [plugins]
-com-github-ben-manes-versions = "com.github.ben-manes.versions:0.46.0"
+com-gradle-plugin-publish = "com.gradle.plugin-publish:1.1.0"
+io-github-gradle-nexus-publish-plugin = "io.github.gradle-nexus.publish-plugin:1.2.0"
 kotlin = "kotlin:1.8.10"
 kotlin-android = "kotlin-android:1.8.10"
 kotlin-android-extensions = "kotlin-android-extensions:1.8.10"
@@ -50,5 +51,3 @@ org-jetbrains-kotlin-platform-jvm = "org.jetbrains.kotlin.platform.jvm:1.8.10"
 org-jetbrains-kotlin-plugin-parcelize = "org.jetbrains.kotlin.plugin.parcelize:1.8.10"
 org-jetbrains-kotlin-plugin-sam-with-receiver = "org.jetbrains.kotlin.plugin.sam.with.receiver:1.8.10"
 org-jetbrains-kotlin-plugin-scripting = "org.jetbrains.kotlin.plugin.scripting:1.8.10"
-com-gradle-plugin-publish = "com.gradle.plugin-publish:1.1.0"
-io-github-gradle-nexus-publish-plugin = "io.github.gradle-nexus.publish-plugin:1.2.0"
