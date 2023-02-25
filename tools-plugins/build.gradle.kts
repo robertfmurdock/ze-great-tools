@@ -11,6 +11,7 @@ plugins {
     id("java-gradle-plugin")
     alias(libs.plugins.com.github.ben.manes.versions)
     alias(libs.plugins.nl.littlerobots.version.catalog.update)
+    alias(libs.plugins.io.github.gradle.nexus.publish.plugin)
     alias(libs.plugins.org.jmailen.kotlinter)
 }
 
@@ -40,5 +41,17 @@ tasks {
     }
     lintKotlinMain {
         exclude { spec -> spec.file.absolutePath.contains("generated-sources") }
+    }
+}
+
+nexusPublishing {
+    repositories {
+        sonatype {
+            username.set(System.getenv("SONATYPE_USERNAME"))
+            password.set(System.getenv("SONATYPE_PASSWORD"))
+            nexusUrl.set(uri("https://s01.oss.sonatype.org/service/local/"))
+            snapshotRepositoryUrl.set(uri("https://s01.oss.sonatype.org/content/repositories/snapshots/"))
+            stagingProfileId.set("59331990bed4c")
+        }
     }
 }
