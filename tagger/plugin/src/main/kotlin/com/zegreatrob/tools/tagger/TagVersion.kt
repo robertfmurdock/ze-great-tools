@@ -46,7 +46,7 @@ open class TagVersion : DefaultTask(), TaggerExtensionSyntax {
     }
 
     private fun headHasNoTag(): Boolean = grgit.head().let { head ->
-         grgit.resolve.toTagName(head.id) == head.id
+        grgit.resolve.toTagName(head.id) == head.id
     }
 }
 
