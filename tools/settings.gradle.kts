@@ -1,5 +1,6 @@
 rootProject.name = "tagger"
-include("plugin")
+include("tagger-plugin")
+include("tools-bom")
 includeBuild("../tools-plugins")
 
 buildCache {

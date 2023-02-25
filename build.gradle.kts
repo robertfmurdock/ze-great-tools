@@ -21,7 +21,7 @@ tasks {
         dependsOn(provider { gradle.includedBuilds.map { it.task(":check") }.toList() })
     }
     release {
-        dependsOn(provider { gradle.includedBuild("tagger").task(":release") })
+        dependsOn(provider { gradle.includedBuild("tools").task(":release") })
     }
     "versionCatalogUpdate" {
         dependsOn(provider { gradle.includedBuilds.map { it.task(":versionCatalogUpdate") }.toList() })

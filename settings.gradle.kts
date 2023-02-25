@@ -4,7 +4,7 @@ plugins {
 
 rootProject.name = "ze-great-tools"
 includeBuild("tools-plugins")
-includeBuild("tagger")
+includeBuild("tools")
 
 gradleEnterprise {
     buildScan {
