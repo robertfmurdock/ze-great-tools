@@ -15,8 +15,6 @@ tasks {
     register("release"){ finalizedBy(provider { (getTasksByName("publish", true)).toList() }) }
 }
 
-println("version is $version")
-
 versionCatalogUpdate {
     sortByKey.set(true)
     keep {
