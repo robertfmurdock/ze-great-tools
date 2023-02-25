@@ -13,7 +13,7 @@ plugins {
 
 tasks {
     check { dependsOn(provider { (getTasksByName("check", true) - this).toList() }) }
-    register("release"){ mustRunAfter(provider { (getTasksByName("publish", true)).toList() }) }
+    register("release"){ finalizedBy(provider { (getTasksByName("publish", true)).toList() }) }
 }
 
 versionCatalogUpdate {
