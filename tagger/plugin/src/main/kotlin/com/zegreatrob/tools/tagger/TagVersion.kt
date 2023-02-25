@@ -33,11 +33,19 @@ open class TagVersion : DefaultTask(), TaggerExtensionSyntax {
 
     @TaskAction
     fun execute() {
-        if (!isSnapshot() && isOnReleaseBranch(grgit, releaseBranch)) {
+        if (
+            !isSnapshot() &&
+            headHasNoTag() &&
+            isOnReleaseBranch(grgit, releaseBranch)
+        ) {
             this.grgit.tag.add { name = version }
             this.grgit.push { tags = true }
+        } else {
+            logger.warn("skipping tag")
         }
     }
+
+    private fun headHasNoTag() = grgit.resolve.toTag(grgit.head()) == null
 }
 
 open class CommitReport : DefaultTask(), TaggerExtensionSyntax {
