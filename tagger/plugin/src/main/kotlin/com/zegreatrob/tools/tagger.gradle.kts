@@ -27,6 +27,11 @@ tasks {
 
     val tag by registering(TagVersion::class) {
         taggerExtension = tagger
+        mustRunAfter(check)
+
+        mustRunAfter(
+            provider { project.getTasksByName("check", true).toList() }
+        )
     }
     register("commitReport", CommitReport::class) {
         taggerExtension = tagger
