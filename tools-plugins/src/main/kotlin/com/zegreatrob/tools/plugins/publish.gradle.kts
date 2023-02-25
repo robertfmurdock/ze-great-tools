@@ -22,12 +22,7 @@ repositories {
 group = "com.zegreatrob.tools"
 
 afterEvaluate {
-    publishing.publications.forEach {
-        println("publiscation ${it.name} type is ${it::class.qualifiedName}")
-    }
-
     publishing.publications.withType<MavenPublication>().forEach {
-        println("maven publication is ${it.name}")
         with(it) {
             val scmUrl = "https://github.com/robertfmurdock/ze-great-tools"
 

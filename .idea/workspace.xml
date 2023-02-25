@@ -5,11 +5,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c93eaa29-1979-4878-b45c-c04819e6607b" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tagger/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/tagger/build.gradle.kts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tagger/gradle/libs.versions.toml" beforeDir="false" afterPath="$PROJECT_DIR$/tagger/gradle/libs.versions.toml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tools-plugins/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/tools-plugins/build.gradle.kts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tools-plugins/gradle/libs.versions.toml" beforeDir="false" afterPath="$PROJECT_DIR$/tools-plugins/gradle/libs.versions.toml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/tools-plugins/src/main/kotlin/com/zegreatrob/tools/plugins/publish.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/tools-plugins/src/main/kotlin/com/zegreatrob/tools/plugins/publish.gradle.kts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -175,7 +170,7 @@
       <workItem from="1677120385202" duration="5620000" />
       <workItem from="1677194961205" duration="524000" />
       <workItem from="1677208567247" duration="3909000" />
-      <workItem from="1677289534229" duration="1630000" />
+      <workItem from="1677289534229" duration="1811000" />
     </task>
     <servers />
   </component>
