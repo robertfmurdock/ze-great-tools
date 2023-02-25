@@ -1,3 +1,4 @@
+import gradle.kotlin.dsl.accessors._2502cef48cff830615fe1c6d6ab5e104.publish
 import java.nio.charset.Charset
 import java.util.Base64
 
@@ -36,6 +37,7 @@ tasks {
     check {
         dependsOn(testing.suites.named("functionalTest"))
     }
+    publish { finalizedBy("::closeAndReleaseSonatypeStagingRepository") }
     named<Test>("test") {
         useJUnitPlatform()
     }
