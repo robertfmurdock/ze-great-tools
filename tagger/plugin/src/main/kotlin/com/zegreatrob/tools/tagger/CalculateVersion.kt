@@ -32,11 +32,13 @@ fun Grgit.calculateNextVersion(): String {
     if (previousVersionNumber.length == 0) {
         return "0.0.0"
     }
-    val (major, minor, patch) = (if (previousVersionNumber.startsWith("v")) {
-        previousVersionNumber.substring(1)
-    } else {
-        previousVersionNumber
-    }).split(".")
+    val (major, minor, patch) = (
+        if (previousVersionNumber.startsWith("v")) {
+            previousVersionNumber.substring(1)
+        } else {
+            previousVersionNumber
+        }
+        ).split(".")
     return "$major.$minor.${patch.toInt() + 1}"
 }
 
