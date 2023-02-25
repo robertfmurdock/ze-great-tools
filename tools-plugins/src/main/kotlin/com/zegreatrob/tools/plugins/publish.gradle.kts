@@ -73,7 +73,7 @@ signing {
 }
 
 tasks {
-    // publish { finalizedBy("::closeAndReleaseSonatypeStagingRepository") }
+    publish { finalizedBy("::closeAndReleaseSonatypeStagingRepository") }
 
     val javadocJar by creating(Jar::class) {
         archiveClassifier.set("javadoc")
