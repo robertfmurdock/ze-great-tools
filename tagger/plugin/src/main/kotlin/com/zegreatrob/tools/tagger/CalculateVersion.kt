@@ -1,5 +1,6 @@
 package com.zegreatrob.tools.tagger
 
+import org.ajoberstar.grgit.Commit
 import org.ajoberstar.grgit.Grgit
 import org.ajoberstar.grgit.Tag
 import org.gradle.api.DefaultTask
@@ -27,20 +28,67 @@ open class CalculateVersion : DefaultTask(), TaggerExtensionSyntax {
 }
 
 fun Grgit.calculateNextVersion(): String {
-    val description = describe {} ?: "v0.0.0"
-    val (previousVersionNumber) = description.split("-")
-    if (previousVersionNumber.length == 0) {
+    val description = describe {}
+    val descriptionComponents = description?.split("-")
+    val previousVersionNumber = descriptionComponents?.getOrNull(0)
+    if (previousVersionNumber?.length == 0 || previousVersionNumber == null) {
         return "0.0.0"
     }
-    val (major, minor, patch) = (
-        if (previousVersionNumber.startsWith("v")) {
-            previousVersionNumber.substring(1)
-        } else {
-            previousVersionNumber
-        }
-        ).split(".")
-    return "$major.$minor.${patch.toInt() + 1}"
+    val incrementComponent = findAppropriateIncrement(previousVersionNumber)
+    return incrementComponent.increment(
+        previousVersionNumber.asSemverComponents()
+    )
 }
+
+private fun Grgit.findAppropriateIncrement(previousVersionNumber: String): ChangeType =
+    log { range(previousVersionNumber, "HEAD") }
+        .map(Commit::changeType)
+        .fold(ChangeType.Patch, ::highestPriority)
+
+private fun highestPriority(left: ChangeType, right: ChangeType) =
+    if (left.priority > right.priority) {
+        left
+    } else {
+        right
+    }
+
+private fun Commit.changeType() = when {
+    shortMessage.startsWith("[major]") -> ChangeType.Major
+    shortMessage.startsWith("[minor]") -> ChangeType.Minor
+    shortMessage.startsWith("[patch]") -> ChangeType.Patch
+    else -> ChangeType.Patch
+}
+
+enum class ChangeType(val priority: Int) {
+    Major(3) {
+        override fun increment(components: List<String>): String {
+            val (major) = components
+            return "${major.toInt() + 1}.0.0"
+        }
+    },
+    Minor(2) {
+        override fun increment(components: List<String>): String {
+            val (major, minor) = components
+            return "$major.${minor.toInt() + 1}.0"
+        }
+    },
+    Patch(1) {
+        override fun increment(components: List<String>): String {
+            val (major, minor, patch) = components
+            return "$major.$minor.${patch.toInt() + 1}"
+        }
+    };
+
+    abstract fun increment(components: List<String>): String
+}
+
+private fun String.asSemverComponents() = (
+    if (startsWith("v")) {
+        substring(1)
+    } else {
+        this
+    }
+    ).split(".")
 
 fun Grgit.canRelease(releaseBranch: String?): Boolean {
     val currentBranch = branch.current()
