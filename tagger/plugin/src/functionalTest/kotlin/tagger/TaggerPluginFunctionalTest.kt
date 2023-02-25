@@ -35,7 +35,7 @@ class TaggerPluginFunctionalTest {
         runner.withProjectDir(projectDir)
         val result = runner.build()
 
-        assertEquals(result.output.trim(), "v0.0.0-SNAPSHOT")
+        assertEquals(result.output.trim(), "0.0.1-SNAPSHOT")
     }
 
     private fun initializeGitRepo() {
