@@ -90,7 +90,7 @@ private fun String.asSemverComponents() = (
     }
     ).split(".")
 
-fun Grgit.canRelease(releaseBranch: String?): Boolean {
+fun Grgit.canRelease(releaseBranch: String): Boolean {
     val currentBranch = branch.current()
 
     val currentBranchStatus = runCatching { branch.status { this.name = currentBranch.name } }

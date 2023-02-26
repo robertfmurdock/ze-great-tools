@@ -27,6 +27,10 @@ class TaggerPluginFunctionalTest {
             plugins {
                 id('com.zegreatrob.tools.tagger')
             }
+            tagger {
+                releaseBranch = "master"
+            }
+
             """.trimIndent()
         )
 
@@ -48,6 +52,9 @@ class TaggerPluginFunctionalTest {
             """
             plugins {
                 id('com.zegreatrob.tools.tagger')
+            }
+            tagger {
+                releaseBranch = "master"
             }
             """.trimIndent()
         )
@@ -71,6 +78,10 @@ class TaggerPluginFunctionalTest {
             plugins {
                 id('com.zegreatrob.tools.tagger')
             }
+            
+            tagger {
+                releaseBranch = "master"
+            }
             """.trimIndent()
         )
 
@@ -93,6 +104,11 @@ class TaggerPluginFunctionalTest {
             plugins {
                 id('com.zegreatrob.tools.tagger')
             }
+            
+            tagger {
+                releaseBranch = "master"
+            }
+
             """.trimIndent()
         )
 

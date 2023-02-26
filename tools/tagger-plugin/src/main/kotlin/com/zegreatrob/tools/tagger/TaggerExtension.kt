@@ -3,6 +3,7 @@ package com.zegreatrob.tools.tagger
 import com.zegreatrob.tools.TaggerPlugin
 import org.ajoberstar.grgit.Grgit
 import org.ajoberstar.grgit.gradle.GrgitServiceExtension
+import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskProvider
@@ -12,7 +13,13 @@ open class TaggerExtension(val grgitServiceExtension: GrgitServiceExtension, @Tr
     @Input
     var releaseBranch: String? = null
 
-    val version by lazy { calculateBuildVersion(grgitServiceExtension.service.get().grgit, releaseBranch) }
+    val version by lazy {
+        calculateBuildVersion(
+            grgitServiceExtension.service.get().grgit,
+            releaseBranch
+                ?: throw GradleException("Please configure the tagger release branch.")
+        )
+    }
 
     val releaseProvider: TaskProvider<ReleaseVersion>
         get() = rootProject
@@ -20,7 +27,7 @@ open class TaggerExtension(val grgitServiceExtension: GrgitServiceExtension, @Tr
             .withType(ReleaseVersion::class.java)
             .named("release")
 
-    private fun calculateBuildVersion(grgit: Grgit, releaseBranch: String?) = grgit.calculateNextVersion() +
+    private fun calculateBuildVersion(grgit: Grgit, releaseBranch: String) = grgit.calculateNextVersion() +
         if (grgit.canRelease(releaseBranch)) {
             ""
         } else {
