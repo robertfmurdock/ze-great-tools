@@ -24,7 +24,7 @@ dependencies {
 
 testing {
     suites {
-        val functionalTest by registering(JvmTestSuite::class) {
+        register("functionalTest", JvmTestSuite::class) {
             gradlePlugin.testSourceSets(sources)
         }
     }
