@@ -35,6 +35,7 @@ tasks {
                 .matches(candidate.version)
         }
     }
+    assemble { dependsOn(provider { (getTasksByName("assemble", true) - this).toList() }) }
     formatKotlinMain {
         exclude { spec -> spec.file.absolutePath.contains("generated-sources") }
     }

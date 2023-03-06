@@ -4,11 +4,11 @@ import java.util.Base64
 plugins {
     `java-gradle-plugin`
     `kotlin-dsl`
-    id("org.jetbrains.kotlin.jvm")
+    alias(libs.plugins.com.gradle.plugin.publish)
     base
     id("com.zegreatrob.tools.plugins.lint")
     id("com.zegreatrob.tools.plugins.versioning")
-    alias(libs.plugins.com.gradle.plugin.publish)
+    id("org.jetbrains.kotlin.jvm")
     signing
 }
 

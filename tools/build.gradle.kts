@@ -12,6 +12,7 @@ plugins {
 }
 
 tasks {
+    assemble { dependsOn(provider { (getTasksByName("assemble", true) - this).toList() }) }
     check { dependsOn(provider { (getTasksByName("check", true) - this).toList() }) }
     register("release"){
         mustRunAfter(check)

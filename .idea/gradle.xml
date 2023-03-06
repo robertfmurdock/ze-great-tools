@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="GradleSettings">
+    <option name="linkedExternalProjectsSettings">
+      <GradleProjectSettings>
+        <compositeConfiguration>
+          <compositeBuild compositeDefinitionSource="SCRIPT">
+            <builds>
+              <build path="$PROJECT_DIR$/tools-plugins" name="tools-plugins">
+                <projects>
+                  <project path="$PROJECT_DIR$/tools-plugins" />
+                </projects>
+              </build>
+              <build path="$PROJECT_DIR$/tools" name="tools">
+                <projects>
+                  <project path="$PROJECT_DIR$/tools" />
+                  <project path="$PROJECT_DIR$/tools/tagger-plugin" />
+                  <project path="$PROJECT_DIR$/tools/tools-bom" />
+                </projects>
+              </build>
+            </builds>
+          </compositeBuild>
+        </compositeConfiguration>
+        <option name="delegatedBuild" value="true" />
+        <option name="testRunner" value="GRADLE" />
+        <option name="distributionType" value="WRAPPED" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="gradleJvm" value="#JAVA_HOME" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/tools" />
+            <option value="$PROJECT_DIR$/tools-plugins" />
+            <option value="$PROJECT_DIR$/tools/tagger-plugin" />
+            <option value="$PROJECT_DIR$/tools/tools-bom" />
+          </set>
+        </option>
+      </GradleProjectSettings>
+    </option>
+  </component>
+</project>
