@@ -3,6 +3,7 @@ package tagger
 import org.ajoberstar.grgit.Grgit
 import org.ajoberstar.grgit.operation.AddOp
 import org.ajoberstar.grgit.operation.CommitOp
+import org.ajoberstar.grgit.operation.RemoteAddOp
 import org.ajoberstar.grgit.operation.TagAddOp
 import org.gradle.testkit.runner.GradleRunner
 import org.junit.jupiter.api.io.TempDir
@@ -43,6 +44,45 @@ class TaggerPluginFunctionalTest {
         val result = runner.build()
 
         assertEquals("0.0.0-SNAPSHOT", result.output.trim())
+    }
+
+    @Test
+    fun `calculating version when current commit already has tag will use tag`() {
+        settingsFile.writeText("")
+        buildFile.writeText(
+            """
+            plugins {
+                id('com.zegreatrob.tools.tagger')
+            }
+            tagger {
+                releaseBranch = "master"
+            }
+
+            """.trimIndent()
+        )
+
+        val grgit = Grgit.init(mapOf("dir" to projectDir.absolutePath))
+        disableGpgSign()
+        grgit.add(fun(it: AddOp) {
+            it.patterns = setOf(".")
+        })
+        grgit.commit(fun(it: CommitOp) { it.message = "test commit" })
+        grgit.tag.add(fun(it: TagAddOp) {
+            it.name = "1.0.23"
+        })
+        grgit.checkout(mapOf<String?, Any>("branch" to "main", "createBranch" to true))
+        grgit.remote.add(fun(it: RemoteAddOp) {
+            it.name = "origin"
+            it.url = projectDir.absolutePath
+        })
+        val runner = GradleRunner.create()
+        runner.forwardOutput()
+        runner.withPluginClasspath()
+        runner.withArguments("calculateVersion", "-q")
+        runner.withProjectDir(projectDir)
+        val result = runner.build()
+
+        assertEquals("1.0.23-SNAPSHOT", result.output.trim())
     }
 
     @Test
@@ -124,10 +164,7 @@ class TaggerPluginFunctionalTest {
 
     private fun initializeGitRepo(additionalCommits: List<String> = listOf(), initialTag: String? = null) {
         val grgit = Grgit.init(mapOf("dir" to projectDir.absolutePath))
-        FileOutputStream(projectDir.resolve(".git/config"), true)
-            .writer().use {
-                it.write("[commit]\n        gpgsign = false")
-            }
+        disableGpgSign()
         grgit.add(fun(it: AddOp) {
             it.patterns = setOf(settingsFile.absolutePath, buildFile.absolutePath)
         })
@@ -144,5 +181,12 @@ class TaggerPluginFunctionalTest {
             })
         }
         grgit.checkout(mapOf("branch" to "main", "createBranch" to true))
+    }
+
+    private fun disableGpgSign() {
+        FileOutputStream(projectDir.resolve(".git/config"), true)
+            .writer().use {
+                it.write("[commit]\n        gpgsign = false")
+            }
     }
 }

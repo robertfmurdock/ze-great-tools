@@ -35,13 +35,13 @@ fun Grgit.calculateNextVersion(): String {
         return "0.0.0"
     }
     val incrementComponent = findAppropriateIncrement(previousVersionNumber)
-    return incrementComponent.increment(
-        previousVersionNumber.asSemverComponents()
-    )
+    return incrementComponent?.increment(previousVersionNumber.asSemverComponents())
+        ?: previousVersionNumber
 }
 
-private fun Grgit.findAppropriateIncrement(previousVersionNumber: String): ChangeType =
+private fun Grgit.findAppropriateIncrement(previousVersionNumber: String): ChangeType? =
     log { range(previousVersionNumber, "HEAD") }
+        .also { if (it.isEmpty()) return null }
         .map(Commit::changeType)
         .fold(ChangeType.Patch, ::highestPriority)
 
