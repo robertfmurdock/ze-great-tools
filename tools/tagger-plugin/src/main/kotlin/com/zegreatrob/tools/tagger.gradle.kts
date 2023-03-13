@@ -36,7 +36,12 @@ tasks {
             provider { (project.getTasksByName("check", true)).toList() }
         )
         mustRunAfter(
-            provider { project.getTasksByName("publish", true).toList() }
+            provider {
+                project.getTasksByName("publish", true).toList()
+            },
+            provider {
+                project.getTasksByName("publish", true).map { it.finalizedBy }.toList()
+            }
         )
     }
     register("commitReport", CommitReport::class) {
