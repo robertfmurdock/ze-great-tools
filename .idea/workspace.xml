@@ -5,10 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f2ddb022-1fc7-40a7-af0e-86fe35055d6d" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/gradle.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/gradle.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tools/tagger-plugin/src/functionalTest/kotlin/tagger/TaggerPluginFunctionalTest.kt" beforeDir="false" afterPath="$PROJECT_DIR$/tools/tagger-plugin/src/functionalTest/kotlin/tagger/TaggerPluginFunctionalTest.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tools/tagger-plugin/src/main/kotlin/com/zegreatrob/tools/tagger/CalculateVersion.kt" beforeDir="false" afterPath="$PROJECT_DIR$/tools/tagger-plugin/src/main/kotlin/com/zegreatrob/tools/tagger/CalculateVersion.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/tagger-plugin/src/main/kotlin/com/zegreatrob/tools/tagger.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/tools/tagger-plugin/src/main/kotlin/com/zegreatrob/tools/tagger.gradle.kts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -45,6 +43,10 @@
   </component>
   <component name="GoLibraries">
     <option name="indexEntireGoPath" value="true" />
+  </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.ajoberstar.grgit/grgit-core/5.0.0/11c42f389a5e2344e5faabc8373114c6dface8a2/grgit-core-5.0.0-sources.jar!/org/ajoberstar/grgit/operation/AddOp.groovy" root0="SKIP_INSPECTION" />
+    <setting file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.ajoberstar.grgit/grgit-core/5.0.0/f27e1219823cd8c2bd20c3c0482cb0ce0186d3e5/grgit-core-5.0.0.jar!/org/ajoberstar/grgit/service/BranchService.class" root0="SKIP_INSPECTION" />
   </component>
   <component name="JsFlowSettings">
     <service-enabled>true</service-enabled>
@@ -144,7 +146,8 @@
       <workItem from="1678073143257" duration="856000" />
       <workItem from="1678234609239" duration="3380000" />
       <workItem from="1678571151651" duration="482000" />
-      <workItem from="1678592483663" duration="2768000" />
+      <workItem from="1678592483663" duration="2926000" />
+      <workItem from="1678673803110" duration="1172000" />
     </task>
     <servers />
   </component>

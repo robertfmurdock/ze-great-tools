@@ -23,6 +23,9 @@ tasks {
     }
     check {
         dependsOn(calculateVersion)
+        dependsOn(
+            provider { (project.getTasksByName("check", true) - check.get()).toList() }
+        )
     }
 
     val tag by registering(TagVersion::class) {
@@ -30,7 +33,10 @@ tasks {
         mustRunAfter(check)
 
         mustRunAfter(
-            provider { project.getTasksByName("check", true).toList() }
+            provider { (project.getTasksByName("check", true)).toList() }
+        )
+        mustRunAfter(
+            provider { project.getTasksByName("publish", true).toList() }
         )
     }
     register("commitReport", CommitReport::class) {
@@ -42,5 +48,6 @@ tasks {
         dependsOn(assemble)
         mustRunAfter(check)
         finalizedBy(tag)
+        finalizedBy(provider { (getTasksByName("publish", true)).toList() })
     }
 }
