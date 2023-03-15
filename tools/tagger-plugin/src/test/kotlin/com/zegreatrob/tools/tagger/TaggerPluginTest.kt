@@ -34,12 +34,12 @@ class TaggerPluginTest {
         assertTrue(
             tagTask.mustRunAfter.getDependencies(tagTask)
                 .contains(rootCheck),
-            "Did not run after root check"
+            "Did not run after root check",
         )
         assertTrue(
             tagTask.mustRunAfter.getDependencies(tagTask)
                 .contains(innerProject1Check),
-            "Did not run after inner project check"
+            "Did not run after inner project check",
         )
     }
 }

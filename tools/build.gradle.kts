@@ -5,6 +5,7 @@ repositories {
 }
 
 plugins {
+    id("com.zegreatrob.tools.plugins.lint")
     id("com.zegreatrob.tools.plugins.versioning")
     alias(libs.plugins.nl.littlerobots.version.catalog.update)
     alias(libs.plugins.io.github.gradle.nexus.publish.plugin)
@@ -14,6 +15,9 @@ plugins {
 tasks {
     assemble { dependsOn(provider { (getTasksByName("assemble", true) - this).toList() }) }
     check { dependsOn(provider { (getTasksByName("check", true) - this).toList() }) }
+    register("formatKotlin"){
+        dependsOn(provider { (getTasksByName("formatKotlin", true) - this).toList() })
+    }
     register("release"){
         mustRunAfter(check)
         finalizedBy(provider { (getTasksByName("publish", true)).toList() })

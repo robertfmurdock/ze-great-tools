@@ -29,6 +29,9 @@ tasks {
     "versionCatalogUpdate" {
         dependsOn(provider { gradle.includedBuilds.map { it.task(":versionCatalogUpdate") }.toList() })
     }
+    register("formatKotlin") {
+        dependsOn(provider { gradle.includedBuilds.map { it.task(":formatKotlin") }.toList() })
+    }
 }
 
 versionCatalogUpdate {

@@ -61,7 +61,7 @@ signing {
         val decodedKey = Base64.getDecoder().decode(signingKey).toString(Charset.defaultCharset())
         useInMemoryPgpKeys(
             decodedKey,
-            signingPassword
+            signingPassword,
         )
     }
     sign(publishing.publications)

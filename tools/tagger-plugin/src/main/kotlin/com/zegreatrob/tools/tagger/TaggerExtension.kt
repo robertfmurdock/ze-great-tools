@@ -17,7 +17,7 @@ open class TaggerExtension(val grgitServiceExtension: GrgitServiceExtension, @Tr
         calculateBuildVersion(
             grgitServiceExtension.service.get().grgit,
             releaseBranch
-                ?: throw GradleException("Please configure the tagger release branch.")
+                ?: throw GradleException("Please configure the tagger release branch."),
         )
     }
 

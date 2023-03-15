@@ -77,7 +77,7 @@ enum class ChangeType(val priority: Int) {
             val (major, minor, patch) = components
             return "$major.$minor.${patch.toInt() + 1}"
         }
-    };
+    }, ;
 
     abstract fun increment(components: List<String>): String
 }
