@@ -24,7 +24,7 @@ tasks {
     check {
         dependsOn(calculateVersion)
         dependsOn(
-            provider { (project.getTasksByName("check", true) - check.get()).toList() }
+            provider { (project.getTasksByName("check", true) - check.get()).toList() },
         )
     }
 
@@ -33,7 +33,7 @@ tasks {
         mustRunAfter(check)
 
         mustRunAfter(
-            provider { (project.getTasksByName("check", true)).toList() }
+            provider { (project.getTasksByName("check", true)).toList() },
         )
         mustRunAfter(
             provider {
@@ -41,7 +41,7 @@ tasks {
             },
             provider {
                 project.getTasksByName("publish", true).map { it.finalizedBy }.toList()
-            }
+            },
         )
     }
     register("commitReport", CommitReport::class) {

@@ -32,7 +32,7 @@ class TaggerPluginFunctionalTest {
                 releaseBranch = "master"
             }
 
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         initializeGitRepo(listOf("[patch] commit 1", "[patch] commit 2"))
@@ -58,7 +58,7 @@ class TaggerPluginFunctionalTest {
                 releaseBranch = "master"
             }
 
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         val grgit = Grgit.init(mapOf("dir" to projectDir.absolutePath))
@@ -96,7 +96,7 @@ class TaggerPluginFunctionalTest {
             tagger {
                 releaseBranch = "master"
             }
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         initializeGitRepo(listOf("[patch] commit 1", "[patch] commit 2"), "1.2.3")
@@ -122,7 +122,7 @@ class TaggerPluginFunctionalTest {
             tagger {
                 releaseBranch = "master"
             }
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         initializeGitRepo(listOf("[patch] commit 1", "[minor] commit 2", "[patch] commit 3"), "1.2.3")
@@ -149,7 +149,7 @@ class TaggerPluginFunctionalTest {
                 releaseBranch = "master"
             }
 
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         initializeGitRepo(listOf("[major] commit 1", "[minor] commit 2", "[patch] commit 3"), "1.2.3")
