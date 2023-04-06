@@ -36,4 +36,9 @@ tasks {
 
 versionCatalogUpdate {
     sortByKey.set(true)
+    keep {
+        keepUnusedPlugins.set(true)
+        keepUnusedVersions.set(true)
+        keepUnusedLibraries.set(true)
+    }
 }

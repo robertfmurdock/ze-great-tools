@@ -26,6 +26,10 @@ tasks {
 
 versionCatalogUpdate {
     sortByKey.set(true)
+    keep {
+        keepUnusedVersions.set(true)
+        keepUnusedLibraries.set(true)
+    }
 }
 
 nexusPublishing {
