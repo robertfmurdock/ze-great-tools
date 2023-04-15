@@ -20,7 +20,7 @@ interface TaggerExtensionSyntax {
     val version get() = taggerExtension.version
 
     @Internal
-    fun isSnapshot() = version.contains("SNAPSHOT")
+    fun isSnapshot() = taggerExtension.isSnapshot
 
     @Internal
     fun isOnReleaseBranch(grgit: Grgit, releaseBranch: String?) = grgit.branch.current().name == releaseBranch
@@ -30,6 +30,8 @@ open class TagVersion : DefaultTask(), TaggerExtensionSyntax {
 
     @Input
     override lateinit var taggerExtension: TaggerExtension
+
+    override fun getEnabled(): Boolean = !isSnapshot()
 
     @TaskAction
     fun execute() {
