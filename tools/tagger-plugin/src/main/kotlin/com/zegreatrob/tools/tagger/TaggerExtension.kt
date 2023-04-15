@@ -21,6 +21,8 @@ open class TaggerExtension(val grgitServiceExtension: GrgitServiceExtension, @Tr
         )
     }
 
+    val isSnapshot get() = version.contains("SNAPSHOT")
+
     val releaseProvider: TaskProvider<ReleaseVersion>
         get() = rootProject
             .tasks

@@ -50,6 +50,7 @@ tasks {
 
     register("release", ReleaseVersion::class) {
         taggerExtension = tagger
+        enabled = !taggerExtension.isSnapshot
         dependsOn(assemble)
         mustRunAfter(check)
         finalizedBy(tag)
