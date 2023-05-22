@@ -6,8 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="f2ddb022-1fc7-40a7-af0e-86fe35055d6d" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tools/tagger-plugin/src/main/kotlin/com/zegreatrob/tools/tagger.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/tools/tagger-plugin/src/main/kotlin/com/zegreatrob/tools/tagger.gradle.kts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tools/tagger-plugin/src/main/kotlin/com/zegreatrob/tools/tagger/TaggerExtension.kt" beforeDir="false" afterPath="$PROJECT_DIR$/tools/tagger-plugin/src/main/kotlin/com/zegreatrob/tools/tagger/TaggerExtension.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle.kts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -158,7 +157,7 @@
       <workItem from="1680744232338" duration="693000" />
       <workItem from="1680962029185" duration="877000" />
       <workItem from="1681570190485" duration="1068000" />
-      <workItem from="1684725694277" duration="1151000" />
+      <workItem from="1684725694277" duration="1717000" />
     </task>
     <servers />
   </component>

@@ -14,6 +14,7 @@ plugins {
 
 tagger {
     releaseBranch = "main"
+    githubReleaseEnabled.set(true)
 }
 
 tasks {
