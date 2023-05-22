@@ -53,14 +53,14 @@ tasks {
         dependsOn(tag)
         commandLine(
             (
-                "gh api \\\n" +
-                    "  --method POST \\\n" +
-                    "  -H \"Accept: application/vnd.github+json\" \\\n" +
-                    "  -H \"X-GitHub-Api-Version: 2022-11-28\" \\\n" +
-                    "  /repos/${System.getenv("GITHUB_REPOSITORY")}/releases \\\n" +
-                    "  -f tag_name='${tagger.version}' \\\n" +
-                    " -f name='${tagger.version}' \\\n" +
-                    " -f body='${tagger.version}' \\\n" +
+                "gh api " +
+                    "  --method POST " +
+                    "  -H \"Accept: application/vnd.github+json\" " +
+                    "  -H \"X-GitHub-Api-Version: 2022-11-28\" " +
+                    "  /repos/${System.getenv("GITHUB_REPOSITORY")}/releases " +
+                    "  -f tag_name='${tagger.version}' " +
+                    " -f name='${tagger.version}' " +
+                    " -f body='${tagger.version}' " +
                     " -F generate_release_notes=false "
                 )
                 .split(" "),
