@@ -5,13 +5,22 @@ import org.ajoberstar.grgit.Grgit
 import org.ajoberstar.grgit.gradle.GrgitServiceExtension
 import org.gradle.api.GradleException
 import org.gradle.api.Project
+import org.gradle.api.model.ObjectFactory
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskProvider
+import org.gradle.kotlin.dsl.property
 
-open class TaggerExtension(val grgitServiceExtension: GrgitServiceExtension, @Transient val rootProject: Project) {
+open class TaggerExtension(
+    val grgitServiceExtension: GrgitServiceExtension,
+    @Transient val rootProject: Project,
+    objectFactory: ObjectFactory,
+) {
 
     @Input
     var releaseBranch: String? = null
+
+    @Input
+    var githubReleaseEnabled = objectFactory.property<Boolean>().convention(false)
 
     val version by lazy {
         calculateBuildVersion(

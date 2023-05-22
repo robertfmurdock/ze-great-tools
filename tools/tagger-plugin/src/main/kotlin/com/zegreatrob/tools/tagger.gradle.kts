@@ -48,12 +48,29 @@ tasks {
         taggerExtension = tagger
     }
 
+    val githubRelease by registering(Exec::class) {
+        enabled = tagger.githubReleaseEnabled.get()
+        dependsOn(tag)
+        commandLine(
+            "gh api \\\n" +
+                "  --method POST \\\n" +
+                "  -H \"Accept: application/vnd.github+json\" \\\n" +
+                "  -H \"X-GitHub-Api-Version: 2022-11-28\" \\\n" +
+                "  /repos/${System.getenv("GITHUB_REPOSITORY")}/releases \\\n" +
+                "  -f tag_name='${tagger.version}' \\\n" +
+                " -f name='${tagger.version}' \\\n" +
+                " -f body='${tagger.version}' \\\n" +
+                " -F generate_release_notes=false "
+                    .split(" "),
+        )
+    }
+
     register("release", ReleaseVersion::class) {
         taggerExtension = tagger
         enabled = !taggerExtension.isSnapshot
         dependsOn(assemble)
         mustRunAfter(check)
-        finalizedBy(tag)
+        finalizedBy(tag, githubRelease)
         finalizedBy(provider { (getTasksByName("publish", true)).toList() })
     }
 }
