@@ -54,7 +54,8 @@ tasks {
         val githubRepository = System.getenv("GITHUB_REPOSITORY")
         commandLine(
             "gh api --method POST -H \"Accept: application/vnd.github+json\" -H \"X-GitHub-Api-Version: 2022-11-28\" /repos/$githubRepository/releases  -f tag_name='${tagger.version}' -f name='${tagger.version}' -f body='${tagger.version} -F draft=false -F prerelease=false -F generate_release_notes=false"
-                .split(" "),
+                .split(" ")
+                .also { println("release command = $it") },
         )
     }
 
