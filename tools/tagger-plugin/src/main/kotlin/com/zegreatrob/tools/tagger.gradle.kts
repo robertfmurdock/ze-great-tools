@@ -54,14 +54,14 @@ tasks {
         commandLine(
             (
                 "gh api " +
-                    "  --method POST " +
-                    "  -H \"Accept: application/vnd.github+json\" " +
-                    "  -H \"X-GitHub-Api-Version: 2022-11-28\" " +
+                    "  --method=POST " +
+                    "  -H=\"Accept: application/vnd.github+json\" " +
+                    "  -H=\"X-GitHub-Api-Version: 2022-11-28\" " +
                     "  /repos/${System.getenv("GITHUB_REPOSITORY")}/releases " +
-                    "  -f tag_name='${tagger.version}' " +
-                    " -f name='${tagger.version}' " +
-                    " -f body='${tagger.version}' " +
-                    " -F generate_release_notes=false "
+                    "  -f=tag_name='${tagger.version}' " +
+                    " -f=name='${tagger.version}' " +
+                    " -f=body='${tagger.version}' " +
+                    " -F=generate_release_notes=false "
                 )
                 .split(" "),
         )
