@@ -49,7 +49,7 @@ tasks {
     }
 
     val githubRelease by registering(Exec::class) {
-        enabled = tagger.githubReleaseEnabled.get()
+        enabled = with(tagger) { !isSnapshot && githubReleaseEnabled.get() }
         dependsOn(tag)
         val githubRepository = System.getenv("GITHUB_REPOSITORY")
         commandLine(
@@ -79,7 +79,7 @@ tasks {
 
     register("release", ReleaseVersion::class) {
         taggerExtension = tagger
-        enabled = !taggerExtension.isSnapshot
+        enabled = !tagger.isSnapshot
         dependsOn(assemble)
         mustRunAfter(check)
         finalizedBy(tag, githubRelease)
