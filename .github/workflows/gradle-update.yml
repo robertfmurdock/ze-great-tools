@@ -4,7 +4,7 @@ on:
     - cron: "0 17 * * *"
   workflow_dispatch:
 permissions:
-  id-token: read
+  id-token: write
   contents: write
   pull-requests: write
 jobs:
