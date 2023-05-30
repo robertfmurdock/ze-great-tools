@@ -5,6 +5,10 @@ on:
       - '**'
     tags-ignore:
       - '**'
+  workflow_dispatch:
+permissions:
+  id-token: write
+  contents: write
 jobs:
   build-job:
     name: "Build"
