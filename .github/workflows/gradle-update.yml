@@ -28,7 +28,7 @@ jobs:
         with:
           branch: "cpr-gradle-update/${{github.job}}/${{github.run_id}}"
           commit-message: "[create-pull-request] ${{github.workflow}}"
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.TOOLS_PAT }}
       - name: Enable Pull Request Automerge
         if: steps.cpr.outputs.pull-request-operation == 'created'
         uses: peter-evans/enable-pull-request-automerge@v2
