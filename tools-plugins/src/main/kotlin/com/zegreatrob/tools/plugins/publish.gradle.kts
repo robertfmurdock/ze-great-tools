@@ -1,7 +1,5 @@
 package com.zegreatrob.tools.plugins
 
-import gradle.kotlin.dsl.accessors._2502cef48cff830615fe1c6d6ab5e104.publishing
-import gradle.kotlin.dsl.accessors._2502cef48cff830615fe1c6d6ab5e104.signing
 import org.gradle.kotlin.dsl.creating
 import org.gradle.kotlin.dsl.`maven-publish`
 import org.gradle.kotlin.dsl.repositories
