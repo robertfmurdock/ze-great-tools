@@ -17,7 +17,6 @@ repositories {
 }
 
 dependencies {
-    implementation(kotlin("gradle-plugin", libs.versions.org.jetbrains.kotlin.get()))
     implementation(libs.org.ajoberstar.grgit.gradle.plugin)
     testImplementation(libs.org.jetbrains.kotlin.kotlin.test.junit5)
 }
