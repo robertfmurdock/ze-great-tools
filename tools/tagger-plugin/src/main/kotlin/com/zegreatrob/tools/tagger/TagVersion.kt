@@ -1,6 +1,8 @@
 package com.zegreatrob.tools.tagger
 
 import org.ajoberstar.grgit.Grgit
+import org.ajoberstar.grgit.operation.PushOp
+import org.ajoberstar.grgit.operation.TagAddOp
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.tasks.Input
@@ -40,8 +42,8 @@ open class TagVersion : DefaultTask(), TaggerExtensionSyntax {
             headHasNoTag() &&
             isOnReleaseBranch(grgit, releaseBranch)
         ) {
-            this.grgit.tag.add { it.name = version }
-            this.grgit.push { it.tags = true }
+            this.grgit.tag.add(fun (it: TagAddOp) { it.name = version })
+            this.grgit.push(fun (it: PushOp) { it.tags = true })
         } else {
             logger.warn("skipping tag")
         }

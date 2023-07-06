@@ -4,6 +4,8 @@ import org.ajoberstar.grgit.BranchStatus
 import org.ajoberstar.grgit.Commit
 import org.ajoberstar.grgit.Grgit
 import org.ajoberstar.grgit.Tag
+import org.ajoberstar.grgit.operation.BranchStatusOp
+import org.ajoberstar.grgit.operation.LogOp
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskAction
@@ -41,7 +43,7 @@ fun Grgit.calculateNextVersion(): String {
 }
 
 private fun Grgit.findAppropriateIncrement(previousVersionNumber: String): ChangeType? =
-    log({ it.range(previousVersionNumber, "HEAD") })
+    log(fun (it: LogOp) { it.range(previousVersionNumber, "HEAD") })
         .also { if (it.isEmpty()) return null }
         .map(Commit::changeType)
         .fold(ChangeType.Patch, ::highestPriority)
@@ -94,7 +96,9 @@ private fun String.asSemverComponents() = (
 fun Grgit.canRelease(releaseBranch: String): Boolean {
     val currentBranch = branch.current()
 
-    val currentBranchStatus: BranchStatus? = runCatching { branch.status { it.name = currentBranch.name } }
+    val currentBranchStatus: BranchStatus? = runCatching {
+        branch.status(fun (it: BranchStatusOp) { it.name = currentBranch.name })
+    }
         .getOrNull()
     return if (currentBranchStatus == null) {
         false
