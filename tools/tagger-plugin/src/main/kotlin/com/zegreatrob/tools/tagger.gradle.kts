@@ -16,7 +16,7 @@ val tagger = project.extensions.create("tagger", TaggerExtension::class, grgitSe
 tasks {
     val exportToGithub = project.findProperty("exportToGithub")
     val calculateVersion by registering(CalculateVersion::class) {
-        taggerExtension = tagger
+        this.taggerExtension = tagger
         exportToGithub?.let {
             exportToGithubEnv = true
         }
@@ -44,8 +44,8 @@ tasks {
             },
         )
     }
-    register("commitReport", CommitReport::class) {
-        taggerExtension = tagger
+    register<CommitReport>("commitReport") {
+        this.taggerExtension = tagger
     }
 
     val githubRelease by registering(Exec::class) {
@@ -77,7 +77,7 @@ tasks {
         )
     }
 
-    register("release", ReleaseVersion::class) {
+    register<ReleaseVersion>("release") {
         taggerExtension = tagger
         enabled = !tagger.isSnapshot
         dependsOn(assemble)

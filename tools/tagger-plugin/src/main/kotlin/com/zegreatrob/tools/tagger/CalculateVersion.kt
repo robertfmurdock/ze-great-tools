@@ -1,5 +1,6 @@
 package com.zegreatrob.tools.tagger
 
+import org.ajoberstar.grgit.BranchStatus
 import org.ajoberstar.grgit.Commit
 import org.ajoberstar.grgit.Grgit
 import org.ajoberstar.grgit.Tag
@@ -40,7 +41,7 @@ fun Grgit.calculateNextVersion(): String {
 }
 
 private fun Grgit.findAppropriateIncrement(previousVersionNumber: String): ChangeType? =
-    log { range(previousVersionNumber, "HEAD") }
+    log({ it.range(previousVersionNumber, "HEAD") })
         .also { if (it.isEmpty()) return null }
         .map(Commit::changeType)
         .fold(ChangeType.Patch, ::highestPriority)
@@ -93,7 +94,7 @@ private fun String.asSemverComponents() = (
 fun Grgit.canRelease(releaseBranch: String): Boolean {
     val currentBranch = branch.current()
 
-    val currentBranchStatus = runCatching { branch.status { this.name = currentBranch.name } }
+    val currentBranchStatus: BranchStatus? = runCatching { branch.status { it.name = currentBranch.name } }
         .getOrNull()
     return if (currentBranchStatus == null) {
         false
