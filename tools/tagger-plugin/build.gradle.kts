@@ -23,7 +23,7 @@ dependencies {
 
 testing {
     suites {
-        register("functionalTest", JvmTestSuite::class) {
+        register<JvmTestSuite>("functionalTest") {
             gradlePlugin.testSourceSets(sources)
         }
     }
