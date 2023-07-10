@@ -32,6 +32,9 @@ testing {
 configurations["functionalTestImplementation"].extendsFrom(configurations["testImplementation"])
 
 tasks {
+    "compileFunctionalTestKotlin" {
+        dependsOn("compileKotlin")
+    }
     check {
         dependsOn(testing.suites.named("functionalTest"))
     }
