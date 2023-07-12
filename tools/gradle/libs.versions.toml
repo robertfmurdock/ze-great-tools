@@ -1,8 +1,10 @@
 [versions]
+org-ajoberstar-grgit = "5.2.0"
 org-jetbrains-kotlin = "1.9.0"
 
 [libraries]
-org-ajoberstar-grgit-gradle-plugin = "org.ajoberstar.grgit:org.ajoberstar.grgit.gradle.plugin:5.2.0"
+# @keep
+org-ajoberstar-grgit-gradle-plugin = { module = "org.ajoberstar.grgit:org.ajoberstar.grgit.gradle.plugin", version.ref = "org-ajoberstar-grgit" }
 org-jetbrains-kotlin-kotlin-test-junit5 = { module = "org.jetbrains.kotlin:kotlin-test-junit5", version.ref = "org-jetbrains-kotlin" }
 org-junit-junit-bom = "org.junit:junit-bom:5.9.3"
 
@@ -10,3 +12,4 @@ org-junit-junit-bom = "org.junit:junit-bom:5.9.3"
 com-gradle-plugin-publish = "com.gradle.plugin-publish:1.2.0"
 io-github-gradle-nexus-publish-plugin = "io.github.gradle-nexus.publish-plugin:2.0.0-rc-1"
 nl-littlerobots-version-catalog-update = "nl.littlerobots.version-catalog-update:0.8.0"
+org-ajoberstar-grgit = { id = "org.ajoberstar.grgit", version.ref = "org-ajoberstar-grgit" }
