@@ -30,36 +30,38 @@ open class CalculateVersion : DefaultTask(), TaggerExtensionSyntax {
     }
 }
 
-fun Grgit.calculateNextVersion(): String {
+fun Grgit.calculateNextVersion(implicitPatch: Boolean): String {
     val description = describe {}
     val descriptionComponents = description?.split("-")
     val previousVersionNumber = descriptionComponents?.getOrNull(0)
     if (previousVersionNumber?.length == 0 || previousVersionNumber == null) {
         return "0.0.0"
     }
-    val incrementComponent = findAppropriateIncrement(previousVersionNumber)
+    val incrementComponent = findAppropriateIncrement(previousVersionNumber, implicitPatch)
     return incrementComponent?.increment(previousVersionNumber.asSemverComponents())
         ?: previousVersionNumber
 }
 
-private fun Grgit.findAppropriateIncrement(previousVersionNumber: String): ChangeType? =
-    log(fun (it: LogOp) { it.range(previousVersionNumber, "HEAD") })
+private fun Grgit.findAppropriateIncrement(previousVersionNumber: String, implicitPatch: Boolean): ChangeType? =
+    log(fun(it: LogOp) { it.range(previousVersionNumber, "HEAD") })
         .also { if (it.isEmpty()) return null }
         .map(Commit::changeType)
-        .fold(ChangeType.Patch, ::highestPriority)
+        .fold(null, ::highestPriority)
+        ?: if (implicitPatch) ChangeType.Patch else ChangeType.None
 
-private fun highestPriority(left: ChangeType, right: ChangeType) =
-    if (left.priority > right.priority) {
-        left
-    } else {
-        right
-    }
+private fun highestPriority(left: ChangeType?, right: ChangeType?) = when {
+    left == null -> right
+    right == null -> left
+    left.priority > right.priority -> left
+    else -> right
+}
 
 private fun Commit.changeType() = when {
-    shortMessage.startsWith("[major]") -> ChangeType.Major
-    shortMessage.startsWith("[minor]") -> ChangeType.Minor
-    shortMessage.startsWith("[patch]") -> ChangeType.Patch
-    else -> ChangeType.Patch
+    shortMessage.lowercase().startsWith("[major]") -> ChangeType.Major
+    shortMessage.lowercase().startsWith("[minor]") -> ChangeType.Minor
+    shortMessage.lowercase().startsWith("[patch]") -> ChangeType.Patch
+    shortMessage.lowercase().startsWith("[none]") -> ChangeType.None
+    else -> null
 }
 
 enum class ChangeType(val priority: Int) {
@@ -80,6 +82,12 @@ enum class ChangeType(val priority: Int) {
             val (major, minor, patch) = components
             return "$major.$minor.${patch.toInt() + 1}"
         }
+    },
+    None(0) {
+        override fun increment(components: List<String>): String {
+            val (major, minor, patch) = components
+            return "$major.$minor.${patch.toInt()}"
+        }
     }, ;
 
     abstract fun increment(components: List<String>): String
@@ -97,7 +105,7 @@ fun Grgit.canRelease(releaseBranch: String): Boolean {
     val currentBranch = branch.current()
 
     val currentBranchStatus: BranchStatus? = runCatching {
-        branch.status(fun (it: BranchStatusOp) { it.name = currentBranch.name })
+        branch.status(fun(it: BranchStatusOp) { it.name = currentBranch.name })
     }
         .getOrNull()
     return if (currentBranchStatus == null) {

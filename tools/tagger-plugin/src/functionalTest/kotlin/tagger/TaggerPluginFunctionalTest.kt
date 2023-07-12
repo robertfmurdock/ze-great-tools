@@ -111,6 +111,84 @@ class TaggerPluginFunctionalTest {
     }
 
     @Test
+    fun `given no implicit patch, calculating version with unlabeled commits does not increment`() {
+        settingsFile.writeText("")
+        buildFile.writeText(
+            """
+            plugins {
+                id('com.zegreatrob.tools.tagger')
+            }
+            tagger {
+                releaseBranch = "master"
+                implicitPatch = false
+            }
+            """.trimIndent(),
+        )
+
+        initializeGitRepo(listOf("commit 1", "commit 2"), "1.2.3")
+        val runner = GradleRunner.create()
+        runner.forwardOutput()
+        runner.withPluginClasspath()
+        runner.withArguments("calculateVersion", "-q")
+        runner.withProjectDir(projectDir)
+        val result = runner.build()
+
+        assertEquals("1.2.3-SNAPSHOT", result.output.trim())
+    }
+
+    @Test
+    fun `given implicit patch, calculating version with unlabeled commits increments patch`() {
+        settingsFile.writeText("")
+        buildFile.writeText(
+            """
+            plugins {
+                id('com.zegreatrob.tools.tagger')
+            }
+            tagger {
+                releaseBranch = "master"
+                implicitPatch = true
+            }
+            """.trimIndent(),
+        )
+
+        initializeGitRepo(listOf("commit 1", "commit 2"), "1.2.3")
+        val runner = GradleRunner.create()
+        runner.forwardOutput()
+        runner.withPluginClasspath()
+        runner.withArguments("calculateVersion", "-q")
+        runner.withProjectDir(projectDir)
+        val result = runner.build()
+
+        assertEquals("1.2.4-SNAPSHOT", result.output.trim())
+    }
+
+    @Test
+    fun `given implicit patch, calculating version with None commits does not increment`() {
+        settingsFile.writeText("")
+        buildFile.writeText(
+            """
+            plugins {
+                id('com.zegreatrob.tools.tagger')
+            }
+            tagger {
+                releaseBranch = "master"
+                implicitPatch = true
+            }
+            """.trimIndent(),
+        )
+
+        initializeGitRepo(listOf("[None] commit 1", "[none] commit 2"), "1.2.3")
+        val runner = GradleRunner.create()
+        runner.forwardOutput()
+        runner.withPluginClasspath()
+        runner.withArguments("calculateVersion", "-q")
+        runner.withProjectDir(projectDir)
+        val result = runner.build()
+
+        assertEquals("1.2.3-SNAPSHOT", result.output.trim())
+    }
+
+    @Test
     fun `calculating version with one minor commits only increments minor`() {
         settingsFile.writeText("")
         buildFile.writeText(

@@ -7,7 +7,6 @@ import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.TaskProvider
 import org.gradle.kotlin.dsl.property
 
 open class TaggerExtension(
@@ -18,6 +17,9 @@ open class TaggerExtension(
 
     @Input
     var releaseBranch: String? = null
+
+    @Input
+    var implicitPatch = objectFactory.property<Boolean>().convention(true)
 
     @Input
     var githubReleaseEnabled = objectFactory.property<Boolean>().convention(false)
@@ -32,13 +34,7 @@ open class TaggerExtension(
 
     val isSnapshot get() = version.contains("SNAPSHOT")
 
-    val releaseProvider: TaskProvider<ReleaseVersion>
-        get() = rootProject
-            .tasks
-            .withType(ReleaseVersion::class.java)
-            .named("release")
-
-    private fun calculateBuildVersion(grgit: Grgit, releaseBranch: String) = grgit.calculateNextVersion() +
+    private fun calculateBuildVersion(grgit: Grgit, releaseBranch: String) = grgit.calculateNextVersion(implicitPatch.get()) +
         if (grgit.canRelease(releaseBranch)) {
             ""
         } else {
