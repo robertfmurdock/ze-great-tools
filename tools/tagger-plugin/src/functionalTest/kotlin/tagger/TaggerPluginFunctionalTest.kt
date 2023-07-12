@@ -17,7 +17,7 @@ class TaggerPluginFunctionalTest {
     @field:TempDir
     lateinit var projectDir: File
 
-    private val buildFile by lazy { projectDir.resolve("build.gradle") }
+    private val buildFile by lazy { projectDir.resolve("build.gradle.kts") }
     private val settingsFile by lazy { projectDir.resolve("settings.gradle") }
 
     @Test
@@ -26,7 +26,7 @@ class TaggerPluginFunctionalTest {
         buildFile.writeText(
             """
             plugins {
-                id('com.zegreatrob.tools.tagger')
+                id("com.zegreatrob.tools.tagger")
             }
             tagger {
                 releaseBranch = "master"
@@ -52,7 +52,7 @@ class TaggerPluginFunctionalTest {
         buildFile.writeText(
             """
             plugins {
-                id('com.zegreatrob.tools.tagger')
+                id("com.zegreatrob.tools.tagger")
             }
             tagger {
                 releaseBranch = "master"
@@ -91,7 +91,7 @@ class TaggerPluginFunctionalTest {
         buildFile.writeText(
             """
             plugins {
-                id('com.zegreatrob.tools.tagger')
+                id("com.zegreatrob.tools.tagger")
             }
             tagger {
                 releaseBranch = "master"
@@ -116,11 +116,11 @@ class TaggerPluginFunctionalTest {
         buildFile.writeText(
             """
             plugins {
-                id('com.zegreatrob.tools.tagger')
+                id("com.zegreatrob.tools.tagger")
             }
             tagger {
                 releaseBranch = "master"
-                implicitPatch = false
+                implicitPatch.set(false)
             }
             """.trimIndent(),
         )
@@ -142,11 +142,11 @@ class TaggerPluginFunctionalTest {
         buildFile.writeText(
             """
             plugins {
-                id('com.zegreatrob.tools.tagger')
+                id("com.zegreatrob.tools.tagger")
             }
             tagger {
                 releaseBranch = "master"
-                implicitPatch = true
+                implicitPatch.set(true)
             }
             """.trimIndent(),
         )
@@ -168,11 +168,11 @@ class TaggerPluginFunctionalTest {
         buildFile.writeText(
             """
             plugins {
-                id('com.zegreatrob.tools.tagger')
+                id("com.zegreatrob.tools.tagger")
             }
             tagger {
                 releaseBranch = "master"
-                implicitPatch = true
+                implicitPatch.set(true)
             }
             """.trimIndent(),
         )
@@ -194,7 +194,7 @@ class TaggerPluginFunctionalTest {
         buildFile.writeText(
             """
             plugins {
-                id('com.zegreatrob.tools.tagger')
+                id("com.zegreatrob.tools.tagger")
             }
             
             tagger {
@@ -215,12 +215,124 @@ class TaggerPluginFunctionalTest {
     }
 
     @Test
+    fun canReplaceMinorRegex() {
+        settingsFile.writeText("")
+        buildFile.writeText(
+            """
+            plugins {
+                id("com.zegreatrob.tools.tagger")
+            }
+            
+            tagger {
+                releaseBranch = "master"
+                implicitPatch.set(false)
+                minorRegex.set(Regex(".*(middle).*"))
+            }
+            """.trimIndent(),
+        )
+
+        initializeGitRepo(listOf("[patch] commit 1", "commit (middle) 2", "[patch] commit 3"), "1.2.3")
+        val runner = GradleRunner.create()
+        runner.forwardOutput()
+        runner.withPluginClasspath()
+        runner.withArguments("calculateVersion", "-q")
+        runner.withProjectDir(projectDir)
+        val result = runner.build()
+
+        assertEquals("1.3.0-SNAPSHOT", result.output.trim())
+    }
+
+    @Test
+    fun canReplaceMajorRegex() {
+        settingsFile.writeText("")
+        buildFile.writeText(
+            """
+            plugins {
+                id("com.zegreatrob.tools.tagger")
+            }
+            
+            tagger {
+                releaseBranch = "master"
+                implicitPatch.set(false)
+                majorRegex.set(Regex(".*(big).*"))
+            }
+            """.trimIndent(),
+        )
+
+        initializeGitRepo(listOf("[patch] commit 1", "commit (big) 2", "[patch] commit 3"), "1.2.3")
+        val runner = GradleRunner.create()
+        runner.forwardOutput()
+        runner.withPluginClasspath()
+        runner.withArguments("calculateVersion", "-q")
+        runner.withProjectDir(projectDir)
+        val result = runner.build()
+
+        assertEquals("2.0.0-SNAPSHOT", result.output.trim())
+    }
+
+    @Test
+    fun canReplacePatchRegex() {
+        settingsFile.writeText("")
+        buildFile.writeText(
+            """
+            plugins {
+                id("com.zegreatrob.tools.tagger")
+            }
+            
+            tagger {
+                releaseBranch = "master"
+                implicitPatch.set(false)
+                patchRegex.set(Regex(".*(tiny).*"))
+            }
+            """.trimIndent(),
+        )
+
+        initializeGitRepo(listOf("commit 1", "commit (tiny) 2", "commit 3"), "1.2.3")
+        val runner = GradleRunner.create()
+        runner.forwardOutput()
+        runner.withPluginClasspath()
+        runner.withArguments("calculateVersion", "-q")
+        runner.withProjectDir(projectDir)
+        val result = runner.build()
+
+        assertEquals("1.2.4-SNAPSHOT", result.output.trim())
+    }
+
+    @Test
+    fun canReplaceNoneRegex() {
+        settingsFile.writeText("")
+        buildFile.writeText(
+            """
+            plugins {
+                id("com.zegreatrob.tools.tagger")
+            }
+            
+            tagger {
+                releaseBranch = "master"
+                implicitPatch.set(true)
+                noneRegex.set(Regex(".*(no).*"))
+            }
+            """.trimIndent(),
+        )
+
+        initializeGitRepo(listOf("commit (no) 1"), "1.2.3")
+        val runner = GradleRunner.create()
+        runner.forwardOutput()
+        runner.withPluginClasspath()
+        runner.withArguments("calculateVersion", "-q")
+        runner.withProjectDir(projectDir)
+        val result = runner.build()
+
+        assertEquals("1.2.3-SNAPSHOT", result.output.trim())
+    }
+
+    @Test
     fun `calculating version with one major commits only increments major`() {
         settingsFile.writeText("")
         buildFile.writeText(
             """
             plugins {
-                id('com.zegreatrob.tools.tagger')
+                id("com.zegreatrob.tools.tagger")
             }
             
             tagger {

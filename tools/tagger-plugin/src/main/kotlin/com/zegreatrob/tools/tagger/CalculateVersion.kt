@@ -30,22 +30,26 @@ open class CalculateVersion : DefaultTask(), TaggerExtensionSyntax {
     }
 }
 
-fun Grgit.calculateNextVersion(implicitPatch: Boolean): String {
+fun Grgit.calculateNextVersion(implicitPatch: Boolean, versionRegex: VersionRegex): String {
     val description = describe {}
     val descriptionComponents = description?.split("-")
     val previousVersionNumber = descriptionComponents?.getOrNull(0)
     if (previousVersionNumber?.length == 0 || previousVersionNumber == null) {
         return "0.0.0"
     }
-    val incrementComponent = findAppropriateIncrement(previousVersionNumber, implicitPatch)
+    val incrementComponent = findAppropriateIncrement(previousVersionNumber, implicitPatch, versionRegex)
     return incrementComponent?.increment(previousVersionNumber.asSemverComponents())
         ?: previousVersionNumber
 }
 
-private fun Grgit.findAppropriateIncrement(previousVersionNumber: String, implicitPatch: Boolean): ChangeType? =
+private fun Grgit.findAppropriateIncrement(
+    previousVersionNumber: String,
+    implicitPatch: Boolean,
+    minorRegex: VersionRegex,
+): ChangeType? =
     log(fun(it: LogOp) { it.range(previousVersionNumber, "HEAD") })
         .also { if (it.isEmpty()) return null }
-        .map(Commit::changeType)
+        .map { it.changeType(minorRegex) }
         .fold(null, ::highestPriority)
         ?: if (implicitPatch) ChangeType.Patch else ChangeType.None
 
@@ -56,13 +60,7 @@ private fun highestPriority(left: ChangeType?, right: ChangeType?) = when {
     else -> right
 }
 
-private fun Commit.changeType() = when {
-    shortMessage.lowercase().startsWith("[major]") -> ChangeType.Major
-    shortMessage.lowercase().startsWith("[minor]") -> ChangeType.Minor
-    shortMessage.lowercase().startsWith("[patch]") -> ChangeType.Patch
-    shortMessage.lowercase().startsWith("[none]") -> ChangeType.None
-    else -> null
-}
+private fun Commit.changeType(versionRegex: VersionRegex) = versionRegex.changeType(shortMessage)
 
 enum class ChangeType(val priority: Int) {
     Major(3) {

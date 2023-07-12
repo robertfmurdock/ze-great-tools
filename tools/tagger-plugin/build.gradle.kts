@@ -16,11 +16,6 @@ repositories {
     mavenCentral()
 }
 
-dependencies {
-    implementation(libs.org.ajoberstar.grgit.gradle.plugin)
-    testImplementation(libs.org.jetbrains.kotlin.kotlin.test.junit5)
-}
-
 testing {
     suites {
         register<JvmTestSuite>("functionalTest") {
@@ -30,6 +25,12 @@ testing {
 }
 
 configurations["functionalTestImplementation"].extendsFrom(configurations["testImplementation"])
+
+dependencies {
+    implementation(libs.org.ajoberstar.grgit.gradle.plugin)
+    testImplementation(libs.org.jetbrains.kotlin.kotlin.test.junit5)
+    "functionalTestImplementation"(platform(libs.org.junit.junit.bom))
+}
 
 tasks {
     "compileFunctionalTestKotlin" {

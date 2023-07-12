@@ -1,6 +1,5 @@
 package com.zegreatrob.tools.tagger
 
-import com.zegreatrob.tools.TaggerPlugin
 import org.ajoberstar.grgit.Grgit
 import org.ajoberstar.grgit.gradle.GrgitServiceExtension
 import org.gradle.api.GradleException
@@ -24,6 +23,18 @@ open class TaggerExtension(
     @Input
     var githubReleaseEnabled = objectFactory.property<Boolean>().convention(false)
 
+    @Input
+    var noneRegex = objectFactory.property<Regex>().convention(Regex("\\[none].*"))
+
+    @Input
+    var patchRegex = objectFactory.property<Regex>().convention(Regex("\\[patch].*"))
+
+    @Input
+    var minorRegex = objectFactory.property<Regex>().convention(Regex("\\[minor].*"))
+
+    @Input
+    var majorRegex = objectFactory.property<Regex>().convention(Regex("\\[major].*"))
+
     val version by lazy {
         calculateBuildVersion(
             grgitServiceExtension.service.get().grgit,
@@ -34,18 +45,17 @@ open class TaggerExtension(
 
     val isSnapshot get() = version.contains("SNAPSHOT")
 
-    private fun calculateBuildVersion(grgit: Grgit, releaseBranch: String) = grgit.calculateNextVersion(implicitPatch.get()) +
+    private fun calculateBuildVersion(grgit: Grgit, releaseBranch: String) = grgit.calculateNextVersion(implicitPatch.get(), versionRegex()) +
         if (grgit.canRelease(releaseBranch)) {
             ""
         } else {
             "-SNAPSHOT"
         }
 
-    companion object {
-        fun apply(rootProject: Project): TaggerExtension {
-            check(rootProject == rootProject.rootProject)
-            rootProject.plugins.apply(TaggerPlugin::class.java)
-            return rootProject.extensions.getByName("tagger") as TaggerExtension
-        }
-    }
+    private fun versionRegex() = VersionRegex(
+        none = noneRegex.get(),
+        patch = patchRegex.get(),
+        minor = minorRegex.get(),
+        major = majorRegex.get(),
+    )
 }
