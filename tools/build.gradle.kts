@@ -15,25 +15,17 @@ plugins {
 tasks {
     assemble { dependsOn(provider { (getTasksByName("assemble", true) - this).toList() }) }
     check { dependsOn(provider { (getTasksByName("check", true) - this).toList() }) }
-    register("formatKotlin"){
+    register("formatKotlin") {
         dependsOn(provider { (getTasksByName("formatKotlin", true) - this).toList() })
     }
-    register("release"){
+    register("release") {
         mustRunAfter(check)
         finalizedBy(provider { (getTasksByName("publish", true)).toList() })
     }
 }
 
-versionCatalogUpdate {
-    sortByKey.set(true)
-    keep {
-        keepUnusedVersions.set(true)
-        keepUnusedLibraries.set(true)
-    }
-}
-
 nexusPublishing {
-    repositories {
+    repositories(Action {
         sonatype {
             username.set(System.getenv("SONATYPE_USERNAME"))
             password.set(System.getenv("SONATYPE_PASSWORD"))
@@ -41,5 +33,5 @@ nexusPublishing {
             snapshotRepositoryUrl.set(uri("https://s01.oss.sonatype.org/content/repositories/snapshots/"))
             stagingProfileId.set("59331990bed4c")
         }
-    }
+    })
 }
