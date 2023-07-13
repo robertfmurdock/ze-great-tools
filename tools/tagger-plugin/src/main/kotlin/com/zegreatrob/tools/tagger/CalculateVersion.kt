@@ -30,7 +30,7 @@ open class CalculateVersion : DefaultTask(), TaggerExtensionSyntax {
     }
 }
 
-fun Grgit.calculateNextVersion(implicitPatch: Boolean, versionRegex: VersionRegex): String {
+fun Grgit.calculateNextVersion(implicitPatch: Boolean, versionRegex: VersionRegex, releaseBranch: String): String {
     val description = describe {}
     val descriptionComponents = description?.split("-")
     val previousVersionNumber = descriptionComponents?.getOrNull(0)
@@ -38,8 +38,16 @@ fun Grgit.calculateNextVersion(implicitPatch: Boolean, versionRegex: VersionRege
         return "0.0.0"
     }
     val incrementComponent = findAppropriateIncrement(previousVersionNumber, implicitPatch, versionRegex)
-    return incrementComponent?.increment(previousVersionNumber.asSemverComponents())
-        ?: previousVersionNumber
+    val currentVersionNumber = (
+        incrementComponent?.increment(previousVersionNumber.asSemverComponents())
+            ?: previousVersionNumber
+        )
+
+    return if (canRelease(releaseBranch) && currentVersionNumber != previousVersionNumber) {
+        currentVersionNumber
+    } else {
+        "$currentVersionNumber-SNAPSHOT"
+    }
 }
 
 private fun Grgit.findAppropriateIncrement(

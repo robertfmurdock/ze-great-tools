@@ -2,6 +2,8 @@ package tagger
 
 import org.ajoberstar.grgit.Grgit
 import org.ajoberstar.grgit.operation.AddOp
+import org.ajoberstar.grgit.operation.BranchChangeOp
+import org.ajoberstar.grgit.operation.CheckoutOp
 import org.ajoberstar.grgit.operation.CommitOp
 import org.ajoberstar.grgit.operation.RemoteAddOp
 import org.ajoberstar.grgit.operation.TagAddOp
@@ -9,6 +11,7 @@ import org.gradle.testkit.runner.GradleRunner
 import org.junit.jupiter.api.io.TempDir
 import java.io.File
 import java.io.FileOutputStream
+import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -19,17 +22,23 @@ class TaggerPluginFunctionalTest {
 
     private val buildFile by lazy { projectDir.resolve("build.gradle.kts") }
     private val settingsFile by lazy { projectDir.resolve("settings.gradle") }
+    private val ignoreFile by lazy { projectDir.resolve(".gitignore") }
+
+    @BeforeTest
+    fun setup() {
+        settingsFile.writeText("")
+        ignoreFile.writeText(".gradle")
+    }
 
     @Test
-    fun `calculating version with no tags produces patch snapshot`() {
-        settingsFile.writeText("")
+    fun `calculating version with no tags produces zero version`() {
         buildFile.writeText(
             """
             plugins {
                 id("com.zegreatrob.tools.tagger")
             }
             tagger {
-                releaseBranch = "master"
+                releaseBranch = "main"
             }
 
             """.trimIndent(),
@@ -43,19 +52,18 @@ class TaggerPluginFunctionalTest {
         runner.withProjectDir(projectDir)
         val result = runner.build()
 
-        assertEquals("0.0.0-SNAPSHOT", result.output.trim())
+        assertEquals("0.0.0", result.output.trim())
     }
 
     @Test
     fun `calculating version when current commit already has tag will use tag`() {
-        settingsFile.writeText("")
         buildFile.writeText(
             """
             plugins {
                 id("com.zegreatrob.tools.tagger")
             }
             tagger {
-                releaseBranch = "master"
+                releaseBranch = "main"
             }
 
             """.trimIndent(),
@@ -87,14 +95,13 @@ class TaggerPluginFunctionalTest {
 
     @Test
     fun `calculating version with all patch commits only increments patch`() {
-        settingsFile.writeText("")
         buildFile.writeText(
             """
             plugins {
                 id("com.zegreatrob.tools.tagger")
             }
             tagger {
-                releaseBranch = "master"
+                releaseBranch = "main"
             }
             """.trimIndent(),
         )
@@ -107,19 +114,18 @@ class TaggerPluginFunctionalTest {
         runner.withProjectDir(projectDir)
         val result = runner.build()
 
-        assertEquals("1.2.4-SNAPSHOT", result.output.trim())
+        assertEquals("1.2.4", result.output.trim())
     }
 
     @Test
     fun `given no implicit patch, calculating version with unlabeled commits does not increment`() {
-        settingsFile.writeText("")
         buildFile.writeText(
             """
             plugins {
                 id("com.zegreatrob.tools.tagger")
             }
             tagger {
-                releaseBranch = "master"
+                releaseBranch = "main"
                 implicitPatch.set(false)
             }
             """.trimIndent(),
@@ -138,14 +144,13 @@ class TaggerPluginFunctionalTest {
 
     @Test
     fun `given implicit patch, calculating version with unlabeled commits increments patch`() {
-        settingsFile.writeText("")
         buildFile.writeText(
             """
             plugins {
                 id("com.zegreatrob.tools.tagger")
             }
             tagger {
-                releaseBranch = "master"
+                releaseBranch = "main"
                 implicitPatch.set(true)
             }
             """.trimIndent(),
@@ -159,19 +164,18 @@ class TaggerPluginFunctionalTest {
         runner.withProjectDir(projectDir)
         val result = runner.build()
 
-        assertEquals("1.2.4-SNAPSHOT", result.output.trim())
+        assertEquals("1.2.4", result.output.trim())
     }
 
     @Test
-    fun `given implicit patch, calculating version with None commits does not increment`() {
-        settingsFile.writeText("")
+    fun `given implicit patch, calculating version with None commits does not increment and is always snapshot`() {
         buildFile.writeText(
             """
             plugins {
                 id("com.zegreatrob.tools.tagger")
             }
             tagger {
-                releaseBranch = "master"
+                releaseBranch = "main"
                 implicitPatch.set(true)
             }
             """.trimIndent(),
@@ -190,7 +194,6 @@ class TaggerPluginFunctionalTest {
 
     @Test
     fun `calculating version with one minor commits only increments minor`() {
-        settingsFile.writeText("")
         buildFile.writeText(
             """
             plugins {
@@ -198,7 +201,7 @@ class TaggerPluginFunctionalTest {
             }
             
             tagger {
-                releaseBranch = "master"
+                releaseBranch = "main"
             }
             """.trimIndent(),
         )
@@ -211,12 +214,11 @@ class TaggerPluginFunctionalTest {
         runner.withProjectDir(projectDir)
         val result = runner.build()
 
-        assertEquals("1.3.0-SNAPSHOT", result.output.trim())
+        assertEquals("1.3.0", result.output.trim())
     }
 
     @Test
     fun canReplaceMinorRegex() {
-        settingsFile.writeText("")
         buildFile.writeText(
             """
             plugins {
@@ -224,7 +226,7 @@ class TaggerPluginFunctionalTest {
             }
             
             tagger {
-                releaseBranch = "master"
+                releaseBranch = "main"
                 implicitPatch.set(false)
                 minorRegex.set(Regex(".*(middle).*"))
             }
@@ -239,12 +241,11 @@ class TaggerPluginFunctionalTest {
         runner.withProjectDir(projectDir)
         val result = runner.build()
 
-        assertEquals("1.3.0-SNAPSHOT", result.output.trim())
+        assertEquals("1.3.0", result.output.trim())
     }
 
     @Test
     fun canReplaceMajorRegex() {
-        settingsFile.writeText("")
         buildFile.writeText(
             """
             plugins {
@@ -252,7 +253,7 @@ class TaggerPluginFunctionalTest {
             }
             
             tagger {
-                releaseBranch = "master"
+                releaseBranch = "main"
                 implicitPatch.set(false)
                 majorRegex.set(Regex(".*(big).*"))
             }
@@ -267,12 +268,11 @@ class TaggerPluginFunctionalTest {
         runner.withProjectDir(projectDir)
         val result = runner.build()
 
-        assertEquals("2.0.0-SNAPSHOT", result.output.trim())
+        assertEquals("2.0.0", result.output.trim())
     }
 
     @Test
     fun canReplacePatchRegex() {
-        settingsFile.writeText("")
         buildFile.writeText(
             """
             plugins {
@@ -280,7 +280,7 @@ class TaggerPluginFunctionalTest {
             }
             
             tagger {
-                releaseBranch = "master"
+                releaseBranch = "main"
                 implicitPatch.set(false)
                 patchRegex.set(Regex(".*(tiny).*"))
             }
@@ -295,12 +295,11 @@ class TaggerPluginFunctionalTest {
         runner.withProjectDir(projectDir)
         val result = runner.build()
 
-        assertEquals("1.2.4-SNAPSHOT", result.output.trim())
+        assertEquals("1.2.4", result.output.trim())
     }
 
     @Test
     fun canReplaceNoneRegex() {
-        settingsFile.writeText("")
         buildFile.writeText(
             """
             plugins {
@@ -308,7 +307,7 @@ class TaggerPluginFunctionalTest {
             }
             
             tagger {
-                releaseBranch = "master"
+                releaseBranch = "main"
                 implicitPatch.set(true)
                 noneRegex.set(Regex(".*(no).*"))
             }
@@ -328,7 +327,6 @@ class TaggerPluginFunctionalTest {
 
     @Test
     fun `calculating version with one major commits only increments major`() {
-        settingsFile.writeText("")
         buildFile.writeText(
             """
             plugins {
@@ -336,7 +334,7 @@ class TaggerPluginFunctionalTest {
             }
             
             tagger {
-                releaseBranch = "master"
+                releaseBranch = "main"
             }
 
             """.trimIndent(),
@@ -349,17 +347,20 @@ class TaggerPluginFunctionalTest {
         runner.withArguments("calculateVersion", "-q")
         runner.withProjectDir(projectDir)
         val result = runner.build()
-        assertEquals("2.0.0-SNAPSHOT", result.output.trim())
+        assertEquals("2.0.0", result.output.trim())
     }
 
-    private fun initializeGitRepo(additionalCommits: List<String> = listOf(), initialTag: String? = null) {
+    private fun initializeGitRepo(
+        additionalCommits: List<String> = listOf(),
+        initialTag: String? = null,
+    ) {
         val grgit = Grgit.init(mapOf("dir" to projectDir.absolutePath))
         disableGpgSign()
-        grgit.add(fun(it: AddOp) {
-            it.patterns = setOf(settingsFile.absolutePath, buildFile.absolutePath)
+        grgit.add(fun AddOp.() {
+            patterns = setOf(settingsFile.name, buildFile.name, ignoreFile.name)
         })
 
-        grgit.commit(fun(it: CommitOp) { it.message = "test commit" })
+        grgit.commit(fun CommitOp.() { message = "test commit" })
         if (initialTag != null) {
             grgit.tag.add(fun(it: TagAddOp) {
                 it.name = initialTag
@@ -370,7 +371,21 @@ class TaggerPluginFunctionalTest {
                 it.message = message
             })
         }
-        grgit.checkout(mapOf("branch" to "main", "createBranch" to true))
+
+        grgit.remote.add(fun RemoteAddOp.() {
+            this.name = "origin"
+            this.url = projectDir.absolutePath
+        })
+        grgit.checkout(fun CheckoutOp.() {
+            branch = "main"
+            createBranch = true
+        })
+        grgit.pull()
+        grgit.branch.change(fun BranchChangeOp.() {
+            this.name = "main"
+            this.startPoint = "origin/main"
+            this.mode = BranchChangeOp.Mode.TRACK
+        })
     }
 
     private fun disableGpgSign() {

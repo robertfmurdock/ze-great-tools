@@ -45,12 +45,7 @@ open class TaggerExtension(
 
     val isSnapshot get() = version.contains("SNAPSHOT")
 
-    private fun calculateBuildVersion(grgit: Grgit, releaseBranch: String) = grgit.calculateNextVersion(implicitPatch.get(), versionRegex()) +
-        if (grgit.canRelease(releaseBranch)) {
-            ""
-        } else {
-            "-SNAPSHOT"
-        }
+    private fun calculateBuildVersion(grgit: Grgit, releaseBranch: String) = grgit.calculateNextVersion(implicitPatch.get(), versionRegex(), releaseBranch)
 
     private fun versionRegex() = VersionRegex(
         none = noneRegex.get(),
