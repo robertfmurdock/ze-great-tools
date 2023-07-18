@@ -57,7 +57,7 @@ private fun Grgit.findAppropriateIncrement(
 ): ChangeType? =
     log(fun(it: LogOp) { it.range(previousVersionNumber, "HEAD") })
         .also { if (it.isEmpty()) return null }
-        .map { it.changeType(minorRegex) }
+        .map { it.changeType(minorRegex) ?: if (implicitPatch) ChangeType.Patch else null }
         .fold(null, ::highestPriority)
         ?: if (implicitPatch) ChangeType.Patch else ChangeType.None
 
@@ -68,7 +68,7 @@ private fun highestPriority(left: ChangeType?, right: ChangeType?) = when {
     else -> right
 }
 
-private fun Commit.changeType(versionRegex: VersionRegex) = versionRegex.changeType(shortMessage)
+private fun Commit.changeType(versionRegex: VersionRegex) = versionRegex.changeType(shortMessage.lowercase())
 
 enum class ChangeType(val priority: Int) {
     Major(3) {

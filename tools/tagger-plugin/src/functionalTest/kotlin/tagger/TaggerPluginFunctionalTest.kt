@@ -168,6 +168,31 @@ class TaggerPluginFunctionalTest {
     }
 
     @Test
+    fun `given implicit patch, calculating version with none and then unlabeled commits increments patch`() {
+        buildFile.writeText(
+            """
+            plugins {
+                id("com.zegreatrob.tools.tagger")
+            }
+            tagger {
+                releaseBranch = "main"
+                implicitPatch.set(true)
+            }
+            """.trimIndent(),
+        )
+
+        initializeGitRepo(listOf("[none] commit 1", "commit 2"), "1.2.3")
+        val runner = GradleRunner.create()
+        runner.forwardOutput()
+        runner.withPluginClasspath()
+        runner.withArguments("calculateVersion", "-q")
+        runner.withProjectDir(projectDir)
+        val result = runner.build()
+
+        assertEquals("1.2.4", result.output.trim())
+    }
+
+    @Test
     fun `given implicit patch, calculating version with None commits does not increment and is always snapshot`() {
         buildFile.writeText(
             """
