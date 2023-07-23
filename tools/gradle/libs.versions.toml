@@ -6,7 +6,7 @@ org-jetbrains-kotlin = "1.9.0"
 # @keep
 org-ajoberstar-grgit-gradle-plugin = { module = "org.ajoberstar.grgit:org.ajoberstar.grgit.gradle.plugin", version.ref = "org-ajoberstar-grgit" }
 org-jetbrains-kotlin-kotlin-test-junit5 = { module = "org.jetbrains.kotlin:kotlin-test-junit5", version.ref = "org-jetbrains-kotlin" }
-org-junit-junit-bom = "org.junit:junit-bom:5.9.3"
+org-junit-junit-bom = "org.junit:junit-bom:5.10.0"
 
 [plugins]
 com-gradle-plugin-publish = "com.gradle.plugin-publish:1.2.0"
