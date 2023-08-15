@@ -21,6 +21,9 @@ tasks {
     register("release") {
         mustRunAfter(check)
         finalizedBy(provider { (getTasksByName("publish", true)).toList() })
+        if (!isSnapshot()) {
+            dependsOn(provider { (getTasksByName("publishPlugins", true) - this).toList() })
+        }
     }
 }
 
@@ -35,3 +38,5 @@ nexusPublishing {
         }
     })
 }
+
+fun Project.isSnapshot() = version.toString().contains("SNAPSHOT")

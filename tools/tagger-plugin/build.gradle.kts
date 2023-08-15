@@ -1,7 +1,7 @@
 @file:Suppress("UnstableApiUsage")
 
 import java.nio.charset.Charset
-import java.util.Base64
+import java.util.*
 
 plugins {
     `java-gradle-plugin`
@@ -32,6 +32,19 @@ dependencies {
     implementation(libs.org.ajoberstar.grgit.gradle.plugin)
     testImplementation(libs.org.jetbrains.kotlin.kotlin.test.junit5)
     "functionalTestImplementation"(platform(libs.org.junit.junit.bom))
+}
+
+gradlePlugin {
+    website.set("https://github.com/robertfmurdock/ze-great-tools")
+    vcsUrl.set("https://github.com/robertfmurdock/ze-great-tools")
+    plugins {
+        named("com.zegreatrob.tools.tagger") {
+            displayName = "Tagger Plugin"
+            description =
+                "This plugin automates generation of version numbers based on commit messages and git tags."
+            tags.addAll("git", "tags", "version", "semver", "github", "release", "commit")
+        }
+    }
 }
 
 tasks {
