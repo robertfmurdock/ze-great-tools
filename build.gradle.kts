@@ -22,6 +22,9 @@ tasks {
     check {
         dependsOn(provider { gradle.includedBuilds.map { it.task(":check") }.toList() })
     }
+    clean {
+        dependsOn(provider { gradle.includedBuilds.map { it.task(":clean") }.toList() })
+    }
     release {
         dependsOn(provider { gradle.includedBuild("tools").task(":release") })
     }
@@ -30,5 +33,14 @@ tasks {
     }
     register("formatKotlin") {
         dependsOn(provider { gradle.includedBuilds.map { it.task(":formatKotlin") }.toList() })
+    }
+    val testBuilds = listOf(
+        gradle.includedBuild("tools"),
+    )
+    create<Copy>("collectResults") {
+        dependsOn(provider { (getTasksByName("collectResults", true) - this).toList() })
+        dependsOn(provider { testBuilds.map { it.task(":collectResults") } })
+        from(testBuilds.map { it.projectDir.resolve("build/test-output") })
+        into("${rootProject.buildDir.path}/test-output/${project.path}".replace(":", "/"))
     }
 }

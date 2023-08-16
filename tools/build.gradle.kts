@@ -15,6 +15,9 @@ plugins {
 tasks {
     assemble { dependsOn(provider { (getTasksByName("assemble", true) - this).toList() }) }
     check { dependsOn(provider { (getTasksByName("check", true) - this).toList() }) }
+    create("collectResults") {
+        dependsOn(provider { (getTasksByName("collectResults", true) - this).toList() })
+    }
     register("formatKotlin") {
         dependsOn(provider { (getTasksByName("formatKotlin", true) - this).toList() })
     }
