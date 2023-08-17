@@ -41,6 +41,6 @@ tasks {
         dependsOn(provider { (getTasksByName("collectResults", true) - this).toList() })
         dependsOn(provider { testBuilds.map { it.task(":collectResults") } })
         from(testBuilds.map { it.projectDir.resolve("build/test-output") })
-        into("${rootProject.buildDir.path}/test-output/${project.path}".replace(":", "/"))
+        into(rootProject.layout.buildDirectory.file("test-output/${project.path}".replace(":", "/")))
     }
 }
