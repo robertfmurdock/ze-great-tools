@@ -141,6 +141,16 @@ jobs:
 
 Make note that it must be granted permission to push tags, which can currently be done using `contents: write`.
 
+Publishing a github-release will require the GH_TOKEN environment variable to be set as well. See:
+
+```yml
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+```
+
 ## FAQ
 
 ### Why two steps?
