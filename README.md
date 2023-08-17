@@ -17,3 +17,5 @@ Included:
 ### Tagger
 
 An opinionated plugin for automatic semantic versioning via git tags and information in commits.
+
+See its [README](tools/tagger-plugin/README.md) for more.
