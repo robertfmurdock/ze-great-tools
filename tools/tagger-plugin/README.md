@@ -29,7 +29,8 @@ The `calculateVersion` task will generate a new version number based on all of t
 For example:
 
 ```bash
-./gradlew calculateVersion -q                                                                                                                                                                         ─╯
+./gradlew calculateVersion -q                                                                                                                
+
 0.0.0
 ```
 
@@ -71,6 +72,18 @@ By default, tagger will use a 'patch' version if it does not match any of the re
 tagger {
     implicitPatch.set(false)
 }
+```
+
+#### Keep in mind!
+
+In order to correctly generate the version number, the local git repository must be able to see the last relevant tag. This means a shallow git clone that only includes new commits will not be able to generate the correct version numbers.
+
+With github actions, this can be fixed by configuration of `checkout` action:
+
+```yml
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 ```
 
 ### Release
@@ -116,6 +129,8 @@ jobs:
       GRGIT_USER: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v2
       - name: Generate Version 🧮
