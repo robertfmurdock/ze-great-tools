@@ -1,5 +1,6 @@
 package digger
 
+import groovy.json.JsonOutput
 import org.ajoberstar.grgit.Grgit
 import org.ajoberstar.grgit.Person
 import org.ajoberstar.grgit.operation.AddOp
@@ -8,6 +9,7 @@ import org.ajoberstar.grgit.operation.CheckoutOp
 import org.ajoberstar.grgit.operation.CommitOp
 import org.ajoberstar.grgit.operation.RemoteAddOp
 import org.ajoberstar.grgit.operation.TagAddOp
+import org.gradle.internal.impldep.com.google.gson.Gson
 import org.gradle.testkit.runner.GradleRunner
 import org.junit.jupiter.api.io.TempDir
 import java.io.File
@@ -54,16 +56,20 @@ class DiggerPluginFunctionalTest {
         val runner = GradleRunner.create()
         runner.forwardOutput()
         runner.withPluginClasspath()
-        runner.withArguments("listCoAuthorEmails", "-q")
+        runner.withArguments("contributionData", "-q")
         runner.withProjectDir(projectDir)
         val result = runner.build()
 
         assertEquals(
-            """first@guy.edu
-                |funk@test.io
-                |second@gui.io
-                |test@funk.edu
-            """.trimMargin(),
+            Gson().toJson(object {
+                @Suppress("unused")
+                val authors: List<String> = listOf(
+                    "first@guy.edu",
+                    "funk@test.io",
+                    "second@gui.io",
+                    "test@funk.edu",
+                )
+            }),
             result.output.trim(),
         )
     }
@@ -101,18 +107,22 @@ class DiggerPluginFunctionalTest {
         val runner = GradleRunner.create()
         runner.forwardOutput()
         runner.withPluginClasspath()
-        runner.withArguments("listCoAuthorEmails", "-q")
+        runner.withArguments("contributionData", "-q")
         runner.withProjectDir(projectDir)
         val result = runner.build()
 
         assertEquals(
-            """first@guy.edu
-                |fourth@guy.edu
-                |funk@test.io
-                |second@gui.io
-                |test@funk.edu
-                |third@guy.edu
-            """.trimMargin(),
+            Gson().toJson(object {
+                @Suppress("unused")
+                val authors: List<String> = listOf(
+                    "first@guy.edu",
+                    "fourth@guy.edu",
+                    "funk@test.io",
+                    "second@gui.io",
+                    "test@funk.edu",
+                    "third@guy.edu",
+                )
+            }),
             result.output.trim(),
         )
     }
@@ -151,16 +161,21 @@ class DiggerPluginFunctionalTest {
         val runner = GradleRunner.create()
         runner.forwardOutput()
         runner.withPluginClasspath()
-        runner.withArguments("listCoAuthorEmails", "-q")
+        runner.withArguments("contributionData", "-q")
         runner.withProjectDir(projectDir)
         val result = runner.build()
 
         assertEquals(
-            """fourth@gui.io
-                |funk@test.io
-                |test@funk.edu
-                |third@guy.edu
-            """.trimMargin(),
+            JsonOutput.toJson(
+                mapOf(
+                    "authors" to listOf(
+                        "fourth@gui.io",
+                        "funk@test.io",
+                        "test@funk.edu",
+                        "third@guy.edu",
+                    ),
+                ),
+            ),
             result.output.trim(),
         )
     }

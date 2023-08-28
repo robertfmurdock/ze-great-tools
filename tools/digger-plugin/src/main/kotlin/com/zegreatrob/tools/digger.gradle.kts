@@ -12,7 +12,7 @@ val digger = project.extensions.create("digger", DiggerExtension::class, grgitSe
 
 tasks {
     val exportToGithub = project.findProperty("exportToGithub")
-    val listCoAuthorEmails by registering(ListCoAuthorEmails::class) {
+    val contributionData by registering(ListCoAuthorEmails::class) {
         this.diggerExtension = digger
         exportToGithub?.let {
             exportToGithubEnv = true
