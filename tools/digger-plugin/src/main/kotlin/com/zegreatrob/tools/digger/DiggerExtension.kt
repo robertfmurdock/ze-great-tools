@@ -6,7 +6,7 @@ import org.ajoberstar.grgit.Person
 import org.ajoberstar.grgit.gradle.GrgitServiceExtension
 import org.ajoberstar.grgit.operation.LogOp
 
-val coAuthorRegex = Regex("Co-authored-by: (.*) <(.*)>")
+val coAuthorRegex = Regex("Co-authored-by: (.*) <(.*)>", RegexOption.IGNORE_CASE)
 
 open class DiggerExtension(
     private val grgitServiceExtension: GrgitServiceExtension,
