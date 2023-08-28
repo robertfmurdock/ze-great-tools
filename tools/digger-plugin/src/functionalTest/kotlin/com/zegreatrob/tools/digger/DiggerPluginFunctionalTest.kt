@@ -65,7 +65,7 @@ class DiggerPluginFunctionalTest {
                 "second@gui.io",
                 "test@funk.edu",
             ),
-            parseAuthors(result.output)
+            parseAuthors(result.output),
         )
     }
 
@@ -118,7 +118,7 @@ class DiggerPluginFunctionalTest {
                 "test@funk.edu",
                 "third@guy.edu",
             ),
-            parseAuthors(result.output)
+            parseAuthors(result.output),
         )
     }
 
@@ -167,7 +167,7 @@ class DiggerPluginFunctionalTest {
                 "test@funk.edu",
                 "third@guy.edu",
             ),
-            parseAuthors(result.output)
+            parseAuthors(result.output),
         )
     }
 
