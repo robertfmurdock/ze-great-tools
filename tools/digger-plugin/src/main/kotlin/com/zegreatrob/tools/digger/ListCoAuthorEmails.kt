@@ -4,7 +4,7 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskAction
 
-open class DiggerGitDescription : DefaultTask() {
+open class ListCoAuthorEmails : DefaultTask() {
 
     @Input
     lateinit var diggerExtension: DiggerExtension
@@ -14,6 +14,10 @@ open class DiggerGitDescription : DefaultTask() {
 
     @TaskAction
     fun execute() {
-        logger.quiet(diggerExtension.coAuthors.joinToString("\n", transform = CoAuthor::email))
+        logger.quiet(
+            diggerExtension.collectCoAuthors()
+                .sortedBy { it.email }
+                .joinToString("\n", transform = CoAuthor::email),
+        )
     }
 }

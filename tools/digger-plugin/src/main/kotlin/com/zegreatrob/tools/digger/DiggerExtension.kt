@@ -1,21 +1,37 @@
 package com.zegreatrob.tools.digger
 
 import org.ajoberstar.grgit.Commit
+import org.ajoberstar.grgit.Grgit
 import org.ajoberstar.grgit.Person
 import org.ajoberstar.grgit.gradle.GrgitServiceExtension
-import org.gradle.api.tasks.Input
+import org.ajoberstar.grgit.operation.LogOp
 
 val coAuthorRegex = Regex("Co-authored-by: (.*) <(.*)>")
 
 open class DiggerExtension(
-    val grgitServiceExtension: GrgitServiceExtension,
+    private val grgitServiceExtension: GrgitServiceExtension,
 ) {
 
-    val coAuthors: Set<CoAuthor> by lazy {
+    fun collectCoAuthors(): Set<CoAuthor> = run {
         val grgit = grgitServiceExtension.service.get().grgit
-        val commit = grgit.head()
-        setOf(commit.committer.coAuthor(), commit.author.coAuthor()) + commit.coAuthors()
+
+        recentCommits(grgit)
+            .flatMap { it.allAuthors() }.toSet()
     }
+
+    private fun recentCommits(grgit: Grgit): List<Commit> {
+        val description = grgit.describe {}
+        val descriptionComponents = description?.split("-")
+        val previousTag = descriptionComponents?.getOrNull(0)
+
+        return if (previousTag == null) {
+            grgit.log()
+        } else {
+            return grgit.log(fun(it: LogOp) { it.range(previousTag, "HEAD") })
+        }
+    }
+
+    private fun Commit.allAuthors() = setOf(committer.coAuthor(), author.coAuthor()) + coAuthors()
 
     private fun Person.coAuthor() = CoAuthor(name, email)
 
@@ -25,9 +41,6 @@ open class DiggerExtension(
     private fun String.lineCoAuthor() = coAuthorRegex.matchEntire(this)
         ?.groupValues
         ?.let { (_, name, email) -> CoAuthor(name, email) }
-
-    @Input
-    var releaseBranch: String? = null
 }
 
 data class CoAuthor(

@@ -54,15 +54,112 @@ class DiggerPluginFunctionalTest {
         val runner = GradleRunner.create()
         runner.forwardOutput()
         runner.withPluginClasspath()
-        runner.withArguments("diggerGitDescription", "-q")
+        runner.withArguments("listCoAuthorEmails", "-q")
         runner.withProjectDir(projectDir)
         val result = runner.build()
 
         assertEquals(
-            """test@funk.edu
+            """first@guy.edu
                 |funk@test.io
-                |first@guy.edu
                 |second@gui.io
+                |test@funk.edu
+            """.trimMargin(),
+            result.output.trim(),
+        )
+    }
+
+    @Test
+    fun `will include authors from multiple commits after last tag`() {
+        buildFile.writeText(
+            """
+            plugins {
+                id("com.zegreatrob.tools.digger")
+            }
+            """.trimIndent(),
+        )
+
+        initializeGitRepo(
+            listOf(
+                """here's a message
+                |
+                |
+                |Co-authored-by: First Guy <first@guy.edu>
+                |Co-authored-by: Second Gui <second@gui.io>
+                """.trimMargin(),
+                """another
+                |
+                |
+                |Co-authored-by: Third Guy <third@guy.edu>
+                """.trimMargin(),
+                """yet another
+                |
+                |
+                |Co-authored-by: 4th Guy <fourth@guy.edu>
+                """.trimMargin(),
+            ),
+        )
+        val runner = GradleRunner.create()
+        runner.forwardOutput()
+        runner.withPluginClasspath()
+        runner.withArguments("listCoAuthorEmails", "-q")
+        runner.withProjectDir(projectDir)
+        val result = runner.build()
+
+        assertEquals(
+            """first@guy.edu
+                |fourth@guy.edu
+                |funk@test.io
+                |second@gui.io
+                |test@funk.edu
+                |third@guy.edu
+            """.trimMargin(),
+            result.output.trim(),
+        )
+    }
+
+    @Test
+    fun `will not include authors from commits before last tag`() {
+        buildFile.writeText(
+            """
+            plugins {
+                id("com.zegreatrob.tools.digger")
+            }
+            """.trimIndent(),
+        )
+
+        val grgit = initializeGitRepo(
+            listOf(
+                """here's a message
+                |
+                |
+                |Co-authored-by: First Guy <first@guy.edu>
+                |Co-authored-by: Second Gui <second@gui.io>
+                """.trimMargin(),
+            ),
+        )
+
+        grgit.addTag("release")
+        grgit.addCommitWithMessage(
+            """here's a message
+                |
+                |
+                |Co-authored-by: Third Guy <third@guy.edu>
+                |Co-authored-by: 4th Gui <fourth@gui.io>
+            """.trimMargin(),
+        )
+
+        val runner = GradleRunner.create()
+        runner.forwardOutput()
+        runner.withPluginClasspath()
+        runner.withArguments("listCoAuthorEmails", "-q")
+        runner.withProjectDir(projectDir)
+        val result = runner.build()
+
+        assertEquals(
+            """fourth@gui.io
+                |funk@test.io
+                |test@funk.edu
+                |third@guy.edu
             """.trimMargin(),
             result.output.trim(),
         )
@@ -71,24 +168,16 @@ class DiggerPluginFunctionalTest {
     private fun initializeGitRepo(
         commits: List<String> = listOf(),
         initialTag: String? = null,
-    ) {
+    ): Grgit {
         val grgit = Grgit.init(mapOf("dir" to projectDir.absolutePath))
         disableGpgSign()
         grgit.add(fun AddOp.() {
             patterns = setOf(settingsFile.name, buildFile.name, ignoreFile.name)
         })
         if (initialTag != null) {
-            grgit.tag.add(fun(it: TagAddOp) {
-                it.name = initialTag
-            })
+            grgit.addTag(initialTag)
         }
-        commits.forEach { message ->
-            grgit.commit(fun(it: CommitOp) {
-                it.author = Person("Funky Testerson", "funk@test.io")
-                it.committer = Person("Testy Funkerson", "test@funk.edu")
-                it.message = message
-            })
-        }
+        commits.forEach { message -> grgit.addCommitWithMessage(message) }
 
         grgit.remote.add(fun RemoteAddOp.() {
             this.name = "origin"
@@ -103,6 +192,21 @@ class DiggerPluginFunctionalTest {
             this.name = "main"
             this.startPoint = "origin/main"
             this.mode = BranchChangeOp.Mode.TRACK
+        })
+        return grgit
+    }
+
+    private fun Grgit.addTag(initialTag: String?) {
+        tag.add(fun(it: TagAddOp) {
+            it.name = initialTag
+        })
+    }
+
+    private fun Grgit.addCommitWithMessage(message: String) {
+        commit(fun(it: CommitOp) {
+            it.author = Person("Funky Testerson", "funk@test.io")
+            it.committer = Person("Testy Funkerson", "test@funk.edu")
+            it.message = message
         })
     }
 

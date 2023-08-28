@@ -1,7 +1,7 @@
 package com.zegreatrob.tools
 
 import com.zegreatrob.tools.digger.DiggerExtension
-import com.zegreatrob.tools.digger.DiggerGitDescription
+import com.zegreatrob.tools.digger.ListCoAuthorEmails
 
 plugins {
     id("org.ajoberstar.grgit.service")
@@ -12,7 +12,7 @@ val digger = project.extensions.create("digger", DiggerExtension::class, grgitSe
 
 tasks {
     val exportToGithub = project.findProperty("exportToGithub")
-    val diggerGitDescription by registering(DiggerGitDescription::class) {
+    val listCoAuthorEmails by registering(ListCoAuthorEmails::class) {
         this.diggerExtension = digger
         exportToGithub?.let {
             exportToGithubEnv = true

@@ -9,6 +9,6 @@ class DiggerPluginTest {
     fun `plugin registers task`() {
         val project = ProjectBuilder.builder().build()
         project.plugins.apply("com.zegreatrob.tools.digger")
-        assertNotNull(project.tasks.findByName("diggerGitDescription"))
+        assertNotNull(project.tasks.findByName("listCoAuthorEmails"))
     }
 }
