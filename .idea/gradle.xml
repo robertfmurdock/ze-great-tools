@@ -10,6 +10,7 @@
               <build path="$PROJECT_DIR$/tools" name="tools">
                 <projects>
                   <project path="$PROJECT_DIR$/tools" />
+                  <project path="$PROJECT_DIR$/tools/digger-plugin" />
                   <project path="$PROJECT_DIR$/tools/tagger-plugin" />
                   <project path="$PROJECT_DIR$/tools/tools-bom" />
                 </projects>
@@ -30,6 +31,7 @@
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/tools" />
             <option value="$PROJECT_DIR$/tools-plugins" />
+            <option value="$PROJECT_DIR$/tools/digger-plugin" />
             <option value="$PROJECT_DIR$/tools/tagger-plugin" />
             <option value="$PROJECT_DIR$/tools/tools-bom" />
           </set>

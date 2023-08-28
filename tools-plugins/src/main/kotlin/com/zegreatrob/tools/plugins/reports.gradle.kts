@@ -1,15 +1,13 @@
 package com.zegreatrob.tools.plugins
 
-import org.gradle.kotlin.dsl.creating
-import org.gradle.kotlin.dsl.getting
-import org.gradle.kotlin.dsl.repositories
-
 repositories {
     mavenCentral()
 }
 
 tasks {
-    val projectResultPath = "${rootProject.buildDir.path}/test-output/${project.path}/results".replace(":", "/")
+    val projectResultPath = rootProject.layout.buildDirectory.dir(
+        "test-output/${project.path}/results".replace(":", "/"),
+    )
 
     val check by getting
     val copyReportsToRootDirectory by creating(Copy::class) {
@@ -28,5 +26,6 @@ tasks {
 }
 
 afterEvaluate {
-    mkdir(file(rootProject.buildDir.toPath().resolve("test-output")))
+    val testOutputPath = rootProject.layout.buildDirectory.dir("test-output")
+    mkdir(testOutputPath.get().asFile)
 }
