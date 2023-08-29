@@ -6,7 +6,7 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskAction
 import java.io.FileOutputStream
 
-open class ListCoAuthorEmails : DefaultTask() {
+open class CurrentContributionData : DefaultTask() {
 
     @Input
     lateinit var diggerExtension: DiggerExtension
@@ -18,7 +18,7 @@ open class ListCoAuthorEmails : DefaultTask() {
     fun execute() {
         val output = JsonOutput.toJson(
             ContributionDataJson(
-                diggerExtension.collectCoAuthors()
+                diggerExtension.currentContributionData()
                     .sortedBy { it.email }
                     .map { it.email }
                     .toList(),

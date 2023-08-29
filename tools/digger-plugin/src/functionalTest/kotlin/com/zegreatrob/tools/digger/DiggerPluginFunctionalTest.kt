@@ -33,7 +33,7 @@ class DiggerPluginFunctionalTest {
     }
 
     @Test
-    fun `will show authors and co-authors case insensitive`() {
+    fun `currentContributionData will show authors and co-authors case insensitive`() {
         buildFile.writeText(
             """
             plugins {
@@ -55,7 +55,7 @@ class DiggerPluginFunctionalTest {
         val runner = GradleRunner.create()
         runner.forwardOutput()
         runner.withPluginClasspath()
-        runner.withArguments("contributionData", "-q")
+        runner.withArguments("currentContributionData", "-q")
         runner.withProjectDir(projectDir)
         val result = runner.build()
         assertEquals(
@@ -73,7 +73,7 @@ class DiggerPluginFunctionalTest {
         (JsonSlurper().parse(output.trim().toCharArray()) as Map<*, *>)["authors"]
 
     @Test
-    fun `will include authors from multiple commits after last tag`() {
+    fun `currentContributionData will include authors from multiple commits after last tag`() {
         buildFile.writeText(
             """
             plugins {
@@ -105,7 +105,7 @@ class DiggerPluginFunctionalTest {
         val runner = GradleRunner.create()
         runner.forwardOutput()
         runner.withPluginClasspath()
-        runner.withArguments("contributionData", "-q")
+        runner.withArguments("currentContributionData", "-q")
         runner.withProjectDir(projectDir)
         val result = runner.build()
 
@@ -123,7 +123,63 @@ class DiggerPluginFunctionalTest {
     }
 
     @Test
-    fun `will not include authors from commits before last tag`() {
+    fun `currentContributionData will include most recent tag range when head is tagged`() {
+        buildFile.writeText(
+            """
+            plugins {
+                id("com.zegreatrob.tools.digger")
+            }
+            """.trimIndent(),
+        )
+
+        val grgit = initializeGitRepo(
+            listOf(
+                """here's a message
+                |
+                |
+                |Co-authored-by: First Guy <first@guy.edu>
+                |Co-authored-by: Second Gui <second@gui.io>
+                """.trimMargin(),
+            ),
+        )
+        grgit.addTag("earlier")
+
+        grgit.addCommitWithMessage(
+            """another
+                |
+                |
+                |Co-authored-by: Third Guy <third@guy.edu>
+            """.trimMargin(),
+        )
+        grgit.addCommitWithMessage(
+            """yet another
+                |
+                |
+                |Co-authored-by: 4th Guy <fourth@guy.edu>
+            """.trimMargin(),
+        )
+        grgit.addTag("now")
+
+        val runner = GradleRunner.create()
+        runner.forwardOutput()
+        runner.withPluginClasspath()
+        runner.withArguments("currentContributionData", "-q")
+        runner.withProjectDir(projectDir)
+        val result = runner.build()
+
+        assertEquals(
+            listOf(
+                "fourth@guy.edu",
+                "funk@test.io",
+                "test@funk.edu",
+                "third@guy.edu",
+            ),
+            parseAuthors(result.output),
+        )
+    }
+
+    @Test
+    fun `currentContributionData will not include authors from commits before last tag`() {
         buildFile.writeText(
             """
             plugins {
@@ -156,7 +212,7 @@ class DiggerPluginFunctionalTest {
         val runner = GradleRunner.create()
         runner.forwardOutput()
         runner.withPluginClasspath()
-        runner.withArguments("contributionData", "-q")
+        runner.withArguments("currentContributionData", "-q")
         runner.withProjectDir(projectDir)
         val result = runner.build()
 
