@@ -1,6 +1,7 @@
 package com.zegreatrob.tools.digger
 
 import groovy.json.JsonSlurper
+import org.ajoberstar.grgit.Commit
 import org.ajoberstar.grgit.Grgit
 import org.ajoberstar.grgit.Person
 import org.ajoberstar.grgit.operation.AddOp
@@ -65,12 +66,15 @@ class DiggerPluginFunctionalTest {
                 "second@gui.io",
                 "test@funk.edu",
             ),
-            parseAuthors(result.output),
+            parseCurrentAuthors(result.output),
         )
     }
 
-    private fun parseAuthors(output: String) =
+    private fun parseCurrentAuthors(output: String) =
         (JsonSlurper().parse(output.trim().toCharArray()) as Map<*, *>)["authors"]
+
+    private fun parseAll(output: String) =
+        (JsonSlurper().parse(output.trim().toCharArray()) as List<*>)
 
     @Test
     fun `currentContributionData will include authors from multiple commits after last tag`() {
@@ -118,7 +122,7 @@ class DiggerPluginFunctionalTest {
                 "test@funk.edu",
                 "third@guy.edu",
             ),
-            parseAuthors(result.output),
+            parseCurrentAuthors(result.output),
         )
     }
 
@@ -174,7 +178,7 @@ class DiggerPluginFunctionalTest {
                 "test@funk.edu",
                 "third@guy.edu",
             ),
-            parseAuthors(result.output),
+            parseCurrentAuthors(result.output),
         )
     }
 
@@ -223,7 +227,73 @@ class DiggerPluginFunctionalTest {
                 "test@funk.edu",
                 "third@guy.edu",
             ),
-            parseAuthors(result.output),
+            parseCurrentAuthors(result.output),
+        )
+    }
+
+    @Test
+    fun `allContributionData will include all tag segments`() {
+        buildFile.writeText(
+            """
+            plugins {
+                id("com.zegreatrob.tools.digger")
+            }
+            """.trimIndent(),
+        )
+
+        val grgit = initializeGitRepo(
+            listOf(
+                """here's a message
+                |
+                |
+                |Co-authored-by: First Guy <first@guy.edu>
+                |Co-authored-by: Second Gui <second@gui.io>
+                """.trimMargin(),
+            ),
+        )
+        val firstCommit = grgit.head()
+
+        grgit.addTag("release")
+        val secondCommit = grgit.addCommitWithMessage(
+            """here's a message
+                |
+                |
+                |Co-authored-by: Third Guy <third@guy.edu>
+                |Co-authored-by: 4th Gui <fourth@gui.io>
+            """.trimMargin(),
+        )
+
+        val runner = GradleRunner.create()
+        runner.forwardOutput()
+        runner.withPluginClasspath()
+        runner.withArguments("allContributionData", "-q")
+        runner.withProjectDir(projectDir)
+        val result = runner.build()
+
+        assertEquals(
+            listOf(
+                mapOf(
+                    "lastCommit" to secondCommit.id,
+                    "firstCommit" to secondCommit.id,
+                    "authors" to listOf(
+                        "fourth@gui.io",
+                        "funk@test.io",
+                        "test@funk.edu",
+                        "third@guy.edu",
+                    ),
+                ),
+                mapOf(
+                    "lastCommit" to firstCommit.id,
+                    "firstCommit" to firstCommit.id,
+                    "authors" to listOf(
+                        "first@guy.edu",
+                        "funk@test.io",
+                        "second@gui.io",
+                        "test@funk.edu",
+                    ),
+                ),
+            ),
+            parseAll(result.output),
         )
     }
 
@@ -264,13 +334,11 @@ class DiggerPluginFunctionalTest {
         })
     }
 
-    private fun Grgit.addCommitWithMessage(message: String) {
-        commit(fun(it: CommitOp) {
-            it.author = Person("Funky Testerson", "funk@test.io")
-            it.committer = Person("Testy Funkerson", "test@funk.edu")
-            it.message = message
-        })
-    }
+    private fun Grgit.addCommitWithMessage(message: String): Commit = commit(fun(it: CommitOp) {
+        it.author = Person("Funky Testerson", "funk@test.io")
+        it.committer = Person("Testy Funkerson", "test@funk.edu")
+        it.message = message
+    })
 
     private fun disableGpgSign() {
         FileOutputStream(projectDir.resolve(".git/config"), true)

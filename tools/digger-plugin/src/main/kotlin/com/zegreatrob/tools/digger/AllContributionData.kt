@@ -6,7 +6,7 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskAction
 import java.io.FileOutputStream
 
-open class CurrentContributionData : DefaultTask() {
+open class AllContributionData : DefaultTask() {
 
     @Input
     lateinit var diggerExtension: DiggerExtension
@@ -17,13 +17,13 @@ open class CurrentContributionData : DefaultTask() {
     @TaskAction
     fun execute() {
         val output = JsonOutput.toJson(
-            diggerExtension.currentContributionData(),
+            diggerExtension.allContributionData(),
         )
 
         val githubEnvFile = System.getenv("GITHUB_ENV")
         if (exportToGithubEnv && githubEnvFile != null) {
             FileOutputStream(githubEnvFile, true)
-                .write("DIGGER_CONTRIBUTION_DATA=$output".toByteArray())
+                .write("DIGGER_ALL_CONTRIBUTION_DATA=$output".toByteArray())
         } else {
             logger.quiet(output)
         }

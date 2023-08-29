@@ -13,19 +13,48 @@ open class DiggerExtension(
     private val grgitServiceExtension: GrgitServiceExtension,
 ) {
 
-    fun currentContributionData(): Set<CoAuthor> = run {
+    fun allContributionData() = grgitServiceExtension.service.get().grgit
+        .allContributionCommits()
+        .map { range -> range.contributionDataJson() }
+
+    private fun List<Commit>.contributionDataJson() = ContributionDataJson(
+        firstCommit = firstOrNull()?.id ?: "",
+        lastCommit = lastOrNull()?.id ?: "",
+        authors = flatMap { commit -> commit.allAuthors() }.toSet()
+            .sortedBy(CoAuthor::email)
+            .map(CoAuthor::email)
+            .toList(),
+    )
+
+    fun currentContributionData() = run {
         val grgit = grgitServiceExtension.service.get().grgit
 
-        recentCommits(grgit)
-            .flatMap { it.allAuthors() }.toSet()
+        val range = grgit.currentContributionCommits()
+        range.contributionDataJson()
     }
 
-    private fun recentCommits(grgit: Grgit): List<Commit> {
-        val tag = grgit.previousTag()
+    private fun Grgit.currentContributionCommits(): List<Commit> {
+        val tag = previousTag()
         return if (tag == null) {
-            grgit.log()
+            log()
         } else {
-            return grgit.log(fun(it: LogOp) { it.range(tag, "HEAD") })
+            return log(fun(it: LogOp) { it.range(tag, "HEAD") })
+        }
+    }
+
+    private fun Grgit.allContributionCommits(): List<List<Commit>> {
+        val tagList = tag.list()
+        return log().fold(emptyList()) { acc, commit ->
+            if (tagList.any { it.commit == commit }) {
+                acc.plus(element = listOf(commit))
+            } else {
+                val lastList = acc.lastOrNull()
+                if (lastList != null) {
+                    acc.slice(acc.indices).plus(element = lastList.plusElement(commit))
+                } else {
+                    acc.plus(element = listOf(commit))
+                }
+            }
         }
     }
 

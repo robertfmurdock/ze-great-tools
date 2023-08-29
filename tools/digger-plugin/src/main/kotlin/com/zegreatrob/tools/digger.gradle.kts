@@ -1,5 +1,6 @@
 package com.zegreatrob.tools
 
+import com.zegreatrob.tools.digger.AllContributionData
 import com.zegreatrob.tools.digger.CurrentContributionData
 import com.zegreatrob.tools.digger.DiggerExtension
 
@@ -13,6 +14,12 @@ val digger = project.extensions.create("digger", DiggerExtension::class, grgitSe
 tasks {
     val exportToGithub = project.findProperty("exportToGithub")
     val currentContributionData by registering(CurrentContributionData::class) {
+        this.diggerExtension = digger
+        exportToGithub?.let {
+            exportToGithubEnv = true
+        }
+    }
+    val allContributionData by registering(AllContributionData::class) {
         this.diggerExtension = digger
         exportToGithub?.let {
             exportToGithubEnv = true
