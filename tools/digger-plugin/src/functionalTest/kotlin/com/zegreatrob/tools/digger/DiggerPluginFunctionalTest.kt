@@ -275,6 +275,7 @@ class DiggerPluginFunctionalTest {
                 mapOf(
                     "lastCommit" to secondCommit.id,
                     "firstCommit" to secondCommit.id,
+                    "dateTime" to secondCommit.dateTime.toString(),
                     "authors" to listOf(
                         "fourth@gui.io",
                         "funk@test.io",
@@ -285,6 +286,7 @@ class DiggerPluginFunctionalTest {
                 mapOf(
                     "lastCommit" to firstCommit.id,
                     "firstCommit" to firstCommit.id,
+                    "dateTime" to firstCommit.dateTime.toString(),
                     "authors" to listOf(
                         "first@guy.edu",
                         "funk@test.io",

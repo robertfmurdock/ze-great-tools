@@ -20,18 +20,16 @@ open class DiggerExtension(
     private fun List<Commit>.contributionDataJson() = ContributionDataJson(
         firstCommit = firstOrNull()?.id ?: "",
         lastCommit = lastOrNull()?.id ?: "",
+        dateTime = lastOrNull()?.dateTime?.toString(),
         authors = flatMap { commit -> commit.allAuthors() }.toSet()
             .sortedBy(CoAuthor::email)
             .map(CoAuthor::email)
             .toList(),
     )
 
-    fun currentContributionData() = run {
-        val grgit = grgitServiceExtension.service.get().grgit
-
-        val range = grgit.currentContributionCommits()
-        range.contributionDataJson()
-    }
+    fun currentContributionData() = grgitServiceExtension.service.get().grgit
+        .currentContributionCommits()
+        .contributionDataJson()
 
     private fun Grgit.currentContributionCommits(): List<Commit> {
         val tag = previousTag()

@@ -4,4 +4,5 @@ data class ContributionDataJson(
     val lastCommit: String,
     val firstCommit: String,
     val authors: List<String>,
+    val dateTime: String?,
 )
