@@ -5,4 +5,5 @@ data class VersionRegex(
     val patch: Regex,
     val minor: Regex,
     val major: Regex,
+    val unified: Regex?,
 )

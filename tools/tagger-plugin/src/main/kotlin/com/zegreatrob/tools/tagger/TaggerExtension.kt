@@ -24,6 +24,9 @@ open class TaggerExtension(
     var githubReleaseEnabled = objectFactory.property<Boolean>().convention(false)
 
     @Input
+    var versionRegex = objectFactory.property<Regex?>().convention(null)
+
+    @Input
     var noneRegex = objectFactory.property<Regex>().convention(Regex("\\[none].*"))
 
     @Input
@@ -45,12 +48,30 @@ open class TaggerExtension(
 
     val isSnapshot get() = version.contains("SNAPSHOT")
 
-    private fun calculateBuildVersion(grgit: Grgit, releaseBranch: String) = grgit.calculateNextVersion(implicitPatch.get(), versionRegex(), releaseBranch)
+    private fun calculateBuildVersion(grgit: Grgit, releaseBranch: String) = grgit.calculateNextVersion(
+        implicitPatch = implicitPatch.get(),
+        versionRegex = versionRegex(),
+        releaseBranch = releaseBranch,
+    )
 
     private fun versionRegex() = VersionRegex(
         none = noneRegex.get(),
         patch = patchRegex.get(),
         minor = minorRegex.get(),
         major = majorRegex.get(),
+        unified = versionRegex.orNull?.also { it.validateVersionRegex() },
     )
+}
+
+private fun Regex.validateVersionRegex() {
+    if (
+        pattern.contains("?<major>") &&
+        pattern.contains("?<minor>") &&
+        pattern.contains("?<patch>") &&
+        pattern.contains("?<none>")
+    ) {
+        return
+    } else {
+        throw GradleException("version regex must include groups named 'major', 'minor', 'patch', and 'none'.")
+    }
 }

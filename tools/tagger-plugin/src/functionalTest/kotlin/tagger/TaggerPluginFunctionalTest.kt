@@ -13,6 +13,7 @@ import java.io.File
 import java.io.FileOutputStream
 import kotlin.test.BeforeTest
 import kotlin.test.Test
+import kotlin.test.assertContains
 import kotlin.test.assertEquals
 
 class TaggerPluginFunctionalTest {
@@ -243,33 +244,6 @@ class TaggerPluginFunctionalTest {
     }
 
     @Test
-    fun canReplaceMinorRegex() {
-        buildFile.writeText(
-            """
-            plugins {
-                id("com.zegreatrob.tools.tagger")
-            }
-            
-            tagger {
-                releaseBranch = "main"
-                implicitPatch.set(false)
-                minorRegex.set(Regex(".*(middle).*"))
-            }
-            """.trimIndent(),
-        )
-
-        initializeGitRepo(listOf("[patch] commit 1", "commit (middle) 2", "[patch] commit 3"), "1.2.3")
-        val runner = GradleRunner.create()
-        runner.forwardOutput()
-        runner.withPluginClasspath()
-        runner.withArguments("calculateVersion", "-q")
-        runner.withProjectDir(projectDir)
-        val result = runner.build()
-
-        assertEquals("1.3.0", result.output.trim())
-    }
-
-    @Test
     fun canReplaceMajorRegex() {
         buildFile.writeText(
             """
@@ -297,6 +271,87 @@ class TaggerPluginFunctionalTest {
     }
 
     @Test
+    fun unifiedGroupRegexCanReplaceMajorRegex() {
+        buildFile.writeText(
+            """
+            plugins {
+                id("com.zegreatrob.tools.tagger")
+            }
+            
+            tagger {
+                releaseBranch = "main"
+                implicitPatch.set(false)
+                versionRegex.set(Regex("(?<major>.*big.*)?(?<minor>.*mid.*)?(?<patch>.*widdle.*)?(?<none>.*no.*)?"))
+            }
+            """.trimIndent(),
+        )
+
+        initializeGitRepo(listOf("[patch] commit 1", "commit (big) 2", "[patch] commit 3"), "1.2.3")
+        val runner = GradleRunner.create()
+        runner.forwardOutput()
+        runner.withPluginClasspath()
+        runner.withArguments("calculateVersion", "-q")
+        runner.withProjectDir(projectDir)
+        val result = runner.build()
+
+        assertEquals("2.0.0", result.output.trim())
+    }
+
+    @Test
+    fun canReplaceMinorRegex() {
+        buildFile.writeText(
+            """
+            plugins {
+                id("com.zegreatrob.tools.tagger")
+            }
+            
+            tagger {
+                releaseBranch = "main"
+                implicitPatch.set(false)
+                versionRegex.set(Regex("(?<major>.*big.*)?(?<minor>.*mid.*)?(?<patch>.*widdle.*)?(?<none>.*no.*)?"))
+            }
+            """.trimIndent(),
+        )
+
+        initializeGitRepo(listOf("[patch] commit 1", "commit (middle) 2", "[patch] commit 3"), "1.2.3")
+        val runner = GradleRunner.create()
+        runner.forwardOutput()
+        runner.withPluginClasspath()
+        runner.withArguments("calculateVersion", "-q")
+        runner.withProjectDir(projectDir)
+        val result = runner.build()
+
+        assertEquals("1.3.0", result.output.trim())
+    }
+
+    @Test
+    fun unifiedGroupCanReplaceMinorRegex() {
+        buildFile.writeText(
+            """
+            plugins {
+                id("com.zegreatrob.tools.tagger")
+            }
+            
+            tagger {
+                releaseBranch = "main"
+                implicitPatch.set(false)
+                minorRegex.set(Regex(".*(middle).*"))
+            }
+            """.trimIndent(),
+        )
+
+        initializeGitRepo(listOf("[patch] commit 1", "commit (middle) 2", "[patch] commit 3"), "1.2.3")
+        val runner = GradleRunner.create()
+        runner.forwardOutput()
+        runner.withPluginClasspath()
+        runner.withArguments("calculateVersion", "-q")
+        runner.withProjectDir(projectDir)
+        val result = runner.build()
+
+        assertEquals("1.3.0", result.output.trim())
+    }
+
+    @Test
     fun canReplacePatchRegex() {
         buildFile.writeText(
             """
@@ -313,6 +368,33 @@ class TaggerPluginFunctionalTest {
         )
 
         initializeGitRepo(listOf("commit 1", "commit (tiny) 2", "commit 3"), "1.2.3")
+        val runner = GradleRunner.create()
+        runner.forwardOutput()
+        runner.withPluginClasspath()
+        runner.withArguments("calculateVersion", "-q")
+        runner.withProjectDir(projectDir)
+        val result = runner.build()
+
+        assertEquals("1.2.4", result.output.trim())
+    }
+
+    @Test
+    fun unifiedGroupCanReplacePatchRegex() {
+        buildFile.writeText(
+            """
+            plugins {
+                id("com.zegreatrob.tools.tagger")
+            }
+            
+            tagger {
+                releaseBranch = "main"
+                implicitPatch.set(false)
+                versionRegex.set(Regex("(?<major>.*big.*)?(?<minor>.*mid.*)?(?<patch>.*widdle.*)?(?<none>.*no.*)?"))
+            }
+            """.trimIndent(),
+        )
+
+        initializeGitRepo(listOf("commit 1", "commit (widdle) 2", "commit 3"), "1.2.3")
         val runner = GradleRunner.create()
         runner.forwardOutput()
         runner.withPluginClasspath()
@@ -348,6 +430,63 @@ class TaggerPluginFunctionalTest {
         val result = runner.build()
 
         assertEquals("1.2.3-SNAPSHOT", result.output.trim())
+    }
+
+    @Test
+    fun unifiedGroupCanReplaceNoneRegex() {
+        buildFile.writeText(
+            """
+            plugins {
+                id("com.zegreatrob.tools.tagger")
+            }
+            
+            tagger {
+                releaseBranch = "main"
+                implicitPatch.set(true)
+                versionRegex.set(Regex("(?<major>.*big.*)?(?<minor>.*mid.*)?(?<patch>.*widdle.*)?(?<none>.*no.*)?"))
+            }
+            """.trimIndent(),
+        )
+
+        initializeGitRepo(listOf("commit (no) 1"), "1.2.3")
+        val runner = GradleRunner.create()
+        runner.forwardOutput()
+        runner.withPluginClasspath()
+        runner.withArguments("calculateVersion", "-q")
+        runner.withProjectDir(projectDir)
+        val result = runner.build()
+
+        assertEquals("1.2.3-SNAPSHOT", result.output.trim())
+    }
+
+    @Test
+    fun unifiedGroupWillReportErrorsWhenMissingGroupsWithCorrectNames() {
+        buildFile.writeText(
+            """
+            plugins {
+                id("com.zegreatrob.tools.tagger")
+            }
+            
+            tagger {
+                releaseBranch = "main"
+                implicitPatch.set(true)
+                versionRegex.set(Regex(".*"))
+            }
+            """.trimIndent(),
+        )
+
+        initializeGitRepo(listOf("commit (no) 1"), "1.2.3")
+        val runner = GradleRunner.create()
+        runner.forwardOutput()
+        runner.withPluginClasspath()
+        runner.withArguments("calculateVersion", "-q")
+        runner.withProjectDir(projectDir)
+        val result = runCatching { runner.build() }.exceptionOrNull()
+
+        assertContains(
+            charSequence = result.toString(),
+            other = "version regex must include groups named 'major', 'minor', 'patch', and 'none'.",
+        )
     }
 
     @Test
