@@ -8,6 +8,7 @@ import org.ajoberstar.grgit.gradle.GrgitServiceExtension
 import org.ajoberstar.grgit.operation.LogOp
 
 val coAuthorRegex = Regex("Co-authored-by: (.*) <(.*)>", RegexOption.IGNORE_CASE)
+val easeRegex = Regex(".*-(?<ease>[1-5])-.*", RegexOption.IGNORE_CASE)
 
 open class DiggerExtension(
     private val grgitServiceExtension: GrgitServiceExtension,
@@ -15,16 +16,17 @@ open class DiggerExtension(
 
     fun allContributionData() = grgitServiceExtension.service.get().grgit
         .allContributionCommits()
-        .map { range -> range.contributionDataJson() }
+        .map { range -> range.toList().contributionDataJson() }
 
     private fun List<Commit>.contributionDataJson() = ContributionDataJson(
-        firstCommit = firstOrNull()?.id ?: "",
-        lastCommit = lastOrNull()?.id ?: "",
+        firstCommit = lastOrNull()?.id ?: "",
+        lastCommit = firstOrNull()?.id ?: "",
         dateTime = lastOrNull()?.dateTime?.toString(),
         authors = flatMap { commit -> commit.allAuthors() }.toSet()
             .sortedBy(CoAuthor::email)
             .map(CoAuthor::email)
             .toList(),
+        ease = mapNotNull { commit -> commit.ease() }.maxOrNull(),
     )
 
     fun currentContributionData() = grgitServiceExtension.service.get().grgit
@@ -48,7 +50,7 @@ open class DiggerExtension(
             } else {
                 val lastList = acc.lastOrNull()
                 if (lastList != null) {
-                    acc.slice(acc.indices).plus(element = lastList.plusElement(commit))
+                    acc.slice(0..acc.size - 2).plus(element = lastList.plusElement(commit))
                 } else {
                     acc.plus(element = listOf(commit))
                 }
@@ -77,6 +79,11 @@ open class DiggerExtension(
         ?.groupValues
         ?.let { (_, name, email) -> CoAuthor(name, email) }
 }
+
+private fun Commit.ease(): Int? = runCatching { easeRegex.matchEntire(fullMessage)?.groups?.get("ease") }
+    .getOrNull()
+    ?.value
+    ?.toIntOrNull()
 
 data class CoAuthor(
     val name: String,
