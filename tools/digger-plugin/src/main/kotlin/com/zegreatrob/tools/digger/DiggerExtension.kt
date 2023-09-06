@@ -22,7 +22,7 @@ open class DiggerExtension(
         return ContributionDataJson(
             firstCommit = lastOrNull()?.id ?: "",
             lastCommit = firstOrNull()?.id ?: "",
-            dateTime = lastOrNull()?.dateTime?.toString(),
+            dateTime = firstOrNull()?.dateTime?.toString(),
             authors = messageDigResults.flatMap { it.authors }
                 .map { it.lowercase() }
                 .toSet()
