@@ -2,14 +2,9 @@ package com.zegreatrob.tools.digger
 
 import org.ajoberstar.grgit.Commit
 import org.ajoberstar.grgit.Grgit
-import org.ajoberstar.grgit.Person
 import org.ajoberstar.grgit.Tag
 import org.ajoberstar.grgit.gradle.GrgitServiceExtension
 import org.ajoberstar.grgit.operation.LogOp
-
-val coAuthorRegex = Regex("Co-authored-by: (.*) <(.*)>", RegexOption.IGNORE_CASE)
-val easeRegex = Regex(".*-(?<ease>[1-5])-.*", RegexOption.IGNORE_CASE)
-val storyRegex = Regex("\\[(?<storyId>.*)].*", RegexOption.IGNORE_CASE)
 
 open class DiggerExtension(
     private val grgitServiceExtension: GrgitServiceExtension,
@@ -19,23 +14,36 @@ open class DiggerExtension(
         .allContributionCommits()
         .map { range -> range.toList().contributionDataJson() }
 
-    private fun List<Commit>.contributionDataJson() = ContributionDataJson(
-        firstCommit = lastOrNull()?.id ?: "",
-        lastCommit = firstOrNull()?.id ?: "",
-        dateTime = lastOrNull()?.dateTime?.toString(),
-        authors = flatMap { commit -> commit.allAuthors() }.toSet()
-            .sortedBy(CoAuthor::email)
-            .map(CoAuthor::email)
-            .toList(),
-        ease = mapNotNull { commit -> commit.ease() }.maxOrNull(),
-        storyId = mapNotNull { commit -> commit.storyId() }
-            .let {
-                if (it.isEmpty()) {
-                    null
-                } else {
-                    it.toSortedSet().joinToString(", ")
-                }
-            },
+    private fun List<Commit>.contributionDataJson(): ContributionDataJson {
+        val messageDigResults = map { commit ->
+            commit.commitInspectionResult(digIntoMessage(commit.fullMessage))
+        }
+
+        return ContributionDataJson(
+            firstCommit = lastOrNull()?.id ?: "",
+            lastCommit = firstOrNull()?.id ?: "",
+            dateTime = lastOrNull()?.dateTime?.toString(),
+            authors = messageDigResults.flatMap { it.authors }.toSet()
+                .sorted()
+                .toList(),
+            ease = messageDigResults.mapNotNull { it.ease }.maxOrNull(),
+            storyId = messageDigResults.mapNotNull { it.storyId }
+                .let {
+                    if (it.isEmpty()) {
+                        null
+                    } else {
+                        it.toSortedSet().joinToString(", ")
+                    }
+                },
+        )
+    }
+
+    private fun Commit.commitInspectionResult(
+        it: MessageDigResult,
+    ) = CommitInspectionResult(
+        storyId = it.storyId,
+        ease = it.ease,
+        authors = listOf(committer.email, author.email) + it.coauthors,
     )
 
     fun currentContributionData() = grgitServiceExtension.service.get().grgit
@@ -76,29 +84,4 @@ open class DiggerExtension(
             tag
         }
     }
-
-    private fun Commit.allAuthors() = setOf(committer.coAuthor(), author.coAuthor()) + coAuthors()
-
-    private fun Person.coAuthor() = CoAuthor(name, email)
-
-    private fun Commit.coAuthors() = fullMessage.split("\n")
-        .mapNotNull { it.lineCoAuthor() }
-
-    private fun String.lineCoAuthor() = coAuthorRegex.matchEntire(this)
-        ?.groupValues
-        ?.let { (_, name, email) -> CoAuthor(name, email) }
 }
-
-private fun Commit.ease(): Int? = runCatching { easeRegex.matchEntire(fullMessage)?.groups?.get("ease") }
-    .getOrNull()
-    ?.value
-    ?.toIntOrNull()
-
-private fun Commit.storyId(): String? = runCatching { storyRegex.matchEntire(fullMessage)?.groups?.get("storyId") }
-    .getOrNull()
-    ?.value
-
-data class CoAuthor(
-    val name: String,
-    val email: String,
-)
