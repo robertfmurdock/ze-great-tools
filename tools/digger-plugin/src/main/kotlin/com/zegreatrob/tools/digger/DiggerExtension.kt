@@ -23,7 +23,9 @@ open class DiggerExtension(
             firstCommit = lastOrNull()?.id ?: "",
             lastCommit = firstOrNull()?.id ?: "",
             dateTime = lastOrNull()?.dateTime?.toString(),
-            authors = messageDigResults.flatMap { it.authors }.toSet()
+            authors = messageDigResults.flatMap { it.authors }
+                .map { it.lowercase() }
+                .toSet()
                 .sorted()
                 .toList(),
             ease = messageDigResults.mapNotNull { it.ease }.maxOrNull(),

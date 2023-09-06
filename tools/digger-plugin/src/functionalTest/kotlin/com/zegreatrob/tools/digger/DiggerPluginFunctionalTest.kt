@@ -208,7 +208,7 @@ class DiggerPluginFunctionalTest {
             """here's a message
                 |
                 |
-                |Co-authored-by: Third Guy <third@guy.edu>
+                |Co-authored-by: Third Guy <Third@Guy.edu>
                 |Co-authored-by: 4th Gui <fourth@gui.io>
             """.trimMargin(),
         )
