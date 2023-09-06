@@ -9,6 +9,7 @@ import org.ajoberstar.grgit.operation.LogOp
 
 val coAuthorRegex = Regex("Co-authored-by: (.*) <(.*)>", RegexOption.IGNORE_CASE)
 val easeRegex = Regex(".*-(?<ease>[1-5])-.*", RegexOption.IGNORE_CASE)
+val storyRegex = Regex("\\[(?<storyId>.*)].*", RegexOption.IGNORE_CASE)
 
 open class DiggerExtension(
     private val grgitServiceExtension: GrgitServiceExtension,
@@ -27,6 +28,14 @@ open class DiggerExtension(
             .map(CoAuthor::email)
             .toList(),
         ease = mapNotNull { commit -> commit.ease() }.maxOrNull(),
+        storyId = mapNotNull { commit -> commit.storyId() }
+            .let {
+                if (it.isEmpty()) {
+                    null
+                } else {
+                    it.joinToString(",")
+                }
+            },
     )
 
     fun currentContributionData() = grgitServiceExtension.service.get().grgit
@@ -84,6 +93,10 @@ private fun Commit.ease(): Int? = runCatching { easeRegex.matchEntire(fullMessag
     .getOrNull()
     ?.value
     ?.toIntOrNull()
+
+private fun Commit.storyId(): String? = runCatching { storyRegex.matchEntire(fullMessage)?.groups?.get("storyId") }
+    .getOrNull()
+    ?.value
 
 data class CoAuthor(
     val name: String,

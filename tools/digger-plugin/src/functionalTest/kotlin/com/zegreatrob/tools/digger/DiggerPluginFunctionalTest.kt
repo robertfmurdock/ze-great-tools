@@ -283,6 +283,7 @@ class DiggerPluginFunctionalTest {
                         "third@guy.edu",
                     ),
                     "ease" to null,
+                    "storyId" to null,
                 ),
                 mapOf(
                     "lastCommit" to firstCommit.id,
@@ -295,6 +296,7 @@ class DiggerPluginFunctionalTest {
                         "test@funk.edu",
                     ),
                     "ease" to null,
+                    "storyId" to null,
                 ),
             ),
             parseAll(result.output),
@@ -338,6 +340,7 @@ class DiggerPluginFunctionalTest {
                     "dateTime" to secondCommit.dateTime.toString(),
                     "firstCommit" to secondCommit.id,
                     "ease" to 3,
+                    "storyId" to null,
                 ),
                 mapOf(
                     "authors" to listOf("funk@test.io", "test@funk.edu"),
@@ -345,6 +348,50 @@ class DiggerPluginFunctionalTest {
                     "dateTime" to firstCommit.dateTime.toString(),
                     "firstCommit" to firstCommit.id,
                     "ease" to 4,
+                    "storyId" to null,
+                ),
+            ),
+            parseAll(result.output),
+        )
+    }
+
+    @Test
+    fun `allContributionData will include story ids`() {
+        buildFile.writeText(
+            """
+            plugins {
+                id("com.zegreatrob.tools.digger")
+            }
+            """.trimIndent(),
+        )
+        val grgit = initializeGitRepo(listOf("[DOGCOW-17] here's a message"))
+        val firstCommit = grgit.head()
+        grgit.addTag("release")
+        val secondCommit = grgit.addCommitWithMessage("[DOGCOW-18] -3- here's a message")
+        val runner = GradleRunner.create()
+        runner.forwardOutput()
+        runner.withPluginClasspath()
+        runner.withArguments("allContributionData", "-q")
+        runner.withProjectDir(projectDir)
+        val result = runner.build()
+
+        assertEquals(
+            listOf(
+                mapOf(
+                    "authors" to listOf("funk@test.io", "test@funk.edu"),
+                    "lastCommit" to secondCommit.id,
+                    "dateTime" to secondCommit.dateTime.toString(),
+                    "firstCommit" to secondCommit.id,
+                    "ease" to 3,
+                    "storyId" to "DOGCOW-18",
+                ),
+                mapOf(
+                    "authors" to listOf("funk@test.io", "test@funk.edu"),
+                    "lastCommit" to firstCommit.id,
+                    "dateTime" to firstCommit.dateTime.toString(),
+                    "firstCommit" to firstCommit.id,
+                    "ease" to null,
+                    "storyId" to "DOGCOW-17",
                 ),
             ),
             parseAll(result.output),
@@ -385,6 +432,7 @@ class DiggerPluginFunctionalTest {
                     "dateTime" to secondCommit.dateTime.toString(),
                     "firstCommit" to firstCommit.id,
                     "ease" to 4,
+                    "storyId" to null,
                 ),
             ),
             parseAll(result.output),

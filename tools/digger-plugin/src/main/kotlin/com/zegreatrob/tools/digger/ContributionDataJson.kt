@@ -6,4 +6,5 @@ data class ContributionDataJson(
     val authors: List<String>,
     val dateTime: String?,
     val ease: Int?,
+    val storyId: String?,
 )
