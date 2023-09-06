@@ -1,7 +1,7 @@
 package com.zegreatrob.tools.digger
 
 private val allRegex = Regex(
-    pattern = "(?>\\[(?<storyId>.*)])?(?>-(?<ease>[1-5])-)?(?>Co-authored-by: .* <(?<coAuthors>.*)>)?",
+    pattern = "(?>\\[(?<storyId>.*?)])?(?>-(?<ease>[1-5])-)?(?>Co-authored-by: .* <(?<coAuthors>.*)>)?",
     options = setOf(RegexOption.IGNORE_CASE, RegexOption.MULTILINE),
 )
 
