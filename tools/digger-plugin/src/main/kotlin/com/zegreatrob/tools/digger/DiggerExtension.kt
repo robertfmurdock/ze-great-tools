@@ -86,4 +86,6 @@ open class DiggerExtension(
             tag
         }
     }
+
+    fun headId(): String = grgitServiceExtension.service.get().grgit.head().id
 }

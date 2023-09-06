@@ -26,6 +26,7 @@ class DiggerPluginFunctionalTest {
     private val buildFile by lazy { projectDir.resolve("build.gradle.kts") }
     private val settingsFile by lazy { projectDir.resolve("settings.gradle") }
     private val ignoreFile by lazy { projectDir.resolve(".gitignore") }
+    private val currentOutput by lazy { projectDir.resolve("build/digger/current.json") }
 
     @BeforeTest
     fun setup() {
@@ -53,12 +54,12 @@ class DiggerPluginFunctionalTest {
                 """.trimMargin(),
             ),
         )
-        val runner = GradleRunner.create()
-        runner.forwardOutput()
-        runner.withPluginClasspath()
-        runner.withArguments("currentContributionData", "-q")
-        runner.withProjectDir(projectDir)
-        val result = runner.build()
+        GradleRunner.create()
+            .forwardOutput()
+            .withPluginClasspath()
+            .withArguments("currentContributionData", "-q")
+            .withProjectDir(projectDir)
+            .build()
         assertEquals(
             listOf(
                 "first@guy.edu",
@@ -66,7 +67,7 @@ class DiggerPluginFunctionalTest {
                 "second@gui.io",
                 "test@funk.edu",
             ),
-            parseCurrentAuthors(result.output),
+            parseCurrentAuthors(currentOutput.readText()),
         )
     }
 
@@ -106,12 +107,12 @@ class DiggerPluginFunctionalTest {
                 """.trimMargin(),
             ),
         )
-        val runner = GradleRunner.create()
-        runner.forwardOutput()
-        runner.withPluginClasspath()
-        runner.withArguments("currentContributionData", "-q")
-        runner.withProjectDir(projectDir)
-        val result = runner.build()
+        GradleRunner.create()
+            .forwardOutput()
+            .withPluginClasspath()
+            .withArguments("currentContributionData", "-q")
+            .withProjectDir(projectDir)
+            .build()
 
         assertEquals(
             listOf(
@@ -122,7 +123,7 @@ class DiggerPluginFunctionalTest {
                 "test@funk.edu",
                 "third@guy.edu",
             ),
-            parseCurrentAuthors(result.output),
+            parseCurrentAuthors(currentOutput.readText()),
         )
     }
 
@@ -164,12 +165,12 @@ class DiggerPluginFunctionalTest {
         )
         grgit.addTag("now")
 
-        val runner = GradleRunner.create()
-        runner.forwardOutput()
-        runner.withPluginClasspath()
-        runner.withArguments("currentContributionData", "-q")
-        runner.withProjectDir(projectDir)
-        val result = runner.build()
+        GradleRunner.create()
+            .forwardOutput()
+            .withPluginClasspath()
+            .withArguments("currentContributionData", "-q")
+            .withProjectDir(projectDir)
+            .build()
 
         assertEquals(
             listOf(
@@ -178,7 +179,7 @@ class DiggerPluginFunctionalTest {
                 "test@funk.edu",
                 "third@guy.edu",
             ),
-            parseCurrentAuthors(result.output),
+            parseCurrentAuthors(currentOutput.readText()),
         )
     }
 
@@ -213,12 +214,12 @@ class DiggerPluginFunctionalTest {
             """.trimMargin(),
         )
 
-        val runner = GradleRunner.create()
-        runner.forwardOutput()
-        runner.withPluginClasspath()
-        runner.withArguments("currentContributionData", "-q")
-        runner.withProjectDir(projectDir)
-        val result = runner.build()
+        GradleRunner.create()
+            .forwardOutput()
+            .withPluginClasspath()
+            .withArguments("currentContributionData", "-q")
+            .withProjectDir(projectDir)
+            .build()
 
         assertEquals(
             listOf(
@@ -227,7 +228,7 @@ class DiggerPluginFunctionalTest {
                 "test@funk.edu",
                 "third@guy.edu",
             ),
-            parseCurrentAuthors(result.output),
+            parseCurrentAuthors(currentOutput.readText()),
         )
     }
 

@@ -15,6 +15,10 @@ tasks {
     val exportToGithub = project.findProperty("exportToGithub")
     val currentContributionData by registering(CurrentContributionData::class) {
         this.diggerExtension = digger
+
+        inputs.property("GIT_HEAD", digger.headId())
+
+        outputFile.set(layout.buildDirectory.file("digger/current.json"))
         exportToGithub?.let {
             exportToGithubEnv = true
         }
