@@ -33,7 +33,7 @@ open class DiggerExtension(
                 if (it.isEmpty()) {
                     null
                 } else {
-                    it.joinToString(",")
+                    it.toSortedSet().joinToString(", ")
                 }
             },
     )

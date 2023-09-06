@@ -399,6 +399,74 @@ class DiggerPluginFunctionalTest {
     }
 
     @Test
+    fun `allContributionData will merge the same story id within a contribution`() {
+        buildFile.writeText(
+            """
+            plugins {
+                id("com.zegreatrob.tools.digger")
+            }
+            """.trimIndent(),
+        )
+        val grgit = initializeGitRepo(listOf("[DOGCOW-17] here's a message"))
+        val firstCommit = grgit.head()
+        val secondCommit = grgit.addCommitWithMessage("[DOGCOW-17] -3- here's a message")
+        val runner = GradleRunner.create()
+        runner.forwardOutput()
+        runner.withPluginClasspath()
+        runner.withArguments("allContributionData", "-q")
+        runner.withProjectDir(projectDir)
+        val result = runner.build()
+
+        assertEquals(
+            listOf(
+                mapOf(
+                    "authors" to listOf("funk@test.io", "test@funk.edu"),
+                    "lastCommit" to secondCommit.id,
+                    "dateTime" to secondCommit.dateTime.toString(),
+                    "firstCommit" to firstCommit.id,
+                    "ease" to 3,
+                    "storyId" to "DOGCOW-17",
+                ),
+            ),
+            parseAll(result.output),
+        )
+    }
+
+    @Test
+    fun `allContributionData will merge the different story ids within a contribution`() {
+        buildFile.writeText(
+            """
+            plugins {
+                id("com.zegreatrob.tools.digger")
+            }
+            """.trimIndent(),
+        )
+        val grgit = initializeGitRepo(listOf("[DOGCOW-17] here's a message"))
+        val firstCommit = grgit.head()
+        val secondCommit = grgit.addCommitWithMessage("[DOGCOW-18] -3- here's a message")
+        val runner = GradleRunner.create()
+        runner.forwardOutput()
+        runner.withPluginClasspath()
+        runner.withArguments("allContributionData", "-q")
+        runner.withProjectDir(projectDir)
+        val result = runner.build()
+
+        assertEquals(
+            listOf(
+                mapOf(
+                    "authors" to listOf("funk@test.io", "test@funk.edu"),
+                    "lastCommit" to secondCommit.id,
+                    "dateTime" to secondCommit.dateTime.toString(),
+                    "firstCommit" to firstCommit.id,
+                    "ease" to 3,
+                    "storyId" to "DOGCOW-17, DOGCOW-18",
+                ),
+            ),
+            parseAll(result.output),
+        )
+    }
+
+    @Test
     fun `allContributionData will include flatten ease into largest number`() {
         buildFile.writeText(
             """
