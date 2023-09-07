@@ -241,11 +241,20 @@ class MessageDigTest {
     }
 
     @Test
-    fun includingPatchAndStoryIdWorksAsExpected() {
+    fun includingStoryIdAndPatchWorksAsExpected() {
         val input = "[Cowdog-42] [patch] I did that thing"
         val result = MessageDigger(Regex("\\(.*big.*\\)")).digIntoMessage(input)
 
         assertEquals(expected = "Cowdog-42", actual = result.storyId)
         assertEquals(expected = SemverType.Patch, actual = result.semver)
+    }
+
+    @Test
+    fun includingMajorAndStoryIdWorksAsExpected() {
+        val input = "[major] [Cowdog-42]  I did that thing"
+        val result = MessageDigger().digIntoMessage(input)
+
+        assertEquals(expected = "Cowdog-42", actual = result.storyId)
+        assertEquals(expected = SemverType.Major, actual = result.semver)
     }
 }

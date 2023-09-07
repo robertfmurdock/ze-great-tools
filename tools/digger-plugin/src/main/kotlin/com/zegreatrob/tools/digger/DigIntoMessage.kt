@@ -29,23 +29,21 @@ private fun Sequence<MatchResult>.messageDigResult() = MessageDigResult(
     storyId = firstNotNullOfOrNull { it.groups["storyId"] }?.value,
     ease = firstNotNullOfOrNull { it.groups["ease"] }?.value?.toIntOrNull(),
     coauthors = mapNotNull { it.groups["coAuthors"]?.value }.toList(),
-    semver = mapNotNull {
-        when {
-            it.groupMatches("major") -> SemverType.Major
-            it.groupMatches("minor") -> SemverType.Minor
-            it.groupMatches("patch") -> SemverType.Patch
-            it.groupMatches("none") -> SemverType.None
-            else -> null
-        }
-    }.sorted()
-        .lastOrNull(),
-
+    semver = mapNotNull { getSemver(it) }.maxOrNull(),
 )
+
+private fun getSemver(it: MatchResult) = when {
+    it.groupMatches("major") -> SemverType.Major
+    it.groupMatches("minor") -> SemverType.Minor
+    it.groupMatches("patch") -> SemverType.Patch
+    it.groupMatches("none") -> SemverType.None
+    else -> null
+}
 
 private fun MatchResult.groupMatches(groupName: String) =
     runCatching { this@groupMatches.groups[groupName] }.getOrNull() != null
 
-fun List<SemverType>.highestPrioritySemver() = sorted().lastOrNull()
+fun List<SemverType>.highestPrioritySemver() = maxOrNull()
 
 enum class SemverType {
     None, Patch, Minor, Major
