@@ -1,4 +1,4 @@
-package com.zegreatrob.tools.digger
+package com.zegreatrob.tools.digger.core
 
 class MessageDigger(
     majorRegex: Regex = Regex("\\[major]"),

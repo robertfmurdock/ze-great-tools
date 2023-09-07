@@ -1,5 +1,7 @@
 package com.zegreatrob.tools.digger
 
+import com.zegreatrob.tools.digger.core.MessageDigger
+import com.zegreatrob.tools.digger.core.SemverType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

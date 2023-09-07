@@ -1,5 +1,8 @@
 package com.zegreatrob.tools.digger
 
+import com.zegreatrob.tools.digger.core.MessageDigResult
+import com.zegreatrob.tools.digger.core.MessageDigger
+import com.zegreatrob.tools.digger.core.highestPrioritySemver
 import org.ajoberstar.grgit.Commit
 import org.ajoberstar.grgit.Grgit
 import org.ajoberstar.grgit.Tag
