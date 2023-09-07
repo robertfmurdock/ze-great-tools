@@ -4,10 +4,12 @@ data class MessageDigResult(
     val storyId: String?,
     val ease: Int?,
     val coauthors: List<String>,
+    val semver: SemverType?,
 )
 
 data class CommitInspectionResult(
     val storyId: String?,
     val ease: Int?,
     val authors: List<String>,
+    val semver: String?,
 )

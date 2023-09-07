@@ -72,8 +72,44 @@ class DiggerPluginFunctionalTest {
         )
     }
 
+    @Test
+    fun `when included currentContributionData will show semver level`() {
+        buildFile.writeText(
+            """
+            plugins {
+                id("com.zegreatrob.tools.digger")
+            }
+            """.trimIndent(),
+        )
+
+        initializeGitRepo(
+            listOf(
+                """[patch] here's a message
+                |
+                |
+                |co-authored-by: First Guy <first@guy.edu>
+                |CO-AUTHORED-BY: Second Gui <second@gui.io>
+                """.trimMargin(),
+            ),
+        )
+        GradleRunner.create()
+            .forwardOutput()
+            .withPluginClasspath()
+            .withArguments("currentContributionData", "-q")
+            .withProjectDir(projectDir)
+            .build()
+        assertEquals("Patch", parseSemver(currentOutput.readText()))
+        assertEquals(null, parseStoryId(currentOutput.readText()))
+    }
+
     private fun parseCurrentAuthors(output: String) =
         (JsonSlurper().parse(output.trim().toCharArray()) as Map<*, *>)["authors"]
+
+    private fun parseSemver(output: String) =
+        (JsonSlurper().parse(output.trim().toCharArray()) as Map<*, *>)["semver"]
+
+    private fun parseStoryId(output: String) =
+        (JsonSlurper().parse(output.trim().toCharArray()) as Map<*, *>)["storyId"]
 
     private fun parseAll(output: String) =
         (JsonSlurper().parse(output.trim().toCharArray()) as List<*>)
@@ -284,6 +320,7 @@ class DiggerPluginFunctionalTest {
                     ),
                     "ease" to null,
                     "storyId" to null,
+                    "semver" to null,
                 ),
                 mapOf(
                     "lastCommit" to firstCommit.id,
@@ -297,6 +334,7 @@ class DiggerPluginFunctionalTest {
                     ),
                     "ease" to null,
                     "storyId" to null,
+                    "semver" to null,
                 ),
             ),
             parseAll(allOutput.readText()),
@@ -339,6 +377,7 @@ class DiggerPluginFunctionalTest {
                     "firstCommit" to secondCommit.id,
                     "ease" to 3,
                     "storyId" to null,
+                    "semver" to null,
                 ),
                 mapOf(
                     "authors" to listOf("funk@test.io", "test@funk.edu"),
@@ -347,6 +386,7 @@ class DiggerPluginFunctionalTest {
                     "firstCommit" to firstCommit.id,
                     "ease" to 4,
                     "storyId" to null,
+                    "semver" to null,
                 ),
             ),
             parseAll(allOutput.readText()),
@@ -381,6 +421,7 @@ class DiggerPluginFunctionalTest {
                     "firstCommit" to secondCommit.id,
                     "ease" to 3,
                     "storyId" to "DOGCOW-18",
+                    "semver" to null,
                 ),
                 mapOf(
                     "authors" to listOf("funk@test.io", "test@funk.edu"),
@@ -389,6 +430,7 @@ class DiggerPluginFunctionalTest {
                     "firstCommit" to firstCommit.id,
                     "ease" to null,
                     "storyId" to "DOGCOW-17",
+                    "semver" to null,
                 ),
             ),
             parseAll(allOutput.readText()),
@@ -422,6 +464,7 @@ class DiggerPluginFunctionalTest {
                     "firstCommit" to firstCommit.id,
                     "ease" to 3,
                     "storyId" to "DOGCOW-17",
+                    "semver" to null,
                 ),
             ),
             parseAll(allOutput.readText()),
@@ -457,6 +500,7 @@ class DiggerPluginFunctionalTest {
                     "firstCommit" to firstCommit.id,
                     "ease" to 3,
                     "storyId" to "DOGCOW-17, DOGCOW-18",
+                    "semver" to null,
                 ),
             ),
             parseAll(allOutput.readText()),
@@ -494,6 +538,7 @@ class DiggerPluginFunctionalTest {
                 mapOf(
                     "authors" to listOf("funk@test.io", "test@funk.edu"),
                     "lastCommit" to secondCommit.id,
+                    "semver" to null,
                     "dateTime" to secondCommit.dateTime.toString(),
                     "firstCommit" to firstCommit.id,
                     "ease" to 4,

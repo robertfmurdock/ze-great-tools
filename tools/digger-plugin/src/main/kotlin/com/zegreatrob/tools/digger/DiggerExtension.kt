@@ -37,6 +37,7 @@ open class DiggerExtension(
                         it.toSortedSet().joinToString(", ")
                     }
                 },
+            semver = messageDigResults.firstNotNullOfOrNull { it.semver },
         )
     }
 
@@ -46,6 +47,7 @@ open class DiggerExtension(
         storyId = it.storyId,
         ease = it.ease,
         authors = listOf(committer.email, author.email) + it.coauthors,
+        semver = it.semver?.toString(),
     )
 
     fun currentContributionData() = grgitServiceExtension.service.get().grgit

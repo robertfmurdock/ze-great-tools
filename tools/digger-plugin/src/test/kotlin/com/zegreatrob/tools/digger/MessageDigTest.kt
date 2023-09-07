@@ -73,6 +73,58 @@ class MessageDigTest {
     }
 
     @Test
+    fun onlyMajorWorksAsIntended() {
+        val input = "[major] I did that thing"
+        val result = digIntoMessage(input)
+
+        assertEquals(expected = SemverType.Major, actual = result.semver)
+        assertEquals(expected = null, actual = result.storyId)
+        assertEquals(
+            expected = emptyList(),
+            actual = result.coauthors,
+        )
+    }
+
+    @Test
+    fun onlyMinorWorksAsIntended() {
+        val input = "[minor] I did that thing"
+        val result = digIntoMessage(input)
+
+        assertEquals(expected = SemverType.Minor, actual = result.semver)
+        assertEquals(expected = null, actual = result.storyId)
+        assertEquals(
+            expected = emptyList(),
+            actual = result.coauthors,
+        )
+    }
+
+    @Test
+    fun onlyPatchWorksAsIntended() {
+        val input = "[patch] I did that thing"
+        val result = digIntoMessage(input)
+
+        assertEquals(expected = SemverType.Patch, actual = result.semver)
+        assertEquals(expected = null, actual = result.storyId)
+        assertEquals(
+            expected = emptyList(),
+            actual = result.coauthors,
+        )
+    }
+
+    @Test
+    fun onlyNoneWorksAsIntended() {
+        val input = "[none] I did that thing"
+        val result = digIntoMessage(input)
+
+        assertEquals(expected = SemverType.None, actual = result.semver)
+        assertEquals(expected = null, actual = result.storyId)
+        assertEquals(
+            expected = emptyList(),
+            actual = result.coauthors,
+        )
+    }
+
+    @Test
     fun multipleStoryPrefersFirst() {
         val input = "[Cowdog-42] [otherStuff] [Eeeeee] I did that thing"
         val (storyId, ease, coAuthors) = digIntoMessage(input)
@@ -83,5 +135,14 @@ class MessageDigTest {
             expected = emptyList(),
             actual = coAuthors,
         )
+    }
+
+    @Test
+    fun includingPatchAndStoryIdWorksAsExpected() {
+        val input = "[Cowdog-42] [patch] I did that thing"
+        val result = digIntoMessage(input)
+
+        assertEquals(expected = "Cowdog-42", actual = result.storyId)
+        assertEquals(expected = SemverType.Patch, actual = result.semver)
     }
 }

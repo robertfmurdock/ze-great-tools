@@ -7,4 +7,5 @@ data class ContributionDataJson(
     val dateTime: String?,
     val ease: Int?,
     val storyId: String?,
+    val semver: String?,
 )
