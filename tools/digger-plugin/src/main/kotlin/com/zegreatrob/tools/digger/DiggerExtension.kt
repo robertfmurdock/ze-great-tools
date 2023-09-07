@@ -16,7 +16,7 @@ open class DiggerExtension(
 
     private fun List<Commit>.contributionDataJson(): ContributionDataJson {
         val messageDigResults = map { commit ->
-            commit.commitInspectionResult(digIntoMessage(commit.fullMessage))
+            commit.commitInspectionResult(MessageDigger(Regex("\\(.*big.*\\)")).digIntoMessage(commit.fullMessage))
         }
 
         return ContributionDataJson(
