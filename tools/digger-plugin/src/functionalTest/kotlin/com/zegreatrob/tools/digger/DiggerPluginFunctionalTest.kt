@@ -27,6 +27,7 @@ class DiggerPluginFunctionalTest {
     private val settingsFile by lazy { projectDir.resolve("settings.gradle") }
     private val ignoreFile by lazy { projectDir.resolve(".gitignore") }
     private val currentOutput by lazy { projectDir.resolve("build/digger/current.json") }
+    private val allOutput by lazy { projectDir.resolve("build/digger/all.json") }
 
     @BeforeTest
     fun setup() {
@@ -263,14 +264,12 @@ class DiggerPluginFunctionalTest {
                 |Co-authored-by: 4th Gui <fourth@gui.io>
             """.trimMargin(),
         )
-
-        val runner = GradleRunner.create()
-        runner.forwardOutput()
-        runner.withPluginClasspath()
-        runner.withArguments("allContributionData", "-q")
-        runner.withProjectDir(projectDir)
-        val result = runner.build()
-
+        GradleRunner.create()
+            .forwardOutput()
+            .withPluginClasspath()
+            .withArguments("allContributionData", "-q")
+            .withProjectDir(projectDir)
+            .build()
         assertEquals(
             listOf(
                 mapOf(
@@ -300,7 +299,7 @@ class DiggerPluginFunctionalTest {
                     "storyId" to null,
                 ),
             ),
-            parseAll(result.output),
+            parseAll(allOutput.readText()),
         )
     }
 
@@ -325,14 +324,12 @@ class DiggerPluginFunctionalTest {
         val secondCommit = grgit.addCommitWithMessage(
             "-3- here's a message",
         )
-
-        val runner = GradleRunner.create()
-        runner.forwardOutput()
-        runner.withPluginClasspath()
-        runner.withArguments("allContributionData", "-q", "--stacktrace")
-        runner.withProjectDir(projectDir)
-        val result = runner.build()
-
+        GradleRunner.create()
+            .forwardOutput()
+            .withPluginClasspath()
+            .withArguments("allContributionData", "-q")
+            .withProjectDir(projectDir)
+            .build()
         assertEquals(
             listOf(
                 mapOf(
@@ -352,7 +349,7 @@ class DiggerPluginFunctionalTest {
                     "storyId" to null,
                 ),
             ),
-            parseAll(result.output),
+            parseAll(allOutput.readText()),
         )
     }
 
@@ -369,13 +366,12 @@ class DiggerPluginFunctionalTest {
         val firstCommit = grgit.head()
         grgit.addTag("release")
         val secondCommit = grgit.addCommitWithMessage("[DOGCOW-18] -3- here's a message")
-        val runner = GradleRunner.create()
-        runner.forwardOutput()
-        runner.withPluginClasspath()
-        runner.withArguments("allContributionData", "-q")
-        runner.withProjectDir(projectDir)
-        val result = runner.build()
-
+        GradleRunner.create()
+            .forwardOutput()
+            .withPluginClasspath()
+            .withArguments("allContributionData", "-q")
+            .withProjectDir(projectDir)
+            .build()
         assertEquals(
             listOf(
                 mapOf(
@@ -395,7 +391,7 @@ class DiggerPluginFunctionalTest {
                     "storyId" to "DOGCOW-17",
                 ),
             ),
-            parseAll(result.output),
+            parseAll(allOutput.readText()),
         )
     }
 
@@ -411,13 +407,12 @@ class DiggerPluginFunctionalTest {
         val grgit = initializeGitRepo(listOf("[DOGCOW-17] here's a message"))
         val firstCommit = grgit.head()
         val secondCommit = grgit.addCommitWithMessage("[DOGCOW-17] -3- here's a message")
-        val runner = GradleRunner.create()
-        runner.forwardOutput()
-        runner.withPluginClasspath()
-        runner.withArguments("allContributionData", "-q")
-        runner.withProjectDir(projectDir)
-        val result = runner.build()
-
+        GradleRunner.create()
+            .forwardOutput()
+            .withPluginClasspath()
+            .withArguments("allContributionData", "-q")
+            .withProjectDir(projectDir)
+            .build()
         assertEquals(
             listOf(
                 mapOf(
@@ -429,7 +424,7 @@ class DiggerPluginFunctionalTest {
                     "storyId" to "DOGCOW-17",
                 ),
             ),
-            parseAll(result.output),
+            parseAll(allOutput.readText()),
         )
     }
 
@@ -445,12 +440,13 @@ class DiggerPluginFunctionalTest {
         val grgit = initializeGitRepo(listOf("[DOGCOW-17] here's a message"))
         val firstCommit = grgit.head()
         val secondCommit = grgit.addCommitWithMessage("[DOGCOW-18] -3- here's a message")
-        val runner = GradleRunner.create()
-        runner.forwardOutput()
-        runner.withPluginClasspath()
-        runner.withArguments("allContributionData", "-q")
-        runner.withProjectDir(projectDir)
-        val result = runner.build()
+
+        GradleRunner.create()
+            .forwardOutput()
+            .withPluginClasspath()
+            .withArguments("allContributionData", "-q")
+            .withProjectDir(projectDir)
+            .build()
 
         assertEquals(
             listOf(
@@ -463,7 +459,7 @@ class DiggerPluginFunctionalTest {
                     "storyId" to "DOGCOW-17, DOGCOW-18",
                 ),
             ),
-            parseAll(result.output),
+            parseAll(allOutput.readText()),
         )
     }
 
@@ -486,12 +482,12 @@ class DiggerPluginFunctionalTest {
         val secondCommit = grgit.addCommitWithMessage(
             "-3- here's a message",
         )
-        val runner = GradleRunner.create()
-        runner.forwardOutput()
-        runner.withPluginClasspath()
-        runner.withArguments("allContributionData", "-q")
-        runner.withProjectDir(projectDir)
-        val result = runner.build()
+        GradleRunner.create()
+            .forwardOutput()
+            .withPluginClasspath()
+            .withArguments("allContributionData", "-q")
+            .withProjectDir(projectDir)
+            .build()
 
         assertEquals(
             listOf(
@@ -504,7 +500,7 @@ class DiggerPluginFunctionalTest {
                     "storyId" to null,
                 ),
             ),
-            parseAll(result.output),
+            parseAll(allOutput.readText()),
         )
     }
 

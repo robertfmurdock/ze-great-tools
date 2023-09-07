@@ -2,17 +2,23 @@ package com.zegreatrob.tools.digger
 
 import groovy.json.JsonOutput
 import org.gradle.api.DefaultTask
+import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import java.io.FileOutputStream
 
-open class AllContributionData : DefaultTask() {
+abstract class AllContributionData : DefaultTask() {
 
-    @Input
+    @Internal
     lateinit var diggerExtension: DiggerExtension
 
     @Input
     var exportToGithubEnv: Boolean = false
+
+    @get:OutputFile
+    abstract val outputFile: RegularFileProperty
 
     @TaskAction
     fun execute() {
@@ -25,7 +31,7 @@ open class AllContributionData : DefaultTask() {
             FileOutputStream(githubEnvFile, true)
                 .write("DIGGER_ALL_CONTRIBUTION_DATA=$output".toByteArray())
         } else {
-            logger.quiet(output)
+            outputFile.get().asFile.writeText(output)
         }
     }
 }

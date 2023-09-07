@@ -3,6 +3,7 @@ package com.zegreatrob.tools
 import com.zegreatrob.tools.digger.AllContributionData
 import com.zegreatrob.tools.digger.CurrentContributionData
 import com.zegreatrob.tools.digger.DiggerExtension
+import com.zegreatrob.tools.digger.HeadTask
 
 plugins {
     id("org.ajoberstar.grgit.service")
@@ -11,13 +12,18 @@ plugins {
 
 val digger = project.extensions.create("digger", DiggerExtension::class, grgitService)
 
+val exportToGithub = project.findProperty("exportToGithub")
+val diggerBuildDirectory: Provider<Directory> = layout.buildDirectory.dir("digger")
+
 tasks {
-    val exportToGithub = project.findProperty("exportToGithub")
+    val gitHead by registering(HeadTask::class) {
+        this.diggerExtension = digger
+        outputFile.set(diggerBuildDirectory.map { it.file("head") })
+    }
     val currentContributionData by registering(CurrentContributionData::class) {
         this.diggerExtension = digger
-
-        inputs.property("GIT_HEAD", digger.headId())
-
+        dependsOn(gitHead)
+        inputs.file(gitHead.map { it.outputFile })
         outputFile.set(layout.buildDirectory.file("digger/current.json"))
         exportToGithub?.let {
             exportToGithubEnv = true
@@ -25,6 +31,9 @@ tasks {
     }
     val allContributionData by registering(AllContributionData::class) {
         this.diggerExtension = digger
+        dependsOn(gitHead)
+        inputs.file(gitHead.map { it.outputFile })
+        outputFile.set(layout.buildDirectory.file("digger/all.json"))
         exportToGithub?.let {
             exportToGithubEnv = true
         }
