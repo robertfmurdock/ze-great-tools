@@ -15,6 +15,8 @@ val digger = project.extensions.create("digger", DiggerExtension::class, grgitSe
 val exportToGithub = project.findProperty("exportToGithub")
 val diggerBuildDirectory: Provider<Directory> = layout.buildDirectory.dir("digger")
 
+logger.warn("The 'digger' gradle plugin is current experimental. Be warned each update may make breaking changes.")
+
 tasks {
     val gitHead by registering(HeadTask::class) {
         this.diggerExtension = digger
