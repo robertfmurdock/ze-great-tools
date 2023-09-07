@@ -7,6 +7,7 @@ dependencies {
     constraints {
         api(project(":tagger-plugin"))
         api(project(":digger-plugin"))
+        api(project(":digger"))
     }
 }
 
