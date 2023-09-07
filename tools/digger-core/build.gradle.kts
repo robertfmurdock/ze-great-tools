@@ -23,6 +23,7 @@ java {
 }
 
 dependencies {
+    implementation(libs.org.ajoberstar.grgit.grgit.core)
     testImplementation(libs.org.jetbrains.kotlin.kotlin.test.junit5)
 }
 

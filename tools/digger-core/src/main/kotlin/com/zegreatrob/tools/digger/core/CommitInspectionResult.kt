@@ -1,6 +1,4 @@
-package com.zegreatrob.tools.digger
-
-import com.zegreatrob.tools.digger.core.SemverType
+package com.zegreatrob.tools.digger.core
 
 data class CommitInspectionResult(
     val storyId: String?,

@@ -1,8 +1,7 @@
 package com.zegreatrob.tools.digger
 
-import com.zegreatrob.tools.digger.core.MessageDigResult
-import com.zegreatrob.tools.digger.core.MessageDigger
-import com.zegreatrob.tools.digger.core.highestPrioritySemver
+import com.zegreatrob.tools.digger.core.allContributionCommits
+import com.zegreatrob.tools.digger.core.contributionDataJson
 import org.ajoberstar.grgit.Commit
 import org.ajoberstar.grgit.Grgit
 import org.ajoberstar.grgit.Tag
@@ -17,40 +16,6 @@ open class DiggerExtension(
         .allContributionCommits()
         .map { range -> range.toList().contributionDataJson() }
 
-    private fun List<Commit>.contributionDataJson(): ContributionDataJson {
-        val messageDigResults = map { commit ->
-            commit.commitInspectionResult(MessageDigger().digIntoMessage(commit.fullMessage))
-        }
-
-        return ContributionDataJson(
-            firstCommit = lastOrNull()?.id ?: "",
-            lastCommit = firstOrNull()?.id ?: "",
-            dateTime = firstOrNull()?.dateTime?.toString(),
-            authors = messageDigResults.flatMap { it.authors }
-                .map { it.lowercase() }
-                .toSet()
-                .sorted()
-                .toList(),
-            ease = messageDigResults.mapNotNull { it.ease }.maxOrNull(),
-            storyId = messageDigResults.mapNotNull { it.storyId }
-                .let {
-                    if (it.isEmpty()) {
-                        null
-                    } else {
-                        it.toSortedSet().joinToString(", ")
-                    }
-                },
-            semver = messageDigResults.mapNotNull { it.semver }.highestPrioritySemver()?.toString(),
-        )
-    }
-
-    private fun Commit.commitInspectionResult(digResult: MessageDigResult) = CommitInspectionResult(
-        storyId = digResult.storyId,
-        ease = digResult.ease,
-        authors = listOf(committer.email, author.email) + digResult.coauthors,
-        semver = digResult.semver,
-    )
-
     fun currentContributionData() = grgitServiceExtension.service.get().grgit
         .currentContributionCommits()
         .contributionDataJson()
@@ -61,22 +26,6 @@ open class DiggerExtension(
             log()
         } else {
             return log(fun(it: LogOp) { it.range(tag, "HEAD") })
-        }
-    }
-
-    private fun Grgit.allContributionCommits(): List<List<Commit>> {
-        val tagList = tag.list()
-        return log().fold(emptyList()) { acc, commit ->
-            if (tagList.any { it.commit == commit }) {
-                acc.plus(element = listOf(commit))
-            } else {
-                val lastList = acc.lastOrNull()
-                if (lastList != null) {
-                    acc.slice(0..acc.size - 2).plus(element = lastList.plusElement(commit))
-                } else {
-                    acc.plus(element = listOf(commit))
-                }
-            }
         }
     }
 
