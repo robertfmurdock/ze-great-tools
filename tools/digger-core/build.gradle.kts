@@ -8,12 +8,18 @@ plugins {
     id("com.zegreatrob.tools.plugins.publish")
     id("org.jetbrains.kotlin.jvm")
     signing
+    `java-library`
 }
 
 group = "com.zegreatrob.tools"
 
 repositories {
     mavenCentral()
+}
+
+java {
+    withJavadocJar()
+    withSourcesJar()
 }
 
 dependencies {

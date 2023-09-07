@@ -62,12 +62,4 @@ signing {
 
 tasks {
     publish { finalizedBy("::closeAndReleaseSonatypeStagingRepository") }
-
-    val javadocJar by creating(Jar::class) {
-        archiveClassifier.set("javadoc")
-        from("${rootDir.absolutePath}/javadocs")
-    }
-    publishing.publications {
-        withType<MavenPublication> { artifact(javadocJar) }
-    }
 }
