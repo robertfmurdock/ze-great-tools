@@ -16,7 +16,7 @@ open class DiggerExtension(
 
     private fun List<Commit>.contributionDataJson(): ContributionDataJson {
         val messageDigResults = map { commit ->
-            commit.commitInspectionResult(MessageDigger(Regex("\\(.*big.*\\)")).digIntoMessage(commit.fullMessage))
+            commit.commitInspectionResult(MessageDigger().digIntoMessage(commit.fullMessage))
         }
 
         return ContributionDataJson(
@@ -37,17 +37,15 @@ open class DiggerExtension(
                         it.toSortedSet().joinToString(", ")
                     }
                 },
-            semver = messageDigResults.firstNotNullOfOrNull { it.semver },
+            semver = messageDigResults.mapNotNull { it.semver }.highestPrioritySemver()?.toString(),
         )
     }
 
-    private fun Commit.commitInspectionResult(
-        it: MessageDigResult,
-    ) = CommitInspectionResult(
-        storyId = it.storyId,
-        ease = it.ease,
-        authors = listOf(committer.email, author.email) + it.coauthors,
-        semver = it.semver?.toString(),
+    private fun Commit.commitInspectionResult(digResult: MessageDigResult) = CommitInspectionResult(
+        storyId = digResult.storyId,
+        ease = digResult.ease,
+        authors = listOf(committer.email, author.email) + digResult.coauthors,
+        semver = digResult.semver,
     )
 
     fun currentContributionData() = grgitServiceExtension.service.get().grgit

@@ -11,5 +11,5 @@ data class CommitInspectionResult(
     val storyId: String?,
     val ease: Int?,
     val authors: List<String>,
-    val semver: String?,
+    val semver: SemverType?,
 )

@@ -40,15 +40,12 @@ private fun Sequence<MatchResult>.messageDigResult() = MessageDigResult(
     }.sorted()
         .lastOrNull(),
 
-//    mapNotNull { it.groups["semver"]?.value }.map { it.capitalized().let(SemverType::valueOf) }
-//        .highestPrioritySemver(),
-
 )
 
 private fun MatchResult.groupMatches(groupName: String) =
     runCatching { this@groupMatches.groups[groupName] }.getOrNull() != null
 
-private fun Sequence<SemverType>.highestPrioritySemver() = sorted().lastOrNull()
+fun List<SemverType>.highestPrioritySemver() = sorted().lastOrNull()
 
 enum class SemverType {
     None, Patch, Minor, Major

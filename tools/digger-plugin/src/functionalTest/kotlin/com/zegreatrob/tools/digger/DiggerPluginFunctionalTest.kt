@@ -102,6 +102,42 @@ class DiggerPluginFunctionalTest {
         assertEquals(null, parseStoryId(currentOutput.readText()))
     }
 
+    @Test
+    fun `when currentContributionData includes multiple semvers uses largest`() {
+        buildFile.writeText(
+            """
+            plugins {
+                id("com.zegreatrob.tools.digger")
+            }
+            """.trimIndent(),
+        )
+
+        initializeGitRepo(
+            listOf(
+                """[major] here's a message
+                |
+                |
+                |co-authored-by: First Guy <first@guy.edu>
+                |CO-AUTHORED-BY: Second Gui <second@gui.io>
+                """.trimMargin(),
+                """[minor] here's a message
+                |
+                |
+                |co-authored-by: First Guy <first@guy.edu>
+                |CO-AUTHORED-BY: Second Gui <second@gui.io>
+                """.trimMargin(),
+            ),
+        )
+        GradleRunner.create()
+            .forwardOutput()
+            .withPluginClasspath()
+            .withArguments("currentContributionData", "-q")
+            .withProjectDir(projectDir)
+            .build()
+        assertEquals("Major", parseSemver(currentOutput.readText()))
+        assertEquals(null, parseStoryId(currentOutput.readText()))
+    }
+
     private fun parseCurrentAuthors(output: String) =
         (JsonSlurper().parse(output.trim().toCharArray()) as Map<*, *>)["authors"]
 
