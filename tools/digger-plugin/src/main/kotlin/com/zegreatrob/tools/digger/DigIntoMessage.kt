@@ -13,10 +13,12 @@ private fun Sequence<MatchResult>.messageDigResult() = MessageDigResult(
     storyId = firstNotNullOfOrNull { it.groups["storyId"] }?.value,
     ease = firstNotNullOfOrNull { it.groups["ease"] }?.value?.toIntOrNull(),
     coauthors = mapNotNull { it.groups["coAuthors"]?.value }.toList(),
-    semver = mapNotNull { it.groups["semver"]?.value }.firstOrNull()
-        ?.capitalized()
-        ?.let { SemverType.valueOf(it) },
+    semver = mapNotNull { it.groups["semver"]?.value }.map { it.capitalized().let(SemverType::valueOf) }
+        .highestPrioritySemver(),
+
 )
+
+private fun Sequence<SemverType>.highestPrioritySemver() = sorted().lastOrNull()
 
 enum class SemverType {
     None, Patch, Minor, Major

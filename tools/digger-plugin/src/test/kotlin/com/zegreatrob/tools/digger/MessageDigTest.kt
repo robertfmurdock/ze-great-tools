@@ -99,6 +99,45 @@ class MessageDigTest {
     }
 
     @Test
+    fun whenIncludingMajorMultipleSemverTagsRespectsLargestOne() {
+        val input = "[minor] [major] [none] [patch] I did that thing"
+        val result = digIntoMessage(input)
+
+        assertEquals(expected = SemverType.Major, actual = result.semver)
+        assertEquals(expected = null, actual = result.storyId)
+        assertEquals(
+            expected = emptyList(),
+            actual = result.coauthors,
+        )
+    }
+
+    @Test
+    fun whenIncludingMinorMultipleSemverTagsRespectsLargestOne() {
+        val input = "[minor] [none] [patch] I did that thing"
+        val result = digIntoMessage(input)
+
+        assertEquals(expected = SemverType.Minor, actual = result.semver)
+        assertEquals(expected = null, actual = result.storyId)
+        assertEquals(
+            expected = emptyList(),
+            actual = result.coauthors,
+        )
+    }
+
+    @Test
+    fun whenIncludingPatchMultipleSemverTagsRespectsLargestOne() {
+        val input = "[none] [patch] I did that thing"
+        val result = digIntoMessage(input)
+
+        assertEquals(expected = SemverType.Patch, actual = result.semver)
+        assertEquals(expected = null, actual = result.storyId)
+        assertEquals(
+            expected = emptyList(),
+            actual = result.coauthors,
+        )
+    }
+
+    @Test
     fun onlyPatchWorksAsIntended() {
         val input = "[patch] I did that thing"
         val result = digIntoMessage(input)
