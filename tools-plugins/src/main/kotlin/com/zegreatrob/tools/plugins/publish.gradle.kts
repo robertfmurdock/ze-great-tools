@@ -1,12 +1,7 @@
 package com.zegreatrob.tools.plugins
 
-import org.gradle.kotlin.dsl.creating
-import org.gradle.kotlin.dsl.`maven-publish`
-import org.gradle.kotlin.dsl.repositories
-import org.gradle.kotlin.dsl.signing
-import org.gradle.kotlin.dsl.withType
 import java.nio.charset.Charset
-import java.util.Base64
+import java.util.*
 
 plugins {
     `maven-publish`
@@ -76,5 +71,3 @@ tasks {
         withType<MavenPublication> { artifact(javadocJar) }
     }
 }
-
-fun PublicationContainer.jvmPublication(): NamedDomainObjectSet<Publication> = matching { it.name == "jvm" }

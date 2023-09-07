@@ -44,7 +44,3 @@ private fun MatchResult.groupMatches(groupName: String) =
     runCatching { this@groupMatches.groups[groupName] }.getOrNull() != null
 
 fun List<SemverType>.highestPrioritySemver() = maxOrNull()
-
-enum class SemverType {
-    None, Patch, Minor, Major
-}
