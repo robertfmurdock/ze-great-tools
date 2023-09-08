@@ -7,7 +7,9 @@ pluginManagement {
 
 rootProject.name = "tools"
 
+include("dependency-bom")
 include("digger-core")
+include("digger-json")
 include("digger-plugin")
 include("tagger-plugin")
 include("tools-bom")

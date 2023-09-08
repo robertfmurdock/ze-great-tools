@@ -31,6 +31,7 @@ configurations["functionalTestImplementation"].extendsFrom(configurations["testI
 
 dependencies {
     implementation(project(":digger-core"))
+    implementation(project(":digger-json"))
     implementation(libs.org.ajoberstar.grgit.gradle.plugin)
     testImplementation(libs.org.jetbrains.kotlin.kotlin.test.junit5)
     "functionalTestImplementation"(platform(libs.org.junit.junit.bom))
