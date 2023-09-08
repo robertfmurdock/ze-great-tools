@@ -1,6 +1,6 @@
 package com.zegreatrob.tools.digger
 
-import groovy.json.JsonOutput
+import com.zegreatrob.tools.digger.json.toJsonString
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.tasks.Input
@@ -22,9 +22,7 @@ abstract class AllContributionData : DefaultTask() {
 
     @TaskAction
     fun execute() {
-        val output = JsonOutput.toJson(
-            diggerExtension.allContributionData(),
-        )
+        val output = diggerExtension.allContributionData().toJsonString()
 
         val githubEnvFile = System.getenv("GITHUB_ENV")
         if (exportToGithubEnv && githubEnvFile != null) {

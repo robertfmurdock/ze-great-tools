@@ -3,6 +3,8 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/tools/digger-core/tools.digger-core.test.iml" filepath="$PROJECT_DIR$/.idea/modules/tools/digger-core/tools.digger-core.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/tools/digger-json/tools.digger-json.main.iml" filepath="$PROJECT_DIR$/.idea/modules/tools/digger-json/tools.digger-json.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/tools/digger-json/tools.digger-json.test.iml" filepath="$PROJECT_DIR$/.idea/modules/tools/digger-json/tools.digger-json.test.iml" />
     </modules>
   </component>
 </project>

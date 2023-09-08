@@ -2,7 +2,7 @@ package com.zegreatrob.tools.digger.core
 
 import org.ajoberstar.grgit.Commit
 
-data class ContributionDataJson(
+data class Contribution(
     val lastCommit: String,
     val firstCommit: String,
     val authors: List<String>,
@@ -12,12 +12,12 @@ data class ContributionDataJson(
     val semver: String?,
 )
 
-fun List<Commit>.contributionDataJson(): ContributionDataJson {
+fun List<Commit>.contributionDataJson(): Contribution {
     val messageDigResults = map { commit ->
         commit.commitInspectionResult(MessageDigger().digIntoMessage(commit.fullMessage))
     }
 
-    return ContributionDataJson(
+    return Contribution(
         firstCommit = lastOrNull()?.id ?: "",
         lastCommit = firstOrNull()?.id ?: "",
         dateTime = firstOrNull()?.dateTime?.toString(),
