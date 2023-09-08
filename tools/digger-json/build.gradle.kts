@@ -25,7 +25,7 @@ java {
 
 dependencies {
     implementation(platform(project(":dependency-bom")))
-    implementation(project(":digger-core"))
+    api(project(":digger-core"))
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json")
     testImplementation(libs.org.jetbrains.kotlin.kotlin.test.junit5)
 }
