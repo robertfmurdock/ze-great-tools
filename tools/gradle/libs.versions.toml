@@ -12,7 +12,7 @@ org-junit-junit-bom = "org.junit:junit-bom:5.10.0"
 
 [plugins]
 com-gradle-plugin-publish = "com.gradle.plugin-publish:1.2.1"
-org-jetbrains-kotlin-plugin-serialization = "org.jetbrains.kotlin.plugin.serialization:1.9.10"
 io-github-gradle-nexus-publish-plugin = "io.github.gradle-nexus.publish-plugin:2.0.0-rc-1"
 nl-littlerobots-version-catalog-update = "nl.littlerobots.version-catalog-update:0.8.1"
 org-ajoberstar-grgit = { id = "org.ajoberstar.grgit", version.ref = "org-ajoberstar-grgit" }
+org-jetbrains-kotlin-plugin-serialization = "org.jetbrains.kotlin.plugin.serialization:1.9.10"
