@@ -26,23 +26,8 @@ tasks {
 
 afterEvaluate {
     tasks {
-
-        val signKotlinMultiplatformPublication = findByName("signKotlinMultiplatformPublication")
-        if (signKotlinMultiplatformPublication != null) {
-            tasks.findByName("publishJsPublicationToSonatypeRepository")
-                ?.dependsOn(signKotlinMultiplatformPublication)
-            tasks.findByName("publishJvmPublicationToSonatypeRepository")
-                ?.dependsOn(signKotlinMultiplatformPublication)
+        withType<PublishToMavenRepository> {
+            mustRunAfter(withType<Sign>())
         }
-        tasks.findByName("signJsPublication")
-            ?.let {
-                tasks.findByName("publishKotlinMultiplatformPublicationToSonatypeRepository")
-                    ?.dependsOn(it)
-            }
-        tasks.findByName("signJvmPublication")
-            ?.let {
-                tasks.findByName("publishKotlinMultiplatformPublicationToSonatypeRepository")
-                    ?.dependsOn(it)
-            }
     }
 }
