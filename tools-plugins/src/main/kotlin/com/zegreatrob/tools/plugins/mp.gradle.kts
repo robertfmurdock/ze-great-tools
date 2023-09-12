@@ -22,22 +22,27 @@ tasks {
     publishing.publications {
         withType<MavenPublication> { artifact(javadocJar) }
     }
+}
 
-    val signKotlinMultiplatformPublication = findByName("signKotlinMultiplatformPublication")
-    if (signKotlinMultiplatformPublication != null) {
-        tasks.findByName("publishJsPublicationToSonatypeRepository")
-            ?.dependsOn(signKotlinMultiplatformPublication)
-        tasks.findByName("publishJvmPublicationToSonatypeRepository")
-            ?.dependsOn(signKotlinMultiplatformPublication)
+afterEvaluate {
+    tasks {
+
+        val signKotlinMultiplatformPublication = findByName("signKotlinMultiplatformPublication")
+        if (signKotlinMultiplatformPublication != null) {
+            tasks.findByName("publishJsPublicationToSonatypeRepository")
+                ?.dependsOn(signKotlinMultiplatformPublication)
+            tasks.findByName("publishJvmPublicationToSonatypeRepository")
+                ?.dependsOn(signKotlinMultiplatformPublication)
+        }
+        tasks.findByName("signJsPublication")
+            ?.let {
+                tasks.findByName("publishKotlinMultiplatformPublicationToSonatypeRepository")
+                    ?.dependsOn(it)
+            }
+        tasks.findByName("signJvmPublication")
+            ?.let {
+                tasks.findByName("publishKotlinMultiplatformPublicationToSonatypeRepository")
+                    ?.dependsOn(it)
+            }
     }
-    tasks.findByName("signJsPublication")
-        ?.let {
-            tasks.findByName("publishKotlinMultiplatformPublicationToSonatypeRepository")
-                ?.dependsOn(it)
-        }
-    tasks.findByName("signJvmPublication")
-        ?.let {
-            tasks.findByName("publishKotlinMultiplatformPublicationToSonatypeRepository")
-                ?.dependsOn(it)
-        }
 }
