@@ -7,12 +7,7 @@ plugins {
     `java-gradle-plugin`
     `kotlin-dsl`
     alias(libs.plugins.com.gradle.plugin.publish)
-    base
-    id("com.zegreatrob.tools.plugins.reports")
-    id("com.zegreatrob.tools.plugins.lint")
-    id("com.zegreatrob.tools.plugins.versioning")
-    id("org.jetbrains.kotlin.jvm")
-    signing
+    id("com.zegreatrob.tools.plugins.jvm")
 }
 
 repositories {

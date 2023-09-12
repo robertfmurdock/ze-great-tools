@@ -1,14 +1,8 @@
 @file:Suppress("UnstableApiUsage")
 
 plugins {
-    base
-    id("com.zegreatrob.tools.plugins.reports")
-    id("com.zegreatrob.tools.plugins.lint")
-    id("com.zegreatrob.tools.plugins.versioning")
+    id("com.zegreatrob.tools.plugins.jvm")
     id("com.zegreatrob.tools.plugins.publish")
-    id("org.jetbrains.kotlin.jvm")
-    signing
-    `java-library`
 }
 
 group = "com.zegreatrob.tools"
