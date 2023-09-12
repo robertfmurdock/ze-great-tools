@@ -3,7 +3,6 @@
 plugins {
     id("com.zegreatrob.tools.plugins.mp")
     id("com.zegreatrob.tools.plugins.publish")
-    alias(libs.plugins.org.jetbrains.kotlin.plugin.serialization)
 }
 
 group = "com.zegreatrob.tools"
@@ -19,10 +18,6 @@ kotlin {
 
 dependencies {
     commonMainImplementation(platform(project(":dependency-bom")))
-    commonMainApi(project(":digger-model"))
-    commonMainImplementation("org.jetbrains.kotlinx:kotlinx-serialization-json")
-    commonTestImplementation(kotlin("test"))
-    commonTestImplementation("com.benasher44:uuid")
     "jvmTestImplementation"(libs.org.jetbrains.kotlin.kotlin.test.junit5)
 }
 

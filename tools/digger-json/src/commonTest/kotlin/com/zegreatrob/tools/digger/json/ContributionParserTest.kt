@@ -1,7 +1,7 @@
 package com.zegreatrob.tools.digger.json
 
-import com.zegreatrob.tools.digger.core.Contribution
-import java.util.*
+import com.benasher44.uuid.uuid4
+import com.zegreatrob.tools.digger.model.Contribution
 import kotlin.random.Random
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -23,12 +23,12 @@ class ContributionParserTest {
     }
 
     private fun stubContribution() = Contribution(
-        lastCommit = UUID.randomUUID().toString(),
-        firstCommit = UUID.randomUUID().toString(),
-        authors = listOf(UUID.randomUUID().toString()),
-        dateTime = UUID.randomUUID().toString(),
+        lastCommit = "${uuid4()}",
+        firstCommit = "${uuid4()}",
+        authors = listOf("${uuid4()}"),
+        dateTime = "${uuid4()}",
         ease = Random.nextInt(),
-        storyId = UUID.randomUUID().toString(),
-        semver = UUID.randomUUID().toString(),
+        storyId = "${uuid4()}",
+        semver = "${uuid4()}",
     )
 }

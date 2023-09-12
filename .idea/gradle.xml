@@ -13,6 +13,7 @@
                   <project path="$PROJECT_DIR$/tools/dependency-bom" />
                   <project path="$PROJECT_DIR$/tools/digger-core" />
                   <project path="$PROJECT_DIR$/tools/digger-json" />
+                  <project path="$PROJECT_DIR$/tools/digger-model" />
                   <project path="$PROJECT_DIR$/tools/digger-plugin" />
                   <project path="$PROJECT_DIR$/tools/tagger-plugin" />
                   <project path="$PROJECT_DIR$/tools/tools-bom" />
@@ -26,9 +27,7 @@
             </builds>
           </compositeBuild>
         </compositeConfiguration>
-        <option name="distributionType" value="WRAPPED" />
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
-        <option name="gradleJvm" value="#JAVA_HOME" />
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
@@ -37,6 +36,7 @@
             <option value="$PROJECT_DIR$/tools/dependency-bom" />
             <option value="$PROJECT_DIR$/tools/digger-core" />
             <option value="$PROJECT_DIR$/tools/digger-json" />
+            <option value="$PROJECT_DIR$/tools/digger-model" />
             <option value="$PROJECT_DIR$/tools/digger-plugin" />
             <option value="$PROJECT_DIR$/tools/tagger-plugin" />
             <option value="$PROJECT_DIR$/tools/tools-bom" />

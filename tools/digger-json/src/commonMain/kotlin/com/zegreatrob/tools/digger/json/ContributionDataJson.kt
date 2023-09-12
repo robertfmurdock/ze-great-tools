@@ -1,6 +1,6 @@
 package com.zegreatrob.tools.digger.json
 
-import com.zegreatrob.tools.digger.core.Contribution
+import com.zegreatrob.tools.digger.model.Contribution
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
