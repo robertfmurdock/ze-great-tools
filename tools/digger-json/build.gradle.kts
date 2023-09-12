@@ -2,7 +2,6 @@
 
 plugins {
     id("com.zegreatrob.tools.plugins.mp")
-    id("com.zegreatrob.tools.plugins.publish")
     alias(libs.plugins.org.jetbrains.kotlin.plugin.serialization)
 }
 

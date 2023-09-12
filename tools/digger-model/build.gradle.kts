@@ -2,7 +2,6 @@
 
 plugins {
     id("com.zegreatrob.tools.plugins.mp")
-    id("com.zegreatrob.tools.plugins.publish")
 }
 
 group = "com.zegreatrob.tools"
@@ -31,4 +30,5 @@ tasks {
     lintKotlinCommonMain {
         exclude { spec -> spec.file.absolutePath.contains("generated-sources") }
     }
+
 }
