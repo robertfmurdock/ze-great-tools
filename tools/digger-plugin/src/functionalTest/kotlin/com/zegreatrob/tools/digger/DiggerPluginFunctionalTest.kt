@@ -1,6 +1,7 @@
 package com.zegreatrob.tools.digger
 
 import groovy.json.JsonSlurper
+import kotlinx.datetime.toKotlinInstant
 import org.ajoberstar.grgit.Commit
 import org.ajoberstar.grgit.Grgit
 import org.ajoberstar.grgit.Person
@@ -14,6 +15,7 @@ import org.gradle.testkit.runner.GradleRunner
 import org.junit.jupiter.api.io.TempDir
 import java.io.File
 import java.io.FileOutputStream
+import java.time.ZonedDateTime
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -347,7 +349,7 @@ class DiggerPluginFunctionalTest {
                 mapOf(
                     "lastCommit" to secondCommit.id,
                     "firstCommit" to secondCommit.id,
-                    "dateTime" to secondCommit.dateTime.toString(),
+                    "dateTime" to secondCommit.dateTime.toKotlinInstantString(),
                     "authors" to listOf(
                         "fourth@gui.io",
                         "funk@test.io",
@@ -361,7 +363,7 @@ class DiggerPluginFunctionalTest {
                 mapOf(
                     "lastCommit" to firstCommit.id,
                     "firstCommit" to firstCommit.id,
-                    "dateTime" to firstCommit.dateTime.toString(),
+                    "dateTime" to firstCommit.dateTime.toKotlinInstantString(),
                     "authors" to listOf(
                         "first@guy.edu",
                         "funk@test.io",
@@ -409,7 +411,7 @@ class DiggerPluginFunctionalTest {
                 mapOf(
                     "authors" to listOf("funk@test.io", "test@funk.edu"),
                     "lastCommit" to secondCommit.id,
-                    "dateTime" to secondCommit.dateTime.toString(),
+                    "dateTime" to secondCommit.dateTime.toKotlinInstantString(),
                     "firstCommit" to secondCommit.id,
                     "ease" to 3,
                     "storyId" to null,
@@ -418,7 +420,7 @@ class DiggerPluginFunctionalTest {
                 mapOf(
                     "authors" to listOf("funk@test.io", "test@funk.edu"),
                     "lastCommit" to firstCommit.id,
-                    "dateTime" to firstCommit.dateTime.toString(),
+                    "dateTime" to firstCommit.dateTime.toKotlinInstantString(),
                     "firstCommit" to firstCommit.id,
                     "ease" to 4,
                     "storyId" to null,
@@ -453,7 +455,7 @@ class DiggerPluginFunctionalTest {
                 mapOf(
                     "authors" to listOf("funk@test.io", "test@funk.edu"),
                     "lastCommit" to secondCommit.id,
-                    "dateTime" to secondCommit.dateTime.toString(),
+                    "dateTime" to secondCommit.dateTime.toKotlinInstantString(),
                     "firstCommit" to secondCommit.id,
                     "ease" to 3,
                     "storyId" to "DOGCOW-18",
@@ -462,7 +464,7 @@ class DiggerPluginFunctionalTest {
                 mapOf(
                     "authors" to listOf("funk@test.io", "test@funk.edu"),
                     "lastCommit" to firstCommit.id,
-                    "dateTime" to firstCommit.dateTime.toString(),
+                    "dateTime" to firstCommit.dateTime.toKotlinInstantString(),
                     "firstCommit" to firstCommit.id,
                     "ease" to null,
                     "storyId" to "DOGCOW-17",
@@ -496,7 +498,7 @@ class DiggerPluginFunctionalTest {
                 mapOf(
                     "authors" to listOf("funk@test.io", "test@funk.edu"),
                     "lastCommit" to secondCommit.id,
-                    "dateTime" to secondCommit.dateTime.toString(),
+                    "dateTime" to secondCommit.dateTime.toKotlinInstantString(),
                     "firstCommit" to firstCommit.id,
                     "ease" to 3,
                     "storyId" to "DOGCOW-17",
@@ -532,7 +534,7 @@ class DiggerPluginFunctionalTest {
                 mapOf(
                     "authors" to listOf("funk@test.io", "test@funk.edu"),
                     "lastCommit" to secondCommit.id,
-                    "dateTime" to secondCommit.dateTime.toString(),
+                    "dateTime" to secondCommit.dateTime.toKotlinInstantString(),
                     "firstCommit" to firstCommit.id,
                     "ease" to 3,
                     "storyId" to "DOGCOW-17, DOGCOW-18",
@@ -575,7 +577,7 @@ class DiggerPluginFunctionalTest {
                     "authors" to listOf("funk@test.io", "test@funk.edu"),
                     "lastCommit" to secondCommit.id,
                     "semver" to null,
-                    "dateTime" to secondCommit.dateTime.toString(),
+                    "dateTime" to secondCommit.dateTime.toKotlinInstantString(),
                     "firstCommit" to firstCommit.id,
                     "ease" to 4,
                     "storyId" to null,
@@ -584,6 +586,8 @@ class DiggerPluginFunctionalTest {
             parseAll(allOutput.readText()),
         )
     }
+
+    private fun ZonedDateTime.toKotlinInstantString() = toInstant()?.toKotlinInstant()?.toString()
 
     private fun initializeGitRepo(
         commits: List<String> = listOf(),

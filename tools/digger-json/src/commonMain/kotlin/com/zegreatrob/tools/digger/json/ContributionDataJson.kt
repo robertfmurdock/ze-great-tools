@@ -1,6 +1,7 @@
 package com.zegreatrob.tools.digger.json
 
 import com.zegreatrob.tools.digger.model.Contribution
+import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -10,7 +11,7 @@ internal data class ContributionJson(
     val lastCommit: String,
     val firstCommit: String,
     val authors: List<String>,
-    val dateTime: String?,
+    val dateTime: Instant?,
     val ease: Int?,
     val storyId: String?,
     val semver: String?,

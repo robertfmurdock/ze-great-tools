@@ -1,6 +1,7 @@
 package com.zegreatrob.tools.digger.core
 
 import com.zegreatrob.tools.digger.model.Contribution
+import kotlinx.datetime.toKotlinInstant
 import org.ajoberstar.grgit.Commit
 
 fun List<Commit>.contribution(): Contribution {
@@ -11,7 +12,7 @@ fun List<Commit>.contribution(): Contribution {
     return Contribution(
         firstCommit = lastOrNull()?.id ?: "",
         lastCommit = firstOrNull()?.id ?: "",
-        dateTime = firstOrNull()?.dateTime?.toString(),
+        dateTime = firstOrNull()?.dateTime?.toInstant()?.toKotlinInstant(),
         authors = messageDigResults.flatMap { it.authors }
             .map { it.lowercase() }
             .toSet()
