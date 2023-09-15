@@ -11,11 +11,11 @@ internal data class ContributionJson(
     val lastCommit: String,
     val firstCommit: String,
     val authors: List<String>,
-    val dateTime: Instant?,
-    val ease: Int?,
-    val storyId: String?,
-    val semver: String?,
-    val label: String?,
+    val dateTime: Instant? = null,
+    val ease: Int? = null,
+    val storyId: String? = null,
+    val semver: String? = null,
+    val label: String? = null,
 )
 
 fun Iterable<Contribution>.toJsonString(): String = Json.encodeToString(map(Contribution::toJsonModel))
