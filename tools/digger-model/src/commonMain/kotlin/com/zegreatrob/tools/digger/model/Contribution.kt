@@ -10,4 +10,5 @@ data class Contribution(
     val ease: Int?,
     val storyId: String?,
     val semver: String?,
+    val label: String?,
 )

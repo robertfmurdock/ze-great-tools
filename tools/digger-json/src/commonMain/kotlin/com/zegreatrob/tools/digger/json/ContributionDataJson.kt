@@ -15,6 +15,7 @@ internal data class ContributionJson(
     val ease: Int?,
     val storyId: String?,
     val semver: String?,
+    val label: String?,
 )
 
 fun Iterable<Contribution>.toJsonString(): String = Json.encodeToString(map(Contribution::toJsonModel))
@@ -37,6 +38,7 @@ private fun Contribution.toJsonModel() = ContributionJson(
     ease = ease,
     storyId = storyId,
     semver = semver,
+    label = label,
 )
 
 private fun ContributionJson.toModel() = Contribution(
@@ -47,4 +49,5 @@ private fun ContributionJson.toModel() = Contribution(
     ease = ease,
     storyId = storyId,
     semver = semver,
+    label = label,
 )

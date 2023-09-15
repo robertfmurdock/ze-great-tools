@@ -359,6 +359,7 @@ class DiggerPluginFunctionalTest {
                     "ease" to null,
                     "storyId" to null,
                     "semver" to null,
+                    "label" to projectDir.name,
                 ),
                 mapOf(
                     "lastCommit" to firstCommit.id,
@@ -373,6 +374,7 @@ class DiggerPluginFunctionalTest {
                     "ease" to null,
                     "storyId" to null,
                     "semver" to null,
+                    "label" to projectDir.name,
                 ),
             ),
             parseAll(allOutput.readText()),
@@ -416,6 +418,7 @@ class DiggerPluginFunctionalTest {
                     "ease" to 3,
                     "storyId" to null,
                     "semver" to null,
+                    "label" to projectDir.name,
                 ),
                 mapOf(
                     "authors" to listOf("funk@test.io", "test@funk.edu"),
@@ -425,6 +428,7 @@ class DiggerPluginFunctionalTest {
                     "ease" to 4,
                     "storyId" to null,
                     "semver" to null,
+                    "label" to projectDir.name,
                 ),
             ),
             parseAll(allOutput.readText()),
@@ -460,6 +464,7 @@ class DiggerPluginFunctionalTest {
                     "ease" to 3,
                     "storyId" to "DOGCOW-18",
                     "semver" to null,
+                    "label" to projectDir.name,
                 ),
                 mapOf(
                     "authors" to listOf("funk@test.io", "test@funk.edu"),
@@ -469,6 +474,7 @@ class DiggerPluginFunctionalTest {
                     "ease" to null,
                     "storyId" to "DOGCOW-17",
                     "semver" to null,
+                    "label" to projectDir.name,
                 ),
             ),
             parseAll(allOutput.readText()),
@@ -503,6 +509,7 @@ class DiggerPluginFunctionalTest {
                     "ease" to 3,
                     "storyId" to "DOGCOW-17",
                     "semver" to null,
+                    "label" to projectDir.name,
                 ),
             ),
             parseAll(allOutput.readText()),
@@ -515,6 +522,9 @@ class DiggerPluginFunctionalTest {
             """
             plugins {
                 id("com.zegreatrob.tools.digger")
+            }
+            digger {
+                label.set("AwesomeProject")
             }
             """.trimIndent(),
         )
@@ -539,6 +549,7 @@ class DiggerPluginFunctionalTest {
                     "ease" to 3,
                     "storyId" to "DOGCOW-17, DOGCOW-18",
                     "semver" to null,
+                    "label" to "AwesomeProject",
                 ),
             ),
             parseAll(allOutput.readText()),
@@ -581,6 +592,7 @@ class DiggerPluginFunctionalTest {
                     "firstCommit" to firstCommit.id,
                     "ease" to 4,
                     "storyId" to null,
+                    "label" to projectDir.name,
                 ),
             ),
             parseAll(allOutput.readText()),

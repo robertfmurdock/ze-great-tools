@@ -12,6 +12,8 @@ plugins {
 
 val digger = project.extensions.create("digger", DiggerExtension::class, grgitService)
 
+digger.label.convention(project.name)
+
 val exportToGithub = project.findProperty("exportToGithub")
 val diggerBuildDirectory: Provider<Directory> = layout.buildDirectory.dir("digger")
 

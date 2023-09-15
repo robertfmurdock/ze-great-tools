@@ -36,5 +36,6 @@ class ContributionParserTest {
         ease = Random.nextInt(),
         storyId = "${uuid4()}",
         semver = "${uuid4()}",
+        label = "${uuid4()}",
     )
 }

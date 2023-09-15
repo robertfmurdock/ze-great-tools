@@ -10,14 +10,14 @@ fun List<Commit>.contribution(): Contribution {
     }
 
     return Contribution(
-        firstCommit = lastOrNull()?.id ?: "",
         lastCommit = firstOrNull()?.id ?: "",
-        dateTime = firstOrNull()?.dateTime?.toInstant()?.toKotlinInstant(),
+        firstCommit = lastOrNull()?.id ?: "",
         authors = messageDigResults.flatMap { it.authors }
             .map { it.lowercase() }
             .toSet()
             .sorted()
             .toList(),
+        dateTime = firstOrNull()?.dateTime?.toInstant()?.toKotlinInstant(),
         ease = messageDigResults.mapNotNull { it.ease }.maxOrNull(),
         storyId = messageDigResults.mapNotNull { it.storyId }
             .let {
@@ -28,6 +28,7 @@ fun List<Commit>.contribution(): Contribution {
                 }
             },
         semver = messageDigResults.mapNotNull { it.semver }.highestPrioritySemver()?.toString(),
+        label = null,
     )
 }
 
