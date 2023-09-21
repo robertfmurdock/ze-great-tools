@@ -1,5 +1,6 @@
 # Tagger
 
+![GitHub tag (latest by date)](https://img.shields.io/github/v/tag/robertfmurdock/ze-great-tools?label=Release)
 [![Gradle Plugin Portal](https://img.shields.io/gradle-plugin-portal/v/com.zegreatrob.tools.tagger?label=Tagger%20Plugin)](https://plugins.gradle.org/plugin/com.zegreatrob.tools.tagger)
 
 An opinionated plugin for automatic semantic versioning via git tags and information in commits.
