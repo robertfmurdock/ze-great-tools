@@ -55,7 +55,9 @@ private fun Grgit.findAppropriateIncrement(
     implicitPatch: Boolean,
     minorRegex: VersionRegex,
 ): ChangeType? =
-    log(fun(it: LogOp) { it.range(previousVersionNumber, "HEAD") })
+    log(fun(it: LogOp) {
+        it.range(previousVersionNumber, "HEAD")
+    })
         .also { if (it.isEmpty()) return null }
         .map { it.changeType(minorRegex) ?: if (implicitPatch) ChangeType.Patch else null }
         .fold(null, ::highestPriority)
@@ -111,7 +113,9 @@ fun Grgit.canRelease(releaseBranch: String): Boolean {
     val currentBranch = branch.current()
 
     val currentBranchStatus: BranchStatus? = runCatching {
-        branch.status(fun(it: BranchStatusOp) { it.name = currentBranch.name })
+        branch.status(fun(it: BranchStatusOp) {
+            it.name = currentBranch.name
+        })
     }
         .getOrNull()
     return if (currentBranchStatus == null) {

@@ -42,8 +42,12 @@ open class TagVersion : DefaultTask(), TaggerExtensionSyntax {
             headHasNoTag() &&
             isOnReleaseBranch(grgit, releaseBranch)
         ) {
-            this.grgit.tag.add(fun (it: TagAddOp) { it.name = version })
-            this.grgit.push(fun (it: PushOp) { it.tags = true })
+            this.grgit.tag.add(fun (it: TagAddOp) {
+                it.name = version
+            })
+            this.grgit.push(fun (it: PushOp) {
+                it.tags = true
+            })
         } else {
             logger.warn("skipping tag")
         }
