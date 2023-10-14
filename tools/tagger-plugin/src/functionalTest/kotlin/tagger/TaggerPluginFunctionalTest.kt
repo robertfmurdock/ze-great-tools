@@ -75,7 +75,9 @@ class TaggerPluginFunctionalTest {
         grgit.add(fun(it: AddOp) {
             it.patterns = setOf(".")
         })
-        grgit.commit(fun(it: CommitOp) { it.message = "test commit" })
+        grgit.commit(fun(it: CommitOp) {
+            it.message = "test commit"
+        })
         grgit.tag.add(fun(it: TagAddOp) {
             it.name = "1.0.23"
         })
@@ -524,7 +526,9 @@ class TaggerPluginFunctionalTest {
             patterns = setOf(settingsFile.name, buildFile.name, ignoreFile.name)
         })
 
-        grgit.commit(fun CommitOp.() { message = "test commit" })
+        grgit.commit(fun CommitOp.() {
+            message = "test commit"
+        })
         if (initialTag != null) {
             grgit.tag.add(fun(it: TagAddOp) {
                 it.name = initialTag
