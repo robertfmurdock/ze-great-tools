@@ -1,5 +1,5 @@
 [versions]
-org-ajoberstar-grgit = "5.2.0"
+org-ajoberstar-grgit = "5.2.1"
 org-jetbrains-kotlin = "1.9.10"
 
 [libraries]
