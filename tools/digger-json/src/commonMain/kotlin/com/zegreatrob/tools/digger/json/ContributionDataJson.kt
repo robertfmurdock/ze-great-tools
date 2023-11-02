@@ -7,7 +7,7 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 @Serializable
-internal data class ContributionJson(
+data class ContributionJson(
     val lastCommit: String,
     val firstCommit: String,
     val authors: List<String>,

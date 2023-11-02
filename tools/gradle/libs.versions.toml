@@ -11,6 +11,7 @@ org-jetbrains-kotlin-kotlin-test-junit5 = { module = "org.jetbrains.kotlin:kotli
 org-jetbrains-kotlinx-kotlinx-datetime = "org.jetbrains.kotlinx:kotlinx-datetime:0.4.1"
 org-jetbrains-kotlinx-kotlinx-serialization-bom = "org.jetbrains.kotlinx:kotlinx-serialization-bom:1.6.0"
 org-junit-junit-bom = "org.junit:junit-bom:5.10.0"
+org-jetbrains-kotlin-kotlin-bom = { module = "org.jetbrains.kotlin:kotlin-bom", version.ref = "org-jetbrains-kotlin" }
 
 [plugins]
 com-gradle-plugin-publish = "com.gradle.plugin-publish:1.2.1"

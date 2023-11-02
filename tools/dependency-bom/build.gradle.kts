@@ -9,6 +9,7 @@ javaPlatform {
 
 dependencies {
     api(platform(libs.org.jetbrains.kotlinx.kotlinx.serialization.bom))
+    api(platform(libs.org.jetbrains.kotlin.kotlin.bom))
     constraints {
         api(libs.com.benasher44.uuid)
         api(libs.org.jetbrains.kotlinx.kotlinx.datetime)
