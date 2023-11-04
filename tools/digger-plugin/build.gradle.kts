@@ -28,7 +28,7 @@ dependencies {
     implementation(project(":digger-core"))
     implementation(project(":digger-json"))
     implementation(libs.org.ajoberstar.grgit.gradle.plugin)
-    testImplementation(libs.org.jetbrains.kotlin.kotlin.test.junit5)
+    testImplementation(kotlin("test-junit5", embeddedKotlinVersion))
     "functionalTestImplementation"(platform(libs.org.junit.junit.bom))
 }
 

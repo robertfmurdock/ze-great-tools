@@ -18,7 +18,7 @@ kotlin {
 dependencies {
     commonMainApi(platform(project(":dependency-bom")))
     commonMainApi("org.jetbrains.kotlinx:kotlinx-datetime")
-    "jvmTestImplementation"(libs.org.jetbrains.kotlin.kotlin.test.junit5)
+    "jvmTestImplementation"(kotlin("test-junit5", embeddedKotlinVersion))
 }
 
 tasks {

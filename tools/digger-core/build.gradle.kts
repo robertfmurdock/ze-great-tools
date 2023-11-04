@@ -19,7 +19,7 @@ java {
 dependencies {
     implementation(libs.org.ajoberstar.grgit.grgit.core)
     implementation(project(":digger-model"))
-    testImplementation(libs.org.jetbrains.kotlin.kotlin.test.junit5)
+    testImplementation(kotlin("test-junit5", embeddedKotlinVersion))
 }
 
 tasks {
