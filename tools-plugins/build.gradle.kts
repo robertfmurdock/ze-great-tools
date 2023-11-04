@@ -15,8 +15,8 @@ plugins {
 }
 
 dependencies {
-    implementation(kotlin("stdlib", embeddedKotlinVersion))
-    implementation(kotlin("gradle-plugin", embeddedKotlinVersion))
+    implementation(kotlin("stdlib", "1.9.20"))
+    implementation(kotlin("gradle-plugin", "1.9.20"))
     implementation(libs.com.github.ben.manes.gradle.versions.plugin)
     implementation(libs.org.jmailen.gradle.kotlinter.gradle)
 }

@@ -24,6 +24,10 @@ tasks {
     }
 }
 
+dependencies {
+    commonMainImplementation(platform(project(":dependency-bom")))
+}
+
 afterEvaluate {
     tasks {
         withType<PublishToMavenRepository> {

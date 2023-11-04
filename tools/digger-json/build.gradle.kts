@@ -17,9 +17,7 @@ kotlin {
 }
 
 dependencies {
-    commonMainImplementation(platform(project(":dependency-bom")))
     commonMainApi(project(":digger-model"))
-    commonMainImplementation("org.jetbrains.kotlin:kotlin-stdlib")
     commonMainImplementation("org.jetbrains.kotlinx:kotlinx-serialization-json")
     commonTestImplementation(kotlin("test"))
     commonTestImplementation("com.benasher44:uuid")
