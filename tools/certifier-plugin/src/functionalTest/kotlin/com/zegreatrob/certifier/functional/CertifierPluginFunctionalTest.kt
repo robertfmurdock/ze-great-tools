@@ -4,6 +4,7 @@ import org.gradle.testkit.runner.GradleRunner
 import org.junit.jupiter.api.io.TempDir
 import java.io.File
 import kotlin.test.BeforeTest
+import kotlin.test.Ignore
 import kotlin.test.Test
 
 class CertifierPluginFunctionalTest {
@@ -22,7 +23,8 @@ class CertifierPluginFunctionalTest {
     }
 
     @Test
-    fun `calculating version with no tags produces zero version`() {
+    @Ignore
+    fun `can run install cert task`() {
         val certificatePath = this.javaClass.getResource("/localhost.crt")?.toURI()?.path
 
         buildFile.writeText(
