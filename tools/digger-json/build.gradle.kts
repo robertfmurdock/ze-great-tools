@@ -21,6 +21,11 @@ dependencies {
     commonMainApi(project(":digger-model"))
     commonMainImplementation("org.jetbrains.kotlinx:kotlinx-serialization-json")
     commonTestImplementation(kotlin("test"))
+    "commonTestImplementation"("org.jetbrains.kotlin:kotlin-stdlib") {
+        version {
+            strictly(embeddedKotlinVersion)
+        }
+    }
     commonTestImplementation("com.benasher44:uuid")
     "jvmTestImplementation"(kotlin("test-junit5", embeddedKotlinVersion))
 }
