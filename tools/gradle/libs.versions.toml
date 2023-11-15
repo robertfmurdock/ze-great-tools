@@ -7,7 +7,8 @@ com-benasher44-uuid = "com.benasher44:uuid:0.8.2"
 org-ajoberstar-grgit-gradle-plugin = { module = "org.ajoberstar.grgit:org.ajoberstar.grgit.gradle.plugin", version.ref = "org-ajoberstar-grgit" }
 org-ajoberstar-grgit-grgit-core = { module = "org.ajoberstar.grgit:grgit-core", version.ref = "org-ajoberstar-grgit" }
 org-jetbrains-kotlinx-kotlinx-datetime = "org.jetbrains.kotlinx:kotlinx-datetime:0.4.1"
-org-jetbrains-kotlinx-kotlinx-serialization-bom = "org.jetbrains.kotlinx:kotlinx-serialization-bom:1.6.1"
+# @pin
+org-jetbrains-kotlinx-kotlinx-serialization-bom = "org.jetbrains.kotlinx:kotlinx-serialization-bom:1.6.0"
 org-junit-junit-bom = "org.junit:junit-bom:5.10.1"
 
 [plugins]
