@@ -1,5 +1,5 @@
 [versions]
-org-ajoberstar-grgit = "5.2.1"
+org-ajoberstar-grgit = "5.2.2"
 
 [libraries]
 com-benasher44-uuid = "com.benasher44:uuid:0.8.2"
