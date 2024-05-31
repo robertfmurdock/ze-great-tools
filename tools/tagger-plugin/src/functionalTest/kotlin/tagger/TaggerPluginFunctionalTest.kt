@@ -146,6 +146,31 @@ class TaggerPluginFunctionalTest {
     }
 
     @Test
+    fun `given initial tag with suffix, ignore suffix and follow normal rules`() {
+        buildFile.writeText(
+            """
+            plugins {
+                id("com.zegreatrob.tools.tagger")
+            }
+            tagger {
+                releaseBranch = "main"
+                implicitPatch.set(false)
+            }
+            """.trimIndent(),
+        )
+
+        initializeGitRepo(listOf("commit 1", "commit 2"), "1.2.3-SNAPSHOT")
+        val runner = GradleRunner.create()
+        runner.forwardOutput()
+        runner.withPluginClasspath()
+        runner.withArguments("calculateVersion", "-q")
+        runner.withProjectDir(projectDir)
+        val result = runner.build()
+
+        assertEquals("1.2.3-SNAPSHOT", result.output.trim())
+    }
+
+    @Test
     fun `given implicit patch, calculating version with unlabeled commits increments patch`() {
         buildFile.writeText(
             """
