@@ -1,6 +1,5 @@
 package com.zegreatrob.tools.tagger
 
-import org.ajoberstar.grgit.Grgit
 import org.ajoberstar.grgit.gradle.GrgitServiceExtension
 import org.gradle.api.GradleException
 import org.gradle.api.Project
@@ -13,7 +12,6 @@ open class TaggerExtension(
     @Transient val rootProject: Project,
     objectFactory: ObjectFactory,
 ) {
-
     @Input
     var releaseBranch: String? = null
 
@@ -38,29 +36,33 @@ open class TaggerExtension(
     @Input
     var majorRegex = objectFactory.property<Regex>().convention(Regex("\\[major].*"))
 
+    private val grgit get() = grgitServiceExtension.service.get().grgit
+
+    val lastVersionAndTag by lazy { grgit.lastVersionAndTag() }
+
     val version by lazy {
-        calculateBuildVersion(
-            grgitServiceExtension.service.get().grgit,
-            releaseBranch
-                ?: throw GradleException("Please configure the tagger release branch."),
+        val (previousVersionNumber, lastTagDescription) =
+            lastVersionAndTag
+                ?: return@lazy "0.0.0"
+        grgit.calculateNextVersion(
+            lastTagDescription = lastTagDescription,
+            previousVersionNumber = previousVersionNumber,
+            implicitPatch = implicitPatch.get(),
+            versionRegex = versionRegex(),
+            releaseBranch = releaseBranch ?: throw GradleException("Please configure the tagger release branch."),
         )
     }
 
     val isSnapshot get() = version.contains("SNAPSHOT")
 
-    private fun calculateBuildVersion(grgit: Grgit, releaseBranch: String) = grgit.calculateNextVersion(
-        implicitPatch = implicitPatch.get(),
-        versionRegex = versionRegex(),
-        releaseBranch = releaseBranch,
-    )
-
-    private fun versionRegex() = VersionRegex(
-        none = noneRegex.get(),
-        patch = patchRegex.get(),
-        minor = minorRegex.get(),
-        major = majorRegex.get(),
-        unified = versionRegex.orNull?.also { it.validateVersionRegex() },
-    )
+    private fun versionRegex() =
+        VersionRegex(
+            none = noneRegex.get(),
+            patch = patchRegex.get(),
+            minor = minorRegex.get(),
+            major = majorRegex.get(),
+            unified = versionRegex.orNull?.also { it.validateVersionRegex() },
+        )
 }
 
 private fun Regex.validateVersionRegex() {

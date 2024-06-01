@@ -7,7 +7,6 @@ import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 
 abstract class HeadTask : DefaultTask() {
-
     @Internal
     lateinit var diggerExtension: DiggerExtension
 

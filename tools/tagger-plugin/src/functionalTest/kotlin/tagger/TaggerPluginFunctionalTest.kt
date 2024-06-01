@@ -17,7 +17,6 @@ import kotlin.test.assertContains
 import kotlin.test.assertEquals
 
 class TaggerPluginFunctionalTest {
-
     @field:TempDir
     lateinit var projectDir: File
 
@@ -72,20 +71,28 @@ class TaggerPluginFunctionalTest {
 
         val grgit = Grgit.init(mapOf("dir" to projectDir.absolutePath))
         disableGpgSign()
-        grgit.add(fun(it: AddOp) {
-            it.patterns = setOf(".")
-        })
-        grgit.commit(fun(it: CommitOp) {
-            it.message = "test commit"
-        })
-        grgit.tag.add(fun(it: TagAddOp) {
-            it.name = "1.0.23"
-        })
+        grgit.add(
+            fun(it: AddOp) {
+                it.patterns = setOf(".")
+            },
+        )
+        grgit.commit(
+            fun(it: CommitOp) {
+                it.message = "test commit"
+            },
+        )
+        grgit.tag.add(
+            fun(it: TagAddOp) {
+                it.name = "1.0.23"
+            },
+        )
         grgit.checkout(mapOf<String?, Any>("branch" to "main", "createBranch" to true))
-        grgit.remote.add(fun(it: RemoteAddOp) {
-            it.name = "origin"
-            it.url = projectDir.absolutePath
-        })
+        grgit.remote.add(
+            fun(it: RemoteAddOp) {
+                it.name = "origin"
+                it.url = projectDir.absolutePath
+            },
+        )
         val runner = GradleRunner.create()
         runner.forwardOutput()
         runner.withPluginClasspath()
@@ -547,38 +554,52 @@ class TaggerPluginFunctionalTest {
     ) {
         val grgit = Grgit.init(mapOf("dir" to projectDir.absolutePath))
         disableGpgSign()
-        grgit.add(fun AddOp.() {
-            patterns = setOf(settingsFile.name, buildFile.name, ignoreFile.name)
-        })
+        grgit.add(
+            fun AddOp.() {
+                patterns = setOf(settingsFile.name, buildFile.name, ignoreFile.name)
+            },
+        )
 
-        grgit.commit(fun CommitOp.() {
-            message = "test commit"
-        })
+        grgit.commit(
+            fun CommitOp.() {
+                message = "test commit"
+            },
+        )
         if (initialTag != null) {
-            grgit.tag.add(fun(it: TagAddOp) {
-                it.name = initialTag
-            })
+            grgit.tag.add(
+                fun(it: TagAddOp) {
+                    it.name = initialTag
+                },
+            )
         }
         additionalCommits.forEach { message ->
-            grgit.commit(fun(it: CommitOp) {
-                it.message = message
-            })
+            grgit.commit(
+                fun(it: CommitOp) {
+                    it.message = message
+                },
+            )
         }
 
-        grgit.remote.add(fun RemoteAddOp.() {
-            this.name = "origin"
-            this.url = projectDir.absolutePath
-        })
-        grgit.checkout(fun CheckoutOp.() {
-            branch = "main"
-            createBranch = true
-        })
+        grgit.remote.add(
+            fun RemoteAddOp.() {
+                this.name = "origin"
+                this.url = projectDir.absolutePath
+            },
+        )
+        grgit.checkout(
+            fun CheckoutOp.() {
+                branch = "main"
+                createBranch = true
+            },
+        )
         grgit.pull()
-        grgit.branch.change(fun BranchChangeOp.() {
-            this.name = "main"
-            this.startPoint = "origin/main"
-            this.mode = BranchChangeOp.Mode.TRACK
-        })
+        grgit.branch.change(
+            fun BranchChangeOp.() {
+                this.name = "main"
+                this.startPoint = "origin/main"
+                this.mode = BranchChangeOp.Mode.TRACK
+            },
+        )
     }
 
     private fun disableGpgSign() {

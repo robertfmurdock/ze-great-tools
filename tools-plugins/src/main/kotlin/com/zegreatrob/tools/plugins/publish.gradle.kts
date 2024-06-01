@@ -1,7 +1,7 @@
 package com.zegreatrob.tools.plugins
 
 import java.nio.charset.Charset
-import java.util.*
+import java.util.Base64
 
 plugins {
     `maven-publish`

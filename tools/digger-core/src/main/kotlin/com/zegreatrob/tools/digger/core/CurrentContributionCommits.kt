@@ -10,9 +10,11 @@ fun Grgit.currentContributionCommits(): List<Commit> {
     return if (tag == null) {
         log()
     } else {
-        return log(fun(it: LogOp) {
-            it.range(tag, "HEAD")
-        })
+        return log(
+            fun(it: LogOp) {
+                it.range(tag, "HEAD")
+            },
+        )
     }
 }
 

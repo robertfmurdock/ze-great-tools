@@ -10,7 +10,6 @@ import org.gradle.api.tasks.TaskAction
 import java.io.FileOutputStream
 
 abstract class CurrentContributionData : DefaultTask() {
-
     @Internal
     lateinit var diggerExtension: DiggerExtension
 

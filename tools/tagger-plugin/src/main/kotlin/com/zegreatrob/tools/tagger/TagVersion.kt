@@ -25,11 +25,13 @@ interface TaggerExtensionSyntax {
     fun isSnapshot() = taggerExtension.isSnapshot
 
     @Internal
-    fun isOnReleaseBranch(grgit: Grgit, releaseBranch: String?) = grgit.branch.current().name == releaseBranch
+    fun isOnReleaseBranch(
+        grgit: Grgit,
+        releaseBranch: String?,
+    ) = grgit.branch.current().name == releaseBranch
 }
 
 open class TagVersion : DefaultTask(), TaggerExtensionSyntax {
-
     @Input
     override lateinit var taggerExtension: TaggerExtension
 
@@ -42,24 +44,28 @@ open class TagVersion : DefaultTask(), TaggerExtensionSyntax {
             headHasNoTag() &&
             isOnReleaseBranch(grgit, releaseBranch)
         ) {
-            this.grgit.tag.add(fun (it: TagAddOp) {
-                it.name = version
-            })
-            this.grgit.push(fun (it: PushOp) {
-                it.tags = true
-            })
+            this.grgit.tag.add(
+                fun (it: TagAddOp) {
+                    it.name = version
+                },
+            )
+            this.grgit.push(
+                fun (it: PushOp) {
+                    it.tags = true
+                },
+            )
         } else {
             logger.warn("skipping tag")
         }
     }
 
-    private fun headHasNoTag(): Boolean = grgit.head().let { head ->
-        grgit.resolve.toTagName(head.id) == head.id
-    }
+    private fun headHasNoTag(): Boolean =
+        grgit.head().let { head ->
+            grgit.resolve.toTagName(head.id) == head.id
+        }
 }
 
 open class CommitReport : DefaultTask(), TaggerExtensionSyntax {
-
     @Input
     override lateinit var taggerExtension: TaggerExtension
 
@@ -72,7 +78,6 @@ open class CommitReport : DefaultTask(), TaggerExtensionSyntax {
 }
 
 open class ReleaseVersion : DefaultTask(), TaggerExtensionSyntax {
-
     @Input
     override lateinit var taggerExtension: TaggerExtension
 

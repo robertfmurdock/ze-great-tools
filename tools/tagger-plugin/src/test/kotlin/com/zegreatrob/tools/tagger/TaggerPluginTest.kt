@@ -15,12 +15,14 @@ class TaggerPluginTest {
 
     @Test
     fun tagMustRunAfterAllChecksInMultiProject() {
-        val rootProject = ProjectBuilder.builder()
-            .build()
-        val innerProject1 = ProjectBuilder.builder()
-            .withParent(rootProject)
-            .withName("p1")
-            .build()
+        val rootProject =
+            ProjectBuilder.builder()
+                .build()
+        val innerProject1 =
+            ProjectBuilder.builder()
+                .withParent(rootProject)
+                .withName("p1")
+                .build()
         ProjectBuilder.builder()
             .withParent(rootProject)
             .withName("p2")

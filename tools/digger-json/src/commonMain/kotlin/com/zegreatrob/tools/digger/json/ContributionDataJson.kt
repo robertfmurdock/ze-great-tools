@@ -23,31 +23,35 @@ fun Iterable<Contribution>.toJsonString(): String = Json.encodeToString(map(Cont
 fun Contribution.toJsonString(): String = Json.encodeToString(toJsonModel())
 
 object ContributionParser {
-    fun parseContributions(jsonString: String) = Json.decodeFromString<Array<ContributionJson>>(jsonString)
-        .map(ContributionJson::toModel)
+    fun parseContributions(jsonString: String) =
+        Json.decodeFromString<Array<ContributionJson>>(jsonString)
+            .map(ContributionJson::toModel)
 
-    fun parseContribution(jsonString: String) = Json.decodeFromString<ContributionJson?>(jsonString)
-        ?.toModel()
+    fun parseContribution(jsonString: String) =
+        Json.decodeFromString<ContributionJson?>(jsonString)
+            ?.toModel()
 }
 
-private fun Contribution.toJsonModel() = ContributionJson(
-    lastCommit = lastCommit,
-    firstCommit = firstCommit,
-    authors = authors,
-    dateTime = dateTime,
-    ease = ease,
-    storyId = storyId,
-    semver = semver,
-    label = label,
-)
+private fun Contribution.toJsonModel() =
+    ContributionJson(
+        lastCommit = lastCommit,
+        firstCommit = firstCommit,
+        authors = authors,
+        dateTime = dateTime,
+        ease = ease,
+        storyId = storyId,
+        semver = semver,
+        label = label,
+    )
 
-private fun ContributionJson.toModel() = Contribution(
-    lastCommit = lastCommit,
-    firstCommit = firstCommit,
-    authors = authors,
-    dateTime = dateTime,
-    ease = ease,
-    storyId = storyId,
-    semver = semver,
-    label = label,
-)
+private fun ContributionJson.toModel() =
+    Contribution(
+        lastCommit = lastCommit,
+        firstCommit = firstCommit,
+        authors = authors,
+        dateTime = dateTime,
+        ease = ease,
+        storyId = storyId,
+        semver = semver,
+        label = label,
+    )

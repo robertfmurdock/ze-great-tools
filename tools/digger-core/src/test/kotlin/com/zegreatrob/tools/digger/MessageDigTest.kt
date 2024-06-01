@@ -6,7 +6,6 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class MessageDigTest {
-
     @Test
     fun canGetAllGroupsFromRegex() {
         val input =
@@ -167,9 +166,10 @@ class MessageDigTest {
 
     @Test
     fun givenAlternateMajorRegexWillCorrectlyIdentityTags() {
-        val messageDigger = MessageDigger(
-            majorRegex = Regex("\\(.*big.*\\)"),
-        )
+        val messageDigger =
+            MessageDigger(
+                majorRegex = Regex("\\(.*big.*\\)"),
+            )
         val input = "commit (big) 2"
         val result = messageDigger.digIntoMessage(input)
 
@@ -183,9 +183,10 @@ class MessageDigTest {
 
     @Test
     fun givenAlternateMinorRegexWillCorrectlyIdentityTags() {
-        val messageDigger = MessageDigger(
-            minorRegex = Regex("\\(.*middle.*\\)"),
-        )
+        val messageDigger =
+            MessageDigger(
+                minorRegex = Regex("\\(.*middle.*\\)"),
+            )
         val input = "commit (middle) 2"
         val result = messageDigger.digIntoMessage(input)
 
@@ -199,9 +200,10 @@ class MessageDigTest {
 
     @Test
     fun givenAlternatePatchRegexWillCorrectlyIdentityTags() {
-        val messageDigger = MessageDigger(
-            patchRegex = Regex("\\(.*widdle.*\\)"),
-        )
+        val messageDigger =
+            MessageDigger(
+                patchRegex = Regex("\\(.*widdle.*\\)"),
+            )
         val input = "commit (widdle) 2"
         val result = messageDigger.digIntoMessage(input)
 
@@ -215,9 +217,10 @@ class MessageDigTest {
 
     @Test
     fun givenAlternateNoneRegexWillCorrectlyIdentityTags() {
-        val messageDigger = MessageDigger(
-            noneRegex = Regex("\\(no\\)"),
-        )
+        val messageDigger =
+            MessageDigger(
+                noneRegex = Regex("\\(no\\)"),
+            )
         val input = "commit (no) 2"
         val result = messageDigger.digIntoMessage(input)
 

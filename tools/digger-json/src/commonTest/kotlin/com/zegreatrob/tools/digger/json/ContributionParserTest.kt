@@ -8,7 +8,6 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class ContributionParserTest {
-
     @Test
     fun canRoundTripSuccessfully() {
         val contribution = stubContribution()
@@ -23,19 +22,22 @@ class ContributionParserTest {
         assertEquals(contributions, loaded)
     }
 
-    private fun stubContribution() = Contribution(
-        lastCommit = "${uuid4()}",
-        firstCommit = "${uuid4()}",
-        authors = listOf("${uuid4()}"),
-        dateTime = Instant.fromEpochMilliseconds(
-            epochMilliseconds = Random.nextLong(
-                from = Instant.DISTANT_PAST.toEpochMilliseconds(),
-                until = Instant.DISTANT_FUTURE.toEpochMilliseconds(),
+    private fun stubContribution() =
+        Contribution(
+            lastCommit = "${uuid4()}",
+            firstCommit = "${uuid4()}",
+            authors = listOf("${uuid4()}"),
+            dateTime =
+            Instant.fromEpochMilliseconds(
+                epochMilliseconds =
+                Random.nextLong(
+                    from = Instant.DISTANT_PAST.toEpochMilliseconds(),
+                    until = Instant.DISTANT_FUTURE.toEpochMilliseconds(),
+                ),
             ),
-        ),
-        ease = Random.nextInt(),
-        storyId = "${uuid4()}",
-        semver = "${uuid4()}",
-        label = "${uuid4()}",
-    )
+            ease = Random.nextInt(),
+            storyId = "${uuid4()}",
+            semver = "${uuid4()}",
+            label = "${uuid4()}",
+        )
 }

@@ -2,6 +2,7 @@ package com.zegreatrob.tools
 
 import com.zegreatrob.tools.tagger.CalculateVersion
 import com.zegreatrob.tools.tagger.CommitReport
+import com.zegreatrob.tools.tagger.PreviousVersion
 import com.zegreatrob.tools.tagger.ReleaseVersion
 import com.zegreatrob.tools.tagger.TagVersion
 import com.zegreatrob.tools.tagger.TaggerExtension
@@ -15,6 +16,9 @@ val tagger = project.extensions.create("tagger", TaggerExtension::class, grgitSe
 
 tasks {
     val exportToGithub = project.findProperty("exportToGithub")
+    val previousVersion by registering(PreviousVersion::class) {
+        this.taggerExtension = tagger
+    }
     val calculateVersion by registering(CalculateVersion::class) {
         this.taggerExtension = tagger
         exportToGithub?.let {

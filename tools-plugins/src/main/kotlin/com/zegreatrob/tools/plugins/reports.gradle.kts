@@ -5,9 +5,10 @@ repositories {
 }
 
 tasks {
-    val projectResultPath = rootProject.layout.buildDirectory.dir(
-        "test-output/${project.path}/results".replace(":", "/"),
-    )
+    val projectResultPath =
+        rootProject.layout.buildDirectory.dir(
+            "test-output/${project.path}/results".replace(":", "/"),
+        )
 
     val check by getting
     val copyReportsToRootDirectory by creating(Copy::class) {

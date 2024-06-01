@@ -12,19 +12,20 @@ open class DiggerExtension(
     private val grgitServiceExtension: GrgitServiceExtension,
     objectFactory: ObjectFactory,
 ) {
-
     @Input
     var label = objectFactory.property<String>()
 
-    fun allContributionData() = grgitServiceExtension.service.get().grgit
-        .allContributionCommits()
-        .map { range -> range.toList().contribution() }
-        .map { it.copy(label = label.get()) }
+    fun allContributionData() =
+        grgitServiceExtension.service.get().grgit
+            .allContributionCommits()
+            .map { range -> range.toList().contribution() }
+            .map { it.copy(label = label.get()) }
 
-    fun currentContributionData() = grgitServiceExtension.service.get().grgit
-        .currentContributionCommits()
-        .contribution()
-        .copy(label = label.get())
+    fun currentContributionData() =
+        grgitServiceExtension.service.get().grgit
+            .currentContributionCommits()
+            .contribution()
+            .copy(label = label.get())
 
     fun headId(): String = grgitServiceExtension.service.get().grgit.head().id
 }

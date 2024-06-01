@@ -21,7 +21,6 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class DiggerPluginFunctionalTest {
-
     @field:TempDir
     lateinit var projectDir: File
 
@@ -140,17 +139,13 @@ class DiggerPluginFunctionalTest {
         assertEquals(null, parseStoryId(currentOutput.readText()))
     }
 
-    private fun parseCurrentAuthors(output: String) =
-        (JsonSlurper().parse(output.trim().toCharArray()) as Map<*, *>)["authors"]
+    private fun parseCurrentAuthors(output: String) = (JsonSlurper().parse(output.trim().toCharArray()) as Map<*, *>)["authors"]
 
-    private fun parseSemver(output: String) =
-        (JsonSlurper().parse(output.trim().toCharArray()) as Map<*, *>)["semver"]
+    private fun parseSemver(output: String) = (JsonSlurper().parse(output.trim().toCharArray()) as Map<*, *>)["semver"]
 
-    private fun parseStoryId(output: String) =
-        (JsonSlurper().parse(output.trim().toCharArray()) as Map<*, *>)["storyId"]
+    private fun parseStoryId(output: String) = (JsonSlurper().parse(output.trim().toCharArray()) as Map<*, *>)["storyId"]
 
-    private fun parseAll(output: String) =
-        (JsonSlurper().parse(output.trim().toCharArray()) as List<*>)
+    private fun parseAll(output: String) = (JsonSlurper().parse(output.trim().toCharArray()) as List<*>)
 
     @Test
     fun `currentContributionData will include authors from multiple commits after last tag`() {
@@ -212,16 +207,17 @@ class DiggerPluginFunctionalTest {
             """.trimIndent(),
         )
 
-        val grgit = initializeGitRepo(
-            listOf(
-                """here's a message
+        val grgit =
+            initializeGitRepo(
+                listOf(
+                    """here's a message
                 |
                 |
                 |Co-authored-by: First Guy <first@guy.edu>
                 |Co-authored-by: Second Gui <second@gui.io>
-                """.trimMargin(),
-            ),
-        )
+                    """.trimMargin(),
+                ),
+            )
         grgit.addTag("earlier")
 
         grgit.addCommitWithMessage(
@@ -268,16 +264,17 @@ class DiggerPluginFunctionalTest {
             """.trimIndent(),
         )
 
-        val grgit = initializeGitRepo(
-            listOf(
-                """here's a message
+        val grgit =
+            initializeGitRepo(
+                listOf(
+                    """here's a message
                 |
                 |
                 |Co-authored-by: First Guy <first@guy.edu>
                 |Co-authored-by: Second Gui <second@gui.io>
-                """.trimMargin(),
-            ),
-        )
+                    """.trimMargin(),
+                ),
+            )
 
         grgit.addTag("release")
         grgit.addCommitWithMessage(
@@ -317,27 +314,29 @@ class DiggerPluginFunctionalTest {
             """.trimIndent(),
         )
 
-        val grgit = initializeGitRepo(
-            listOf(
-                """here's a message
+        val grgit =
+            initializeGitRepo(
+                listOf(
+                    """here's a message
                 |
                 |
                 |Co-authored-by: First Guy <first@guy.edu>
                 |Co-authored-by: Second Gui <second@gui.io>
-                """.trimMargin(),
-            ),
-        )
+                    """.trimMargin(),
+                ),
+            )
         val firstCommit = grgit.head()
 
         grgit.addTag("release")
-        val secondCommit = grgit.addCommitWithMessage(
-            """here's a message
+        val secondCommit =
+            grgit.addCommitWithMessage(
+                """here's a message
                 |
                 |
                 |Co-authored-by: Third Guy <third@guy.edu>
                 |Co-authored-by: 4th Gui <fourth@gui.io>
-            """.trimMargin(),
-        )
+                """.trimMargin(),
+            )
         GradleRunner.create()
             .forwardOutput()
             .withPluginClasspath()
@@ -350,24 +349,26 @@ class DiggerPluginFunctionalTest {
                     "lastCommit" to secondCommit.id,
                     "firstCommit" to secondCommit.id,
                     "dateTime" to secondCommit.dateTime.toKotlinInstantString(),
-                    "authors" to listOf(
-                        "fourth@gui.io",
-                        "funk@test.io",
-                        "test@funk.edu",
-                        "third@guy.edu",
-                    ),
+                    "authors" to
+                        listOf(
+                            "fourth@gui.io",
+                            "funk@test.io",
+                            "test@funk.edu",
+                            "third@guy.edu",
+                        ),
                     "label" to projectDir.name,
                 ),
                 mapOf(
                     "lastCommit" to firstCommit.id,
                     "firstCommit" to firstCommit.id,
                     "dateTime" to firstCommit.dateTime.toKotlinInstantString(),
-                    "authors" to listOf(
-                        "first@guy.edu",
-                        "funk@test.io",
-                        "second@gui.io",
-                        "test@funk.edu",
-                    ),
+                    "authors" to
+                        listOf(
+                            "first@guy.edu",
+                            "funk@test.io",
+                            "second@gui.io",
+                            "test@funk.edu",
+                        ),
                     "label" to projectDir.name,
                 ),
             ),
@@ -385,17 +386,19 @@ class DiggerPluginFunctionalTest {
             """.trimIndent(),
         )
 
-        val grgit = initializeGitRepo(
-            listOf(
-                "here's a message -4- more stuff",
-            ),
-        )
+        val grgit =
+            initializeGitRepo(
+                listOf(
+                    "here's a message -4- more stuff",
+                ),
+            )
         val firstCommit = grgit.head()
 
         grgit.addTag("release")
-        val secondCommit = grgit.addCommitWithMessage(
-            "-3- here's a message",
-        )
+        val secondCommit =
+            grgit.addCommitWithMessage(
+                "-3- here's a message",
+            )
         GradleRunner.create()
             .forwardOutput()
             .withPluginClasspath()
@@ -551,15 +554,17 @@ class DiggerPluginFunctionalTest {
             """.trimIndent(),
         )
 
-        val grgit = initializeGitRepo(
-            listOf(
-                "here's a message -4- more stuff",
-            ),
-        )
+        val grgit =
+            initializeGitRepo(
+                listOf(
+                    "here's a message -4- more stuff",
+                ),
+            )
         val firstCommit = grgit.head()
-        val secondCommit = grgit.addCommitWithMessage(
-            "-3- here's a message",
-        )
+        val secondCommit =
+            grgit.addCommitWithMessage(
+                "-3- here's a message",
+            )
         GradleRunner.create()
             .forwardOutput()
             .withPluginClasspath()
@@ -590,42 +595,55 @@ class DiggerPluginFunctionalTest {
     ): Grgit {
         val grgit = Grgit.init(mapOf("dir" to projectDir.absolutePath))
         disableGpgSign()
-        grgit.add(fun AddOp.() {
-            patterns = setOf(settingsFile.name, buildFile.name, ignoreFile.name)
-        })
+        grgit.add(
+            fun AddOp.() {
+                patterns = setOf(settingsFile.name, buildFile.name, ignoreFile.name)
+            },
+        )
         if (initialTag != null) {
             grgit.addTag(initialTag)
         }
         commits.forEach { message -> grgit.addCommitWithMessage(message) }
 
-        grgit.remote.add(fun RemoteAddOp.() {
-            this.name = "origin"
-            this.url = projectDir.absolutePath
-        })
-        grgit.checkout(fun CheckoutOp.() {
-            branch = "main"
-            createBranch = true
-        })
+        grgit.remote.add(
+            fun RemoteAddOp.() {
+                this.name = "origin"
+                this.url = projectDir.absolutePath
+            },
+        )
+        grgit.checkout(
+            fun CheckoutOp.() {
+                branch = "main"
+                createBranch = true
+            },
+        )
         grgit.pull()
-        grgit.branch.change(fun BranchChangeOp.() {
-            this.name = "main"
-            this.startPoint = "origin/main"
-            this.mode = BranchChangeOp.Mode.TRACK
-        })
+        grgit.branch.change(
+            fun BranchChangeOp.() {
+                this.name = "main"
+                this.startPoint = "origin/main"
+                this.mode = BranchChangeOp.Mode.TRACK
+            },
+        )
         return grgit
     }
 
     private fun Grgit.addTag(initialTag: String?) {
-        tag.add(fun(it: TagAddOp) {
-            it.name = initialTag
-        })
+        tag.add(
+            fun(it: TagAddOp) {
+                it.name = initialTag
+            },
+        )
     }
 
-    private fun Grgit.addCommitWithMessage(message: String): Commit = commit(fun(it: CommitOp) {
-        it.author = Person("Funky Testerson", "funk@test.io")
-        it.committer = Person("Testy Funkerson", "test@funk.edu")
-        it.message = message
-    })
+    private fun Grgit.addCommitWithMessage(message: String): Commit =
+        commit(
+            fun(it: CommitOp) {
+                it.author = Person("Funky Testerson", "funk@test.io")
+                it.committer = Person("Testy Funkerson", "test@funk.edu")
+                it.message = message
+            },
+        )
 
     private fun disableGpgSign() {
         FileOutputStream(projectDir.resolve(".git/config"), true)

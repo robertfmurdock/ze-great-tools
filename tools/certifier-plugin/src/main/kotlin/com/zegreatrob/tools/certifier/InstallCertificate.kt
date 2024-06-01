@@ -15,12 +15,13 @@ import org.gradle.process.internal.ExecException
 import java.io.ByteArrayOutputStream
 import javax.inject.Inject
 
-open class InstallCertificate @Inject constructor(
+open class InstallCertificate
+@Inject
+constructor(
     private val objectFactory: ObjectFactory,
     private val execActionFactory: ExecActionFactory,
     private val javaToolchainService: JavaToolchainService,
 ) : DefaultTask() {
-
     @Input
     lateinit var jdkSelector: String
 
@@ -33,9 +34,10 @@ open class InstallCertificate @Inject constructor(
     @TaskAction
     fun installCertificate() {
         val cert = certificatePath
-        val javaLauncher = javaToolchainService.launcherFor {
-            languageVersion.set(JavaLanguageVersion.of(jdkSelector))
-        }
+        val javaLauncher =
+            javaToolchainService.launcherFor {
+                languageVersion.set(JavaLanguageVersion.of(jdkSelector))
+            }
         val javaHome = javaLauncher.get().metadata.installationPath
         execSpec.commandLine(
             ("$javaHome/bin/keytool -importcert -file $cert -alias $cert -cacerts -storepass changeit -noprompt")

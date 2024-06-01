@@ -7,7 +7,6 @@ import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 class CertifierPluginFunctionalTest {
-
     @field:TempDir
     lateinit var projectDir: File
 
