@@ -6,17 +6,21 @@ pluginManagement {
 }
 
 plugins {
-    id("com.gradle.develocity") version "3.17.3"
+    id("com.gradle.develocity") version "3.17.4"
 }
 
 rootProject.name = "ze-great-tools"
 includeBuild("tools-plugins")
 includeBuild("tools")
 
+val isCiServer = System.getenv("CI").isNullOrBlank().not()
+
 develocity {
     buildScan {
-        termsOfUseUrl = "https://gradle.com/terms-of-service"
+        publishing.onlyIf { isCiServer }
+        termsOfUseUrl = "https://gradle.com/help/legal-terms-of-use"
         termsOfUseAgree = "yes"
+        tag("CI")
     }
 }
 
