@@ -56,41 +56,32 @@ private fun Commit.changeType(versionRegex: VersionRegex) = versionRegex.changeT
 
 enum class ChangeType(val priority: Int) {
     Major(3) {
-        override fun increment(components: List<String>): String {
+        override fun increment(components: List<Int>): String {
             val (major) = components
-            return "${major.toInt() + 1}.0.0"
+            return "${major + 1}.0.0"
         }
     },
     Minor(2) {
-        override fun increment(components: List<String>): String {
+        override fun increment(components: List<Int>): String {
             val (major, minor) = components
-            return "$major.${minor.toInt() + 1}.0"
+            return "$major.${minor + 1}.0"
         }
     },
     Patch(1) {
-        override fun increment(components: List<String>): String {
+        override fun increment(components: List<Int>): String {
             val (major, minor, patch) = components
-            return "$major.$minor.${patch.toInt() + 1}"
+            return "$major.$minor.${patch + 1}"
         }
     },
     None(0) {
-        override fun increment(components: List<String>): String {
+        override fun increment(components: List<Int>): String {
             val (major, minor, patch) = components
-            return "$major.$minor.${patch.toInt()}"
+            return "$major.$minor.$patch"
         }
     }, ;
 
-    abstract fun increment(components: List<String>): String
+    abstract fun increment(components: List<Int>): String
 }
-
-private fun String.asSemverComponents() =
-    (
-        if (startsWith("v")) {
-            substring(1)
-        } else {
-            this
-        }
-        ).split(".")
 
 fun Grgit.canRelease(releaseBranch: String): Boolean {
     val currentBranch = branch.current()
