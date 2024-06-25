@@ -31,7 +31,9 @@ interface TaggerExtensionSyntax {
     ) = grgit.branch.current().name == releaseBranch
 }
 
-open class TagVersion : DefaultTask(), TaggerExtensionSyntax {
+open class TagVersion :
+    DefaultTask(),
+    TaggerExtensionSyntax {
     @Input
     override lateinit var taggerExtension: TaggerExtension
 
@@ -65,7 +67,9 @@ open class TagVersion : DefaultTask(), TaggerExtensionSyntax {
         }
 }
 
-open class CommitReport : DefaultTask(), TaggerExtensionSyntax {
+open class CommitReport :
+    DefaultTask(),
+    TaggerExtensionSyntax {
     @Input
     override lateinit var taggerExtension: TaggerExtension
 
@@ -77,7 +81,9 @@ open class CommitReport : DefaultTask(), TaggerExtensionSyntax {
     }
 }
 
-open class ReleaseVersion : DefaultTask(), TaggerExtensionSyntax {
+open class ReleaseVersion :
+    DefaultTask(),
+    TaggerExtensionSyntax {
     @Input
     override lateinit var taggerExtension: TaggerExtension
 

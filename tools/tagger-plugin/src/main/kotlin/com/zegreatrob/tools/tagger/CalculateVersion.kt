@@ -5,7 +5,9 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskAction
 import java.io.FileOutputStream
 
-open class CalculateVersion : DefaultTask(), TaggerExtensionSyntax {
+open class CalculateVersion :
+    DefaultTask(),
+    TaggerExtensionSyntax {
     @Input
     override lateinit var taggerExtension: TaggerExtension
 
