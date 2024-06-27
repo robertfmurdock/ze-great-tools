@@ -9,7 +9,7 @@ org-ajoberstar-grgit-grgit-core = { module = "org.ajoberstar.grgit:grgit-core", 
 org-jetbrains-kotlinx-kotlinx-datetime = "org.jetbrains.kotlinx:kotlinx-datetime:0.6.0"
 # @pin
 org-jetbrains-kotlinx-kotlinx-serialization-bom = "org.jetbrains.kotlinx:kotlinx-serialization-bom:1.6.3"
-org-junit-junit-bom = "org.junit:junit-bom:5.10.2"
+org-junit-junit-bom = "org.junit:junit-bom:5.10.3"
 
 [plugins]
 com-gradle-plugin-publish = "com.gradle.plugin-publish:1.2.1"
