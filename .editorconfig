@@ -2,4 +2,4 @@
 ktlint_code_style = intellij_idea
 ktlint_standard_function-naming = disabled
 ij_kotlin_name_count_to_use_star_import = 2147483647
-ij_kotlin_name_count_to_use_star_import_for_members = 3
+ij_kotlin_name_count_to_use_star_import_for_members = 2147483647
