@@ -35,6 +35,14 @@ class ContributionParserTest {
                     until = Instant.DISTANT_FUTURE.toEpochMilliseconds(),
                 ),
             ),
+            firstCommitDateTime =
+            Instant.fromEpochMilliseconds(
+                epochMilliseconds =
+                Random.nextLong(
+                    from = Instant.DISTANT_PAST.toEpochMilliseconds(),
+                    until = Instant.DISTANT_FUTURE.toEpochMilliseconds(),
+                ),
+            ),
             ease = Random.nextInt(),
             storyId = "${uuid4()}",
             semver = "${uuid4()}",

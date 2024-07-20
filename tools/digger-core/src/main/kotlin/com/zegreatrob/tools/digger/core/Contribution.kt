@@ -10,30 +10,37 @@ fun List<Commit>.contribution(): Contribution {
             commit.commitInspectionResult(MessageDigger().digIntoMessage(commit.fullMessage))
         }
 
+    val lastCommit = firstOrNull()
+    val firstCommit = lastOrNull()
     return Contribution(
-        lastCommit = firstOrNull()?.id ?: "",
-        firstCommit = lastOrNull()?.id ?: "",
-        authors =
-        messageDigResults.flatMap { it.authors }
-            .map { it.lowercase() }
-            .toSet()
-            .sorted()
-            .toList(),
-        dateTime = firstOrNull()?.dateTime?.toInstant()?.toKotlinInstant(),
+        lastCommit = lastCommit?.id ?: "",
+        firstCommit = firstCommit?.id ?: "",
+        authors = allAuthors(messageDigResults),
+        dateTime = lastCommit?.dateTime?.toInstant()?.toKotlinInstant(),
+        firstCommitDateTime = firstCommit?.dateTime?.toInstant()?.toKotlinInstant(),
         ease = messageDigResults.mapNotNull { it.ease }.maxOrNull(),
-        storyId =
-        messageDigResults.mapNotNull { it.storyId }
-            .let {
-                if (it.isEmpty()) {
-                    null
-                } else {
-                    it.toSortedSet().joinToString(", ")
-                }
-            },
+        storyId = mergedStoryIds(messageDigResults),
         semver = messageDigResults.mapNotNull { it.semver }.highestPrioritySemver()?.toString(),
         label = null,
     )
 }
+
+private fun allAuthors(messageDigResults: List<CommitInspectionResult>) = messageDigResults
+    .flatMap(CommitInspectionResult::authors)
+    .map { it.lowercase() }
+    .toSet()
+    .sorted()
+    .toList()
+
+private fun mergedStoryIds(messageDigResults: List<CommitInspectionResult>) = messageDigResults
+    .mapNotNull(CommitInspectionResult::storyId)
+    .let {
+        if (it.isNotEmpty()) {
+            it.toSortedSet().joinToString(", ")
+        } else {
+            null
+        }
+    }
 
 private fun Commit.commitInspectionResult(digResult: MessageDigResult) =
     CommitInspectionResult(

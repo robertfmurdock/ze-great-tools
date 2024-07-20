@@ -7,6 +7,7 @@ data class Contribution(
     val firstCommit: String,
     val authors: List<String>,
     val dateTime: Instant?,
+    val firstCommitDateTime: Instant?,
     val ease: Int?,
     val storyId: String?,
     val semver: String?,

@@ -12,6 +12,7 @@ internal data class ContributionJson(
     val firstCommit: String,
     val authors: List<String>,
     val dateTime: Instant? = null,
+    val firstCommitDateTime: Instant? = null,
     val ease: Int? = null,
     val storyId: String? = null,
     val semver: String? = null,
@@ -35,9 +36,10 @@ object ContributionParser {
 private fun Contribution.toJsonModel() =
     ContributionJson(
         lastCommit = lastCommit,
-        firstCommit = firstCommit,
-        authors = authors,
         dateTime = dateTime,
+        firstCommit = firstCommit,
+        firstCommitDateTime = firstCommitDateTime,
+        authors = authors,
         ease = ease,
         storyId = storyId,
         semver = semver,
@@ -47,9 +49,10 @@ private fun Contribution.toJsonModel() =
 private fun ContributionJson.toModel() =
     Contribution(
         lastCommit = lastCommit,
-        firstCommit = firstCommit,
-        authors = authors,
         dateTime = dateTime,
+        firstCommit = firstCommit,
+        firstCommitDateTime = firstCommitDateTime,
+        authors = authors,
         ease = ease,
         storyId = storyId,
         semver = semver,
