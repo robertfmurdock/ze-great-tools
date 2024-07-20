@@ -24,12 +24,16 @@ fun Iterable<Contribution>.toJsonString(): String = Json.encodeToString(map(Cont
 fun Contribution.toJsonString(): String = Json.encodeToString(toJsonModel())
 
 object ContributionParser {
+
+    private val json = Json {
+        ignoreUnknownKeys = true
+    }
     fun parseContributions(jsonString: String) =
-        Json.decodeFromString<Array<ContributionJson>>(jsonString)
+        json.decodeFromString<Array<ContributionJson>>(jsonString)
             .map(ContributionJson::toModel)
 
     fun parseContribution(jsonString: String) =
-        Json.decodeFromString<ContributionJson?>(jsonString)
+        json.decodeFromString<ContributionJson?>(jsonString)
             ?.toModel()
 }
 
