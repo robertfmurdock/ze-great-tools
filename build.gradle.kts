@@ -18,7 +18,10 @@ tagger {
 
 tasks {
     assemble {
-        dependsOn(provider { gradle.includedBuilds.map { it.task(":assemble") }.toList() })
+        dependsOn(
+            provider { gradle.includedBuilds.map { it.task(":assemble") }.toList() },
+            currentContributionData
+        )
     }
     check {
         dependsOn(provider { gradle.includedBuilds.map { it.task(":check") }.toList() })
