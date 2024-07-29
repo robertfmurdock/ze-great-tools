@@ -12,4 +12,6 @@ data class Contribution(
     val storyId: String?,
     val semver: String?,
     val label: String?,
+    val tagName: String?,
+    val tagDateTime: Instant?,
 )

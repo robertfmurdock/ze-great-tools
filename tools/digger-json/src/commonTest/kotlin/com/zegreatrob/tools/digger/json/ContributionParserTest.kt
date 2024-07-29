@@ -88,24 +88,22 @@ class ContributionParserTest {
             firstCommit = "${uuid4()}",
             authors = listOf("${uuid4()}"),
             dateTime =
-            Instant.fromEpochMilliseconds(
-                epochMilliseconds =
-                Random.nextLong(
-                    from = Instant.DISTANT_PAST.toEpochMilliseconds(),
-                    until = Instant.DISTANT_FUTURE.toEpochMilliseconds(),
-                ),
-            ),
+            randomInstant(),
             firstCommitDateTime =
-            Instant.fromEpochMilliseconds(
-                epochMilliseconds =
-                Random.nextLong(
-                    from = Instant.DISTANT_PAST.toEpochMilliseconds(),
-                    until = Instant.DISTANT_FUTURE.toEpochMilliseconds(),
-                ),
-            ),
+            randomInstant(),
             ease = Random.nextInt(),
             storyId = "${uuid4()}",
             semver = "${uuid4()}",
             label = "${uuid4()}",
+            tagDateTime = randomInstant(),
+            tagName = "${uuid4()}",
         )
+
+    private fun randomInstant() = Instant.fromEpochMilliseconds(
+        epochMilliseconds =
+        Random.nextLong(
+            from = Instant.DISTANT_PAST.toEpochMilliseconds(),
+            until = Instant.DISTANT_FUTURE.toEpochMilliseconds(),
+        ),
+    )
 }

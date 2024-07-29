@@ -1,5 +1,6 @@
 package com.zegreatrob.tools.digger.core
 
+import kotlinx.datetime.toKotlinInstant
 import org.ajoberstar.grgit.Commit
 import org.ajoberstar.grgit.Grgit
 import org.ajoberstar.grgit.Tag
@@ -19,11 +20,24 @@ fun Grgit.currentContributionCommits(): List<Commit> {
 }
 
 private fun Grgit.previousTag(): Tag? {
-    val tagList = tag.list().sortedByDescending { it.dateTime }
+    val tagList = orderedTagList()
     val tag = tagList.firstOrNull()
     return if (tag?.commit == head()) {
         tagList.getOrNull(1)
     } else {
         tag
+    }
+}
+
+private fun Grgit.orderedTagList(): List<Tag> = tag.list().sortedByDescending { it.dateTime?.toInstant()?.toKotlinInstant() }
+
+fun Grgit.currentCommitTag(): Tag? {
+    val firstTag = orderedTagList()
+        .also { it.forEach { println("tag ${it.name} ${it.dateTime?.toInstant()?.toKotlinInstant()}") } }
+        .firstOrNull()
+    return if (firstTag?.commit != head()) {
+        null
+    } else {
+        firstTag
     }
 }

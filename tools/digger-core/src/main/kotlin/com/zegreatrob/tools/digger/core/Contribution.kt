@@ -22,6 +22,8 @@ fun List<Commit>.contribution(): Contribution {
         storyId = mergedStoryIds(messageDigResults),
         semver = messageDigResults.mapNotNull { it.semver }.highestPrioritySemver()?.toString(),
         label = null,
+        tagName = null,
+        tagDateTime = null,
     )
 }
 

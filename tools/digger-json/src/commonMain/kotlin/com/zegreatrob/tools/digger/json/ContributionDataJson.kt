@@ -17,6 +17,8 @@ internal data class ContributionJson(
     val storyId: String? = null,
     val semver: String? = null,
     val label: String? = null,
+    val tagName: String? = null,
+    val tagDateTime: Instant? = null,
 )
 
 fun Iterable<Contribution>.toJsonString(): String = Json.encodeToString(map(Contribution::toJsonModel))
@@ -28,6 +30,7 @@ object ContributionParser {
     private val json = Json {
         ignoreUnknownKeys = true
     }
+
     fun parseContributions(jsonString: String) =
         json.decodeFromString<Array<ContributionJson>>(jsonString)
             .map(ContributionJson::toModel)
@@ -40,25 +43,28 @@ object ContributionParser {
 private fun Contribution.toJsonModel() =
     ContributionJson(
         lastCommit = lastCommit,
-        dateTime = dateTime,
         firstCommit = firstCommit,
-        firstCommitDateTime = firstCommitDateTime,
         authors = authors,
+        dateTime = dateTime,
+        firstCommitDateTime = firstCommitDateTime,
         ease = ease,
         storyId = storyId,
         semver = semver,
         label = label,
+        tagName = tagName,
+        tagDateTime = tagDateTime,
     )
 
-private fun ContributionJson.toModel() =
-    Contribution(
-        lastCommit = lastCommit,
-        dateTime = dateTime,
-        firstCommit = firstCommit,
-        firstCommitDateTime = firstCommitDateTime,
-        authors = authors,
-        ease = ease,
-        storyId = storyId,
-        semver = semver,
-        label = label,
-    )
+private fun ContributionJson.toModel() = Contribution(
+    lastCommit = lastCommit,
+    firstCommit = firstCommit,
+    authors = authors,
+    dateTime = dateTime,
+    firstCommitDateTime = firstCommitDateTime,
+    ease = ease,
+    storyId = storyId,
+    semver = semver,
+    label = label,
+    tagName = tagName,
+    tagDateTime = tagDateTime,
+)
