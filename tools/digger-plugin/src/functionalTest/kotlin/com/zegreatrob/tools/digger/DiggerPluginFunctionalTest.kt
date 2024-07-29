@@ -1,7 +1,8 @@
 package com.zegreatrob.tools.digger
 
 import com.zegreatrob.tools.digger.json.ContributionParser.parseContribution
-import groovy.json.JsonSlurper
+import com.zegreatrob.tools.digger.json.ContributionParser.parseContributions
+import com.zegreatrob.tools.digger.model.Contribution
 import kotlinx.datetime.toKotlinInstant
 import org.ajoberstar.grgit.Commit
 import org.ajoberstar.grgit.Grgit
@@ -18,7 +19,6 @@ import org.junit.jupiter.api.io.TempDir
 import java.io.File
 import java.io.FileOutputStream
 import java.lang.Thread.sleep
-import java.time.ZonedDateTime
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -148,7 +148,7 @@ class DiggerPluginFunctionalTest {
 
     private fun parseStoryId(output: String) = parseContribution(output)?.storyId
 
-    private fun parseAll(output: String) = (JsonSlurper().parse(output.trim().toCharArray()) as List<*>)
+    private fun parseAll(output: String) = parseContributions(output)
 
     @Test
     fun `currentContributionData will include authors from multiple commits after last tag`() {
@@ -368,20 +368,19 @@ class DiggerPluginFunctionalTest {
             """.trimIndent(),
         )
 
-        val grgit =
-            initializeGitRepo(
-                listOf(
-                    """here's a message
+        val grgit = initializeGitRepo(
+            listOf(
+                """here's a message
                 |
                 |
                 |Co-authored-by: First Guy <first@guy.edu>
                 |Co-authored-by: Second Gui <second@gui.io>
                     """.trimMargin(),
-                ),
-            )
+            ),
+        )
         val firstCommit = grgit.head()
 
-        grgit.addTag("release")
+        val firstRelease = grgit.addTag("release")
         val secondCommit =
             grgit.addCommitWithMessage(
                 """here's a message
@@ -399,38 +398,50 @@ class DiggerPluginFunctionalTest {
             .build()
         assertEquals(
             listOf(
-                mapOf(
-                    "lastCommit" to secondCommit.id,
-                    "firstCommit" to secondCommit.id,
-                    "dateTime" to secondCommit.dateTime.toKotlinInstantString(),
-                    "firstCommitDateTime" to secondCommit.dateTime.toKotlinInstantString(),
-                    "authors" to
-                        listOf(
-                            "fourth@gui.io",
-                            "funk@test.io",
-                            "test@funk.edu",
-                            "third@guy.edu",
-                        ),
-                    "label" to projectDir.name,
+                toContribution(
+                    lastCommit = secondCommit,
+                    expectedAuthors = listOf(
+                        "fourth@gui.io",
+                        "funk@test.io",
+                        "test@funk.edu",
+                        "third@guy.edu",
+                    )
                 ),
-                mapOf(
-                    "lastCommit" to firstCommit.id,
-                    "firstCommit" to firstCommit.id,
-                    "dateTime" to firstCommit.dateTime.toKotlinInstantString(),
-                    "firstCommitDateTime" to firstCommit.dateTime.toKotlinInstantString(),
-                    "authors" to
-                        listOf(
-                            "first@guy.edu",
-                            "funk@test.io",
-                            "second@gui.io",
-                            "test@funk.edu",
-                        ),
-                    "label" to projectDir.name,
+                toContribution(
+                    lastCommit = firstCommit,
+                    tag = firstRelease,
+                    expectedAuthors = listOf(
+                        "first@guy.edu",
+                        "funk@test.io",
+                        "second@gui.io",
+                        "test@funk.edu",
+                    ),
                 ),
             ),
             parseAll(allOutput.readText()),
         )
     }
+
+    private fun toContribution(
+        lastCommit: Commit,
+        tag: Tag? = null,
+        firstCommit: Commit = lastCommit,
+        expectedAuthors: List<String>,
+        expectedEase: Int? = null,
+        expectedStoryId: String? = null,
+        expectedLabel: String = projectDir.name,
+    ) = Contribution(
+        lastCommit = lastCommit.id,
+        dateTime = lastCommit.dateTime?.toInstant()?.toKotlinInstant(),
+        firstCommit = firstCommit.id,
+        firstCommitDateTime = firstCommit.dateTime?.toInstant()?.toKotlinInstant(),
+        authors = expectedAuthors,
+        label = expectedLabel,
+        ease = expectedEase,
+        storyId = expectedStoryId,
+        tagName = tag?.name,
+        tagDateTime = tag?.dateTime?.toInstant()?.toKotlinInstant(),
+    )
 
     @Test
     fun `allContributionData will include ease of change`() {
@@ -450,7 +461,7 @@ class DiggerPluginFunctionalTest {
             )
         val firstCommit = grgit.head()
 
-        grgit.addTag("release")
+        val tag = grgit.addTag("release")
         val secondCommit =
             grgit.addCommitWithMessage(
                 "-3- here's a message",
@@ -463,23 +474,16 @@ class DiggerPluginFunctionalTest {
             .build()
         assertEquals(
             listOf(
-                mapOf(
-                    "authors" to listOf("funk@test.io", "test@funk.edu"),
-                    "lastCommit" to secondCommit.id,
-                    "dateTime" to secondCommit.dateTime.toKotlinInstantString(),
-                    "firstCommit" to secondCommit.id,
-                    "firstCommitDateTime" to secondCommit.dateTime.toKotlinInstantString(),
-                    "ease" to 3,
-                    "label" to projectDir.name,
+                toContribution(
+                    lastCommit = secondCommit,
+                    expectedAuthors = listOf("funk@test.io", "test@funk.edu"),
+                    expectedEase = 3,
                 ),
-                mapOf(
-                    "authors" to listOf("funk@test.io", "test@funk.edu"),
-                    "lastCommit" to firstCommit.id,
-                    "dateTime" to firstCommit.dateTime.toKotlinInstantString(),
-                    "firstCommit" to firstCommit.id,
-                    "firstCommitDateTime" to firstCommit.dateTime.toKotlinInstantString(),
-                    "ease" to 4,
-                    "label" to projectDir.name,
+                toContribution(
+                    lastCommit = firstCommit,
+                    tag = tag,
+                    expectedAuthors = listOf("funk@test.io", "test@funk.edu"),
+                    expectedEase = 4,
                 ),
             ),
             parseAll(allOutput.readText()),
@@ -497,7 +501,7 @@ class DiggerPluginFunctionalTest {
         )
         val grgit = initializeGitRepo(listOf("[DOGCOW-17] here's a message"))
         val firstCommit = grgit.head()
-        grgit.addTag("release")
+        val tag = grgit.addTag("release")
         val secondCommit = grgit.addCommitWithMessage("[DOGCOW-18] -3- here's a message")
         GradleRunner.create()
             .forwardOutput()
@@ -507,24 +511,17 @@ class DiggerPluginFunctionalTest {
             .build()
         assertEquals(
             listOf(
-                mapOf(
-                    "authors" to listOf("funk@test.io", "test@funk.edu"),
-                    "lastCommit" to secondCommit.id,
-                    "dateTime" to secondCommit.dateTime.toKotlinInstantString(),
-                    "firstCommit" to secondCommit.id,
-                    "firstCommitDateTime" to secondCommit.dateTime.toKotlinInstantString(),
-                    "ease" to 3,
-                    "storyId" to "DOGCOW-18",
-                    "label" to projectDir.name,
+                toContribution(
+                    lastCommit = secondCommit,
+                    expectedAuthors = listOf("funk@test.io", "test@funk.edu"),
+                    expectedEase = 3,
+                    expectedStoryId = "DOGCOW-18",
                 ),
-                mapOf(
-                    "authors" to listOf("funk@test.io", "test@funk.edu"),
-                    "lastCommit" to firstCommit.id,
-                    "dateTime" to firstCommit.dateTime.toKotlinInstantString(),
-                    "firstCommit" to firstCommit.id,
-                    "firstCommitDateTime" to firstCommit.dateTime.toKotlinInstantString(),
-                    "storyId" to "DOGCOW-17",
-                    "label" to projectDir.name,
+                toContribution(
+                    lastCommit = firstCommit,
+                    tag = tag,
+                    expectedAuthors = listOf("funk@test.io", "test@funk.edu"),
+                    expectedStoryId = "DOGCOW-17",
                 ),
             ),
             parseAll(allOutput.readText()),
@@ -551,15 +548,12 @@ class DiggerPluginFunctionalTest {
             .build()
         assertEquals(
             listOf(
-                mapOf(
-                    "authors" to listOf("funk@test.io", "test@funk.edu"),
-                    "lastCommit" to secondCommit.id,
-                    "dateTime" to secondCommit.dateTime.toKotlinInstantString(),
-                    "firstCommit" to firstCommit.id,
-                    "firstCommitDateTime" to firstCommit.dateTime.toKotlinInstantString(),
-                    "ease" to 3,
-                    "storyId" to "DOGCOW-17",
-                    "label" to projectDir.name,
+                toContribution(
+                    lastCommit = secondCommit,
+                    firstCommit = firstCommit,
+                    expectedAuthors = listOf("funk@test.io", "test@funk.edu"),
+                    expectedEase = 3,
+                    expectedStoryId = "DOGCOW-17",
                 ),
             ),
             parseAll(allOutput.readText()),
@@ -591,15 +585,13 @@ class DiggerPluginFunctionalTest {
 
         assertEquals(
             listOf(
-                mapOf(
-                    "authors" to listOf("funk@test.io", "test@funk.edu"),
-                    "lastCommit" to secondCommit.id,
-                    "dateTime" to secondCommit.dateTime.toKotlinInstantString(),
-                    "firstCommit" to firstCommit.id,
-                    "firstCommitDateTime" to firstCommit.dateTime.toKotlinInstantString(),
-                    "ease" to 3,
-                    "storyId" to "DOGCOW-17, DOGCOW-18",
-                    "label" to "AwesomeProject",
+                toContribution(
+                    lastCommit = secondCommit,
+                    firstCommit = firstCommit,
+                    expectedAuthors = listOf("funk@test.io", "test@funk.edu"),
+                    expectedEase = 3,
+                    expectedStoryId = "DOGCOW-17, DOGCOW-18",
+                    expectedLabel = "AwesomeProject",
                 ),
             ),
             parseAll(allOutput.readText()),
@@ -636,21 +628,16 @@ class DiggerPluginFunctionalTest {
 
         assertEquals(
             listOf(
-                mapOf(
-                    "authors" to listOf("funk@test.io", "test@funk.edu"),
-                    "lastCommit" to secondCommit.id,
-                    "dateTime" to secondCommit.dateTime.toKotlinInstantString(),
-                    "firstCommit" to firstCommit.id,
-                    "firstCommitDateTime" to firstCommit.dateTime.toKotlinInstantString(),
-                    "ease" to 4,
-                    "label" to projectDir.name,
+                toContribution(
+                    lastCommit = secondCommit,
+                    firstCommit = firstCommit,
+                    expectedAuthors = listOf("funk@test.io", "test@funk.edu"),
+                    expectedEase = 4,
                 ),
             ),
             parseAll(allOutput.readText()),
         )
     }
-
-    private fun ZonedDateTime.toKotlinInstantString() = toInstant()?.toKotlinInstant()?.toString()
 
     private fun initializeGitRepo(
         commits: List<String> = listOf(),
