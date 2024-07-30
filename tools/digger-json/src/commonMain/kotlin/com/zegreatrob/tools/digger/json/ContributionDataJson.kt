@@ -13,6 +13,7 @@ internal data class ContributionJson(
     val authors: List<String>,
     val dateTime: Instant? = null,
     val firstCommitDateTime: Instant? = null,
+    val commitCount: Int,
     val ease: Int? = null,
     val storyId: String? = null,
     val semver: String? = null,
@@ -53,6 +54,7 @@ private fun Contribution.toJsonModel() =
         label = label,
         tagName = tagName,
         tagDateTime = tagDateTime,
+        commitCount = commitCount,
     )
 
 private fun ContributionJson.toModel() = Contribution(
@@ -67,4 +69,5 @@ private fun ContributionJson.toModel() = Contribution(
     label = label,
     tagName = tagName,
     tagDateTime = tagDateTime,
+    commitCount = commitCount,
 )

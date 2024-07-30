@@ -24,6 +24,7 @@ fun List<Commit>.contribution(): Contribution {
         label = null,
         tagName = null,
         tagDateTime = null,
+        commitCount = count(),
     )
 }
 

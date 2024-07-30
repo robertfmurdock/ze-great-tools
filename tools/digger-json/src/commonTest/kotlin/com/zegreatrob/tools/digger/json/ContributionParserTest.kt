@@ -97,6 +97,7 @@ class ContributionParserTest {
             label = "${uuid4()}",
             tagDateTime = randomInstant(),
             tagName = "${uuid4()}",
+            commitCount = Random.nextInt(10),
         )
 
     private fun randomInstant() = Instant.fromEpochMilliseconds(

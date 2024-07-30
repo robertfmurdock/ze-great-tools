@@ -429,6 +429,8 @@ class DiggerPluginFunctionalTest {
         expectedAuthors: List<String>,
         expectedEase: Int? = null,
         expectedStoryId: String? = null,
+        expectedCommitCount: Int = 1,
+        expectedSemver: String? = null,
         expectedLabel: String = projectDir.name,
     ) = Contribution(
         lastCommit = lastCommit.id,
@@ -441,6 +443,8 @@ class DiggerPluginFunctionalTest {
         storyId = expectedStoryId,
         tagName = tag?.name,
         tagDateTime = tag?.dateTime?.toInstant()?.toKotlinInstant(),
+        commitCount = expectedCommitCount,
+        semver = expectedSemver,
     )
 
     @Test
@@ -552,6 +556,7 @@ class DiggerPluginFunctionalTest {
                     lastCommit = secondCommit,
                     firstCommit = firstCommit,
                     expectedAuthors = listOf("funk@test.io", "test@funk.edu"),
+                    expectedCommitCount = 2,
                     expectedEase = 3,
                     expectedStoryId = "DOGCOW-17",
                 ),
@@ -589,6 +594,7 @@ class DiggerPluginFunctionalTest {
                     lastCommit = secondCommit,
                     firstCommit = firstCommit,
                     expectedAuthors = listOf("funk@test.io", "test@funk.edu"),
+                    expectedCommitCount = 2,
                     expectedEase = 3,
                     expectedStoryId = "DOGCOW-17, DOGCOW-18",
                     expectedLabel = "AwesomeProject",
@@ -632,6 +638,7 @@ class DiggerPluginFunctionalTest {
                     lastCommit = secondCommit,
                     firstCommit = firstCommit,
                     expectedAuthors = listOf("funk@test.io", "test@funk.edu"),
+                    expectedCommitCount = 2,
                     expectedEase = 4,
                 ),
             ),
