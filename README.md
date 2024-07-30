@@ -11,7 +11,7 @@
 ![Testspace tests](https://img.shields.io/testspace/passed/robertfmurdock/robertfmurdock:ze-great-tools/main)
 
 [![Gradle Plugin Portal](https://img.shields.io/gradle-plugin-portal/v/com.zegreatrob.tools.tagger?label=Tagger%20Plugin)](https://plugins.gradle.org/plugin/com.zegreatrob.tools.tagger)
-
+[![Gradle Plugin Portal](https://img.shields.io/gradle-plugin-portal/v/com.zegreatrob.tools.digger?label=Digger%20Plugin)](https://plugins.gradle.org/plugin/com.zegreatrob.tools.digger)
 
 Basic Gradle tools for continuous development and release.
 
@@ -22,3 +22,9 @@ Included:
 An opinionated plugin for automatic semantic versioning via git tags and information in commits.
 
 See its [README](tools/tagger-plugin/README.md) for more.
+
+### Digger
+
+An plugin extracting contribution information from a git repository.
+
+See its [README](tools/digger-plugin/README.md) for more.
