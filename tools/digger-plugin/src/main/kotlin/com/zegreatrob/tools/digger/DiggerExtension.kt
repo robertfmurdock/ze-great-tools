@@ -35,7 +35,7 @@ open class DiggerExtension(
     fun currentContributionData() =
         with(grgitServiceExtension.service.get().grgit) {
             val currentCommitTag = gitDigger.currentCommitTag()
-            currentContributionCommits()
+            currentContributionCommits(gitDigger)
                 .contribution()
                 .copyWithLabelAndTag(currentCommitTag)
         }
@@ -46,5 +46,5 @@ open class DiggerExtension(
         tagDateTime = currentCommitTag?.dateTime,
     )
 
-    fun headId(): String = grgitServiceExtension.service.get().grgit.head().id
+    fun headId(): String = gitDigger.headCommitId()
 }
