@@ -7,37 +7,30 @@ import com.zegreatrob.tools.digger.core.contribution
 import com.zegreatrob.tools.digger.core.currentCommitTag
 import com.zegreatrob.tools.digger.core.currentContributionCommits
 import com.zegreatrob.tools.digger.model.Contribution
-import org.ajoberstar.grgit.gradle.GrgitServiceExtension
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.tasks.Input
 import org.gradle.kotlin.dsl.property
-import org.gradle.kotlin.dsl.provideDelegate
 import java.io.File
 
-open class DiggerExtension(
-    private val grgitServiceExtension: GrgitServiceExtension,
-    objectFactory: ObjectFactory,
-) {
+open class DiggerExtension(objectFactory: ObjectFactory) {
     @Input
     var label = objectFactory.property<String>()
 
     @Input
     var workingDirectory = objectFactory.property<File>()
 
-    private val gitDigger by lazy { DiggerGitWrapper(workingDirectory.get()) }
+    private val gitDigger get() = DiggerGitWrapper(workingDirectory.get())
 
-    fun allContributionData() =
-        grgitServiceExtension.service.get().grgit
-            .allContributionCommits(gitDigger)
-            .map { range -> range.first to range.second.toList().contribution() }
-            .map { (tag, contributions) -> contributions.copyWithLabelAndTag(tag) }
+    fun allContributionData() = gitDigger
+        .allContributionCommits()
+        .map { range -> range.first to range.second.toList().contribution() }
+        .map { (tag, contributions) -> contributions.copyWithLabelAndTag(tag) }
 
     fun currentContributionData() =
-        with(grgitServiceExtension.service.get().grgit) {
-            val currentCommitTag = gitDigger.currentCommitTag()
-            currentContributionCommits(gitDigger)
+        with(gitDigger) {
+            currentContributionCommits()
                 .contribution()
-                .copyWithLabelAndTag(currentCommitTag)
+                .copyWithLabelAndTag(currentCommitTag())
         }
 
     private fun Contribution.copyWithLabelAndTag(currentCommitTag: TagRef?) = copy(

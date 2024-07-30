@@ -10,7 +10,7 @@ plugins {
     base
 }
 
-val digger = project.extensions.create("digger", DiggerExtension::class, grgitService)
+val digger = project.extensions.create("digger", DiggerExtension::class)
 
 digger.label.convention(project.name)
 digger.workingDirectory.convention(project.rootDir)

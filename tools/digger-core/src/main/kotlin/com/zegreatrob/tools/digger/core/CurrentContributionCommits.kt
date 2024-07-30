@@ -1,19 +1,11 @@
 package com.zegreatrob.tools.digger.core
 
-import org.ajoberstar.grgit.Commit
-import org.ajoberstar.grgit.Grgit
-import org.ajoberstar.grgit.operation.LogOp
-
-fun Grgit.currentContributionCommits(wrapper: DiggerGitWrapper): List<Commit> {
-    val tag = wrapper.previousTag()
+fun DiggerGitWrapper.currentContributionCommits(): List<CommitRef> {
+    val tag = previousTag()
     return if (tag == null) {
         log()
     } else {
-        return log(
-            fun(it: LogOp) {
-                it.range(tag.name, "HEAD")
-            },
-        )
+        return logWithRange(tag.name, "HEAD")
     }
 }
 

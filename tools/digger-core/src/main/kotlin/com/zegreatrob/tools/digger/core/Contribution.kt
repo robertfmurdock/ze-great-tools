@@ -1,10 +1,8 @@
 package com.zegreatrob.tools.digger.core
 
 import com.zegreatrob.tools.digger.model.Contribution
-import kotlinx.datetime.toKotlinInstant
-import org.ajoberstar.grgit.Commit
 
-fun List<Commit>.contribution(): Contribution {
+fun List<CommitRef>.contribution(): Contribution {
     val messageDigResults =
         map { commit ->
             commit.commitInspectionResult(MessageDigger().digIntoMessage(commit.fullMessage))
@@ -16,8 +14,8 @@ fun List<Commit>.contribution(): Contribution {
         lastCommit = lastCommit?.id ?: "",
         firstCommit = firstCommit?.id ?: "",
         authors = allAuthors(messageDigResults),
-        dateTime = lastCommit?.dateTime?.toInstant()?.toKotlinInstant(),
-        firstCommitDateTime = firstCommit?.dateTime?.toInstant()?.toKotlinInstant(),
+        dateTime = lastCommit?.dateTime,
+        firstCommitDateTime = firstCommit?.dateTime,
         ease = messageDigResults.mapNotNull { it.ease }.maxOrNull(),
         storyId = mergedStoryIds(messageDigResults),
         semver = messageDigResults.mapNotNull { it.semver }.highestPrioritySemver()?.toString(),
@@ -45,10 +43,10 @@ private fun mergedStoryIds(messageDigResults: List<CommitInspectionResult>) = me
         }
     }
 
-private fun Commit.commitInspectionResult(digResult: MessageDigResult) =
+private fun CommitRef.commitInspectionResult(digResult: MessageDigResult) =
     CommitInspectionResult(
         storyId = digResult.storyId,
         ease = digResult.ease,
-        authors = listOf(committer.email, author.email) + digResult.coauthors,
+        authors = listOf(committerEmail, authorEmail) + digResult.coauthors,
         semver = digResult.semver,
     )
