@@ -1,5 +1,6 @@
 package com.zegreatrob.tools.digger
 
+import com.zegreatrob.tools.digger.core.DiggerGitWrapper
 import com.zegreatrob.tools.digger.core.TagRef
 import com.zegreatrob.tools.digger.core.allContributionCommits
 import com.zegreatrob.tools.digger.core.contribution
@@ -10,6 +11,7 @@ import org.ajoberstar.grgit.gradle.GrgitServiceExtension
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.tasks.Input
 import org.gradle.kotlin.dsl.property
+import org.gradle.kotlin.dsl.provideDelegate
 import java.io.File
 
 open class DiggerExtension(
@@ -22,15 +24,17 @@ open class DiggerExtension(
     @Input
     var workingDirectory = objectFactory.property<File>()
 
+    private val gitDigger by lazy { DiggerGitWrapper(workingDirectory.get()) }
+
     fun allContributionData() =
         grgitServiceExtension.service.get().grgit
-            .allContributionCommits(workingDirectory.get())
+            .allContributionCommits(gitDigger)
             .map { range -> range.first to range.second.toList().contribution() }
             .map { (tag, contributions) -> contributions.copyWithLabelAndTag(tag) }
 
     fun currentContributionData() =
         with(grgitServiceExtension.service.get().grgit) {
-            val currentCommitTag = currentCommitTag(workingDirectory.get())
+            val currentCommitTag = gitDigger.currentCommitTag()
             currentContributionCommits()
                 .contribution()
                 .copyWithLabelAndTag(currentCommitTag)

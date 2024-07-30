@@ -2,10 +2,9 @@ package com.zegreatrob.tools.digger.core
 
 import org.ajoberstar.grgit.Commit
 import org.ajoberstar.grgit.Grgit
-import java.io.File
 
-fun Grgit.allContributionCommits(workingDirectory: File): List<Pair<TagRef?, List<Commit>>> {
-    val tagList = listTags(workingDirectory)
+fun Grgit.allContributionCommits(gitDigger: DiggerGitWrapper): List<Pair<TagRef?, List<Commit>>> {
+    val tagList = gitDigger.listTags()
     return log().fold(emptyList()) { acc, commit ->
         val tag = tagList.find { it.commitId == commit.id }
         if (tag != null) {
