@@ -19,15 +19,16 @@ fun headCommitId(workingDirectory: File): String {
         ProcessBuilder(
             listOf(
                 "git",
+                "--no-pager",
                 "rev-parse",
                 "HEAD",
             ),
         )
             .directory(workingDirectory)
             .start()
-    process.waitFor()
     val outputText = process.inputStream.readAllBytes().toString(Charset.defaultCharset())
     val error = process.errorStream.readAllBytes().toString(Charset.defaultCharset())
+    process.waitFor()
     if (error.isNotEmpty()) {
         throw Error(error)
     }
@@ -39,6 +40,7 @@ fun listTags(workingDirectory: File): List<TagRef> {
         ProcessBuilder(
             listOf(
                 "git",
+                "--no-pager",
                 "tag",
                 "--list",
                 "--format=%(refname:strip=2),%(*objectname),%(creatordate:iso-strict)",
@@ -46,9 +48,9 @@ fun listTags(workingDirectory: File): List<TagRef> {
         )
             .directory(workingDirectory)
             .start()
-    process.waitFor()
     val outputText = process.inputStream.readAllBytes().toString(Charset.defaultCharset())
     val error = process.errorStream.readAllBytes().toString(Charset.defaultCharset())
+    process.waitFor()
     val output = outputText.split("\n").mapNotNull {
         val commaSplit = it.split(",")
         if (commaSplit.size >= 3) {
