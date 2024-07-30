@@ -31,12 +31,3 @@ private fun Grgit.previousTag(): Tag? {
 
 private fun Grgit.orderedTagList(): List<Tag> =
     tag.list().sortedByDescending { it.dateTime?.toInstant()?.toKotlinInstant() }
-
-fun Grgit.currentCommitTag(): Tag? {
-    val firstTag = orderedTagList().firstOrNull()
-    return if (firstTag?.commit != head()) {
-        null
-    } else {
-        firstTag
-    }
-}
