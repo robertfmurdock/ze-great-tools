@@ -18,19 +18,17 @@ tagger {
 
 tasks {
     assemble {
-        dependsOn(
-            provider { gradle.includedBuilds.map { it.task(":assemble") }.toList() },
-            currentContributionData
-        )
+        dependsOn(provider { gradle.includedBuilds.map { it.task(":assemble") }.toList() })
+    }
+    release {
+        dependsOn(provider { gradle.includedBuild("tools").task(":release") })
+        finalizedBy(currentContributionData)
     }
     check {
         dependsOn(provider { gradle.includedBuilds.map { it.task(":check") }.toList() })
     }
     clean {
         dependsOn(provider { gradle.includedBuilds.map { it.task(":clean") }.toList() })
-    }
-    release {
-        dependsOn(provider { gradle.includedBuild("tools").task(":release") })
     }
     create("versionCatalogUpdate") {
         dependsOn(provider { gradle.includedBuilds.map { it.task(":versionCatalogUpdate") }.toList() })
