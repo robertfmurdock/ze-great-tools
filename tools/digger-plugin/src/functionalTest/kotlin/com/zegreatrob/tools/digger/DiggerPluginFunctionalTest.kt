@@ -375,7 +375,7 @@ class DiggerPluginFunctionalTest {
                 |
                 |Co-authored-by: First Guy <first@guy.edu>
                 |Co-authored-by: Second Gui <second@gui.io>
-                    """.trimMargin(),
+                """.trimMargin(),
             ),
         )
         val firstCommit = grgit.head()
@@ -405,7 +405,7 @@ class DiggerPluginFunctionalTest {
                         "funk@test.io",
                         "test@funk.edu",
                         "third@guy.edu",
-                    )
+                    ),
                 ),
                 toContribution(
                     lastCommit = firstCommit,
