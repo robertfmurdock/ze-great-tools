@@ -19,7 +19,7 @@ open class DiggerExtension(objectFactory: ObjectFactory) {
     @Input
     var workingDirectory = objectFactory.property<File>()
 
-    private val gitDigger get() = DiggerGitWrapper(workingDirectory.get())
+    private val gitDigger get() = DiggerGitWrapper(workingDirectory.get().absolutePath)
 
     fun allContributionData() = gitDigger
         .allContributionCommits()

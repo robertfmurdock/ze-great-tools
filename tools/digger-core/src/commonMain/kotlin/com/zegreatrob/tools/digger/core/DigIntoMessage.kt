@@ -1,10 +1,10 @@
 package com.zegreatrob.tools.digger.core
 
 class MessageDigger(
-    majorRegex: Regex = Regex("\\[major]"),
-    minorRegex: Regex = Regex("\\[minor]"),
-    patchRegex: Regex = Regex("\\[patch]"),
-    noneRegex: Regex = Regex("\\[none]"),
+    majorRegex: Regex = Regex("\\[major\\]"),
+    minorRegex: Regex = Regex("\\[minor\\]"),
+    patchRegex: Regex = Regex("\\[patch\\]"),
+    noneRegex: Regex = Regex("\\[none\\]"),
 ) {
     private val regexes =
         mapOf(
@@ -18,10 +18,12 @@ class MessageDigger(
         regexes.map { (group, regex) ->
             "(?<$group>$regex)?"
         }.joinToString("")
+//    (?<major>\[major\])?(?<minor>\[minor\])?(?<patch>\[patch\])?(?<none>\[none\])?(.*\[(?<storyId>.*?)])?(.*-(?<ease>[1-5])-.*)?(.*Co-authored-by: .* <(?<coAuthors>.*)>)?
 
     private val allRegex =
         Regex(
-            pattern = "$allSemverRegex(?>\\[(?<storyId>.*?)])?(?>-(?<ease>[1-5])-)?(?>Co-authored-by: .* <(?<coAuthors>.*)>)?",
+            pattern = "$allSemverRegex(.*\\[(?<storyId>.*?)])?(.*-(?<ease>[1-5])-.*)?(.*Co-authored-by: .* <(?<coAuthors>.*)>)?"
+                .also { println("regex: $it") },
             options = setOf(RegexOption.IGNORE_CASE, RegexOption.MULTILINE),
         )
 
