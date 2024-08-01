@@ -37,7 +37,7 @@ private fun mergedStoryIds(messageDigResults: List<CommitInspectionResult>) = me
     .mapNotNull(CommitInspectionResult::storyId)
     .let {
         if (it.isNotEmpty()) {
-            it.toSortedSet().joinToString(", ")
+            it.toSet().sorted().joinToString(", ")
         } else {
             null
         }

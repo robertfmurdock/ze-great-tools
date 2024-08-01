@@ -1,10 +1,8 @@
 package com.zegreatrob.tools.digger.core
 
 import kotlinx.datetime.Instant
-import java.io.File
-import java.nio.charset.Charset
 
-class DiggerGitWrapper(private val workingDirectory: File) {
+class DiggerGitWrapper(private val workingDirectory: String) {
 
     fun headCommitId(): String {
         val outputText = runProcess(
@@ -14,6 +12,7 @@ class DiggerGitWrapper(private val workingDirectory: File) {
                 "rev-parse",
                 "HEAD",
             ),
+            workingDirectory,
         )
         return outputText.trim()
     }
@@ -27,6 +26,7 @@ class DiggerGitWrapper(private val workingDirectory: File) {
                 "--list",
                 "--format=%(refname:strip=2),%(*objectname),%(creatordate:iso-strict)",
             ),
+            workingDirectory,
         )
         val output = outputText.split("\n").mapNotNull {
             val commaSplit = it.split(",")
@@ -43,19 +43,6 @@ class DiggerGitWrapper(private val workingDirectory: File) {
         return output
     }
 
-    private fun runProcess(args: List<String>): String {
-        val process = ProcessBuilder(args)
-            .directory(workingDirectory)
-            .start()
-        val outputText = process.inputStream.readAllBytes().toString(Charset.defaultCharset())
-        val error = process.errorStream.readAllBytes().toString(Charset.defaultCharset())
-        process.waitFor()
-        if (error.isNotEmpty()) {
-            throw Error(error)
-        }
-        return outputText
-    }
-
     fun log(): List<CommitRef> = parseLog(
         runProcess(
             listOf(
@@ -64,6 +51,7 @@ class DiggerGitWrapper(private val workingDirectory: File) {
                 "log",
                 "--format=%H%n%ae%n%ce%n%aI%n%B%n$commitSeparator",
             ),
+            workingDirectory,
         ),
     )
 
@@ -76,6 +64,7 @@ class DiggerGitWrapper(private val workingDirectory: File) {
                 "--format=%H%n%ae%n%ce%n%aI%n%B%n$commitSeparator",
                 "$begin..$end",
             ),
+            workingDirectory,
         ),
     )
 
@@ -94,3 +83,5 @@ class DiggerGitWrapper(private val workingDirectory: File) {
             )
         }
 }
+
+expect fun runProcess(args: List<String>, workingDirectory: String): String
