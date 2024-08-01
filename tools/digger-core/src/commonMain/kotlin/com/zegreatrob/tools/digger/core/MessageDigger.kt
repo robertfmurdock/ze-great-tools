@@ -6,7 +6,18 @@ class MessageDigger(
     minorRegex: Regex = Regex("\\[minor\\]"),
     patchRegex: Regex = Regex("\\[patch\\]"),
     noneRegex: Regex = Regex("\\[none\\]"),
+    storyIdRegex: Regex = Regex("\\[(?<storyId>.*?)\\]"),
+    easeRegex: Regex = Regex("-(?<ease>[1-5])-"),
 ) {
+    init {
+        if (!storyIdRegex.pattern.contains("?<storyId>")) {
+            throw RuntimeException("StoryIdRegex must include a storyId group. The regex was: ${storyIdRegex.pattern}")
+        }
+        if (!easeRegex.pattern.contains("?<ease>")) {
+            throw RuntimeException("EaseRegex must include an ease group. The regex was: ${easeRegex.pattern}")
+        }
+    }
+
     private val regexes =
         mapOf(
             "major" to majorRegex,
@@ -20,12 +31,12 @@ class MessageDigger(
             "(?<$group>${regex.cleaned()})?"
         }.joinToString("")
 
-    private val storyIdRegex = "(\\[(?<storyId>.*?)\\])?"
-    private val easeRegex = "(-(?<ease>[1-5])-)?"
+    private val cleanedStoryIdRegex = "(${storyIdRegex.cleaned()})?"
+    private val cleanedEaseRegex = "(${easeRegex.cleaned()})?"
     private val coAuthorRegex = "(Co-authored-by: .* <(?<coAuthors>.*)>)?"
 
     private val allRegex = Regex(
-        pattern = "$allSemverRegex$storyIdRegex$easeRegex$coAuthorRegex",
+        pattern = "$allSemverRegex$cleanedStoryIdRegex$cleanedEaseRegex$coAuthorRegex",
         options = setOf(RegexOption.IGNORE_CASE, RegexOption.MULTILINE),
     )
 

@@ -5,7 +5,7 @@ import com.zegreatrob.tools.digger.core.SemverType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-class MessageDigTest {
+class MessageDiggerTest {
     @Test
     fun canGetAllGroupsFromRegex() {
         val input =
@@ -261,5 +261,31 @@ class MessageDigTest {
 
         assertEquals(expected = "Cowdog-42", actual = result.storyId)
         assertEquals(expected = SemverType.Major, actual = result.semver)
+    }
+
+    @Test
+    fun settingStoryRegexWithoutGroupWillFail() {
+        @Suppress("RegExpRedundantEscape")
+        val badRegex = Regex("\\[.*\\]")
+        val result = kotlin.runCatching { MessageDigger(storyIdRegex = badRegex) }
+            .exceptionOrNull()
+
+        assertEquals(
+            expected = "StoryIdRegex must include a storyId group. The regex was: ${badRegex.pattern}",
+            actual = result?.message,
+        )
+    }
+
+    @Test
+    fun settingEaseRegexWithoutGroupWillFail() {
+        @Suppress("RegExpRedundantEscape")
+        val badRegex = Regex("\\[.*\\]")
+        val result = kotlin.runCatching { MessageDigger(easeRegex = badRegex) }
+            .exceptionOrNull()
+
+        assertEquals(
+            expected = "EaseRegex must include an ease group. The regex was: ${badRegex.pattern}",
+            actual = result?.message,
+        )
     }
 }
