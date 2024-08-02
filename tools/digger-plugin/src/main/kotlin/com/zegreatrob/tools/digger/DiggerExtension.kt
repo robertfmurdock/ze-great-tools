@@ -1,6 +1,7 @@
 package com.zegreatrob.tools.digger
 
 import com.zegreatrob.tools.digger.core.DiggerGitWrapper
+import com.zegreatrob.tools.digger.core.MessageDigger
 import com.zegreatrob.tools.digger.core.TagRef
 import com.zegreatrob.tools.digger.core.allContributionCommits
 import com.zegreatrob.tools.digger.core.contribution
@@ -19,17 +20,43 @@ open class DiggerExtension(objectFactory: ObjectFactory) {
     @Input
     var workingDirectory = objectFactory.property<File>()
 
+    @Input
+    var majorRegex = objectFactory.property<Regex>().convention(MessageDigger.Defaults.majorRegex)
+
+    @Input
+    var minorRegex = objectFactory.property<Regex>().convention(MessageDigger.Defaults.minorRegex)
+
+    @Input
+    var patchRegex = objectFactory.property<Regex>().convention(MessageDigger.Defaults.patchRegex)
+
+    @Input
+    var noneRegex = objectFactory.property<Regex>().convention(MessageDigger.Defaults.noneRegex)
+
+    @Input
+    var storyIdRegex = objectFactory.property<Regex>().convention(MessageDigger.Defaults.storyIdRegex)
+
+    @Input
+    var easeRegex = objectFactory.property<Regex>().convention(MessageDigger.Defaults.easeRegex)
+
     private val gitDigger get() = DiggerGitWrapper(workingDirectory.get().absolutePath)
+    private val messageDigger
+        get() = MessageDigger(
+            majorRegex = majorRegex.get(),
+            minorRegex = minorRegex.get(),
+            patchRegex = patchRegex.get(),
+            noneRegex = noneRegex.get(),
+            storyIdRegex = storyIdRegex.get(),
+            easeRegex = easeRegex.get(),
+        )
 
     fun allContributionData() = gitDigger
         .allContributionCommits()
-        .map { range -> range.first to range.second.toList().contribution() }
+        .map { range -> range.first to messageDigger.contribution(range.second.toList()) }
         .map { (tag, contributions) -> contributions.copyWithLabelAndTag(tag) }
 
     fun currentContributionData() =
         with(gitDigger) {
-            currentContributionCommits()
-                .contribution()
+            messageDigger.contribution(currentContributionCommits())
                 .copyWithLabelAndTag(currentCommitTag())
         }
 

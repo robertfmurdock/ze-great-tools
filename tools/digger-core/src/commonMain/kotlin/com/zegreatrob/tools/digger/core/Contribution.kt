@@ -2,14 +2,14 @@ package com.zegreatrob.tools.digger.core
 
 import com.zegreatrob.tools.digger.model.Contribution
 
-fun List<CommitRef>.contribution(): Contribution {
+fun MessageDigger.contribution(commitRefs: List<CommitRef>): Contribution {
     val messageDigResults =
-        map { commit ->
-            commit.commitInspectionResult(MessageDigger().digIntoMessage(commit.fullMessage))
+        commitRefs.map { commit ->
+            commit.commitInspectionResult(digIntoMessage(commit.fullMessage))
         }
 
-    val lastCommit = firstOrNull()
-    val firstCommit = lastOrNull()
+    val lastCommit = commitRefs.firstOrNull()
+    val firstCommit = commitRefs.lastOrNull()
     return Contribution(
         lastCommit = lastCommit?.id ?: "",
         firstCommit = firstCommit?.id ?: "",
@@ -22,7 +22,7 @@ fun List<CommitRef>.contribution(): Contribution {
         label = null,
         tagName = null,
         tagDateTime = null,
-        commitCount = count(),
+        commitCount = commitRefs.count(),
     )
 }
 

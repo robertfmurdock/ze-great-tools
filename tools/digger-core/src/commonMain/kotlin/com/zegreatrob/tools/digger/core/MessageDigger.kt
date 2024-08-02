@@ -1,13 +1,12 @@
 package com.zegreatrob.tools.digger.core
 
-@Suppress("RegExpRedundantEscape")
 class MessageDigger(
-    majorRegex: Regex = Regex("\\[major\\]"),
-    minorRegex: Regex = Regex("\\[minor\\]"),
-    patchRegex: Regex = Regex("\\[patch\\]"),
-    noneRegex: Regex = Regex("\\[none\\]"),
-    storyIdRegex: Regex = Regex("\\[(?<storyId>.*?)\\]"),
-    easeRegex: Regex = Regex("-(?<ease>[1-5])-"),
+    majorRegex: Regex = Defaults.majorRegex,
+    minorRegex: Regex = Defaults.minorRegex,
+    patchRegex: Regex = Defaults.patchRegex,
+    noneRegex: Regex = Defaults.noneRegex,
+    storyIdRegex: Regex = Defaults.storyIdRegex,
+    easeRegex: Regex = Defaults.easeRegex,
 ) {
     init {
         if (!storyIdRegex.pattern.contains("?<storyId>")) {
@@ -16,6 +15,16 @@ class MessageDigger(
         if (!easeRegex.pattern.contains("?<ease>")) {
             throw RuntimeException("EaseRegex must include an ease group. The regex was: ${easeRegex.pattern}")
         }
+    }
+
+    @Suppress("RegExpRedundantEscape")
+    object Defaults {
+        val majorRegex = Regex("\\[major\\]")
+        val minorRegex = Regex("\\[minor\\]")
+        val patchRegex = Regex("\\[patch\\]")
+        val noneRegex = Regex("\\[none\\]")
+        val storyIdRegex = Regex("\\[(?<storyId>.*?)\\]")
+        val easeRegex = Regex("-(?<ease>[1-5])-")
     }
 
     private val regexes =
