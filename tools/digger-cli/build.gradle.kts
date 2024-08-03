@@ -17,11 +17,14 @@ dependencies {
     commonMainImplementation(project(":digger-core"))
     commonMainImplementation(project(":digger-json"))
     commonMainImplementation("com.github.ajalt.clikt:clikt")
-    commonTestImplementation(kotlin("test", embeddedKotlinVersion))
     commonTestImplementation(project(":digger-test"))
 }
 
 tasks {
+    withType(Test::class) {
+        useJUnitPlatform()
+    }
+
     withType<CreateStartScripts> {
         applicationName = "digger"
     }

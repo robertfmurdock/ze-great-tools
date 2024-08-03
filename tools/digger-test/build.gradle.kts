@@ -12,4 +12,7 @@ dependencies {
     commonMainImplementation(project(":digger-core"))
     commonMainImplementation(project(":digger-json"))
     "jvmMainApi"(libs.org.ajoberstar.grgit.grgit.core)
+    "jvmMainApi"(kotlin("test-junit5", embeddedKotlinVersion))
+    "jvmMainApi"("org.junit.jupiter:junit-jupiter-api")
+    "jvmMainApi"("org.junit.jupiter:junit-jupiter-engine")
 }

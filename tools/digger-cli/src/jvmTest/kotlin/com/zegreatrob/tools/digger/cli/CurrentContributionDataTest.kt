@@ -1,48 +1,17 @@
 package com.zegreatrob.tools.digger.cli
 
 import com.github.ajalt.clikt.testing.test
-import com.zegreatrob.tools.digger.initializeGitRepo
-import com.zegreatrob.tools.digger.parseCurrentAuthors
-import java.nio.file.Path
-import kotlin.io.path.absolutePathString
-import kotlin.io.path.createTempDirectory
-import kotlin.test.BeforeTest
-import kotlin.test.Test
-import kotlin.test.assertEquals
+import com.zegreatrob.tools.digger.CurrentContributionTestSpec
+import org.junit.jupiter.api.io.TempDir
+import java.io.File
 
-class CurrentContributionDataTest {
+class CurrentContributionDataTest : CurrentContributionTestSpec {
 
-    lateinit var projectDir: Path
+    @field:TempDir
+    override lateinit var projectDir: File
 
-    @BeforeTest
-    fun setup() {
-        projectDir = createTempDirectory()
-    }
-
-    @Test
-    fun `currentContributionData will show authors and co-authors case insensitive`() {
-        initializeGitRepo(
-            projectDirectoryPath = projectDir.absolutePathString(),
-            addFileNames = emptySet(),
-            listOf(
-                """here's a message
-                |
-                |
-                |co-authored-by: First Guy <first@guy.edu>
-                |CO-AUTHORED-BY: Second Gui <second@gui.io>
-                """.trimMargin(),
-            ),
-        )
-        val result = CurrentContributionData().test("--dir ${projectDir.absolutePathString()}")
-        result.output
-        assertEquals(
-            listOf(
-                "first@guy.edu",
-                "funk@test.io",
-                "second@gui.io",
-                "test@funk.edu",
-            ),
-            parseCurrentAuthors(result.output),
-        )
-    }
+    override val addFileNames: Set<String> = emptySet()
+    override fun runCurrentContributionData(): String =
+        CurrentContributionData()
+            .test("--dir ${projectDir.absolutePath}").output
 }
