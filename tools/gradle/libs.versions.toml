@@ -5,6 +5,7 @@ org-ajoberstar-grgit = "5.2.2"
 com-benasher44-uuid = "com.benasher44:uuid:0.8.4"
 # @keep
 org-ajoberstar-grgit-gradle-plugin = { module = "org.ajoberstar.grgit:org.ajoberstar.grgit.gradle.plugin", version.ref = "org-ajoberstar-grgit" }
+com-github-ajalt-clikt-clikt = "com.github.ajalt.clikt:clikt:4.4.0"
 org-jetbrains-kotlinx-kotlinx-datetime = "org.jetbrains.kotlinx:kotlinx-datetime:0.6.0"
 # @pin
 org-jetbrains-kotlinx-kotlinx-serialization-bom = "org.jetbrains.kotlinx:kotlinx-serialization-bom:1.6.3"

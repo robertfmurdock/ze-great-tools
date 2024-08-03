@@ -12,6 +12,7 @@
                   <project path="$PROJECT_DIR$/tools" />
                   <project path="$PROJECT_DIR$/tools/certifier-plugin" />
                   <project path="$PROJECT_DIR$/tools/dependency-bom" />
+                  <project path="$PROJECT_DIR$/tools/digger-cli" />
                   <project path="$PROJECT_DIR$/tools/digger-core" />
                   <project path="$PROJECT_DIR$/tools/digger-json" />
                   <project path="$PROJECT_DIR$/tools/digger-model" />
@@ -37,6 +38,7 @@
             <option value="$PROJECT_DIR$/tools-plugins" />
             <option value="$PROJECT_DIR$/tools/certifier-plugin" />
             <option value="$PROJECT_DIR$/tools/dependency-bom" />
+            <option value="$PROJECT_DIR$/tools/digger-cli" />
             <option value="$PROJECT_DIR$/tools/digger-core" />
             <option value="$PROJECT_DIR$/tools/digger-json" />
             <option value="$PROJECT_DIR$/tools/digger-model" />
