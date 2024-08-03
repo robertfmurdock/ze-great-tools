@@ -18,6 +18,7 @@ dependencies {
     commonMainImplementation(project(":digger-json"))
     commonMainImplementation("com.github.ajalt.clikt:clikt")
     commonTestImplementation(kotlin("test", embeddedKotlinVersion))
+    commonTestImplementation(project(":digger-test"))
 }
 
 tasks {

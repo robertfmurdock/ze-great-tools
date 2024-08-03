@@ -1,23 +1,13 @@
 package com.zegreatrob.tools.digger
 
 import com.zegreatrob.tools.digger.json.ContributionParser.parseContribution
-import com.zegreatrob.tools.digger.json.ContributionParser.parseContributions
 import com.zegreatrob.tools.digger.model.Contribution
 import kotlinx.datetime.toKotlinInstant
 import org.ajoberstar.grgit.Commit
-import org.ajoberstar.grgit.Grgit
-import org.ajoberstar.grgit.Person
 import org.ajoberstar.grgit.Tag
-import org.ajoberstar.grgit.operation.AddOp
-import org.ajoberstar.grgit.operation.BranchChangeOp
-import org.ajoberstar.grgit.operation.CheckoutOp
-import org.ajoberstar.grgit.operation.CommitOp
-import org.ajoberstar.grgit.operation.RemoteAddOp
-import org.ajoberstar.grgit.operation.TagAddOp
 import org.gradle.testkit.runner.GradleRunner
 import org.junit.jupiter.api.io.TempDir
 import java.io.File
-import java.io.FileOutputStream
 import java.lang.Thread.sleep
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -50,6 +40,8 @@ class DiggerPluginFunctionalTest {
         )
 
         initializeGitRepo(
+            projectDirectoryPath = projectDir.absolutePath,
+            addFileNames = setOf(settingsFile.name, buildFile.name, ignoreFile.name),
             listOf(
                 """here's a message
                 |
@@ -87,6 +79,8 @@ class DiggerPluginFunctionalTest {
         )
 
         initializeGitRepo(
+            projectDirectoryPath = projectDir.absolutePath,
+            addFileNames = setOf(settingsFile.name, buildFile.name, ignoreFile.name),
             listOf(
                 """[patch] here's a message
                 |
@@ -117,6 +111,8 @@ class DiggerPluginFunctionalTest {
         )
 
         initializeGitRepo(
+            projectDirectoryPath = projectDir.absolutePath,
+            addFileNames = setOf(settingsFile.name, buildFile.name, ignoreFile.name),
             listOf(
                 """[major] here's a message
                 |
@@ -142,14 +138,6 @@ class DiggerPluginFunctionalTest {
         assertEquals(null, parseStoryId(currentOutput.readText()))
     }
 
-    private fun parseCurrentAuthors(output: String) = parseContribution(output)?.authors
-
-    private fun parseSemver(output: String) = parseContribution(output)?.semver
-
-    private fun parseStoryId(output: String) = parseContribution(output)?.storyId
-
-    private fun parseAll(output: String) = parseContributions(output)
-
     @Test
     fun `currentContributionData will include authors from multiple commits after last tag`() {
         buildFile.writeText(
@@ -161,6 +149,8 @@ class DiggerPluginFunctionalTest {
         )
 
         initializeGitRepo(
+            projectDirectoryPath = projectDir.absolutePath,
+            addFileNames = setOf(settingsFile.name, buildFile.name, ignoreFile.name),
             listOf(
                 """here's a message
                 |
@@ -212,6 +202,8 @@ class DiggerPluginFunctionalTest {
 
         val grgit =
             initializeGitRepo(
+                projectDirectoryPath = projectDir.absolutePath,
+                addFileNames = setOf(settingsFile.name, buildFile.name, ignoreFile.name),
                 listOf(
                     """here's a message
                 |
@@ -268,6 +260,8 @@ class DiggerPluginFunctionalTest {
         )
 
         val grgit = initializeGitRepo(
+            projectDirectoryPath = projectDir.absolutePath,
+            addFileNames = setOf(settingsFile.name, buildFile.name, ignoreFile.name),
             listOf(
                 """here's a message
                 |
@@ -320,6 +314,8 @@ class DiggerPluginFunctionalTest {
 
         val grgit =
             initializeGitRepo(
+                projectDirectoryPath = projectDir.absolutePath,
+                addFileNames = setOf(settingsFile.name, buildFile.name, ignoreFile.name),
                 listOf(
                     """here's a message
                 |
@@ -369,6 +365,8 @@ class DiggerPluginFunctionalTest {
         )
 
         val grgit = initializeGitRepo(
+            projectDirectoryPath = projectDir.absolutePath,
+            addFileNames = setOf(settingsFile.name, buildFile.name, ignoreFile.name),
             listOf(
                 """here's a message
                 |
@@ -459,6 +457,8 @@ class DiggerPluginFunctionalTest {
 
         val grgit =
             initializeGitRepo(
+                projectDirectoryPath = projectDir.absolutePath,
+                addFileNames = setOf(settingsFile.name, buildFile.name, ignoreFile.name),
                 listOf(
                     "here's a message -4- more stuff",
                 ),
@@ -503,7 +503,11 @@ class DiggerPluginFunctionalTest {
             }
             """.trimIndent(),
         )
-        val grgit = initializeGitRepo(listOf("[DOGCOW-17] here's a message"))
+        val grgit = initializeGitRepo(
+            projectDirectoryPath = projectDir.absolutePath,
+            addFileNames = setOf(settingsFile.name, buildFile.name, ignoreFile.name),
+            commits = listOf("[DOGCOW-17] here's a message"),
+        )
         val firstCommit = grgit.head()
         val tag = grgit.addTag("release")
         val secondCommit = grgit.addCommitWithMessage("[DOGCOW-18] -3- here's a message")
@@ -541,7 +545,11 @@ class DiggerPluginFunctionalTest {
             }
             """.trimIndent(),
         )
-        val grgit = initializeGitRepo(listOf("[DOGCOW-17] here's a message"))
+        val grgit = initializeGitRepo(
+            projectDirectoryPath = projectDir.absolutePath,
+            addFileNames = setOf(settingsFile.name, buildFile.name, ignoreFile.name),
+            listOf("[DOGCOW-17] here's a message"),
+        )
         val firstCommit = grgit.head()
         val secondCommit = grgit.addCommitWithMessage("[DOGCOW-17] -3- here's a message")
         GradleRunner.create()
@@ -577,7 +585,11 @@ class DiggerPluginFunctionalTest {
             }
             """.trimIndent(),
         )
-        val grgit = initializeGitRepo(listOf("[DOGCOW-17] here's a message"))
+        val grgit = initializeGitRepo(
+            projectDirectoryPath = projectDir.absolutePath,
+            addFileNames = setOf(settingsFile.name, buildFile.name, ignoreFile.name),
+            commits = listOf("[DOGCOW-17] here's a message"),
+        )
         val firstCommit = grgit.head()
         val secondCommit = grgit.addCommitWithMessage("[DOGCOW-18] -3- here's a message")
 
@@ -616,6 +628,8 @@ class DiggerPluginFunctionalTest {
 
         val grgit =
             initializeGitRepo(
+                projectDirectoryPath = projectDir.absolutePath,
+                addFileNames = setOf(settingsFile.name, buildFile.name, ignoreFile.name),
                 listOf(
                     "here's a message -4- more stuff",
                 ),
@@ -644,66 +658,5 @@ class DiggerPluginFunctionalTest {
             ),
             parseAll(allOutput.readText()),
         )
-    }
-
-    private fun initializeGitRepo(
-        commits: List<String> = listOf(),
-        initialTag: String? = null,
-    ): Grgit {
-        val grgit = Grgit.init(mapOf("dir" to projectDir.absolutePath))
-        disableGpgSign()
-        grgit.add(
-            fun AddOp.() {
-                patterns = setOf(settingsFile.name, buildFile.name, ignoreFile.name)
-            },
-        )
-        if (initialTag != null) {
-            grgit.addTag(initialTag)
-        }
-        commits.forEach { message -> grgit.addCommitWithMessage(message) }
-
-        grgit.remote.add(
-            fun RemoteAddOp.() {
-                this.name = "origin"
-                this.url = projectDir.absolutePath
-            },
-        )
-        grgit.checkout(
-            fun CheckoutOp.() {
-                branch = "main"
-                createBranch = true
-            },
-        )
-        grgit.pull()
-        grgit.branch.change(
-            fun BranchChangeOp.() {
-                this.name = "main"
-                this.startPoint = "origin/main"
-                this.mode = BranchChangeOp.Mode.TRACK
-            },
-        )
-        return grgit
-    }
-
-    private fun Grgit.addTag(initialTag: String?): Tag? = tag.add(
-        fun(it: TagAddOp) {
-            it.name = initialTag
-        },
-    )
-
-    private fun Grgit.addCommitWithMessage(message: String): Commit =
-        commit(
-            fun(it: CommitOp) {
-                it.author = Person("Funky Testerson", "funk@test.io")
-                it.committer = Person("Testy Funkerson", "test@funk.edu")
-                it.message = message
-            },
-        )
-
-    private fun disableGpgSign() {
-        FileOutputStream(projectDir.resolve(".git/config"), true)
-            .writer().use {
-                it.write("[commit]\n        gpgsign = false")
-            }
     }
 }

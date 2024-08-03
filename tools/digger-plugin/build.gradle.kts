@@ -30,6 +30,7 @@ dependencies {
     implementation(libs.org.ajoberstar.grgit.gradle.plugin)
     testImplementation(kotlin("test-junit5", embeddedKotlinVersion))
     "functionalTestImplementation"(platform(libs.org.junit.junit.bom))
+    "functionalTestImplementation"(project(":digger-test"))
 }
 
 gradlePlugin {
@@ -63,7 +64,6 @@ tasks {
         exclude { spec -> spec.file.absolutePath.contains("generated-sources") }
     }
 }
-
 
 signing {
     val signingKey: String? by project
