@@ -10,7 +10,7 @@ import com.zegreatrob.tools.digger.core.MessageDigger
 import com.zegreatrob.tools.digger.json.toJsonString
 
 class CurrentContributionData : CliktCommand() {
-    private val dir by argument("dir")
+    private val dir by argument("git-repo")
     private val outputFile by option().default("currentContributionData.json")
     private val label by option().default("")
 
