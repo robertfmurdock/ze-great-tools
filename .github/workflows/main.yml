@@ -39,6 +39,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           registry-url: 'https://registry.npmjs.org'
+      - name: Validate NPM Token
+        run: npm whoami
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       - uses: testspace-com/setup-testspace@v1
         with:
           domain: robertfmurdock
