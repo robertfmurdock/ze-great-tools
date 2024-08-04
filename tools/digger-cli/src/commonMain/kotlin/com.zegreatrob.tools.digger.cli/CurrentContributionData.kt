@@ -11,6 +11,7 @@ import com.zegreatrob.tools.digger.json.toJsonString
 
 class CurrentContributionData : CliktCommand() {
     private val dir by argument("dir")
+    private val outputFile by option().default("currentContributionData.json")
     private val label by option().default("")
 
     private val core
@@ -22,5 +23,8 @@ class CurrentContributionData : CliktCommand() {
 
     override fun run() = core.currentContributionData()
         .toJsonString()
-        .let(::echo)
+        .writeToFile(outputFile)
+        .also { echo("Data written to $outputFile") }
 }
+
+expect fun String.writeToFile(outputFile: String)
