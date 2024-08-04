@@ -12,8 +12,16 @@ interface CurrentContributionTestSpec {
 
     val addFileNames: Set<String>
 
+    fun setupWithDefaults()
+
+    fun runCurrentContributionData(): String
+
+    fun setupWithOverrides(label: String? = null)
+
     @Test
     fun `currentContributionData will show authors and co-authors case insensitive`() {
+        setupWithDefaults()
+
         initializeGitRepo(
             projectDirectoryPath = projectDir.absolutePath,
             addFileNames = addFileNames,
@@ -39,7 +47,33 @@ interface CurrentContributionTestSpec {
     }
 
     @Test
+    fun `when label is set will apply it to contribution`() {
+        val label = "extraSpecialLabel"
+        setupWithOverrides(label = label)
+
+        initializeGitRepo(
+            projectDirectoryPath = projectDir.absolutePath,
+            addFileNames = addFileNames,
+            listOf(
+                """here's a message
+                |
+                |
+                |co-authored-by: First Guy <first@guy.edu>
+                |CO-AUTHORED-BY: Second Gui <second@gui.io>
+                """.trimMargin(),
+            ),
+        )
+        val output = runCurrentContributionData()
+        assertEquals(
+            label,
+            parseContribution(output)?.label,
+        )
+    }
+
+    @Test
     fun `when included currentContributionData will show semver level`() {
+        setupWithDefaults()
+
         initializeGitRepo(
             projectDirectoryPath = projectDir.absolutePath,
             addFileNames = addFileNames,
@@ -60,6 +94,8 @@ interface CurrentContributionTestSpec {
 
     @Test
     fun `when currentContributionData includes multiple semvers uses largest`() {
+        setupWithDefaults()
+
         initializeGitRepo(
             projectDirectoryPath = projectDir.absolutePath,
             addFileNames = addFileNames,
@@ -85,6 +121,8 @@ interface CurrentContributionTestSpec {
 
     @Test
     fun `currentContributionData will include authors from multiple commits after last tag`() {
+        setupWithDefaults()
+
         initializeGitRepo(
             projectDirectoryPath = projectDir.absolutePath,
             addFileNames = addFileNames,
@@ -124,19 +162,20 @@ interface CurrentContributionTestSpec {
 
     @Test
     fun `currentContributionData will include most recent tag range when head is tagged`() {
-        val grgit =
-            initializeGitRepo(
-                projectDirectoryPath = projectDir.absolutePath,
-                addFileNames = addFileNames,
-                listOf(
-                    """here's a message
+        setupWithDefaults()
+
+        val grgit = initializeGitRepo(
+            projectDirectoryPath = projectDir.absolutePath,
+            addFileNames = addFileNames,
+            listOf(
+                """here's a message
                 |
                 |
                 |Co-authored-by: First Guy <first@guy.edu>
                 |Co-authored-by: Second Gui <second@gui.io>
-                    """.trimMargin(),
-                ),
-            )
+                """.trimMargin(),
+            ),
+        )
         grgit.addTag("earlier")
 
         grgit.addCommitWithMessage(
@@ -170,6 +209,8 @@ interface CurrentContributionTestSpec {
 
     @Test
     fun `when head is tagged currentContributionData will use include tag info`() {
+        setupWithDefaults()
+
         val grgit = initializeGitRepo(
             projectDirectoryPath = projectDir.absolutePath,
             addFileNames = addFileNames,
@@ -210,6 +251,8 @@ interface CurrentContributionTestSpec {
 
     @Test
     fun `currentContributionData will not include authors from commits before last tag`() {
+        setupWithDefaults()
+
         val grgit =
             initializeGitRepo(
                 projectDirectoryPath = projectDir.absolutePath,
@@ -246,6 +289,4 @@ interface CurrentContributionTestSpec {
             parseCurrentAuthors(output),
         )
     }
-
-    fun runCurrentContributionData(): String
 }

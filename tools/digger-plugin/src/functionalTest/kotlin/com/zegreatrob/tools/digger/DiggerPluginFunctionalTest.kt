@@ -7,7 +7,6 @@ import org.ajoberstar.grgit.Tag
 import org.gradle.testkit.runner.GradleRunner
 import org.junit.jupiter.api.io.TempDir
 import java.io.File
-import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -20,11 +19,11 @@ class DiggerPluginFunctionalTest : CurrentContributionTestSpec {
     private val settingsFile by lazy { projectDir.resolve("settings.gradle") }
     private val ignoreFile by lazy { projectDir.resolve(".gitignore") }
 
-    @BeforeTest
-    fun setup() {
+    override val addFileNames by lazy { setOf(settingsFile.name, buildFile.name, ignoreFile.name) }
+
+    override fun setupWithDefaults() {
         settingsFile.writeText("")
         ignoreFile.writeText(".gradle")
-
         buildFile.writeText(
             """
             plugins {
@@ -34,7 +33,20 @@ class DiggerPluginFunctionalTest : CurrentContributionTestSpec {
         )
     }
 
-    override val addFileNames by lazy { setOf(settingsFile.name, buildFile.name, ignoreFile.name) }
+    override fun setupWithOverrides(label: String?) {
+        settingsFile.writeText("")
+        ignoreFile.writeText(".gradle")
+        buildFile.writeText(
+            """
+            plugins {
+                id("com.zegreatrob.tools.digger")
+            }
+            digger {
+                ${if (label != null) "label.set(\"$label\")" else ""}
+            }
+            """.trimIndent(),
+        )
+    }
 
     override fun runCurrentContributionData(): String {
         val currentOutput by lazy { projectDir.resolve("build/digger/current.json") }
