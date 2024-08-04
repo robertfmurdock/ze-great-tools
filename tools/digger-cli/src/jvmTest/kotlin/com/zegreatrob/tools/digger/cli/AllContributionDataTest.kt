@@ -21,7 +21,7 @@ class AllContributionDataTest : AllContributionTestSpec {
     }
 
     override fun setupWithDefaults() {
-        arguments += "--dir=${projectDir.absolutePath}"
+        arguments += projectDir.absolutePath
     }
 
     override fun setupWithOverrides(label: String?) {
