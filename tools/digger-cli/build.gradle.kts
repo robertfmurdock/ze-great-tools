@@ -20,7 +20,7 @@ kotlin {
                     customField("author", "rob@continuousexcellence.io")
                     customField("license", "MIT")
                     customField("keywords", arrayOf("git", "contribution", "pair", "agile", "coaching", "statistics"))
-                    customField("bin", mapOf("digger" to "./kotlin/bin/digger"))
+                    customField("bin", mapOf("digger" to "kotlin/bin/digger"))
                     customField("homepage", "https://github.com/robertfmurdock/ze-great-tools")
                 }
             }
