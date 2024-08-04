@@ -37,6 +37,8 @@ jobs:
         with:
           cache-read-only: ${{ github.ref != 'refs/heads/main' }}
       - uses: actions/setup-node@v4
+        with:
+          registry-url: 'https://registry.npmjs.org'
       - uses: testspace-com/setup-testspace@v1
         with:
           domain: robertfmurdock
