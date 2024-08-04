@@ -46,11 +46,9 @@ tasks {
     withType(Test::class) {
         useJUnitPlatform()
     }
-
     withType<CreateStartScripts> {
         applicationName = "digger"
     }
-
     val jsCliTar by registering(Tar::class) {
         dependsOn(
             "jsPackageJson",
@@ -68,5 +66,15 @@ tasks {
         dependsOn(jsCliTar)
         workingDir(mainNpmProjectDir)
         commandLine("npm", "link")
+    }
+    val jsPublish by registering(Exec::class) {
+        dependsOn(jsCliTar)
+        mustRunAfter(check)
+        workingDir(mainNpmProjectDir)
+        commandLine("npm", "publish")
+    }
+    publish {
+        dependsOn(jsPublish)
+        mustRunAfter(check)
     }
 }

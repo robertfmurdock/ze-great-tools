@@ -31,7 +31,7 @@ tasks {
 }
 
 nexusPublishing {
-    repositories(Action {
+    repositories {
         sonatype {
             username.set(System.getenv("SONATYPE_USERNAME"))
             password.set(System.getenv("SONATYPE_PASSWORD"))
@@ -39,7 +39,7 @@ nexusPublishing {
             snapshotRepositoryUrl.set(uri("https://s01.oss.sonatype.org/content/repositories/snapshots/"))
             stagingProfileId.set("59331990bed4c")
         }
-    })
+    }
 }
 
 fun Project.isSnapshot() = version.toString().contains("SNAPSHOT")
