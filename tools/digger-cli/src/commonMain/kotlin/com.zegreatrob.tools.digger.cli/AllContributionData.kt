@@ -8,18 +8,19 @@ import com.zegreatrob.tools.digger.core.DiggerGitWrapper
 import com.zegreatrob.tools.digger.core.MessageDigger
 import com.zegreatrob.tools.digger.json.toJsonString
 
-class CurrentContributionData : CliktCommand() {
+class AllContributionData : CliktCommand() {
     private val dir by option().default("")
     private val label by option().default("")
 
-    private val core
-        get() = DiggerCore(
-            label = label.ifBlank { dir.split("/").lastOrNull() },
-            gitWrapper = DiggerGitWrapper(dir),
-            messageDigger = MessageDigger(),
-        )
+    private val core get() = DiggerCore(
+        label = label.ifBlank { dir.split("/").lastOrNull() },
+        gitWrapper = DiggerGitWrapper(dir),
+        messageDigger = MessageDigger(),
+    )
 
-    override fun run() = core.currentContributionData()
-        .toJsonString()
-        .let(::echo)
+    override fun run() {
+        core.allContributionData()
+            .toJsonString()
+            .let(::echo)
+    }
 }

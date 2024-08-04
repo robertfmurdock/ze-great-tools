@@ -9,14 +9,11 @@ import kotlin.test.assertEquals
 
 interface CurrentContributionTestSpec {
     var projectDir: File
-
     val addFileNames: Set<String>
 
     fun setupWithDefaults()
-
+    fun setupWithOverrides(label: String?)
     fun runCurrentContributionData(): String
-
-    fun setupWithOverrides(label: String? = null)
 
     @Test
     fun `currentContributionData will show authors and co-authors case insensitive`() {
@@ -54,18 +51,27 @@ interface CurrentContributionTestSpec {
         initializeGitRepo(
             projectDirectoryPath = projectDir.absolutePath,
             addFileNames = addFileNames,
-            listOf(
-                """here's a message
-                |
-                |
-                |co-authored-by: First Guy <first@guy.edu>
-                |CO-AUTHORED-BY: Second Gui <second@gui.io>
-                """.trimMargin(),
-            ),
+            listOf("here's a message"),
         )
         val output = runCurrentContributionData()
         assertEquals(
             label,
+            parseContribution(output)?.label,
+        )
+    }
+
+    @Test
+    fun `when label is not set will use directory name`() {
+        setupWithDefaults()
+
+        initializeGitRepo(
+            projectDirectoryPath = projectDir.absolutePath,
+            addFileNames = addFileNames,
+            listOf("here's a message"),
+        )
+        val output = runCurrentContributionData()
+        assertEquals(
+            projectDir.name,
             parseContribution(output)?.label,
         )
     }

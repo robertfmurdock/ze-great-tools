@@ -15,4 +15,15 @@ class DiggerCore(
                     tagDateTime = currentCommitTag?.dateTime,
                 )
         }
+
+    fun allContributionData() = gitWrapper
+        .allContributionCommits()
+        .map { range -> range.first to messageDigger.contribution(range.second.toList()) }
+        .map { (tag, contribution) ->
+            contribution.copy(
+                label = label,
+                tagName = tag?.name,
+                tagDateTime = tag?.dateTime,
+            )
+        }
 }
