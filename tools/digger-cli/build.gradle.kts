@@ -70,6 +70,7 @@ tasks {
     }
     val jsPublish by registering(Exec::class) {
         dependsOn(jsCliTar)
+        enabled = !isSnapshot()
         mustRunAfter(check)
         workingDir(mainNpmProjectDir)
         commandLine("npm", "publish")
@@ -79,3 +80,5 @@ tasks {
         mustRunAfter(check)
     }
 }
+
+fun Project.isSnapshot() = version.toString().contains("SNAPSHOT")
