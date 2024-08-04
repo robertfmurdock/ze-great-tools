@@ -14,9 +14,9 @@
 [![Gradle Plugin Portal](https://img.shields.io/gradle-plugin-portal/v/com.zegreatrob.tools.digger?label=Digger%20Plugin)](https://plugins.gradle.org/plugin/com.zegreatrob.tools.digger)
 ![NPM Version](https://img.shields.io/npm/v/git-digger?label=npm%20git-digger)
 
-Basic Gradle tools for continuous development and release.
+Basic tools for continuous development and release.
 
-Included:
+## Gradle Plugins
 
 ### Tagger
 
@@ -29,3 +29,11 @@ See its [README](tools/tagger-plugin/README.md) for more.
 An plugin extracting contribution information from a git repository.
 
 See its [README](tools/digger-plugin/README.md) for more.
+
+## NPM Utilities
+
+### Digger CLI
+
+A program for extracting contribution information from a git repository.
+
+See its [README](tools/digger-cli/README.md) for more.
