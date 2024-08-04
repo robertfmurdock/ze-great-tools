@@ -15,6 +15,7 @@ kotlin {
         compilations {
             "main" {
                 packageJson {
+                    name = "git-digger"
                     customField("package-name", "git-digger")
                     customField("author", "rob@continuousexcellence.io")
                     customField("license", "MIT")
