@@ -12,6 +12,7 @@
 
 [![Gradle Plugin Portal](https://img.shields.io/gradle-plugin-portal/v/com.zegreatrob.tools.tagger?label=Tagger%20Plugin)](https://plugins.gradle.org/plugin/com.zegreatrob.tools.tagger)
 [![Gradle Plugin Portal](https://img.shields.io/gradle-plugin-portal/v/com.zegreatrob.tools.digger?label=Digger%20Plugin)](https://plugins.gradle.org/plugin/com.zegreatrob.tools.digger)
+![NPM Version](https://img.shields.io/npm/v/git-digger?label=npm%20git-digger)
 
 Basic Gradle tools for continuous development and release.
 
