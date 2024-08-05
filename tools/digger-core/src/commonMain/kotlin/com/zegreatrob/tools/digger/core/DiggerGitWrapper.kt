@@ -49,7 +49,7 @@ class DiggerGitWrapper(private val workingDirectory: String) {
                 "git",
                 "--no-pager",
                 "log",
-                "--format=%H%n%ae%n%ce%n%aI%n%B%n$commitSeparator",
+                "--format=$gitLogFormat",
             ),
             workingDirectory,
         ),
@@ -61,7 +61,7 @@ class DiggerGitWrapper(private val workingDirectory: String) {
                 "git",
                 "--no-pager",
                 "log",
-                "--format=%H%n%ae%n%ce%n%aI%n%B%n$commitSeparator",
+                "--format=$gitLogFormat",
                 "$begin..$end",
             ),
             workingDirectory,
@@ -69,8 +69,10 @@ class DiggerGitWrapper(private val workingDirectory: String) {
     )
 
     private val commitSeparator = "--------!--------"
+    private val gitLogFormat = "%H%n%ae%n%ce%n%aI%n%P%n%B%n$commitSeparator"
 
-    private fun parseLog(outputText: String) = outputText.split("$commitSeparator\n")
+    private fun parseLog(outputText: String) = outputText
+        .split("$commitSeparator\n")
         .filter { it.isNotEmpty() }
         .map { commitEntry ->
             val elements = commitEntry.split("\n")
@@ -79,7 +81,8 @@ class DiggerGitWrapper(private val workingDirectory: String) {
                 authorEmail = elements[1],
                 committerEmail = elements[2],
                 dateTime = Instant.parse(elements[3]),
-                fullMessage = elements.subList(4, elements.size).joinToString("\n"),
+                parents = elements[4].split(" "),
+                fullMessage = elements.subList(5, elements.size).joinToString("\n"),
             )
         }
 }

@@ -7,5 +7,6 @@ data class CommitRef(
     val authorEmail: String,
     val committerEmail: String,
     val dateTime: Instant,
+    val parents: List<String>,
     val fullMessage: String,
 )

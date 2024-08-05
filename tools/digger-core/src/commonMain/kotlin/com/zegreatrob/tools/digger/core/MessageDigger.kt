@@ -15,8 +15,6 @@ class MessageDigger(
         if (!easeRegex.pattern.contains("?<ease>")) {
             throw RuntimeException("EaseRegex must include an ease group. The regex was: ${easeRegex.pattern}")
         }
-        println("story regex ${storyIdRegex.pattern}")
-        println("ease regex ${easeRegex.pattern}")
     }
 
     @Suppress("RegExpRedundantEscape")

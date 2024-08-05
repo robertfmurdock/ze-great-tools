@@ -69,6 +69,64 @@ interface AllContributionTestSpec : SetupWithOverrides {
         )
     }
 
+    @Test
+    fun `allContributionData will handle merge branches`() {
+        setupWithDefaults()
+        val grgit = initializeGitRepo(
+            projectDirectoryPath = projectDir.absolutePath,
+            addFileNames = addFileNames,
+            listOf("first"),
+        )
+        val firstCommit = grgit.head()
+
+        val firstRelease = grgit.addTag("release")
+        grgit.branch.add { it.name = "branch1" }
+        grgit.checkout { it.branch = "branch1" }
+
+        val secondCommit = grgit.addCommitWithMessage("second")
+        grgit.checkout { it.branch = "main" }
+
+        val thirdCommit = grgit.addCommitWithMessage("third")
+        val secondRelease = grgit.addTag("release2")
+        grgit.checkout { it.branch = "branch1" }
+        grgit.addCommitWithMessage("fourth")
+        grgit.checkout { it.branch = "main" }
+        grgit.merge {
+            it.head = "branch1"
+            it.setMode("no-commit")
+        }
+        val mergeCommit = grgit.addCommitWithMessage("merge")
+        val thirdRelease = grgit.addTag("release3")
+
+        val allOutput = runAllContributionData()
+        val expectedAuthors = listOf(
+            "funk@test.io",
+            "test@funk.edu",
+        )
+        assertEquals(
+            listOf(
+                toContribution(
+                    lastCommit = mergeCommit,
+                    firstCommit = secondCommit,
+                    expectedCommitCount = 3,
+                    tag = thirdRelease,
+                    expectedAuthors = expectedAuthors,
+                ),
+                toContribution(
+                    lastCommit = thirdCommit,
+                    tag = secondRelease,
+                    expectedAuthors = expectedAuthors,
+                ),
+                toContribution(
+                    lastCommit = firstCommit,
+                    tag = firstRelease,
+                    expectedAuthors = expectedAuthors,
+                ),
+            ),
+            parseAll(allOutput),
+        )
+    }
+
     private fun toContribution(
         lastCommit: Commit,
         tag: Tag? = null,
