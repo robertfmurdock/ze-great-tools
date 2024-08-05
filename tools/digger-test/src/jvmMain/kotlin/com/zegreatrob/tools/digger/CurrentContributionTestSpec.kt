@@ -7,12 +7,11 @@ import java.lang.Thread.sleep
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-interface CurrentContributionTestSpec {
+interface CurrentContributionTestSpec : SetupWithOverrides {
     var projectDir: File
     val addFileNames: Set<String>
 
     fun setupWithDefaults()
-    fun setupWithOverrides(label: String?)
     fun runCurrentContributionData(): String
 
     @Test
@@ -294,5 +293,63 @@ interface CurrentContributionTestSpec {
             ),
             parseCurrentAuthors(output),
         )
+    }
+
+    @Test
+    fun canReplaceMajorRegex() {
+        setupWithOverrides(majorRegex = ".*(big).*")
+
+        initializeGitRepo(
+            projectDirectoryPath = projectDir.absolutePath,
+            addFileNames = addFileNames,
+            commits = listOf("[patch] commit 1", "commit (big) 2", "[patch] commit 3"),
+        )
+
+        val output = runCurrentContributionData()
+
+        assertEquals("Major", parseContribution(output)?.semver)
+    }
+
+    @Test
+    fun canReplaceMinorRegex() {
+        setupWithOverrides(minorRegex = ".*mid.*")
+
+        initializeGitRepo(
+            projectDirectoryPath = projectDir.absolutePath,
+            addFileNames = addFileNames,
+            commits = listOf("[patch] commit 1", "commit (middle) 2", "[patch] commit 3"),
+        )
+
+        val output = runCurrentContributionData()
+
+        assertEquals("Minor", parseContribution(output)?.semver)
+    }
+
+    @Test
+    fun canReplacePatchRegex() {
+        setupWithOverrides(patchRegex = ".*tiny.*")
+
+        initializeGitRepo(
+            projectDirectoryPath = projectDir.absolutePath,
+            addFileNames = addFileNames,
+            commits = listOf("commit 1", "commit (tiny) 2", "commit 3"),
+        )
+        val output = runCurrentContributionData()
+
+        assertEquals("Patch", parseContribution(output)?.semver)
+    }
+
+    @Test
+    fun canReplaceNoneRegex() {
+        setupWithOverrides(noneRegex = ".*(no).*")
+
+        initializeGitRepo(
+            projectDirectoryPath = projectDir.absolutePath,
+            addFileNames = addFileNames,
+            commits = listOf("commit (no) 1"),
+        )
+        val output = runCurrentContributionData()
+
+        assertEquals("None", parseContribution(output)?.semver)
     }
 }

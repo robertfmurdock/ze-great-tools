@@ -29,7 +29,13 @@ class DiggerPluginFunctionalTest :
         )
     }
 
-    override fun setupWithOverrides(label: String?) {
+    override fun setupWithOverrides(
+        label: String?,
+        majorRegex: String?,
+        minorRegex: String?,
+        patchRegex: String?,
+        noneRegex: String?,
+    ) {
         settingsFile.writeText("")
         ignoreFile.writeText(".gradle")
         buildFile.writeText(
@@ -39,6 +45,10 @@ class DiggerPluginFunctionalTest :
             }
             digger {
                 ${if (label != null) "label.set(\"$label\")" else ""}
+                ${if (majorRegex != null) "majorRegex.set(Regex(\"$majorRegex\"))" else ""}
+                ${if (minorRegex != null) "minorRegex.set(Regex(\"$minorRegex\"))" else ""}
+                ${if (patchRegex != null) "patchRegex.set(Regex(\"$patchRegex\"))" else ""}
+                ${if (noneRegex != null) "noneRegex.set(Regex(\"$noneRegex\"))" else ""}
             }
             """.trimIndent(),
         )

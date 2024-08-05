@@ -332,7 +332,7 @@ class TaggerPluginFunctionalTest {
     }
 
     @Test
-    fun canReplaceMinorRegex() {
+    fun unifiedGroupCanReplaceMinorRegex() {
         buildFile.writeText(
             """
             plugins {
@@ -359,7 +359,7 @@ class TaggerPluginFunctionalTest {
     }
 
     @Test
-    fun unifiedGroupCanReplaceMinorRegex() {
+    fun canReplaceMinorRegex() {
         buildFile.writeText(
             """
             plugins {

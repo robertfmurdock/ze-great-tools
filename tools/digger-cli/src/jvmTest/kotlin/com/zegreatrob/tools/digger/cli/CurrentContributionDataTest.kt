@@ -29,9 +29,19 @@ class CurrentContributionDataTest : CurrentContributionTestSpec {
         arguments += projectDir.absolutePath
     }
 
-    override fun setupWithOverrides(label: String?) {
+    override fun setupWithOverrides(
+        label: String?,
+        majorRegex: String?,
+        minorRegex: String?,
+        patchRegex: String?,
+        noneRegex: String?,
+    ) {
         setupWithDefaults()
         label?.let { arguments += "--label=$label" }
+        majorRegex?.let { arguments += "--major-regex=$majorRegex" }
+        minorRegex?.let { arguments += "--minor-regex=$minorRegex" }
+        patchRegex?.let { arguments += "--patch-regex=$patchRegex" }
+        noneRegex?.let { arguments += "--none-regex=$noneRegex" }
     }
 
     override fun runCurrentContributionData(): String {

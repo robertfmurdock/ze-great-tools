@@ -8,12 +8,11 @@ import java.io.File
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-interface AllContributionTestSpec {
+interface AllContributionTestSpec : SetupWithOverrides {
     var projectDir: File
     val addFileNames: Set<String>
 
     fun setupWithDefaults()
-    fun setupWithOverrides(label: String? = null)
     fun runAllContributionData(): String
 
     @Test
