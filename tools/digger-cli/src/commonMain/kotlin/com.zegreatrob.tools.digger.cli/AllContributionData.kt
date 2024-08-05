@@ -13,12 +13,21 @@ class AllContributionData : CliktCommand() {
     private val dir by argument("git-repo")
     private val outputFile by option().default("allContributionData.json")
     private val label by option().default("")
+    private val majorRegex by option()
+    private val minorRegex by option()
+    private val patchRegex by option()
+    private val noneRegex by option()
 
     private val core
         get() = DiggerCore(
             label = label.ifBlank { dir.split("/").lastOrNull() },
             gitWrapper = DiggerGitWrapper(dir),
-            messageDigger = MessageDigger(),
+            messageDigger = MessageDigger(
+                majorRegex = majorRegex?.let(::Regex) ?: MessageDigger.Defaults.majorRegex,
+                minorRegex = minorRegex?.let(::Regex) ?: MessageDigger.Defaults.minorRegex,
+                patchRegex = patchRegex?.let(::Regex) ?: MessageDigger.Defaults.patchRegex,
+                noneRegex = noneRegex?.let(::Regex) ?: MessageDigger.Defaults.noneRegex,
+            ),
         )
 
     override fun run() = core.allContributionData()

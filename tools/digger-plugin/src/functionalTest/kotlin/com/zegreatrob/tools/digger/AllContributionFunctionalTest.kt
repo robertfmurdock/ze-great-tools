@@ -4,9 +4,7 @@ import org.gradle.testkit.runner.GradleRunner
 import org.junit.jupiter.api.io.TempDir
 import java.io.File
 
-class DiggerPluginFunctionalTest :
-    CurrentContributionTestSpec,
-    AllContributionTestSpec {
+class AllContributionFunctionalTest : AllContributionTestSpec {
     @field:TempDir
     override lateinit var projectDir: File
 
@@ -62,16 +60,5 @@ class DiggerPluginFunctionalTest :
             .withProjectDir(projectDir)
             .build()
         return allOutput.readText()
-    }
-
-    override fun runCurrentContributionData(): String {
-        val currentOutput by lazy { projectDir.resolve("build/digger/current.json") }
-        GradleRunner.create()
-            .forwardOutput()
-            .withPluginClasspath()
-            .withArguments("currentContributionData", "-q")
-            .withProjectDir(projectDir)
-            .build()
-        return currentOutput.readText()
     }
 }

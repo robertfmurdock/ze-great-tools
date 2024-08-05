@@ -37,6 +37,10 @@ class AllContributionDataTest : AllContributionTestSpec {
         setupWithDefaults()
         label?.let { arguments += "--label=$label" }
         majorRegex?.let { arguments += "--major-regex=$majorRegex" }
+        majorRegex?.let { arguments += "--major-regex=$majorRegex" }
+        minorRegex?.let { arguments += "--minor-regex=$minorRegex" }
+        patchRegex?.let { arguments += "--patch-regex=$patchRegex" }
+        noneRegex?.let { arguments += "--none-regex=$noneRegex" }
     }
 
     override fun runAllContributionData(): String {

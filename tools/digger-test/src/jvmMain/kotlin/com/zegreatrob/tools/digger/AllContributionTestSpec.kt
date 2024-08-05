@@ -248,4 +248,62 @@ interface AllContributionTestSpec : SetupWithOverrides {
             parseAll(allOutput),
         )
     }
+
+    @Test
+    fun canReplaceMajorRegex() {
+        setupWithOverrides(majorRegex = ".*(big).*")
+
+        initializeGitRepo(
+            projectDirectoryPath = projectDir.absolutePath,
+            addFileNames = addFileNames,
+            commits = listOf("[patch] commit 1", "commit (big) 2", "[patch] commit 3"),
+        )
+
+        val output = runAllContributionData()
+
+        assertEquals(listOf("Major"), parseAll(output).map { it.semver })
+    }
+
+    @Test
+    fun canReplaceMinorRegex() {
+        setupWithOverrides(minorRegex = ".*mid.*")
+
+        initializeGitRepo(
+            projectDirectoryPath = projectDir.absolutePath,
+            addFileNames = addFileNames,
+            commits = listOf("[patch] commit 1", "commit (middle) 2", "[patch] commit 3"),
+        )
+
+        val output = runAllContributionData()
+
+        assertEquals(listOf("Minor"), parseAll(output).map { it.semver })
+    }
+
+    @Test
+    fun canReplacePatchRegex() {
+        setupWithOverrides(patchRegex = ".*tiny.*")
+
+        initializeGitRepo(
+            projectDirectoryPath = projectDir.absolutePath,
+            addFileNames = addFileNames,
+            commits = listOf("commit 1", "commit (tiny) 2", "commit 3"),
+        )
+        val output = runAllContributionData()
+
+        assertEquals(listOf("Patch"), parseAll(output).map { it.semver })
+    }
+
+    @Test
+    fun canReplaceNoneRegex() {
+        setupWithOverrides(noneRegex = ".*(no).*")
+
+        initializeGitRepo(
+            projectDirectoryPath = projectDir.absolutePath,
+            addFileNames = addFileNames,
+            commits = listOf("commit (no) 1"),
+        )
+        val output = runAllContributionData()
+
+        assertEquals(listOf("None"), parseAll(output).map { it.semver })
+    }
 }
