@@ -306,4 +306,34 @@ interface AllContributionTestSpec : SetupWithOverrides {
 
         assertEquals(listOf("None"), parseAll(output).map { it.semver })
     }
+
+    @Test
+    fun canReplaceStoryRegex() {
+        setupWithOverrides(storyRegex = ".*-(?<storyId>.*-.*)-.*")
+
+        initializeGitRepo(
+            projectDirectoryPath = projectDir.absolutePath,
+            addFileNames = addFileNames,
+            commits = listOf("commit -CowDog-99- 1"),
+        )
+        val output = runAllContributionData()
+
+        val contributions = parseAll(output)
+        assertEquals(listOf("CowDog-99"), contributions.map { it.storyId })
+    }
+
+    @Test
+    fun canReplaceEaseRegex() {
+        setupWithOverrides(easeRegex = """.*\[(?<ease>[0-5])\].*""")
+
+        initializeGitRepo(
+            projectDirectoryPath = projectDir.absolutePath,
+            addFileNames = addFileNames,
+            commits = listOf("commit [4] 1"),
+        )
+        val output = runAllContributionData()
+
+        val contributions = parseAll(output)
+        assertEquals(listOf(4), contributions.map { it.ease })
+    }
 }

@@ -7,5 +7,7 @@ interface SetupWithOverrides {
         minorRegex: String? = null,
         patchRegex: String? = null,
         noneRegex: String? = null,
+        storyRegex: String? = null,
+        easeRegex: String? = null,
     )
 }

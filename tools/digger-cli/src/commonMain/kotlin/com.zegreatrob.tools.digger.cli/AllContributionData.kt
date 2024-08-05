@@ -17,6 +17,8 @@ class AllContributionData : CliktCommand() {
     private val minorRegex by option()
     private val patchRegex by option()
     private val noneRegex by option()
+    private val storyIdRegex by option()
+    private val easeRegex by option()
 
     private val core
         get() = DiggerCore(
@@ -27,6 +29,8 @@ class AllContributionData : CliktCommand() {
                 minorRegex = minorRegex?.let(::Regex) ?: MessageDigger.Defaults.minorRegex,
                 patchRegex = patchRegex?.let(::Regex) ?: MessageDigger.Defaults.patchRegex,
                 noneRegex = noneRegex?.let(::Regex) ?: MessageDigger.Defaults.noneRegex,
+                storyIdRegex = storyIdRegex?.let(::Regex) ?: MessageDigger.Defaults.storyIdRegex,
+                easeRegex = easeRegex?.let(::Regex) ?: MessageDigger.Defaults.easeRegex,
             ),
         )
 

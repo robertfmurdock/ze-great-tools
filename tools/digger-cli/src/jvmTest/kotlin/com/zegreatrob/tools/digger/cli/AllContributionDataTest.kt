@@ -33,6 +33,8 @@ class AllContributionDataTest : AllContributionTestSpec {
         minorRegex: String?,
         patchRegex: String?,
         noneRegex: String?,
+        storyRegex: String?,
+        easeRegex: String?,
     ) {
         setupWithDefaults()
         label?.let { arguments += "--label=$label" }
@@ -41,6 +43,8 @@ class AllContributionDataTest : AllContributionTestSpec {
         minorRegex?.let { arguments += "--minor-regex=$minorRegex" }
         patchRegex?.let { arguments += "--patch-regex=$patchRegex" }
         noneRegex?.let { arguments += "--none-regex=$noneRegex" }
+        storyRegex?.let { arguments += "--story-id-regex=$storyRegex" }
+        easeRegex?.let { arguments += "--ease-regex=$easeRegex" }
     }
 
     override fun runAllContributionData(): String {

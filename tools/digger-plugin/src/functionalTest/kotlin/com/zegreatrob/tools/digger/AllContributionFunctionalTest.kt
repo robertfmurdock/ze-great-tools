@@ -33,6 +33,8 @@ class AllContributionFunctionalTest : AllContributionTestSpec {
         minorRegex: String?,
         patchRegex: String?,
         noneRegex: String?,
+        storyRegex: String?,
+        easeRegex: String?,
     ) {
         settingsFile.writeText("")
         ignoreFile.writeText(".gradle")
@@ -43,10 +45,12 @@ class AllContributionFunctionalTest : AllContributionTestSpec {
             }
             digger {
                 ${if (label != null) "label.set(\"$label\")" else ""}
-                ${if (majorRegex != null) "majorRegex.set(Regex(\"$majorRegex\"))" else ""}
-                ${if (minorRegex != null) "minorRegex.set(Regex(\"$minorRegex\"))" else ""}
-                ${if (patchRegex != null) "patchRegex.set(Regex(\"$patchRegex\"))" else ""}
-                ${if (noneRegex != null) "noneRegex.set(Regex(\"$noneRegex\"))" else ""}
+                ${if (majorRegex != null) "majorRegex.set(Regex(\"${majorRegex.replace("\\", "\\\\")}\"))" else ""}
+                ${if (minorRegex != null) "minorRegex.set(Regex(\"${minorRegex.replace("\\", "\\\\")}\"))" else ""}
+                ${if (patchRegex != null) "patchRegex.set(Regex(\"${patchRegex.replace("\\", "\\\\")}\"))" else ""}
+                ${if (noneRegex != null) "noneRegex.set(Regex(\"${noneRegex.replace("\\", "\\\\")}\"))" else ""}
+                ${if (storyRegex != null) "storyIdRegex.set(Regex(\"${storyRegex.replace("\\", "\\\\")}\"))" else ""}
+                ${if (easeRegex != null) "easeRegex.set(Regex(\"${easeRegex.replace("\\", "\\\\")}\"))" else ""}
             }
             """.trimIndent(),
         )
