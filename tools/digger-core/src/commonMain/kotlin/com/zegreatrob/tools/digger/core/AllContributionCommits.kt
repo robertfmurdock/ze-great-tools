@@ -44,10 +44,12 @@ private fun List<CommitRef>.foldInBranches(log: List<CommitRef>): List<CommitRef
     return reversed()
         .fold<CommitRef, List<CommitRef>>(emptyList()) { acc, commit ->
             if (commit.parents.size > 1) {
-                acc + branchCommits(
-                    commit.parents[1],
-                    offMainCommits - acc.toSet(),
-                ) + listOf(commit)
+                acc + (
+                    branchCommits(
+                        commit.parents[1],
+                        offMainCommits - acc.toSet(),
+                    ) + listOf(commit)
+                    )
             } else {
                 acc + listOf(commit)
             }
@@ -61,9 +63,8 @@ private fun List<Pair<TagRef?, Set<String>>>.withCommitsInOriginalOrder(
     tag to log.filter { commit -> commitIds.contains(commit.id) }
 }
 
-fun branchCommits(id: String?, offMainCommits: List<CommitRef>): List<CommitRef> = (0..offMainCommits.size)
-    .fold(id to emptyList<CommitRef>()) { (id, foundCommits), _ ->
-        val newCommit = offMainCommits.find { it.id == id }
-        newCommit?.parents?.first() to (foundCommits + newCommit)
-            .filterNotNull()
+fun branchCommits(id: String, offMainCommits: List<CommitRef>): List<CommitRef> = (0..offMainCommits.size)
+    .fold(listOf(id) to emptyList<CommitRef>()) { (ids, foundCommits), _ ->
+        val newCommits = offMainCommits.filter { ids.contains(it.id) }
+        newCommits.flatMap { it.parents } to (foundCommits + newCommits)
     }.second

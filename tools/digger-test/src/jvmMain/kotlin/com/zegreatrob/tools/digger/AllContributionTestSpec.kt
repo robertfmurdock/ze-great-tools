@@ -128,6 +128,69 @@ interface AllContributionTestSpec : SetupWithOverrides {
     }
 
     @Test
+    fun `will handle merge commits on merged branches correctly`() {
+        setupWithDefaults()
+        val grgit = initializeGitRepo(
+            projectDirectoryPath = projectDir.absolutePath,
+            addFileNames = addFileNames,
+            listOf("first"),
+        )
+        val firstCommit = grgit.head()
+
+        val firstRelease = grgit.addTag("release")
+        grgit.branch.add { it.name = "branch2" }
+        grgit.checkout { it.branch = "branch2" }
+        val secondCommit = grgit.addCommitWithMessage("second")
+
+        grgit.branch.add { it.name = "branch1" }
+        grgit.checkout { it.branch = "branch1" }
+        grgit.addCommitWithMessage("third")
+
+        grgit.checkout { it.branch = "branch2" }
+        grgit.addCommitWithMessage("fourth")
+        grgit.checkout { it.branch = "branch1" }
+        grgit.addCommitWithMessage("fifth")
+
+        grgit.merge {
+            it.head = "branch2"
+            it.setMode("no-commit")
+        }
+        grgit.addCommitWithMessage("merge1")
+
+        grgit.checkout { it.branch = "main" }
+        grgit.addCommitWithMessage("sixth")
+        grgit.merge {
+            it.head = "branch1"
+            it.setMode("no-commit")
+        }
+        val merge2Commit = grgit.addCommitWithMessage("merge2")
+        val thirdRelease = grgit.addTag("release3")
+
+        val allOutput = runAllContributionData()
+        val expectedAuthors = listOf(
+            "funk@test.io",
+            "test@funk.edu",
+        )
+        assertEquals(
+            listOf(
+                toContribution(
+                    lastCommit = merge2Commit,
+                    firstCommit = secondCommit,
+                    expectedCommitCount = 7,
+                    tag = thirdRelease,
+                    expectedAuthors = expectedAuthors,
+                ),
+                toContribution(
+                    lastCommit = firstCommit,
+                    tag = firstRelease,
+                    expectedAuthors = expectedAuthors,
+                ),
+            ),
+            parseAll(allOutput),
+        )
+    }
+
+    @Test
     fun `when merging multiple times from same branch, commits are only counted once`() {
         setupWithDefaults()
         val grgit = initializeGitRepo(
