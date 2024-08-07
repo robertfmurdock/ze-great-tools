@@ -15,13 +15,21 @@ interface AllContributionTestSpec : SetupWithOverrides {
 
     fun setupWithDefaults()
     fun runAllContributionData(): String
+    fun initializeGitRepo(commits: List<String>) = initializeGitRepo(
+        projectDirectoryPath = projectDir.absolutePath,
+        addFileNames = addFileNames,
+        commits = commits,
+    )
+
+    private fun Grgit.switchToNewBranch(name: String) {
+        branch.add { it.name = name }
+        checkout { it.branch = name }
+    }
 
     @Test
     fun `will include all tag segments`() {
         setupWithDefaults()
         val grgit = initializeGitRepo(
-            projectDirectoryPath = projectDir.absolutePath,
-            addFileNames = addFileNames,
             listOf(
                 """here's a message
                 |
@@ -70,17 +78,10 @@ interface AllContributionTestSpec : SetupWithOverrides {
         )
     }
 
-    val defaultAuthors: List<String>
-        get() = listOf("funk@test.io", "test@funk.edu")
-
     @Test
     fun `will ignore tags on branches via merge commits`() {
         setupWithDefaults()
-        val grgit = initializeGitRepo(
-            projectDirectoryPath = projectDir.absolutePath,
-            addFileNames = addFileNames,
-            listOf("here's a message"),
-        )
+        val grgit = initializeGitRepo(listOf("here's a message"))
         val firstCommit = grgit.head()
         val firstRelease = grgit.addTag("release")
 
@@ -116,19 +117,52 @@ interface AllContributionTestSpec : SetupWithOverrides {
         )
     }
 
-    private fun Grgit.switchToNewBranch(name: String) {
-        branch.add { it.name = name }
-        checkout { it.branch = name }
+    @Test
+    fun `will handle normal merge-into-branch-then-back case well`() {
+        setupWithDefaults()
+        val grgit = initializeGitRepo(listOf("here's a message"))
+        val firstCommit = grgit.head()
+        val firstRelease = grgit.addTag("release")
+
+        grgit.switchToNewBranch("branch")
+        val secondCommit = grgit.addCommitWithMessage("second")
+
+        grgit.checkout { it.branch = "main" }
+        grgit.addCommitWithMessage("third")
+
+        grgit.checkout { it.branch = "branch" }
+        grgit.addCommitWithMessage("fourth")
+        grgit.mergeInBranch("main", "merge-to-branch")
+
+        grgit.checkout { it.branch = "main" }
+
+        val mergeToMainCommit = grgit.mergeInBranch("branch", "merge-to-main")
+        val release2 = grgit.addTag("release-2")
+
+        val allOutput = runAllContributionData()
+        assertEquals(
+            listOf(
+                toContribution(
+                    firstCommit = secondCommit,
+                    lastCommit = mergeToMainCommit,
+                    expectedCommitCount = 5,
+                    tag = release2,
+                    expectedAuthors = defaultAuthors,
+                ),
+                toContribution(
+                    lastCommit = firstCommit,
+                    tag = firstRelease,
+                    expectedAuthors = defaultAuthors,
+                ),
+            ),
+            parseAll(allOutput),
+        )
     }
 
     @Test
     fun `will handle merge branches`() {
         setupWithDefaults()
-        val grgit = initializeGitRepo(
-            projectDirectoryPath = projectDir.absolutePath,
-            addFileNames = addFileNames,
-            listOf("first"),
-        )
+        val grgit = initializeGitRepo(listOf("first"))
         val firstCommit = grgit.head()
 
         val firstRelease = grgit.addTag("release")
@@ -146,10 +180,6 @@ interface AllContributionTestSpec : SetupWithOverrides {
         val thirdRelease = grgit.addTag("release3")
 
         val allOutput = runAllContributionData()
-        val expectedAuthors = listOf(
-            "funk@test.io",
-            "test@funk.edu",
-        )
         assertEquals(
             listOf(
                 toContribution(
@@ -157,17 +187,17 @@ interface AllContributionTestSpec : SetupWithOverrides {
                     firstCommit = secondCommit,
                     expectedCommitCount = 3,
                     tag = thirdRelease,
-                    expectedAuthors = expectedAuthors,
+                    expectedAuthors = defaultAuthors,
                 ),
                 toContribution(
                     lastCommit = thirdCommit,
                     tag = secondRelease,
-                    expectedAuthors = expectedAuthors,
+                    expectedAuthors = defaultAuthors,
                 ),
                 toContribution(
                     lastCommit = firstCommit,
                     tag = firstRelease,
-                    expectedAuthors = expectedAuthors,
+                    expectedAuthors = defaultAuthors,
                 ),
             ),
             parseAll(allOutput),
@@ -177,11 +207,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
     @Test
     fun `will handle merge commits on merged branches correctly`() {
         setupWithDefaults()
-        val grgit = initializeGitRepo(
-            projectDirectoryPath = projectDir.absolutePath,
-            addFileNames = addFileNames,
-            listOf("first"),
-        )
+        val grgit = initializeGitRepo(listOf("first"))
         val firstCommit = grgit.head()
 
         val firstRelease = grgit.addTag("release")
@@ -205,10 +231,6 @@ interface AllContributionTestSpec : SetupWithOverrides {
         val thirdRelease = grgit.addTag("release3")
 
         val allOutput = runAllContributionData()
-        val expectedAuthors = listOf(
-            "funk@test.io",
-            "test@funk.edu",
-        )
         assertEquals(
             listOf(
                 toContribution(
@@ -216,12 +238,12 @@ interface AllContributionTestSpec : SetupWithOverrides {
                     firstCommit = secondCommit,
                     expectedCommitCount = 7,
                     tag = thirdRelease,
-                    expectedAuthors = expectedAuthors,
+                    expectedAuthors = defaultAuthors,
                 ),
                 toContribution(
                     lastCommit = firstCommit,
                     tag = firstRelease,
-                    expectedAuthors = expectedAuthors,
+                    expectedAuthors = defaultAuthors,
                 ),
             ),
             parseAll(allOutput),
@@ -231,11 +253,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
     @Test
     fun `when merging multiple times from same branch, commits are only counted once`() {
         setupWithDefaults()
-        val grgit = initializeGitRepo(
-            projectDirectoryPath = projectDir.absolutePath,
-            addFileNames = addFileNames,
-            listOf("first"),
-        )
+        val grgit = initializeGitRepo(listOf("first"))
         val firstCommit = grgit.head()
         val firstRelease = grgit.addTag("release")
 
@@ -254,10 +272,6 @@ interface AllContributionTestSpec : SetupWithOverrides {
         val thirdRelease = grgit.addTag("release3")
 
         val allOutput = runAllContributionData()
-        val expectedAuthors = listOf(
-            "funk@test.io",
-            "test@funk.edu",
-        )
         assertEquals(
             listOf(
                 toContribution(
@@ -265,19 +279,19 @@ interface AllContributionTestSpec : SetupWithOverrides {
                     firstCommit = fourthCommit,
                     expectedCommitCount = 2,
                     tag = thirdRelease,
-                    expectedAuthors = expectedAuthors,
+                    expectedAuthors = defaultAuthors,
                 ),
                 toContribution(
                     lastCommit = merge1Commit,
                     firstCommit = secondCommit,
                     expectedCommitCount = 3,
                     tag = secondRelease,
-                    expectedAuthors = expectedAuthors,
+                    expectedAuthors = defaultAuthors,
                 ),
                 toContribution(
                     lastCommit = firstCommit,
                     tag = firstRelease,
-                    expectedAuthors = expectedAuthors,
+                    expectedAuthors = defaultAuthors,
                 ),
             ),
             parseAll(allOutput),
@@ -357,11 +371,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
     @Test
     fun `will include story ids`() {
         setupWithDefaults()
-        val grgit = initializeGitRepo(
-            projectDirectoryPath = projectDir.absolutePath,
-            addFileNames = addFileNames,
-            commits = listOf("[DOGCOW-17] here's a message"),
-        )
+        val grgit = initializeGitRepo(commits = listOf("[DOGCOW-17] here's a message"))
         val firstCommit = grgit.head()
         val tag = grgit.addTag("release")
         val secondCommit = grgit.addCommitWithMessage("[DOGCOW-18] -3- here's a message")
@@ -388,11 +398,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
     @Test
     fun `will merge the same story id within a contribution`() {
         setupWithDefaults()
-        val grgit = initializeGitRepo(
-            projectDirectoryPath = projectDir.absolutePath,
-            addFileNames = addFileNames,
-            listOf("[DOGCOW-17] here's a message"),
-        )
+        val grgit = initializeGitRepo(listOf("[DOGCOW-17] here's a message"))
         val firstCommit = grgit.head()
         val secondCommit = grgit.addCommitWithMessage("[DOGCOW-17] -3- here's a message")
         val allOutput = runAllContributionData()
@@ -414,11 +420,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
     @Test
     fun `will merge the different story ids within a contribution`() {
         setupWithOverrides(label = "AwesomeProject")
-        val grgit = initializeGitRepo(
-            projectDirectoryPath = projectDir.absolutePath,
-            addFileNames = addFileNames,
-            commits = listOf("[DOGCOW-17] here's a message"),
-        )
+        val grgit = initializeGitRepo(commits = listOf("[DOGCOW-17] here's a message"))
         val firstCommit = grgit.head()
         val secondCommit = grgit.addCommitWithMessage("[DOGCOW-18] -3- here's a message")
 
@@ -443,19 +445,9 @@ interface AllContributionTestSpec : SetupWithOverrides {
     @Test
     fun `will include flatten ease into largest number`() {
         setupWithDefaults()
-        val grgit =
-            initializeGitRepo(
-                projectDirectoryPath = projectDir.absolutePath,
-                addFileNames = addFileNames,
-                listOf(
-                    "here's a message -4- more stuff",
-                ),
-            )
+        val grgit = initializeGitRepo(listOf("here's a message -4- more stuff"))
         val firstCommit = grgit.head()
-        val secondCommit =
-            grgit.addCommitWithMessage(
-                "-3- here's a message",
-            )
+        val secondCommit = grgit.addCommitWithMessage("-3- here's a message")
         val allOutput = runAllContributionData()
 
         assertEquals(
@@ -476,11 +468,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
     fun canReplaceMajorRegex() {
         setupWithOverrides(majorRegex = ".*(big).*")
 
-        initializeGitRepo(
-            projectDirectoryPath = projectDir.absolutePath,
-            addFileNames = addFileNames,
-            commits = listOf("[patch] commit 1", "commit (big) 2", "[patch] commit 3"),
-        )
+        initializeGitRepo(commits = listOf("[patch] commit 1", "commit (big) 2", "[patch] commit 3"))
 
         val output = runAllContributionData()
 
@@ -491,11 +479,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
     fun canReplaceMinorRegex() {
         setupWithOverrides(minorRegex = ".*mid.*")
 
-        initializeGitRepo(
-            projectDirectoryPath = projectDir.absolutePath,
-            addFileNames = addFileNames,
-            commits = listOf("[patch] commit 1", "commit (middle) 2", "[patch] commit 3"),
-        )
+        initializeGitRepo(commits = listOf("[patch] commit 1", "commit (middle) 2", "[patch] commit 3"))
 
         val output = runAllContributionData()
 
@@ -506,11 +490,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
     fun canReplacePatchRegex() {
         setupWithOverrides(patchRegex = ".*tiny.*")
 
-        initializeGitRepo(
-            projectDirectoryPath = projectDir.absolutePath,
-            addFileNames = addFileNames,
-            commits = listOf("commit 1", "commit (tiny) 2", "commit 3"),
-        )
+        initializeGitRepo(commits = listOf("commit 1", "commit (tiny) 2", "commit 3"))
         val output = runAllContributionData()
 
         assertEquals(listOf("Patch"), parseAll(output).map { it.semver })
@@ -520,11 +500,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
     fun canReplaceNoneRegex() {
         setupWithOverrides(noneRegex = ".*(no).*")
 
-        initializeGitRepo(
-            projectDirectoryPath = projectDir.absolutePath,
-            addFileNames = addFileNames,
-            commits = listOf("commit (no) 1"),
-        )
+        initializeGitRepo(commits = listOf("commit (no) 1"))
         val output = runAllContributionData()
 
         assertEquals(listOf("None"), parseAll(output).map { it.semver })
@@ -534,11 +510,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
     fun canReplaceStoryRegex() {
         setupWithOverrides(storyRegex = ".*-(?<storyId>.*-.*)-.*")
 
-        initializeGitRepo(
-            projectDirectoryPath = projectDir.absolutePath,
-            addFileNames = addFileNames,
-            commits = listOf("commit -CowDog-99- 1"),
-        )
+        initializeGitRepo(commits = listOf("commit -CowDog-99- 1"))
         val output = runAllContributionData()
 
         val contributions = parseAll(output)
@@ -549,11 +521,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
     fun canReplaceEaseRegex() {
         setupWithOverrides(easeRegex = """.*\[(?<ease>[0-5])\].*""")
 
-        initializeGitRepo(
-            projectDirectoryPath = projectDir.absolutePath,
-            addFileNames = addFileNames,
-            commits = listOf("commit [4] 1"),
-        )
+        initializeGitRepo(commits = listOf("commit [4] 1"))
         val output = runAllContributionData()
 
         val contributions = parseAll(output)

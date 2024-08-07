@@ -4,6 +4,9 @@ import com.zegreatrob.tools.digger.json.ContributionParser.parseContribution
 import com.zegreatrob.tools.digger.json.ContributionParser.parseContributions
 import java.io.FileOutputStream
 
+val defaultAuthors: List<String>
+    get() = listOf("funk@test.io", "test@funk.edu")
+
 fun initializeGitRepo(
     projectDirectoryPath: String,
     addFileNames: Set<String>,
