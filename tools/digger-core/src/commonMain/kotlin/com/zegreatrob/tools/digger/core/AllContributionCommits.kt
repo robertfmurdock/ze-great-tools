@@ -1,41 +1,35 @@
 package com.zegreatrob.tools.digger.core
 
 fun DiggerGitWrapper.allContributionCommits(): List<Pair<TagRef?, List<CommitRef>>> {
-    val tagList = listTags()
     val log = log()
     val mainBranchLog = log.mainBranch()
-    val contributionCommits = tagList.relatedCommits(mainBranchLog)
-    return contributionCommits.foldInBranches(log - mainBranchLog.toSet())
+    return listTags()
+        .relateToCommits(mainBranchLog)
+        .foldInBranches(log - mainBranchLog.toSet())
         .map { (tag, commitSet) -> tag to commitSet.map { it.id }.toSet() }
         .withCommitsInOriginalOrder(log)
 }
 
-private fun List<Pair<TagRef?, Set<CommitRef>>>.foldInBranches(
-    offMainCommits: List<CommitRef>,
-): List<Pair<TagRef?, List<CommitRef>>> = reversed()
-    .fold<Pair<TagRef?, Set<CommitRef>>, List<Pair<TagRef?, List<CommitRef>>>>(emptyList()) { acc, (tag, commitSet) ->
-        acc + (
-            tag to run {
-                commitSet.toList().reversed()
-                    .fold<CommitRef, List<CommitRef>>(emptyList()) { acc2, commit ->
-
-                        if (commit.parents.size > 1) {
-                            acc2 + (
-                                branchCommits(
-                                    commit.parents[1],
-                                    offMainCommits - acc2.toSet() - acc.flatMap { it.second }.toSet(),
-                                ) + listOf(commit)
-                                )
-                        } else {
-                            acc2 + listOf(commit)
-                        }
-                    }
-                    .reversed()
-            }
-            )
+private fun List<Pair<TagRef?, Set<CommitRef>>>.foldInBranches(offMainCommits: List<CommitRef>) = reversed()
+    .fold(emptyList<Pair<TagRef?, Set<CommitRef>>>()) { acc, (tag, commitSet) ->
+        acc + (tag to foldInBranches(commitSet, offMainCommits - acc.flatMap { it.second }.toSet()))
     }.reversed()
 
-private fun List<TagRef>.relatedCommits(
+private fun foldInBranches(
+    commitSet: Set<CommitRef>,
+    remainingOffMainCommits: List<CommitRef>,
+): Set<CommitRef> = commitSet.fold(emptySet()) { acc, commit ->
+    acc + commit + if (commit.parents.size <= 1) {
+        emptyList()
+    } else {
+        branchCommits(
+            commit.parents[1],
+            remainingOffMainCommits - acc,
+        )
+    }
+}
+
+private fun List<TagRef>.relateToCommits(
     mainBranchLogsWithFoldedBranches: List<CommitRef>,
 ): List<Pair<TagRef?, Set<CommitRef>>> {
     val tagSets: List<Pair<TagRef?, Set<CommitRef>>> =
