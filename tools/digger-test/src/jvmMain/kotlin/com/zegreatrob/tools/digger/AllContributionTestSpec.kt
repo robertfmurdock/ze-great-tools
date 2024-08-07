@@ -5,6 +5,7 @@ import kotlinx.datetime.toKotlinInstant
 import org.ajoberstar.grgit.Commit
 import org.ajoberstar.grgit.Grgit
 import org.ajoberstar.grgit.Tag
+import org.ajoberstar.grgit.operation.MergeOp.Mode
 import java.io.File
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -147,6 +148,57 @@ interface AllContributionTestSpec : SetupWithOverrides {
                     lastCommit = mergeToMainCommit,
                     expectedCommitCount = 5,
                     tag = release2,
+                    expectedAuthors = defaultAuthors,
+                ),
+                toContribution(
+                    lastCommit = firstCommit,
+                    tag = firstRelease,
+                    expectedAuthors = defaultAuthors,
+                ),
+            ),
+            parseAll(allOutput),
+        )
+    }
+
+    @Test
+    fun `will handle normal merge-into-branch-then-ff-back case`() {
+        setupWithDefaults()
+        println(this.projectDir.absolutePath)
+        val grgit = initializeGitRepo(listOf("here's a message"))
+        val firstCommit = grgit.head()
+        val firstRelease = grgit.addTag("release-1")
+
+        grgit.switchToNewBranch("branch")
+        val secondCommit = grgit.addCommitWithMessage("second")
+
+        grgit.checkout { it.branch = "main" }
+        val thirdCommit = grgit.addCommitWithMessage("third")
+        val secondRelease = grgit.addTag("release-2")
+
+        grgit.checkout { it.branch = "branch" }
+        grgit.addCommitWithMessage("fourth")
+        val mergeInBranchCommit = grgit.mergeInBranch("main", "merge-to-branch")
+
+        grgit.checkout { it.branch = "main" }
+
+        grgit.ffOnlyInBranch("branch")
+        val thirdRelease = grgit.addTag("release-3")
+
+        val allOutput = runAllContributionData()
+        assertEquals(
+            listOf(
+                toContribution(
+                    firstCommit = secondCommit,
+                    lastCommit = mergeInBranchCommit,
+                    expectedCommitCount = 3,
+                    tag = thirdRelease,
+                    expectedAuthors = defaultAuthors,
+                ),
+                toContribution(
+                    firstCommit = thirdCommit,
+                    lastCommit = thirdCommit,
+                    expectedCommitCount = 1,
+                    tag = secondRelease,
                     expectedAuthors = defaultAuthors,
                 ),
                 toContribution(
@@ -304,6 +356,13 @@ interface AllContributionTestSpec : SetupWithOverrides {
             it.setMode("no-commit")
         }
         return addCommitWithMessage(message)
+    }
+
+    private fun Grgit.ffOnlyInBranch(branchName: String) {
+        merge {
+            it.head = branchName
+            it.setMode(Mode.ONLY_FF.name)
+        }
     }
 
     private fun toContribution(
