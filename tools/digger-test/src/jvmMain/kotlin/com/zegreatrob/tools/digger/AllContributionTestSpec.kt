@@ -80,20 +80,20 @@ interface AllContributionTestSpec : SetupWithOverrides {
     }
 
     @Test
-    fun `will ignore tags on branches via merge commits`() {
+    fun `will consider the path with the most tags, the trunk`() {
         setupWithDefaults()
         val grgit = initializeGitRepo(listOf("here's a message"))
         val firstCommit = grgit.head()
-        val firstRelease = grgit.addTag("release")
+        val firstRelease = grgit.addTag("release1")
 
         grgit.switchToNewBranch("branch")
 
         val secondCommit = grgit.addCommitWithMessage("second")
-        grgit.addTag("fake-release")
+        val midRelease = grgit.addTag("release1-5")
 
         grgit.checkout { it.branch = "main" }
 
-        grgit.addCommitWithMessage("third")
+        val thirdCommit = grgit.addCommitWithMessage("third")
 
         val mergeCommit = grgit.mergeInBranch("branch", "merge")
         val release2 = grgit.addTag("release-2")
@@ -102,10 +102,17 @@ interface AllContributionTestSpec : SetupWithOverrides {
         assertEquals(
             listOf(
                 toContribution(
-                    firstCommit = secondCommit,
+                    firstCommit = thirdCommit,
                     lastCommit = mergeCommit,
-                    expectedCommitCount = 3,
+                    expectedCommitCount = 2,
                     tag = release2,
+                    expectedAuthors = defaultAuthors,
+                ),
+                toContribution(
+                    firstCommit = secondCommit,
+                    lastCommit = secondCommit,
+                    expectedCommitCount = 1,
+                    tag = midRelease,
                     expectedAuthors = defaultAuthors,
                 ),
                 toContribution(

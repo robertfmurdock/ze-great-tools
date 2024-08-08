@@ -16,19 +16,16 @@ private fun List<TagRef>.findTrunkPath(log: List<CommitRef>): List<CommitRef> {
     val firstTagCommit = log.reversed().find { it.id == latestTag?.commitId } ?: return log.alwaysLeftParent()
     val allPaths = allPathsGood(log, firstTagCommit)
 
-    val remainingTags = this - latestTag
-
-    val pathTagComparison = allPaths.groupBy { path ->
-        remainingTags
-            .count { tag ->
-                path.map { it.id }.contains(tag?.commitId)
-            }
+    val tagIds = this.map { it.commitId }.toSet()
+    val pathTagComparison = allPaths.associateBy { path ->
+        path.count { tagIds.contains(it.id) }
     }
     val alwaysLeftLog = log.alwaysLeftParent()
-    val pathFromLatestTag = pathTagComparison[pathTagComparison.keys.max()]?.firstOrNull()
+    val maxTags = pathTagComparison.keys.max()
+    val pathFromLatestTag = pathTagComparison[maxTags]
 
     val path = if (pathFromLatestTag != null) {
-        alwaysLeftLog.subList(0, alwaysLeftLog.indexOf(firstTagCommit)) + pathFromLatestTag
+        log.subList(0, log.indexOf(firstTagCommit)) + pathFromLatestTag
     } else {
         null
     }
@@ -44,21 +41,43 @@ private fun allPathsGood(
     val allPaths = mutableListOf<List<CommitRef>>()
 
     var currentPath = emptyList<CommitRef>()
-    var pendingCommits = listOf<Pair<CommitRef, CommitRef?>>(firstTagCommit to null)
+    val pendingCommits = mutableListOf<Pair<CommitRef, Int?>>(firstTagCommit to null)
+    val pathCache = mutableMapOf<CommitRef, List<CommitRef>>()
+    println("")
     while (pendingCommits.isNotEmpty()) {
         val currentEntry = pendingCommits.last()
         val (currentCommit, child) = currentEntry
-        pendingCommits = pendingCommits - currentEntry
+        pendingCommits.removeLast()
 
-        currentPath = currentPath.takeWhile { it != child } + listOfNotNull(child, currentCommit)
+        val toIndex = child?.plus(1) ?: currentPath.size
+        if (child != null) {
+            val cachableList = currentPath.subList(toIndex, currentPath.size)
+            if (cachableList.isNotEmpty()) {
+                pathCache[cachableList.first()] = cachableList
+            }
+        }
+        currentPath = currentPath.subList(0, toIndex) + currentCommit
         if (currentCommit.parents.isEmpty()) {
             allPaths += currentPath
-            println("path: ${currentPath.joinToString(", ")}")
+            if (allPaths.size % 5 == 0) {
+                print("\rFound ${allPaths.size} paths. pending commits ${pendingCommits.size}")
+            }
         } else {
             val parentRefs = currentCommit.parents.mapNotNull { commitMap[it] }
-            pendingCommits = pendingCommits + parentRefs.map { it to currentCommit }
+
+            parentRefs.forEach { parentRef ->
+                val cachedList = pathCache[parentRef]
+                if (cachedList != null) {
+                    val newPath = currentPath + cachedList
+                    allPaths += newPath
+                    print("\rFound ${allPaths.size} paths. pending commits ${pendingCommits.size}")
+                } else {
+                    pendingCommits += Pair(parentRef, currentPath.size - 1)
+                }
+            }
         }
     }
+    println("")
     return allPaths
 }
 
