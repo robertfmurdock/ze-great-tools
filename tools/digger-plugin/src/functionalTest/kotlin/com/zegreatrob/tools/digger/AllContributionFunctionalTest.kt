@@ -1,12 +1,11 @@
 package com.zegreatrob.tools.digger
 
 import org.gradle.testkit.runner.GradleRunner
-import org.junit.jupiter.api.io.CleanupMode
 import org.junit.jupiter.api.io.TempDir
 import java.io.File
 
 class AllContributionFunctionalTest : AllContributionTestSpec {
-    @field:TempDir(cleanup = CleanupMode.ON_SUCCESS)
+    @field:TempDir
     override lateinit var projectDir: File
 
     private val buildFile by lazy { projectDir.resolve("build.gradle.kts") }

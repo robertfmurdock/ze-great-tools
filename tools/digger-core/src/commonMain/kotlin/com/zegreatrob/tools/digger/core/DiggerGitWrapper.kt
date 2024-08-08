@@ -81,7 +81,7 @@ class DiggerGitWrapper(private val workingDirectory: String) {
                 authorEmail = elements[1],
                 committerEmail = elements[2],
                 dateTime = Instant.parse(elements[3]),
-                parents = elements[4].split(" "),
+                parents = elements[4].split(" ").filter { it.isNotEmpty() },
                 fullMessage = elements.subList(5, elements.size).joinToString("\n"),
             )
         }

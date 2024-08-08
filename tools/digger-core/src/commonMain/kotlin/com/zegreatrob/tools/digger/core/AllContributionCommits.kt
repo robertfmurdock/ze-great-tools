@@ -14,7 +14,7 @@ fun DiggerGitWrapper.allContributionCommits(): List<Pair<TagRef?, List<CommitRef
 private fun List<TagRef>.findTrunkPath(log: List<CommitRef>): List<CommitRef> {
     val latestTag = firstOrNull()
     val firstTagCommit = log.reversed().find { it.id == latestTag?.commitId } ?: return log.alwaysLeftParent()
-    val allPaths = allPaths(log, firstTagCommit)
+    val allPaths = allPathsGood(log, firstTagCommit)
 
     val remainingTags = this - latestTag
 
@@ -36,9 +36,9 @@ private fun List<TagRef>.findTrunkPath(log: List<CommitRef>): List<CommitRef> {
     return path ?: alwaysLeftLog
 }
 
-private fun allPaths(
+private fun allPathsGood(
     log: List<CommitRef>,
-    firstTagCommit: CommitRef
+    firstTagCommit: CommitRef,
 ): MutableList<List<CommitRef>> {
     val commitMap = log.associateBy { it.id }
     val allPaths = mutableListOf<List<CommitRef>>()
@@ -51,7 +51,6 @@ private fun allPaths(
         pendingCommits = pendingCommits - currentEntry
 
         currentPath = currentPath.takeWhile { it != child } + listOfNotNull(child, currentCommit)
-        print("currentPath: $currentPath")
         if (currentCommit.parents.isEmpty()) {
             allPaths += currentPath
             println("path: ${currentPath.joinToString(", ")}")
@@ -109,7 +108,7 @@ private fun List<TagRef>.relateToCommits(
 private fun List<CommitRef>.alwaysLeftParent() = fold(emptyList<CommitRef>()) { acc, commit ->
     if (acc.isEmpty()) {
         acc + commit
-    } else if (commit.id == acc.last().parents.first()) {
+    } else if (commit.id == acc.last().parents.firstOrNull()) {
         acc + commit
     } else {
         acc
