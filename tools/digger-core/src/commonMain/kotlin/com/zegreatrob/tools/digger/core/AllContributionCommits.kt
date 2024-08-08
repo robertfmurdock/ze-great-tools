@@ -2,14 +2,8 @@ package com.zegreatrob.tools.digger.core
 
 fun DiggerGitWrapper.allContributionCommits(): List<Pair<TagRef?, List<CommitRef>>> {
     val log = log()
-    val mainBranchLog = log.alwaysLeftParent()
     val tags = listTags()
-    println("tags\n${tags.joinToString("\n")}")
-
     val trunkPath = tags.reversed().findTrunkPath(log)
-    println("mainBranchLog\n${mainBranchLog.joinToString("\n") { it.id }}")
-    println("trunkPath\n${trunkPath.joinToString("\n") { it.id }}")
-
     return tags
         .relateToCommits(trunkPath)
         .foldInBranches(log - trunkPath.toSet())
@@ -19,18 +13,19 @@ fun DiggerGitWrapper.allContributionCommits(): List<Pair<TagRef?, List<CommitRef
 
 private fun List<TagRef>.findTrunkPath(log: List<CommitRef>): List<CommitRef> {
     val latestTag = firstOrNull()
-    val firstTagCommit = log.reversed().find { it.id == latestTag?.commitId }
-    println("before all paths")
-    val treeCache = mutableMapOf<String, TreeRef>()
-    val allPaths = firstTagCommit?.parentTree(log.associateBy { it.id }, treeCache)?.flatten()
-    println("after all paths")
+    val firstTagCommit = log.reversed().find { it.id == latestTag?.commitId } ?: return log.alwaysLeftParent()
+    val allPaths = allPaths(log, firstTagCommit)
 
     val remainingTags = this - latestTag
 
-    val pathTagComparison =
-        allPaths?.groupBy { path -> remainingTags.count { tag -> path.map { it.id }.contains(tag?.commitId) } }
+    val pathTagComparison = allPaths.groupBy { path ->
+        remainingTags
+            .count { tag ->
+                path.map { it.id }.contains(tag?.commitId)
+            }
+    }
     val alwaysLeftLog = log.alwaysLeftParent()
-    val pathFromLatestTag = pathTagComparison?.get(pathTagComparison.keys.max())?.firstOrNull()
+    val pathFromLatestTag = pathTagComparison[pathTagComparison.keys.max()]?.firstOrNull()
 
     val path = if (pathFromLatestTag != null) {
         alwaysLeftLog.subList(0, alwaysLeftLog.indexOf(firstTagCommit)) + pathFromLatestTag
@@ -41,25 +36,32 @@ private fun List<TagRef>.findTrunkPath(log: List<CommitRef>): List<CommitRef> {
     return path ?: alwaysLeftLog
 }
 
-private fun CommitRef.parentTree(log: Map<String, CommitRef>, treeCache: MutableMap<String, TreeRef>): TreeRef = TreeRef(
-    this,
-    parentRefs(this, log)
-        .map { treeCache.getOrPut(it.id) { it.parentTree(log, treeCache) } },
-)
+private fun allPaths(
+    log: List<CommitRef>,
+    firstTagCommit: CommitRef
+): MutableList<List<CommitRef>> {
+    val commitMap = log.associateBy { it.id }
+    val allPaths = mutableListOf<List<CommitRef>>()
 
-data class TreeRef(val commitRef: CommitRef, val parentTree: List<TreeRef>) {
-    fun flatten(): List<List<CommitRef>> = if (parentTree.isEmpty()) {
-        listOf(listOf(commitRef))
-    } else {
-        parentTree.map { it.flatten() }.flatten().map { listOf(commitRef) + it }
-    }.also { println("flattened ${commitRef.id}") }
+    var currentPath = emptyList<CommitRef>()
+    var pendingCommits = listOf<Pair<CommitRef, CommitRef?>>(firstTagCommit to null)
+    while (pendingCommits.isNotEmpty()) {
+        val currentEntry = pendingCommits.last()
+        val (currentCommit, child) = currentEntry
+        pendingCommits = pendingCommits - currentEntry
+
+        currentPath = currentPath.takeWhile { it != child } + listOfNotNull(child, currentCommit)
+        print("currentPath: $currentPath")
+        if (currentCommit.parents.isEmpty()) {
+            allPaths += currentPath
+            println("path: ${currentPath.joinToString(", ")}")
+        } else {
+            val parentRefs = currentCommit.parents.mapNotNull { commitMap[it] }
+            pendingCommits = pendingCommits + parentRefs.map { it to currentCommit }
+        }
+    }
+    return allPaths
 }
-
-private fun parentRefs(
-    commit: CommitRef,
-    log: Map<String, CommitRef>,
-) = commit.parents.mapNotNull { parentId -> log[parentId] }
-    .also { println("parent refs for ${commit.id}") }
 
 private fun List<Pair<TagRef?, Set<CommitRef>>>.foldInBranches(offMainCommits: List<CommitRef>) = reversed()
     .fold(emptyList<Pair<TagRef?, Set<CommitRef>>>()) { acc, (tag, commitSet) ->
