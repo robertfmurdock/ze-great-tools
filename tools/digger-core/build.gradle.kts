@@ -19,6 +19,7 @@ dependencies {
     commonMainImplementation(project(":digger-model"))
     commonTestImplementation(kotlin("test", embeddedKotlinVersion))
     "jvmTestImplementation"(kotlin("test-junit5", embeddedKotlinVersion))
+    "jvmTestImplementation"(project(":digger-test"))
 }
 
 tasks {

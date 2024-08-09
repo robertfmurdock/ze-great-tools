@@ -24,6 +24,7 @@ class DiggerGitWrapper(private val workingDirectory: String) {
                 "--no-pager",
                 "tag",
                 "--list",
+                "--sort=-taggerdate",
                 "--format=%(refname:strip=2),%(*objectname),%(creatordate:iso-strict)",
             ),
             workingDirectory,
