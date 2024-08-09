@@ -3,9 +3,7 @@ package com.zegreatrob.tools.digger
 import com.zegreatrob.tools.digger.model.Contribution
 import kotlinx.datetime.toKotlinInstant
 import org.ajoberstar.grgit.Commit
-import org.ajoberstar.grgit.Grgit
 import org.ajoberstar.grgit.Tag
-import org.ajoberstar.grgit.operation.MergeOp.Mode
 import java.io.File
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -21,11 +19,6 @@ interface AllContributionTestSpec : SetupWithOverrides {
         addFileNames = addFileNames,
         commits = commits,
     )
-
-    private fun Grgit.switchToNewBranch(name: String) {
-        branch.add { it.name = name }
-        checkout { it.branch = name }
-    }
 
     @Test
     fun `will include all tag segments`() {
@@ -85,12 +78,12 @@ interface AllContributionTestSpec : SetupWithOverrides {
         val grgit = initializeGitRepo(listOf("here's a message"))
         val firstCommit = grgit.head()
         val firstRelease = grgit.addTag("release1")
-
+        delayLongEnoughToAffectGitDate()
         grgit.switchToNewBranch("branch")
 
         val secondCommit = grgit.addCommitWithMessage("second")
         val midRelease = grgit.addTag("release1-5")
-
+        delayLongEnoughToAffectGitDate()
         grgit.checkout { it.branch = "main" }
 
         val thirdCommit = grgit.addCommitWithMessage("third")
@@ -170,7 +163,6 @@ interface AllContributionTestSpec : SetupWithOverrides {
     @Test
     fun `will handle normal merge-into-branch-then-ff-back case`() {
         setupWithDefaults()
-        println(this.projectDir.absolutePath)
         val grgit = initializeGitRepo(listOf("here's a message"))
         val firstCommit = grgit.head()
         val firstRelease = grgit.addTag("release-1")
@@ -355,21 +347,6 @@ interface AllContributionTestSpec : SetupWithOverrides {
             ),
             parseAll(allOutput),
         )
-    }
-
-    private fun Grgit.mergeInBranch(branchName: String, message: String): Commit {
-        merge {
-            it.head = branchName
-            it.setMode("no-commit")
-        }
-        return addCommitWithMessage(message)
-    }
-
-    private fun Grgit.ffOnlyInBranch(branchName: String) {
-        merge {
-            it.head = branchName
-            it.setMode(Mode.ONLY_FF.name)
-        }
     }
 
     private fun toContribution(

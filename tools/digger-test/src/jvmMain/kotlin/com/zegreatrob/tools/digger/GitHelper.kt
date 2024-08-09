@@ -2,6 +2,9 @@ package com.zegreatrob.tools.digger
 
 import com.zegreatrob.tools.digger.json.ContributionParser.parseContribution
 import com.zegreatrob.tools.digger.json.ContributionParser.parseContributions
+import org.ajoberstar.grgit.Commit
+import org.ajoberstar.grgit.Grgit
+import org.ajoberstar.grgit.operation.MergeOp.Mode
 import java.io.FileOutputStream
 
 val defaultAuthors: List<String>
@@ -12,8 +15,8 @@ fun initializeGitRepo(
     addFileNames: Set<String>,
     commits: List<String> = listOf(),
     initialTag: String? = null,
-): org.ajoberstar.grgit.Grgit {
-    val grgit = org.ajoberstar.grgit.Grgit.init(mapOf("dir" to projectDirectoryPath))
+): Grgit {
+    val grgit = Grgit.init(mapOf("dir" to projectDirectoryPath))
     disableGpgSign(projectDirectoryPath)
     if (addFileNames.isNotEmpty()) {
         grgit.add(
@@ -50,13 +53,13 @@ fun initializeGitRepo(
     return grgit
 }
 
-fun org.ajoberstar.grgit.Grgit.addTag(initialTag: String?): org.ajoberstar.grgit.Tag? = tag.add(
+fun Grgit.addTag(initialTag: String?): org.ajoberstar.grgit.Tag? = tag.add(
     fun(it: org.ajoberstar.grgit.operation.TagAddOp) {
         it.name = initialTag
     },
 )
 
-fun org.ajoberstar.grgit.Grgit.addCommitWithMessage(message: String): org.ajoberstar.grgit.Commit =
+fun Grgit.addCommitWithMessage(message: String): org.ajoberstar.grgit.Commit =
     commit(
         fun(it: org.ajoberstar.grgit.operation.CommitOp) {
             it.author = org.ajoberstar.grgit.Person("Funky Testerson", "funk@test.io")
@@ -64,6 +67,30 @@ fun org.ajoberstar.grgit.Grgit.addCommitWithMessage(message: String): org.ajober
             it.message = message
         },
     )
+
+fun delayLongEnoughToAffectGitDate() {
+    Thread.sleep(1000)
+}
+
+fun Grgit.switchToNewBranch(name: String) {
+    branch.add { it.name = name }
+    checkout { it.branch = name }
+}
+
+fun Grgit.mergeInBranch(branchName: String, message: String): Commit {
+    merge {
+        it.head = branchName
+        it.setMode("no-commit")
+    }
+    return addCommitWithMessage(message)
+}
+
+fun Grgit.ffOnlyInBranch(branchName: String) {
+    merge {
+        it.head = branchName
+        it.setMode(Mode.ONLY_FF.name)
+    }
+}
 
 private fun disableGpgSign(projectDir: String) {
     FileOutputStream("$projectDir/.git/config", true)

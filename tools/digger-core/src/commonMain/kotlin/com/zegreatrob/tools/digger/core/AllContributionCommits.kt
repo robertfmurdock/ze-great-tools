@@ -3,7 +3,7 @@ package com.zegreatrob.tools.digger.core
 fun DiggerGitWrapper.allContributionCommits(): List<Pair<TagRef?, List<CommitRef>>> {
     val log = log()
     val tags = listTags()
-    val trunkPath = tags.reversed().findTrunkPath(log)
+    val trunkPath = tags.findTrunkPath(log)
     return tags
         .relateToCommits(trunkPath)
         .foldInBranches(log - trunkPath.toSet())
@@ -12,73 +12,16 @@ fun DiggerGitWrapper.allContributionCommits(): List<Pair<TagRef?, List<CommitRef
 }
 
 private fun List<TagRef>.findTrunkPath(log: List<CommitRef>): List<CommitRef> {
-    val latestTag = firstOrNull()
-    val firstTagCommit = log.reversed().find { it.id == latestTag?.commitId } ?: return log.alwaysLeftParent()
-    val allPaths = allPathsGood(log, firstTagCommit)
+    val allPaths = allPaths(log, log.first())
 
     val tagIds = this.map { it.commitId }.toSet()
-    val pathTagComparison = allPaths.associateBy { path ->
+    val pathTagComparison = allPaths.groupBy { path ->
         path.count { tagIds.contains(it.id) }
     }
     val alwaysLeftLog = log.alwaysLeftParent()
     val maxTags = pathTagComparison.keys.max()
-    val pathFromLatestTag = pathTagComparison[maxTags]
-
-    val path = if (pathFromLatestTag != null) {
-        log.subList(0, log.indexOf(firstTagCommit)) + pathFromLatestTag
-    } else {
-        null
-    }
-
-    return path ?: alwaysLeftLog
-}
-
-private fun allPathsGood(
-    log: List<CommitRef>,
-    firstTagCommit: CommitRef,
-): MutableList<List<CommitRef>> {
-    val commitMap = log.associateBy { it.id }
-    val allPaths = mutableListOf<List<CommitRef>>()
-
-    var currentPath = emptyList<CommitRef>()
-    val pendingCommits = mutableListOf<Pair<CommitRef, Int?>>(firstTagCommit to null)
-    val pathCache = mutableMapOf<CommitRef, List<CommitRef>>()
-    println("")
-    while (pendingCommits.isNotEmpty()) {
-        val currentEntry = pendingCommits.last()
-        val (currentCommit, child) = currentEntry
-        pendingCommits.removeLast()
-
-        val toIndex = child?.plus(1) ?: currentPath.size
-        if (child != null) {
-            val cachableList = currentPath.subList(toIndex, currentPath.size)
-            if (cachableList.isNotEmpty()) {
-                pathCache[cachableList.first()] = cachableList
-            }
-        }
-        currentPath = currentPath.subList(0, toIndex) + currentCommit
-        if (currentCommit.parents.isEmpty()) {
-            allPaths += currentPath
-            if (allPaths.size % 5 == 0) {
-                print("\rFound ${allPaths.size} paths. pending commits ${pendingCommits.size}")
-            }
-        } else {
-            val parentRefs = currentCommit.parents.mapNotNull { commitMap[it] }
-
-            parentRefs.forEach { parentRef ->
-                val cachedList = pathCache[parentRef]
-                if (cachedList != null) {
-                    val newPath = currentPath + cachedList
-                    allPaths += newPath
-                    print("\rFound ${allPaths.size} paths. pending commits ${pendingCommits.size}")
-                } else {
-                    pendingCommits += Pair(parentRef, currentPath.size - 1)
-                }
-            }
-        }
-    }
-    println("")
-    return allPaths
+    val shortestPathWithMostTags = pathTagComparison[maxTags]?.minBy { it.size }
+    return shortestPathWithMostTags ?: alwaysLeftLog
 }
 
 private fun List<Pair<TagRef?, Set<CommitRef>>>.foldInBranches(offMainCommits: List<CommitRef>) = reversed()
@@ -103,11 +46,9 @@ private fun foldInBranches(
     }
 }
 
-private fun List<TagRef>.relateToCommits(
-    mainBranchLogsWithFoldedBranches: List<CommitRef>,
-): List<Pair<TagRef?, Set<CommitRef>>> {
+private fun List<TagRef>.relateToCommits(trunkPath: List<CommitRef>): List<Pair<TagRef?, Set<CommitRef>>> {
     val tagSets: List<Pair<TagRef?, Set<CommitRef>>> =
-        mainBranchLogsWithFoldedBranches.fold(emptyList()) { acc, commit ->
+        trunkPath.fold(emptyList()) { acc, commit ->
             val tag = find { it.commitId == commit.id }
             if (tag != null) {
                 acc.plus(element = tag to setOf(commit))
