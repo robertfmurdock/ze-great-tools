@@ -411,7 +411,7 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
 
         val merge2Commit = grgit.mergeInBranch("branch1", "merge2")
         delayLongEnoughToAffectGitDate()
-        val thirdRelease = grgit.addTag("release3")
+        val secondRelease = grgit.addTag("release2")
 
         val allOutput = runCurrentContributionData()
         assertEquals(
@@ -419,6 +419,41 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
                 lastCommit = merge2Commit,
                 firstCommit = secondCommit,
                 expectedCommitCount = 7,
+                tag = secondRelease,
+                expectedAuthors = defaultAuthors,
+            ),
+            parseContribution(allOutput),
+        )
+    }
+
+    @Test
+    fun `will correctly understand longer running branch`() {
+        setupWithDefaults()
+        val grgit = initializeGitRepo(listOf("first"))
+        grgit.head()
+
+        grgit.addTag("release")
+        grgit.switchToNewBranch("branch")
+        val secondCommit = grgit.addCommitWithMessage("second")
+        grgit.checkout { it.branch = "main" }
+        grgit.addCommitWithMessage("third")
+        delayLongEnoughToAffectGitDate()
+        grgit.addTag("release2")
+        grgit.checkout { it.branch = "branch" }
+        grgit.addCommitWithMessage("fourth")
+        grgit.addCommitWithMessage("fifth")
+        grgit.checkout { it.branch = "main" }
+        grgit.mergeInBranch("branch", "merge")
+        val lastCommit = grgit.addCommitWithMessage("sixth")
+        delayLongEnoughToAffectGitDate()
+        val thirdRelease = grgit.addTag("release3")
+
+        val allOutput = runCurrentContributionData()
+        assertEquals(
+            toContribution(
+                lastCommit = lastCommit,
+                firstCommit = secondCommit,
+                expectedCommitCount = 5,
                 tag = thirdRelease,
                 expectedAuthors = defaultAuthors,
             ),
