@@ -71,7 +71,7 @@ class AllPathsTest {
 
         val log = diggerGitWrapper.log()
 
-        val allPaths = allPaths(log, mergeCommit.toCommitRef(), preferredPathId = setOf(fourthCommit.id))
+        val allPaths = allPaths(log, mergeCommit.toCommitRef(), preferredCommitIds = setOf(fourthCommit.id))
 
         assertExpectedPaths(
             setOf(
@@ -210,6 +210,65 @@ class AllPathsTest {
                     mergeCommit1,
                     fourthCommit,
                     secondCommit,
+                    firstCommit,
+                ).map { it.toCommitRef() },
+            ),
+            allPaths,
+        )
+    }
+
+    @Test
+    fun willStopOnceFindingPathContainingAllPreferredCommits() {
+        val grgit = initializeGitRepo(
+            projectDirectoryPath = projectDir.absolutePath,
+            commits = listOf("first"),
+            addFileNames = emptySet(),
+        )
+        val firstCommit = grgit.head()
+        grgit.switchToNewBranch("branch1")
+        grgit.addCommitWithMessage("second")
+
+        grgit.checkout { it.branch = "main" }
+        val thirdCommit = grgit.addCommitWithMessage("third")
+
+        grgit.checkout { it.branch = "branch1" }
+        grgit.addCommitWithMessage("fourth")
+        grgit.checkout { it.branch = "main" }
+        val mergeCommit1 = grgit.mergeInBranch("branch1", "merge")
+        val fifthCommit = grgit.addCommitWithMessage("fifth")
+
+        grgit.switchToNewBranch("branch2")
+        val sixthCommit = grgit.addCommitWithMessage("sixth")
+        grgit.checkout { it.branch = "main" }
+        grgit.addCommitWithMessage("seventh")
+        val mergeCommit2 = grgit.mergeInBranch("branch2", "merge")
+        val eighthCommit = grgit.addCommitWithMessage("eighth")
+
+        grgit.switchToNewBranch("branch3")
+        grgit.addCommitWithMessage("ninth")
+        grgit.checkout { it.branch = "main" }
+        val tenthCommit = grgit.addCommitWithMessage("tenth")
+        val mergeCommit3 = grgit.mergeInBranch("branch3", "merge")
+
+        val log = diggerGitWrapper.log()
+
+        val allPaths = allPaths(
+            log,
+            mergeCommit3.toCommitRef(),
+            preferredCommitIds = setOf(tenthCommit.id, sixthCommit.id, thirdCommit.id),
+        )
+
+        assertExpectedPaths(
+            setOf(
+                listOf(
+                    mergeCommit3,
+                    tenthCommit,
+                    eighthCommit,
+                    mergeCommit2,
+                    sixthCommit,
+                    fifthCommit,
+                    mergeCommit1,
+                    thirdCommit,
                     firstCommit,
                 ).map { it.toCommitRef() },
             ),

@@ -2,7 +2,7 @@ package com.zegreatrob.tools.digger.core
 
 fun DiggerGitWrapper.allContributionCommits(): List<Pair<TagRef?, List<CommitRef>>> {
     val log = log()
-    val tags = listTags()
+    val tags = listTags().filter { log.map(CommitRef::id).contains(it.commitId) }
     val trunkPath = tags.findTrunkPath(log)
     return tags
         .relateToCommits(trunkPath)
