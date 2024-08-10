@@ -11,17 +11,16 @@ fun DiggerGitWrapper.allContributionCommits(): List<Pair<TagRef?, List<CommitRef
         .withCommitsInOriginalOrder(log)
 }
 
-private fun List<TagRef>.findTrunkPath(log: List<CommitRef>): List<CommitRef> {
-    val allPaths = allPaths(log, log.first())
+private fun List<TagRef>.findTrunkPath(log: List<CommitRef>) = allPaths(log, log.first())
+    .shortestPathWithMostTags(taggedCommitIds = map { it.commitId }.toSet())
+    ?: log.alwaysLeftParent()
 
-    val tagIds = this.map { it.commitId }.toSet()
-    val pathTagComparison = allPaths.groupBy { path ->
-        path.count { tagIds.contains(it.id) }
+private fun MutableList<List<CommitRef>>.shortestPathWithMostTags(taggedCommitIds: Set<String>): List<CommitRef>? {
+    val pathTagCountGroups = groupBy { path ->
+        path.count { taggedCommitIds.contains(it.id) }
     }
-    val alwaysLeftLog = log.alwaysLeftParent()
-    val maxTags = pathTagComparison.keys.max()
-    val shortestPathWithMostTags = pathTagComparison[maxTags]?.minBy { it.size }
-    return shortestPathWithMostTags ?: alwaysLeftLog
+    return pathTagCountGroups[pathTagCountGroups.keys.max()]
+        ?.minBy { it.size }
 }
 
 private fun List<Pair<TagRef?, Set<CommitRef>>>.foldInBranches(offMainCommits: List<CommitRef>) = reversed()
