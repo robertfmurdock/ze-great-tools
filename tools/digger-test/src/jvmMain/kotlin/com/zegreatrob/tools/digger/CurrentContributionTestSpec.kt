@@ -410,6 +410,7 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
         grgit.addCommitWithMessage("sixth")
 
         val merge2Commit = grgit.mergeInBranch("branch1", "merge2")
+        delayLongEnoughToAffectGitDate()
         val thirdRelease = grgit.addTag("release3")
 
         val allOutput = runCurrentContributionData()

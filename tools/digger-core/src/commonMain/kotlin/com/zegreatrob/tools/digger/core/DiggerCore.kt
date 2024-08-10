@@ -7,14 +7,28 @@ class DiggerCore(
 ) {
     fun currentContributionData() =
         with(gitWrapper) {
-            val currentCommitTag = currentCommitTag()
-            messageDigger.contribution(currentContributionCommits())
+            val (currentTag, previousTag) = currentRelevantTags(
+                headCommitId = headCommitId(),
+                lastTwoTags = listTags().take(2),
+            )
+            messageDigger.contribution(currentContributionCommits(previousTag))
                 .copy(
                     label = label,
-                    tagName = currentCommitTag?.name,
-                    tagDateTime = currentCommitTag?.dateTime,
+                    tagName = currentTag?.name,
+                    tagDateTime = currentTag?.dateTime,
                 )
         }
+
+    private fun currentRelevantTags(
+        headCommitId: String,
+        lastTwoTags: List<TagRef>,
+    ) = lastTwoTags.getOrNull(0).let { latestTag ->
+        if (latestTag?.commitId == headCommitId) {
+            latestTag to lastTwoTags.getOrNull(1)
+        } else {
+            null to latestTag
+        }
+    }
 
     fun allContributionData() = gitWrapper
         .allContributionCommits()

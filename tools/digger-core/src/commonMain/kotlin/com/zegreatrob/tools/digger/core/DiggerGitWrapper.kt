@@ -4,18 +4,15 @@ import kotlinx.datetime.Instant
 
 class DiggerGitWrapper(private val workingDirectory: String) {
 
-    fun headCommitId(): String {
-        val outputText = runProcess(
-            listOf(
-                "git",
-                "--no-pager",
-                "rev-parse",
-                "HEAD",
-            ),
-            workingDirectory,
-        )
-        return outputText.trim()
-    }
+    fun headCommitId(): String = runProcess(
+        listOf(
+            "git",
+            "--no-pager",
+            "rev-parse",
+            "HEAD",
+        ),
+        workingDirectory,
+    ).trim()
 
     fun listTags(): List<TagRef> {
         val outputText = runProcess(
