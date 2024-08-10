@@ -51,6 +51,37 @@ class AllPathsTest {
     }
 
     @Test
+    fun willIgnoreBranchesWhenOneParentIsInPreferredList() {
+        val grgit = initializeGitRepo(
+            projectDirectoryPath = projectDir.absolutePath,
+            commits = listOf("first"),
+            addFileNames = emptySet(),
+        )
+        val firstCommit = grgit.head()
+        grgit.switchToNewBranch("branch1")
+
+        val secondCommit = grgit.addCommitWithMessage("second")
+        grgit.checkout { it.branch = "main" }
+
+        grgit.addCommitWithMessage("third")
+        grgit.checkout { it.branch = "branch1" }
+        val fourthCommit = grgit.addCommitWithMessage("fourth")
+        grgit.checkout { it.branch = "main" }
+        val mergeCommit = grgit.mergeInBranch("branch1", "merge")
+
+        val log = diggerGitWrapper.log()
+
+        val allPaths = allPaths(log, mergeCommit.toCommitRef(), preferredPathId = setOf(fourthCommit.id))
+
+        assertExpectedPaths(
+            setOf(
+                listOf(mergeCommit, fourthCommit, secondCommit, firstCommit).map { it.toCommitRef() },
+            ),
+            allPaths,
+        )
+    }
+
+    @Test
     fun branchMergeBranchMergeFindsAllPaths() {
         val grgit = initializeGitRepo(
             projectDirectoryPath = projectDir.absolutePath,

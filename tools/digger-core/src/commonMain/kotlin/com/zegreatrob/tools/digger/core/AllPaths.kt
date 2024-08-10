@@ -3,6 +3,7 @@ package com.zegreatrob.tools.digger.core
 fun allPaths(
     log: List<CommitRef>,
     firstTagCommit: CommitRef,
+    preferredPathId: Set<String> = emptySet(),
 ): MutableList<List<CommitRef>> {
     val commitMap = log.associateBy { it.id }
     val rootCommit = log.last { it.parents.isEmpty() }
@@ -37,9 +38,13 @@ fun allPaths(
                 throw Exception("${currentCommit.id} was not ${rootCommit.id}")
             }
             allPaths += currentPath
-            reportState(allPaths, pendingCommits, pathCache)
         } else {
             val parentRefs = currentCommit.parents.mapNotNull { commitMap[it] }
+                .let {
+                    it.filter { ref -> preferredPathId.contains(ref.id) }
+                        .takeIf(List<CommitRef>::isNotEmpty)
+                        ?: it
+                }
 
             val parentRefsWithCacheEntries = pathCache.filterKeys { parentRefs.contains(it) }
 
@@ -54,9 +59,9 @@ fun allPaths(
                     currentPath = currentPath + it.last()
                 }
             }
-
             pendingCommits += parentsRemainingToProcess
         }
+        reportState(allPaths, pendingCommits, pathCache)
     }
     println("")
     return allPaths

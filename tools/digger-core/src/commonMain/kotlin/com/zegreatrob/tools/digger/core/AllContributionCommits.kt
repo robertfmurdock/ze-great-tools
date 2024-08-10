@@ -11,7 +11,7 @@ fun DiggerGitWrapper.allContributionCommits(): List<Pair<TagRef?, List<CommitRef
         .withCommitsInOriginalOrder(log)
 }
 
-private fun List<TagRef>.findTrunkPath(log: List<CommitRef>) = allPaths(log, log.first())
+private fun List<TagRef>.findTrunkPath(log: List<CommitRef>) = allPaths(log, log.first(), map { it.commitId }.toSet())
     .shortestPathWithMostTags(taggedCommitIds = map { it.commitId }.toSet())
     ?: log.alwaysLeftParent()
 
