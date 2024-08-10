@@ -1,7 +1,10 @@
 package com.zegreatrob.tools.digger
 
 import com.zegreatrob.tools.digger.json.ContributionParser.parseContribution
+import com.zegreatrob.tools.digger.model.Contribution
 import kotlinx.datetime.toKotlinInstant
+import org.ajoberstar.grgit.Commit
+import org.ajoberstar.grgit.Tag
 import java.io.File
 import java.lang.Thread.sleep
 import kotlin.test.Test
@@ -382,4 +385,74 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
         val contribution = parseContribution(output)
         assertEquals(4, contribution?.ease)
     }
+
+    @Test
+    fun `will handle merge commits on merged branches correctly`() {
+        setupWithDefaults()
+        val grgit = initializeGitRepo(listOf("first"))
+        grgit.head()
+
+        grgit.addTag("release")
+        grgit.switchToNewBranch("branch2")
+        val secondCommit = grgit.addCommitWithMessage("second")
+
+        grgit.switchToNewBranch("branch1")
+        grgit.addCommitWithMessage("third")
+
+        grgit.checkout { it.branch = "branch2" }
+        grgit.addCommitWithMessage("fourth")
+        grgit.checkout { it.branch = "branch1" }
+        grgit.addCommitWithMessage("fifth")
+
+        grgit.mergeInBranch("branch2", "merge1")
+
+        grgit.checkout { it.branch = "main" }
+        grgit.addCommitWithMessage("sixth")
+
+        val merge2Commit = grgit.mergeInBranch("branch1", "merge2")
+        val thirdRelease = grgit.addTag("release3")
+
+        val allOutput = runCurrentContributionData()
+        assertEquals(
+            toContribution(
+                lastCommit = merge2Commit,
+                firstCommit = secondCommit,
+                expectedCommitCount = 7,
+                tag = thirdRelease,
+                expectedAuthors = defaultAuthors,
+            ),
+            parseContribution(allOutput),
+        )
+    }
+
+    private fun toContribution(
+        lastCommit: Commit,
+        tag: Tag? = null,
+        firstCommit: Commit = lastCommit,
+        expectedAuthors: List<String>,
+        expectedEase: Int? = null,
+        expectedStoryId: String? = null,
+        expectedCommitCount: Int = 1,
+        expectedSemver: String? = null,
+        expectedLabel: String = projectDir.name,
+    ) = Contribution(
+        lastCommit = lastCommit.id,
+        dateTime = lastCommit.dateTime?.toInstant()?.toKotlinInstant(),
+        firstCommit = firstCommit.id,
+        firstCommitDateTime = firstCommit.dateTime?.toInstant()?.toKotlinInstant(),
+        authors = expectedAuthors,
+        label = expectedLabel,
+        ease = expectedEase,
+        storyId = expectedStoryId,
+        tagName = tag?.name,
+        tagDateTime = tag?.dateTime?.toInstant()?.toKotlinInstant(),
+        commitCount = expectedCommitCount,
+        semver = expectedSemver,
+    )
+
+    fun initializeGitRepo(commits: List<String>) = initializeGitRepo(
+        projectDirectoryPath = projectDir.absolutePath,
+        addFileNames = addFileNames,
+        commits = commits,
+    )
 }
