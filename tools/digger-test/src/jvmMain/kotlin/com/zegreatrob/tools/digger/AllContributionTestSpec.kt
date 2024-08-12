@@ -138,6 +138,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
         grgit.checkout { it.branch = "main" }
 
         val mergeToMainCommit = grgit.mergeInBranch("branch", "merge-to-main")
+        delayLongEnoughToAffectGitDate()
         val release2 = grgit.addTag("release-2")
 
         val allOutput = runAllContributionData()
@@ -172,6 +173,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
 
         grgit.checkout { it.branch = "main" }
         val thirdCommit = grgit.addCommitWithMessage("third")
+        delayLongEnoughToAffectGitDate()
         val secondRelease = grgit.addTag("release-2")
 
         grgit.checkout { it.branch = "branch" }
@@ -181,6 +183,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
         grgit.checkout { it.branch = "main" }
 
         grgit.ffOnlyInBranch("branch")
+        delayLongEnoughToAffectGitDate()
         val thirdRelease = grgit.addTag("release-3")
 
         val allOutput = runAllContributionData()
@@ -223,11 +226,13 @@ interface AllContributionTestSpec : SetupWithOverrides {
         grgit.checkout { it.branch = "main" }
 
         val thirdCommit = grgit.addCommitWithMessage("third")
+        delayLongEnoughToAffectGitDate()
         val secondRelease = grgit.addTag("release2")
         grgit.checkout { it.branch = "branch1" }
         grgit.addCommitWithMessage("fourth")
         grgit.checkout { it.branch = "main" }
         val mergeCommit = grgit.mergeInBranch("branch1", "merge")
+        delayLongEnoughToAffectGitDate()
         val thirdRelease = grgit.addTag("release3")
 
         val allOutput = runAllContributionData()
@@ -279,6 +284,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
         grgit.addCommitWithMessage("sixth")
 
         val merge2Commit = grgit.mergeInBranch("branch1", "merge2")
+        delayLongEnoughToAffectGitDate()
         val thirdRelease = grgit.addTag("release3")
 
         val allOutput = runAllContributionData()
@@ -314,12 +320,14 @@ interface AllContributionTestSpec : SetupWithOverrides {
         grgit.checkout { it.branch = "main" }
         grgit.addCommitWithMessage("third")
         val merge1Commit = grgit.mergeInBranch("branch1", "merge1")
+        delayLongEnoughToAffectGitDate()
         val secondRelease = grgit.addTag("release2")
 
         grgit.checkout { it.branch = "branch1" }
         val fourthCommit = grgit.addCommitWithMessage("fourth")
         grgit.checkout { it.branch = "main" }
         val merge2Commit = grgit.mergeInBranch("branch1", "merge2")
+        delayLongEnoughToAffectGitDate()
         val thirdRelease = grgit.addTag("release3")
 
         val allOutput = runAllContributionData()

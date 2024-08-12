@@ -53,15 +53,15 @@ class DiggerGitWrapper(private val workingDirectory: String) {
         ),
     )
 
-    fun logWithRange(begin: String, end: String): List<CommitRef> = parseLog(
+    fun logWithRange(begin: String, end: String? = null): List<CommitRef> = parseLog(
         runProcess(
             listOf(
                 "git",
                 "--no-pager",
                 "log",
                 "--format=$gitLogFormat",
-                "$begin..$end",
-            ),
+                begin,
+            ) + if (end != null) listOf(end) else emptyList(),
             workingDirectory,
         ),
     )
