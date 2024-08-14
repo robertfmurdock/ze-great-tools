@@ -51,6 +51,7 @@ class CurrentContributionFunctionalTest : CurrentContributionTestSpec {
                 ${if (noneRegex != null) "noneRegex.set(Regex(\"${noneRegex.replace("\\", "\\\\")}\"))" else ""}
                 ${if (storyRegex != null) "storyIdRegex.set(Regex(\"${storyRegex.replace("\\", "\\\\")}\"))" else ""}
                 ${if (easeRegex != null) """easeRegex.set(Regex("${easeRegex.replace("\\", "\\\\")}"))""" else ""}
+                ${if (tagRegex != null) """tagRegex.set(Regex("${tagRegex.replace("\\", "\\\\")}"))""" else ""}
             }
             """.trimIndent(),
         )

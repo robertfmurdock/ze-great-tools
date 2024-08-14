@@ -427,6 +427,47 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
     }
 
     @Test
+    fun `will ignore tags that do not match regex`() {
+        setupWithOverrides(
+            tagRegex = "v(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?",
+        )
+        val grgit = initializeGitRepo(listOf("first"))
+        grgit.head()
+
+        grgit.addTag("v1.0.0")
+        grgit.switchToNewBranch("branch2")
+        val secondCommit = grgit.addCommitWithMessage("second")
+
+        grgit.switchToNewBranch("branch1")
+        grgit.addCommitWithMessage("third")
+
+        grgit.checkout { it.branch = "branch2" }
+        grgit.addCommitWithMessage("fourth")
+        grgit.checkout { it.branch = "branch1" }
+        grgit.addCommitWithMessage("fifth")
+
+        grgit.mergeInBranch("branch2", "merge1")
+
+        grgit.checkout { it.branch = "main" }
+        grgit.addCommitWithMessage("sixth")
+
+        val merge2Commit = grgit.mergeInBranch("branch1", "merge2")
+        delayLongEnoughToAffectGitDate()
+        grgit.addTag("ignore-me")
+
+        val allOutput = runCurrentContributionData()
+        assertEquals(
+            toContribution(
+                lastCommit = merge2Commit,
+                firstCommit = secondCommit,
+                expectedCommitCount = 7,
+                expectedAuthors = defaultAuthors,
+            ),
+            parseContribution(allOutput),
+        )
+    }
+
+    @Test
     fun `will correctly understand longer running branch`() {
         setupWithDefaults()
         val grgit = initializeGitRepo(listOf("first"))

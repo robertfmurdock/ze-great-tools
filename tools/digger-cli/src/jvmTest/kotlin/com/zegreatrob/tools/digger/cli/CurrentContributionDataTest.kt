@@ -47,6 +47,7 @@ class CurrentContributionDataTest : CurrentContributionTestSpec {
         noneRegex?.let { arguments += """--none-regex=$noneRegex""" }
         storyRegex?.let { arguments += """--story-id-regex=$storyRegex""" }
         easeRegex?.let { arguments += """--ease-regex=$easeRegex""" }
+        tagRegex?.let { arguments += """--tag-regex=$tagRegex""" }
     }
 
     override fun runCurrentContributionData(): String {

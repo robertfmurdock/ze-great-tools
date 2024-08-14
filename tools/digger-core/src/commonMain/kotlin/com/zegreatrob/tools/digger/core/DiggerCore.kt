@@ -12,7 +12,7 @@ class DiggerCore(
         with(gitWrapper) {
             val (currentTag, previousTag) = currentRelevantTags(
                 headCommitId = headCommitId(),
-                lastTwoTags = listTags().take(2),
+                lastTwoTags = tagRefs().take(2),
             )
             messageDigger.contribution(currentContributionCommits(previousTag))
                 .copy(
