@@ -4,7 +4,10 @@ class DiggerCore(
     private val label: String?,
     private val gitWrapper: DiggerGitWrapper,
     private val messageDigger: MessageDigger,
+    private val tagRegex: Regex = Defaults.tagRegex,
 ) {
+    private fun tagRefs() = gitWrapper.listTags().filter { tagRegex.matches(it.name) }
+
     fun currentContributionData() =
         with(gitWrapper) {
             val (currentTag, previousTag) = currentRelevantTags(
@@ -31,7 +34,7 @@ class DiggerCore(
     }
 
     fun allContributionData() = gitWrapper
-        .allContributionCommits()
+        .allContributionCommits(tagRefs(), gitWrapper.log())
         .map { range -> range.first to messageDigger.contribution(range.second.toList()) }
         .map { (tag, contribution) ->
             contribution.copy(
@@ -40,4 +43,8 @@ class DiggerCore(
                 tagDateTime = tag?.dateTime,
             )
         }
+
+    object Defaults {
+        val tagRegex: Regex = Regex(".*")
+    }
 }

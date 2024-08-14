@@ -37,6 +37,7 @@ class CurrentContributionDataTest : CurrentContributionTestSpec {
         noneRegex: String?,
         storyRegex: String?,
         easeRegex: String?,
+        tagRegex: String?,
     ) {
         setupWithDefaults()
         label?.let { arguments += "--label=$label" }

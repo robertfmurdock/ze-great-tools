@@ -34,10 +34,14 @@ open class DiggerExtension(objectFactory: ObjectFactory) {
     @Input
     var easeRegex: Property<Regex> = objectFactory.property<Regex>().convention(MessageDigger.Defaults.easeRegex)
 
+    @Input
+    var tagRegex: Property<Regex> = objectFactory.property<Regex>().convention(DiggerCore.Defaults.tagRegex)
+
     private val gitWrapper get() = DiggerGitWrapper(workingDirectory.get().absolutePath)
     private val core
         get() = DiggerCore(
             label = label.get().ifBlank { null },
+            tagRegex = tagRegex.get(),
             gitWrapper = gitWrapper,
             messageDigger = MessageDigger(
                 majorRegex = majorRegex.get(),

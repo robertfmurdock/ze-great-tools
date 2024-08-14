@@ -214,18 +214,18 @@ interface AllContributionTestSpec : SetupWithOverrides {
     }
 
     @Test
-    fun `will handle merge branches`() {
+    fun willHandleMergeBranches() {
         setupWithDefaults()
         val grgit = initializeGitRepo(listOf("first"))
         val firstCommit = grgit.head()
 
         val firstRelease = grgit.addTag("release")
         grgit.switchToNewBranch("branch1")
-
         val secondCommit = grgit.addCommitWithMessage("second")
-        grgit.checkout { it.branch = "main" }
 
+        grgit.checkout { it.branch = "main" }
         val thirdCommit = grgit.addCommitWithMessage("third")
+
         delayLongEnoughToAffectGitDate()
         val secondRelease = grgit.addTag("release2")
         grgit.checkout { it.branch = "branch1" }
@@ -248,6 +248,50 @@ interface AllContributionTestSpec : SetupWithOverrides {
                 toContribution(
                     lastCommit = thirdCommit,
                     tag = secondRelease,
+                    expectedAuthors = defaultAuthors,
+                ),
+                toContribution(
+                    lastCommit = firstCommit,
+                    tag = firstRelease,
+                    expectedAuthors = defaultAuthors,
+                ),
+            ),
+            parseAll(allOutput),
+        )
+    }
+
+    @Test
+    fun willIgnoreTagsThatDoNotMatchTagRegex() {
+        setupWithOverrides(
+            tagRegex = "v(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?",
+        )
+        val grgit = initializeGitRepo(listOf("first"))
+        val firstCommit = grgit.head()
+
+        val firstRelease = grgit.addTag("v1.2.8")
+        grgit.switchToNewBranch("branch1")
+        val secondCommit = grgit.addCommitWithMessage("second")
+
+        grgit.checkout { it.branch = "main" }
+        grgit.addCommitWithMessage("third")
+
+        delayLongEnoughToAffectGitDate()
+        grgit.addTag("unrelated-tag")
+        grgit.checkout { it.branch = "branch1" }
+        grgit.addCommitWithMessage("fourth")
+        grgit.checkout { it.branch = "main" }
+        val mergeCommit = grgit.mergeInBranch("branch1", "merge")
+        delayLongEnoughToAffectGitDate()
+        val thirdRelease = grgit.addTag("v20.176.37")
+
+        val allOutput = runAllContributionData()
+        assertEquals(
+            listOf(
+                toContribution(
+                    lastCommit = mergeCommit,
+                    firstCommit = secondCommit,
+                    expectedCommitCount = 4,
+                    tag = thirdRelease,
                     expectedAuthors = defaultAuthors,
                 ),
                 toContribution(

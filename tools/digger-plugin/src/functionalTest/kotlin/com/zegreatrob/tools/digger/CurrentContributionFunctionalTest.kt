@@ -34,6 +34,7 @@ class CurrentContributionFunctionalTest : CurrentContributionTestSpec {
         noneRegex: String?,
         storyRegex: String?,
         easeRegex: String?,
+        tagRegex: String?,
     ) {
         settingsFile.writeText("")
         ignoreFile.writeText(".gradle")

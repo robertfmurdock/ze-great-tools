@@ -19,6 +19,7 @@ class CurrentContributionData : CliktCommand() {
     private val noneRegex by option()
     private val storyIdRegex by option()
     private val easeRegex by option()
+    private val tagRegex by option()
 
     private val core
         get() = DiggerCore(
@@ -32,6 +33,7 @@ class CurrentContributionData : CliktCommand() {
                 storyIdRegex = storyIdRegex?.let(::Regex) ?: MessageDigger.Defaults.storyIdRegex,
                 easeRegex = easeRegex?.let(::Regex) ?: MessageDigger.Defaults.easeRegex,
             ),
+            tagRegex = tagRegex?.let(::Regex) ?: DiggerCore.Defaults.tagRegex,
         )
 
     override fun run() = core.currentContributionData()

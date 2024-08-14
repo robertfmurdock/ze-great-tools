@@ -35,6 +35,7 @@ class AllContributionDataTest : AllContributionTestSpec {
         noneRegex: String?,
         storyRegex: String?,
         easeRegex: String?,
+        tagRegex: String?,
     ) {
         setupWithDefaults()
         label?.let { arguments += "--label=$label" }
@@ -45,6 +46,7 @@ class AllContributionDataTest : AllContributionTestSpec {
         noneRegex?.let { arguments += "--none-regex=$noneRegex" }
         storyRegex?.let { arguments += "--story-id-regex=$storyRegex" }
         easeRegex?.let { arguments += "--ease-regex=$easeRegex" }
+        tagRegex?.let { arguments += "--tag-regex=$tagRegex" }
     }
 
     override fun runAllContributionData(): String {

@@ -9,5 +9,6 @@ interface SetupWithOverrides {
         noneRegex: String? = null,
         storyRegex: String? = null,
         easeRegex: String? = null,
+        tagRegex: String? = null,
     )
 }

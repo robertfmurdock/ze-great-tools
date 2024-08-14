@@ -1,13 +1,14 @@
 package com.zegreatrob.tools.digger.core
 
-fun DiggerGitWrapper.allContributionCommits(): List<Pair<TagRef?, List<CommitRef>>> {
-    val log = log()
-    val tags = listTags()
+fun DiggerGitWrapper.allContributionCommits(
+    tagRefs: List<TagRef>,
+    fullLog: List<CommitRef>,
+): List<Pair<TagRef?, List<CommitRef>>> = sortIntoTagSets(
+    tagRefs = tagRefs
         .distinctBy { it.commitId }
-        .filter { log.map(CommitRef::id).contains(it.commitId) }
-
-    return sortIntoTagSets(tags, log)
-}
+        .filter { fullLog.map(CommitRef::id).contains(it.commitId) },
+    log = fullLog,
+)
 
 fun DiggerGitWrapper.sortIntoTagSets(
     tagRefs: List<TagRef>,

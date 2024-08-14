@@ -19,10 +19,12 @@ class AllContributionData : CliktCommand() {
     private val noneRegex by option()
     private val storyIdRegex by option()
     private val easeRegex by option()
+    private val tagRegex by option()
 
     private val core
         get() = DiggerCore(
             label = label.ifBlank { dir.split("/").lastOrNull() },
+            tagRegex = tagRegex?.let(::Regex) ?: DiggerCore.Defaults.tagRegex,
             gitWrapper = DiggerGitWrapper(dir),
             messageDigger = MessageDigger(
                 majorRegex = majorRegex?.let(::Regex) ?: MessageDigger.Defaults.majorRegex,
