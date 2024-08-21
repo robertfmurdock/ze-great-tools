@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="git-wrapper-jvm">
+    <output-path>$PROJECT_DIR$/tools/git-wrapper/build/libs</output-path>
+    <root id="archive" name="git-wrapper-jvm.jar">
+      <element id="module-output" name="tools.git-wrapper.jvmMain" />
+    </root>
+  </artifact>
+</component>

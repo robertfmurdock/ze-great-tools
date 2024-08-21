@@ -1,4 +1,4 @@
-package com.zegreatrob.tools.digger.core
+package com.zegreatrob.tools.wrapper.git
 
 import java.io.File
 import java.nio.charset.Charset

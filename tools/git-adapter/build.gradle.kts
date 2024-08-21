@@ -16,11 +16,10 @@ kotlin {
 }
 
 dependencies {
-    commonMainApi(project(":digger-model"))
-    commonMainApi(project(":git-adapter"))
+    commonMainApi(platform(project(":dependency-bom")))
+    commonMainApi("org.jetbrains.kotlinx:kotlinx-datetime")
     commonTestImplementation(kotlin("test", embeddedKotlinVersion))
     "jvmTestImplementation"(kotlin("test-junit5", embeddedKotlinVersion))
-    "jvmTestImplementation"(project(":digger-test"))
 }
 
 tasks {

@@ -18,6 +18,7 @@
                   <project path="$PROJECT_DIR$/tools/digger-model" />
                   <project path="$PROJECT_DIR$/tools/digger-plugin" />
                   <project path="$PROJECT_DIR$/tools/digger-test" />
+                  <project path="$PROJECT_DIR$/tools/git-adapter" />
                   <project path="$PROJECT_DIR$/tools/tagger-plugin" />
                   <project path="$PROJECT_DIR$/tools/tools-bom" />
                 </projects>
@@ -45,6 +46,7 @@
             <option value="$PROJECT_DIR$/tools/digger-model" />
             <option value="$PROJECT_DIR$/tools/digger-plugin" />
             <option value="$PROJECT_DIR$/tools/digger-test" />
+            <option value="$PROJECT_DIR$/tools/git-adapter" />
             <option value="$PROJECT_DIR$/tools/tagger-plugin" />
             <option value="$PROJECT_DIR$/tools/tools-bom" />
           </set>

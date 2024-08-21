@@ -3,21 +3,22 @@ package com.zegreatrob.tools.digger.core
 import com.zegreatrob.tools.digger.addCommitWithMessage
 import com.zegreatrob.tools.digger.addTag
 import com.zegreatrob.tools.digger.delayLongEnoughToAffectGitDate
+import com.zegreatrob.tools.wrapper.git.GitAdapter
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.io.TempDir
 import java.io.File
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
-class DiggerGitWrapperTest {
+class GitAdapterTest {
 
     @field:TempDir
     lateinit var projectDir: File
-    private lateinit var wrapper: DiggerGitWrapper
+    private lateinit var wrapper: GitAdapter
 
     @BeforeTest
     fun setup() {
-        wrapper = DiggerGitWrapper(projectDir.absolutePath)
+        wrapper = GitAdapter(projectDir.absolutePath)
     }
 
     fun initializeGitRepo(commits: List<String>) = com.zegreatrob.tools.digger.initializeGitRepo(

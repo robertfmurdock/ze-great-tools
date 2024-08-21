@@ -1,8 +1,8 @@
 package com.zegreatrob.tools.digger
 
 import com.zegreatrob.tools.digger.core.DiggerCore
-import com.zegreatrob.tools.digger.core.DiggerGitWrapper
 import com.zegreatrob.tools.digger.core.MessageDigger
+import com.zegreatrob.tools.wrapper.git.GitAdapter
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
@@ -37,7 +37,7 @@ open class DiggerExtension(objectFactory: ObjectFactory) {
     @Input
     var tagRegex: Property<Regex> = objectFactory.property<Regex>().convention(DiggerCore.Defaults.tagRegex)
 
-    private val gitWrapper get() = DiggerGitWrapper(workingDirectory.get().absolutePath)
+    private val gitWrapper get() = GitAdapter(workingDirectory.get().absolutePath)
     private val core
         get() = DiggerCore(
             label = label.get().ifBlank { null },

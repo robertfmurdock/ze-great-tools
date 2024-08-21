@@ -1,6 +1,10 @@
 package com.zegreatrob.tools.digger.core
 
-fun DiggerGitWrapper.allContributionCommits(
+import com.zegreatrob.tools.wrapper.git.CommitRef
+import com.zegreatrob.tools.wrapper.git.GitAdapter
+import com.zegreatrob.tools.wrapper.git.TagRef
+
+fun GitAdapter.allContributionCommits(
     tagRefs: List<TagRef>,
     fullLog: List<CommitRef>,
 ): List<Pair<TagRef?, List<CommitRef>>> = sortIntoTagSets(
@@ -10,7 +14,7 @@ fun DiggerGitWrapper.allContributionCommits(
     log = fullLog,
 )
 
-fun DiggerGitWrapper.sortIntoTagSets(
+fun GitAdapter.sortIntoTagSets(
     tagRefs: List<TagRef>,
     log: List<CommitRef>,
 ): List<Pair<TagRef?, List<CommitRef>>> = tagRefs.tagPairs()

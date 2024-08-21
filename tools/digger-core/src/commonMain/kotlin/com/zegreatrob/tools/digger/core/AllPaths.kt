@@ -1,5 +1,7 @@
 package com.zegreatrob.tools.digger.core
 
+import com.zegreatrob.tools.wrapper.git.CommitRef
+
 fun allPaths(
     log: List<CommitRef>,
     firstTagCommit: CommitRef,

@@ -4,6 +4,8 @@ import com.zegreatrob.tools.digger.addCommitWithMessage
 import com.zegreatrob.tools.digger.initializeGitRepo
 import com.zegreatrob.tools.digger.mergeInBranch
 import com.zegreatrob.tools.digger.switchToNewBranch
+import com.zegreatrob.tools.wrapper.git.CommitRef
+import com.zegreatrob.tools.wrapper.git.GitAdapter
 import kotlinx.datetime.toKotlinInstant
 import org.ajoberstar.grgit.Commit
 import org.junit.jupiter.api.io.TempDir
@@ -16,7 +18,7 @@ class AllPathsTest {
     @field:TempDir
     lateinit var projectDir: File
 
-    private val diggerGitWrapper by lazy { DiggerGitWrapper(projectDir.absolutePath) }
+    private val diggerGitWrapper by lazy { GitAdapter(projectDir.absolutePath) }
 
     @Test
     fun willHandleSimplePathsEasily() {
