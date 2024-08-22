@@ -41,14 +41,16 @@ open class TaggerExtension(
     @Input
     var majorRegex = objectFactory.property<Regex>().convention(Regex("\\[major].*", RegexOption.IGNORE_CASE))
 
-    val lastVersionAndTag by lazy { lastVersionAndTag(GitAdapter(workingDirectory.get().absolutePath)) }
+    val gitAdapter get() = GitAdapter(workingDirectory.get().absolutePath)
+
+    val lastVersionAndTag by lazy { lastVersionAndTag(gitAdapter) }
 
     val version by lazy {
         val (previousVersionNumber, lastTagDescription) =
             lastVersionAndTag
                 ?: return@lazy "0.0.0"
         calculateNextVersion(
-            adapter = GitAdapter(workingDirectory.get().absolutePath),
+            adapter = gitAdapter,
             lastTagDescription = lastTagDescription,
             implicitPatch = implicitPatch.get(),
             versionRegex = versionRegex(),

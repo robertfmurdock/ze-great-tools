@@ -3,8 +3,9 @@ package com.zegreatrob.tools.tagger
 import com.zegreatrob.tools.adapter.git.CommitRef
 import com.zegreatrob.tools.adapter.git.GitAdapter
 import com.zegreatrob.tools.adapter.git.GitStatus
-import org.ajoberstar.grgit.Grgit
-import org.ajoberstar.grgit.Tag
+import com.zegreatrob.tools.adapter.git.TagRef
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 
 fun calculateNextVersion(
     adapter: GitAdapter,
@@ -86,19 +87,18 @@ fun GitStatus.canRelease(releaseBranch: String): Boolean =
         this.behind == 0 &&
         this.head == releaseBranch
 
-fun Grgit.tagReport() =
-    tag.list()
-        .filter { it.dateTime != null }
+fun tagReport(adapter: GitAdapter) =
+    adapter.listTags()
         .groupBy { tag ->
-            "${tag.dateTime?.year} Week ${tag.weekNumber()}"
+            "${tag.dateTime.toLocalDateTime(TimeZone.currentSystemDefault()).year} Week ${tag.weekNumber()}"
         }.toSortedMap()
         .map {
             "${it.key} has ${it.value.size} tags [${it.value.joinToString { tag -> tag.name }}]"
         }
         .joinToString("\n")
 
-private fun Tag.weekNumber() =
-    "${(dateTime?.dayOfYear ?: 0) / 7}".let {
+private fun TagRef.weekNumber() =
+    "${dateTime.toLocalDateTime(TimeZone.currentSystemDefault()).dayOfYear / 7}".let {
         if (it.length == 1) {
             "0$it"
         } else {

@@ -1,6 +1,6 @@
 package com.zegreatrob.tools.tagger
 
-import org.ajoberstar.grgit.Grgit
+import com.zegreatrob.tools.adapter.git.GitAdapter
 import org.ajoberstar.grgit.operation.PushOp
 import org.ajoberstar.grgit.operation.TagAddOp
 import org.gradle.api.DefaultTask
@@ -26,9 +26,9 @@ interface TaggerExtensionSyntax {
 
     @Internal
     fun isOnReleaseBranch(
-        grgit: Grgit,
+        adapter: GitAdapter,
         releaseBranch: String?,
-    ) = grgit.branch.current().name == releaseBranch
+    ) = adapter.status().head == releaseBranch
 }
 
 open class TagVersion :
@@ -44,7 +44,7 @@ open class TagVersion :
         if (
             !isSnapshot() &&
             headHasNoTag() &&
-            isOnReleaseBranch(grgit, releaseBranch)
+            isOnReleaseBranch(taggerExtension.gitAdapter, releaseBranch)
         ) {
             this.grgit.tag.add(
                 fun (it: TagAddOp) {
@@ -76,7 +76,7 @@ open class CommitReport :
     @TaskAction
     fun execute() {
         println("COMMIT REPORT-------")
-        println("--------------------${taggerExtension.grgitServiceExtension.service.get().grgit.tagReport()}")
+        println("--------------------${tagReport(taggerExtension.gitAdapter)}")
         println("COMMIT REPORT OVAH--")
     }
 }
@@ -89,8 +89,7 @@ open class ReleaseVersion :
 
     @TaskAction
     fun execute() {
-        val grgit = taggerExtension.grgitServiceExtension.service.get().grgit
-        if (isOnReleaseBranch(grgit, taggerExtension.releaseBranch) && isSnapshot()) {
+        if (isOnReleaseBranch(taggerExtension.gitAdapter, taggerExtension.releaseBranch) && isSnapshot()) {
             throw GradleException("Cannot release a snapshot")
         }
     }
