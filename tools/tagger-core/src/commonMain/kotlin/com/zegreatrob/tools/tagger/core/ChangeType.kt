@@ -4,9 +4,6 @@ import com.zegreatrob.tools.adapter.git.CommitRef
 import com.zegreatrob.tools.adapter.git.GitAdapter
 import com.zegreatrob.tools.adapter.git.GitStatus
 import com.zegreatrob.tools.adapter.git.TagRef
-import com.zegreatrob.tools.tagger.VersionRegex
-import com.zegreatrob.tools.tagger.asSemverComponents
-import com.zegreatrob.tools.tagger.changeType
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 
@@ -94,11 +91,12 @@ fun TaggerCore.tagReport() =
     adapter.listTags()
         .groupBy { tag ->
             "${tag.dateTime.toLocalDateTime(TimeZone.currentSystemDefault()).year} Week ${tag.weekNumber()}"
-        }.toSortedMap()
-        .map {
-            "${it.key} has ${it.value.size} tags [${it.value.joinToString { tag -> tag.name }}]"
         }
-        .joinToString("\n")
+        .toList()
+        .sortedBy { (key) -> key }
+        .joinToString("\n") { (key, value) ->
+            "$key has ${value.size} tags [${value.joinToString { tag -> tag.name }}]"
+        }
 
 private fun TagRef.weekNumber() =
     "${dateTime.toLocalDateTime(TimeZone.currentSystemDefault()).dayOfYear / 7}".let {
@@ -108,3 +106,30 @@ private fun TagRef.weekNumber() =
             it
         }
     }
+
+fun VersionRegex.changeType(message: String): ChangeType? = when {
+    unified?.containsMatchIn(message) == true -> findMatchType(message, unified)
+    major.matches(message) -> ChangeType.Major
+    minor.matches(message) -> ChangeType.Minor
+    patch.matches(message) -> ChangeType.Patch
+    none.matches(message) -> ChangeType.None
+    else -> null
+}
+
+private fun findMatchType(
+    message: String,
+    regex: Regex,
+): ChangeType? {
+    val groups = regex.matchEntire(message)?.groups
+    return when {
+        (groups.groupExists("major")) -> ChangeType.Major
+        (groups.groupExists("minor")) -> ChangeType.Minor
+        (groups.groupExists("patch")) -> ChangeType.Patch
+        (groups.groupExists("none")) -> ChangeType.None
+        else -> null
+    }
+}
+
+private fun MatchGroupCollection?.groupExists(groupName: String): Boolean =
+    runCatching { this?.get(groupName) != null }
+        .getOrDefault(false)

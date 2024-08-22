@@ -1,4 +1,4 @@
-package com.zegreatrob.tools.tagger
+package com.zegreatrob.tools.tagger.core
 
 import kotlin.test.Test
 import kotlin.test.assertEquals

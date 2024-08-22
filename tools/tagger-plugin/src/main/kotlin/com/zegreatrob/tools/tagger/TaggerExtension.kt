@@ -2,6 +2,7 @@ package com.zegreatrob.tools.tagger
 
 import com.zegreatrob.tools.adapter.git.GitAdapter
 import com.zegreatrob.tools.tagger.core.TaggerCore
+import com.zegreatrob.tools.tagger.core.VersionRegex
 import com.zegreatrob.tools.tagger.core.calculateNextVersion
 import com.zegreatrob.tools.tagger.core.lastVersionAndTag
 import org.gradle.api.GradleException

@@ -1,4 +1,4 @@
-package com.zegreatrob.tools.tagger
+package com.zegreatrob.tools.tagger.core
 
 fun String.asSemverComponents(): List<Int> = stripPrefix()
     .split(".")

@@ -1,4 +1,4 @@
-package com.zegreatrob.tools.tagger
+package com.zegreatrob.tools.tagger.core
 
 data class VersionRegex(
     val none: Regex,
