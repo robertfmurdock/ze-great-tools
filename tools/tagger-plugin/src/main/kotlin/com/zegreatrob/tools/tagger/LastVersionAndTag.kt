@@ -1,12 +1,10 @@
 package com.zegreatrob.tools.tagger
 
-import org.ajoberstar.grgit.Grgit
+import com.zegreatrob.tools.adapter.git.GitAdapter
 
-fun Grgit.lastVersionAndTag(): Pair<String, String>? {
-    val description: String? = describe { abbrev = 0 }
-    if (description == null) {
-        return null
-    }
+fun lastVersionAndTag(adapter: GitAdapter): Pair<String, String>? {
+    val description: String = adapter.describe(abbrev = 0)
+        ?: return null
     val previousVersionNumber =
         if (description.contains("-")) {
             description.substringBefore("-")

@@ -112,6 +112,11 @@ class GitAdapter(private val workingDirectory: String) {
 
     private fun statusValue(lines: List<String>, prefix: String) =
         lines.find { it.startsWith(prefix) }?.substring(prefix.length + 1)
+
+    fun describe(abbrev: Int): String? = runCatching {
+        runProcess(listOf("git", "describe", "--abbrev=$abbrev"), workingDirectory)
+            .trim()
+    }.getOrNull()
 }
 
 data class GitStatus(

@@ -41,9 +41,7 @@ open class TaggerExtension(
     @Input
     var majorRegex = objectFactory.property<Regex>().convention(Regex("\\[major].*", RegexOption.IGNORE_CASE))
 
-    private val grgit get() = grgitServiceExtension.service.get().grgit
-
-    val lastVersionAndTag by lazy { grgit.lastVersionAndTag() }
+    val lastVersionAndTag by lazy { lastVersionAndTag(GitAdapter(workingDirectory.get().absolutePath)) }
 
     val version by lazy {
         val (previousVersionNumber, lastTagDescription) =
