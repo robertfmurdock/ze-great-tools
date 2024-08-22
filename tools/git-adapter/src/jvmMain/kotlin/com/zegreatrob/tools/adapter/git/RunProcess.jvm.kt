@@ -10,7 +10,7 @@ actual fun runProcess(args: List<String>, workingDirectory: String): String {
     val outputText = process.inputStream.readAllBytes().toString(Charset.defaultCharset())
     val error = process.errorStream.readAllBytes().toString(Charset.defaultCharset())
     process.waitFor()
-    if (error.isNotEmpty()) {
+    if (process.exitValue() != 0) {
         throw Error(error)
     }
     return outputText

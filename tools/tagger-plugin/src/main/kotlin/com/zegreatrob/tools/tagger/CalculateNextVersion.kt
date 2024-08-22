@@ -21,7 +21,8 @@ fun calculateNextVersion(
             ?: previousVersionNumber
         )
 
-    return if (adapter.status().canRelease(releaseBranch) && currentVersionNumber != previousVersionNumber) {
+    return if (adapter.status().canRelease(releaseBranch) && currentVersionNumber != previousVersionNumber
+    ) {
         currentVersionNumber
     } else {
         "$currentVersionNumber-SNAPSHOT"

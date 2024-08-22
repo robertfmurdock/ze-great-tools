@@ -1,22 +1,25 @@
 package tagger
 
+import com.zegreatrob.tools.adapter.git.GitAdapter
 import org.ajoberstar.grgit.Grgit
 import org.ajoberstar.grgit.operation.AddOp
 import org.ajoberstar.grgit.operation.BranchChangeOp
-import org.ajoberstar.grgit.operation.CheckoutOp
 import org.ajoberstar.grgit.operation.CommitOp
+import org.ajoberstar.grgit.operation.InitOp
 import org.ajoberstar.grgit.operation.RemoteAddOp
 import org.ajoberstar.grgit.operation.TagAddOp
 import org.gradle.testkit.runner.GradleRunner
 import org.junit.jupiter.api.io.TempDir
 import java.io.File
 import java.io.FileOutputStream
+import kotlin.io.path.absolutePathString
+import kotlin.io.path.createTempDirectory
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertContains
 import kotlin.test.assertEquals
 
-class TaggerPluginFunctionalTest {
+class TaggerPluginCalculateVersionFunctionalTest {
     @field:TempDir
     lateinit var projectDir: File
 
@@ -26,6 +29,7 @@ class TaggerPluginFunctionalTest {
 
     @BeforeTest
     fun setup() {
+        println("project dir $projectDir")
         settingsFile.writeText("")
         ignoreFile.writeText(".gradle")
     }
@@ -38,7 +42,7 @@ class TaggerPluginFunctionalTest {
                 id("com.zegreatrob.tools.tagger")
             }
             tagger {
-                releaseBranch = "main"
+                releaseBranch = "master"
             }
 
             """.trimIndent(),
@@ -56,6 +60,45 @@ class TaggerPluginFunctionalTest {
     }
 
     @Test
+    fun tagWillTagAndPushSuccessfully() {
+        buildFile.writeText(
+            """
+            plugins {
+                id("com.zegreatrob.tools.tagger")
+            }
+            tagger {
+                releaseBranch = "master"
+            }
+
+            """.trimIndent(),
+        )
+
+        val originDirectory = createTempDirectory()
+        val originGrgit = Grgit.init(fun InitOp.() {
+            this.dir = originDirectory.absolutePathString()
+        })
+        disableGpgSign(originDirectory.toFile())
+        originGrgit.commit(fun CommitOp.() {
+            this.message = "init"
+        })
+        val grgit = initializeGitRepo(
+            listOf("[patch] commit 1", "[patch] commit 2"),
+            remoteUrl = originDirectory.absolutePathString(),
+        )
+        grgit.push()
+
+        val runner = GradleRunner.create()
+        runner.forwardOutput()
+        runner.withPluginClasspath()
+        runner.withArguments("tag", "-Pversion=1.0.0")
+        runner.withProjectDir(projectDir)
+        runner.build()
+
+        val gitAdapter = GitAdapter(this.projectDir.absolutePath)
+        assertEquals("1.0.0", gitAdapter.showTag("HEAD"))
+    }
+
+    @Test
     fun `calculating version when current commit already has tag will use tag`() {
         buildFile.writeText(
             """
@@ -63,14 +106,14 @@ class TaggerPluginFunctionalTest {
                 id("com.zegreatrob.tools.tagger")
             }
             tagger {
-                releaseBranch = "main"
+                releaseBranch = "master"
             }
 
             """.trimIndent(),
         )
 
         val grgit = Grgit.init(mapOf("dir" to projectDir.absolutePath))
-        disableGpgSign()
+        disableGpgSign(projectDir)
         grgit.add(
             fun(it: AddOp) {
                 it.patterns = setOf(".")
@@ -111,7 +154,7 @@ class TaggerPluginFunctionalTest {
                 id("com.zegreatrob.tools.tagger")
             }
             tagger {
-                releaseBranch = "main"
+                releaseBranch = "master"
             }
             """.trimIndent(),
         )
@@ -135,7 +178,7 @@ class TaggerPluginFunctionalTest {
                 id("com.zegreatrob.tools.tagger")
             }
             tagger {
-                releaseBranch = "main"
+                releaseBranch = "master"
                 implicitPatch.set(false)
             }
             """.trimIndent(),
@@ -160,7 +203,7 @@ class TaggerPluginFunctionalTest {
                 id("com.zegreatrob.tools.tagger")
             }
             tagger {
-                releaseBranch = "main"
+                releaseBranch = "master"
                 implicitPatch.set(false)
             }
             """.trimIndent(),
@@ -185,7 +228,7 @@ class TaggerPluginFunctionalTest {
                 id("com.zegreatrob.tools.tagger")
             }
             tagger {
-                releaseBranch = "main"
+                releaseBranch = "master"
                 implicitPatch.set(true)
             }
             """.trimIndent(),
@@ -210,7 +253,7 @@ class TaggerPluginFunctionalTest {
                 id("com.zegreatrob.tools.tagger")
             }
             tagger {
-                releaseBranch = "main"
+                releaseBranch = "master"
                 implicitPatch.set(true)
             }
             """.trimIndent(),
@@ -235,7 +278,7 @@ class TaggerPluginFunctionalTest {
                 id("com.zegreatrob.tools.tagger")
             }
             tagger {
-                releaseBranch = "main"
+                releaseBranch = "master"
                 implicitPatch.set(true)
             }
             """.trimIndent(),
@@ -261,7 +304,7 @@ class TaggerPluginFunctionalTest {
             }
             
             tagger {
-                releaseBranch = "main"
+                releaseBranch = "master"
             }
             """.trimIndent(),
         )
@@ -286,7 +329,7 @@ class TaggerPluginFunctionalTest {
             }
             
             tagger {
-                releaseBranch = "main"
+                releaseBranch = "master"
                 implicitPatch.set(false)
                 majorRegex.set(Regex(".*(big).*"))
             }
@@ -313,7 +356,7 @@ class TaggerPluginFunctionalTest {
             }
             
             tagger {
-                releaseBranch = "main"
+                releaseBranch = "master"
                 implicitPatch.set(false)
                 versionRegex.set(Regex("(?<major>.*big.*)?(?<minor>.*mid.*)?(?<patch>.*widdle.*)?(?<none>.*no.*)?"))
             }
@@ -324,7 +367,10 @@ class TaggerPluginFunctionalTest {
         val runner = GradleRunner.create()
         runner.forwardOutput()
         runner.withPluginClasspath()
-        runner.withArguments("calculateVersion", "-q")
+        runner.withArguments(
+            "calculateVersion",
+            "-q",
+        )
         runner.withProjectDir(projectDir)
         val result = runner.build()
 
@@ -340,7 +386,7 @@ class TaggerPluginFunctionalTest {
             }
             
             tagger {
-                releaseBranch = "main"
+                releaseBranch = "master"
                 implicitPatch.set(false)
                 versionRegex.set(Regex("(?<major>.*big.*)?(?<minor>.*mid.*)?(?<patch>.*widdle.*)?(?<none>.*no.*)?"))
             }
@@ -367,7 +413,7 @@ class TaggerPluginFunctionalTest {
             }
             
             tagger {
-                releaseBranch = "main"
+                releaseBranch = "master"
                 implicitPatch.set(false)
                 minorRegex.set(Regex(".*(middle).*"))
             }
@@ -394,7 +440,7 @@ class TaggerPluginFunctionalTest {
             }
             
             tagger {
-                releaseBranch = "main"
+                releaseBranch = "master"
                 implicitPatch.set(false)
                 patchRegex.set(Regex(".*(tiny).*"))
             }
@@ -421,7 +467,7 @@ class TaggerPluginFunctionalTest {
             }
             
             tagger {
-                releaseBranch = "main"
+                releaseBranch = "master"
                 implicitPatch.set(false)
                 versionRegex.set(Regex("(?<major>.*big.*)?(?<minor>.*mid.*)?(?<patch>.*widdle.*)?(?<none>.*no.*)?"))
             }
@@ -448,7 +494,7 @@ class TaggerPluginFunctionalTest {
             }
             
             tagger {
-                releaseBranch = "main"
+                releaseBranch = "master"
                 implicitPatch.set(true)
                 noneRegex.set(Regex(".*(no).*"))
             }
@@ -475,7 +521,7 @@ class TaggerPluginFunctionalTest {
             }
             
             tagger {
-                releaseBranch = "main"
+                releaseBranch = "master"
                 implicitPatch.set(true)
                 versionRegex.set(Regex("(?<major>.*big.*)?(?<minor>.*mid.*)?(?<patch>.*widdle.*)?(?<none>.*no.*)?", RegexOption.DOT_MATCHES_ALL))
             }
@@ -502,7 +548,7 @@ class TaggerPluginFunctionalTest {
             }
             
             tagger {
-                releaseBranch = "main"
+                releaseBranch = "master"
                 implicitPatch.set(true)
                 versionRegex.set(Regex(".*"))
             }
@@ -532,7 +578,7 @@ class TaggerPluginFunctionalTest {
             }
             
             tagger {
-                releaseBranch = "main"
+                releaseBranch = "master"
             }
 
             """.trimIndent(),
@@ -551,9 +597,11 @@ class TaggerPluginFunctionalTest {
     private fun initializeGitRepo(
         additionalCommits: List<String> = listOf(),
         initialTag: String? = null,
-    ) {
-        val grgit = Grgit.init(mapOf("dir" to projectDir.absolutePath))
-        disableGpgSign()
+        remoteUrl: String = projectDir.absolutePath,
+        directory: String = projectDir.absolutePath,
+    ): Grgit {
+        val grgit = Grgit.init(mapOf("dir" to directory))
+        disableGpgSign(File(directory))
         grgit.add(
             fun AddOp.() {
                 patterns = setOf(settingsFile.name, buildFile.name, ignoreFile.name)
@@ -583,27 +631,22 @@ class TaggerPluginFunctionalTest {
         grgit.remote.add(
             fun RemoteAddOp.() {
                 this.name = "origin"
-                this.url = projectDir.absolutePath
-            },
-        )
-        grgit.checkout(
-            fun CheckoutOp.() {
-                branch = "main"
-                createBranch = true
+                this.url = remoteUrl
             },
         )
         grgit.pull()
         grgit.branch.change(
             fun BranchChangeOp.() {
-                this.name = "main"
-                this.startPoint = "origin/main"
+                this.name = "master"
+                this.startPoint = "origin/master"
                 this.mode = BranchChangeOp.Mode.TRACK
             },
         )
+        return grgit
     }
 
-    private fun disableGpgSign() {
-        FileOutputStream(projectDir.resolve(".git/config"), true)
+    private fun disableGpgSign(directory: File) {
+        FileOutputStream(directory.resolve(".git/config"), true)
             .writer().use {
                 it.write("[commit]\n        gpgsign = false")
             }

@@ -28,7 +28,7 @@ class GitAdapter(private val workingDirectory: String) {
         )
     }
 
-    fun pushWithTags() {
+    fun pushTags() {
         runProcess(listOf("git", "push", "--tags"), workingDirectory)
     }
 
@@ -123,25 +123,29 @@ class GitAdapter(private val workingDirectory: String) {
             "--ahead-behind",
         ),
         workingDirectory,
-    ).let { output ->
-        val lines = output.split("\n")
-        val head = lines.findByPrefix("# branch.head")
-        val upstream = lines.findByPrefix("# branch.upstream")
-        val (a, b) = lines.findByPrefix("# branch.ab")?.split(" ") ?: listOf("-1", "-1")
-        GitStatus(
-            isClean = lines
-                .filterNot { it.startsWith("#") }
-                .filterNot(String::isBlank)
-                .isEmpty(),
-            ahead = a.toInt(),
-            behind = b.toInt(),
-            head = head ?: "",
-            upstream = upstream ?: "",
-        )
-    }
+    )
+        .let { output ->
+            val lines = output.split("\n")
+            val head = lines.findByPrefix("# branch.head ")
+            val upstream = lines.findByPrefix("# branch.upstream ")
+            val (a, b) = lines.findByPrefix("# branch.ab ")
+                ?.split(" ")
+                ?.map { it.substring(1) }
+                ?: listOf("-1", "-1")
+            GitStatus(
+                isClean = lines
+                    .filterNot { it.startsWith("#") }
+                    .filterNot(String::isBlank)
+                    .isEmpty(),
+                ahead = a.toInt(),
+                behind = b.toInt(),
+                head = head ?: "",
+                upstream = upstream ?: "",
+            )
+        }
 
     private fun List<String>.findByPrefix(prefix: String) =
-        find { it.startsWith(prefix) }?.substring(prefix.length + 1)
+        find { it.startsWith(prefix) }?.substring(prefix.length)
 
     fun describe(abbrev: Int): String? = runCatching {
         runProcess(listOf("git", "describe", "--abbrev=$abbrev"), workingDirectory)

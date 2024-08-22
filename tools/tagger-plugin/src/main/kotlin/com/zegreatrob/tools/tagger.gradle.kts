@@ -35,6 +35,7 @@ tasks {
 
     val tag by registering(TagVersion::class) {
         taggerExtension = tagger
+        version = "${project.version}"
         mustRunAfter(check)
 
         mustRunAfter(

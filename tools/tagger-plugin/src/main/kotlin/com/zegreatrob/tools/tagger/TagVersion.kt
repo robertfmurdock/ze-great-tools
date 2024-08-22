@@ -13,9 +13,6 @@ interface TaggerExtensionSyntax {
     @get:Internal
     val releaseBranch get() = taggerExtension.releaseBranch
 
-    @get:Internal
-    val version get() = taggerExtension.version
-
     @Internal
     fun isSnapshot() = taggerExtension.isSnapshot
 
@@ -32,20 +29,34 @@ open class TagVersion :
     @Input
     override lateinit var taggerExtension: TaggerExtension
 
+    @Input
+    lateinit var version: String
+
     override fun getEnabled(): Boolean = !isSnapshot()
 
     @TaskAction
     fun execute() {
         val gitAdapter = taggerExtension.gitAdapter
-        if (
-            !isSnapshot() &&
-            gitAdapter.showTag("HEAD") == null &&
-            isOnReleaseBranch(gitAdapter, releaseBranch)
-        ) {
-            gitAdapter.newAnnotatedTag(version, "HEAD")
-            gitAdapter.pushWithTags()
+        val isSnapshot = isSnapshot()
+        val headTag = gitAdapter.showTag("HEAD")
+        val alreadyTagged = headTag != null
+        val headBranch = gitAdapter.status().head
+        val isNotOnReleaseBranch = headBranch != releaseBranch
+        if (isSnapshot || alreadyTagged || isNotOnReleaseBranch) {
+            logger.warn(
+                "skipping tag due to ${
+                    mapOf(
+                        isSnapshot to "being snapshot",
+                        alreadyTagged to "already tagged $headTag",
+                        isNotOnReleaseBranch to "not on release branch $releaseBranch - branch was $headBranch",
+                    )
+                        .filterKeys { it }
+                        .values.joinToString(", ")
+                }",
+            )
         } else {
-            logger.warn("skipping tag")
+            gitAdapter.newAnnotatedTag(version, "HEAD")
+            gitAdapter.pushTags()
         }
     }
 }
