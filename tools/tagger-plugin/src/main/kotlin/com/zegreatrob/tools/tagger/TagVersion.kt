@@ -43,16 +43,16 @@ open class TagVersion :
     fun execute() {
         if (
             !isSnapshot() &&
-            headHasNoTag() &&
+            taggerExtension.gitAdapter.showTag("HEAD") == null &&
             isOnReleaseBranch(taggerExtension.gitAdapter, releaseBranch)
         ) {
             this.grgit.tag.add(
-                fun (it: TagAddOp) {
+                fun(it: TagAddOp) {
                     it.name = version
                 },
             )
             this.grgit.push(
-                fun (it: PushOp) {
+                fun(it: PushOp) {
                     it.tags = true
                 },
             )
@@ -60,11 +60,6 @@ open class TagVersion :
             logger.warn("skipping tag")
         }
     }
-
-    private fun headHasNoTag(): Boolean =
-        grgit.head().let { head ->
-            grgit.resolve.toTagName(head.id) == head.id
-        }
 }
 
 open class CommitReport :

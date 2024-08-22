@@ -53,6 +53,18 @@ class GitAdapter(private val workingDirectory: String) {
         ),
     )
 
+    fun showTag(ref: String): String? = runProcess(
+        listOf(
+            "git",
+            "show",
+            ref,
+            "--format=%D",
+            "--no-patch",
+        ),
+        workingDirectory,
+    ).split(", ")
+        .findByPrefix("tag: ")
+
     fun logWithRange(begin: String, end: String? = null): List<CommitRef> = parseLog(
         runProcess(
             listOf(
@@ -95,9 +107,9 @@ class GitAdapter(private val workingDirectory: String) {
         workingDirectory,
     ).let { output ->
         val lines = output.split("\n")
-        val head = statusValue(lines, "# branch.head")
-        val upstream = statusValue(lines, "# branch.upstream")
-        val (a, b) = statusValue(lines, "# branch.ab")?.split(" ") ?: listOf("-1", "-1")
+        val head = lines.findByPrefix("# branch.head")
+        val upstream = lines.findByPrefix("# branch.upstream")
+        val (a, b) = lines.findByPrefix("# branch.ab")?.split(" ") ?: listOf("-1", "-1")
         GitStatus(
             isClean = lines
                 .filterNot { it.startsWith("#") }
@@ -110,8 +122,8 @@ class GitAdapter(private val workingDirectory: String) {
         )
     }
 
-    private fun statusValue(lines: List<String>, prefix: String) =
-        lines.find { it.startsWith(prefix) }?.substring(prefix.length + 1)
+    private fun List<String>.findByPrefix(prefix: String) =
+        find { it.startsWith(prefix) }?.substring(prefix.length + 1)
 
     fun describe(abbrev: Int): String? = runCatching {
         runProcess(listOf("git", "describe", "--abbrev=$abbrev"), workingDirectory)
