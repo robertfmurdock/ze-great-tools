@@ -477,7 +477,7 @@ class TaggerPluginFunctionalTest {
             tagger {
                 releaseBranch = "main"
                 implicitPatch.set(true)
-                versionRegex.set(Regex("(?<major>.*big.*)?(?<minor>.*mid.*)?(?<patch>.*widdle.*)?(?<none>.*no.*)?"))
+                versionRegex.set(Regex("(?<major>.*big.*)?(?<minor>.*mid.*)?(?<patch>.*widdle.*)?(?<none>.*no.*)?", RegexOption.DOT_MATCHES_ALL))
             }
             """.trimIndent(),
         )

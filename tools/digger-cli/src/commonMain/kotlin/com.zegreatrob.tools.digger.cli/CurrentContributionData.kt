@@ -4,10 +4,10 @@ import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.option
+import com.zegreatrob.tools.adapter.git.GitAdapter
 import com.zegreatrob.tools.digger.core.DiggerCore
 import com.zegreatrob.tools.digger.core.MessageDigger
 import com.zegreatrob.tools.digger.json.toJsonString
-import com.zegreatrob.tools.wrapper.git.GitAdapter
 
 class CurrentContributionData : CliktCommand() {
     private val dir by argument("git-repo")

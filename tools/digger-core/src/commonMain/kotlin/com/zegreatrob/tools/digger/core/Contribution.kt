@@ -1,7 +1,7 @@
 package com.zegreatrob.tools.digger.core
 
+import com.zegreatrob.tools.adapter.git.CommitRef
 import com.zegreatrob.tools.digger.model.Contribution
-import com.zegreatrob.tools.wrapper.git.CommitRef
 
 fun MessageDigger.contribution(commitRefs: List<CommitRef>): Contribution {
     val messageDigResults =

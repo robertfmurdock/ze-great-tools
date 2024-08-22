@@ -1,42 +1,41 @@
 package com.zegreatrob.tools.tagger
 
+import com.zegreatrob.tools.adapter.git.CommitRef
+import com.zegreatrob.tools.adapter.git.GitAdapter
 import org.ajoberstar.grgit.BranchStatus
-import org.ajoberstar.grgit.Commit
 import org.ajoberstar.grgit.Grgit
 import org.ajoberstar.grgit.Tag
 import org.ajoberstar.grgit.operation.BranchStatusOp
-import org.ajoberstar.grgit.operation.LogOp
 
-fun Grgit.calculateNextVersion(
+fun calculateNextVersion(
+    grgit: Grgit,
+    adapter: GitAdapter,
     lastTagDescription: String,
     implicitPatch: Boolean,
     versionRegex: VersionRegex,
     previousVersionNumber: String,
     releaseBranch: String,
 ): String {
-    val incrementComponent = findAppropriateIncrement(lastTagDescription, implicitPatch, versionRegex)
+    val incrementComponent = findAppropriateIncrement(adapter, lastTagDescription, implicitPatch, versionRegex)
     val currentVersionNumber = (
         incrementComponent?.increment(previousVersionNumber.asSemverComponents())
             ?: previousVersionNumber
         )
 
-    return if (canRelease(releaseBranch) && currentVersionNumber != previousVersionNumber) {
+    return if (grgit.canRelease(releaseBranch) && currentVersionNumber != previousVersionNumber) {
         currentVersionNumber
     } else {
         "$currentVersionNumber-SNAPSHOT"
     }
 }
 
-private fun Grgit.findAppropriateIncrement(
+private fun findAppropriateIncrement(
+    gitAdapter: GitAdapter,
     previousTag: String,
     implicitPatch: Boolean,
     minorRegex: VersionRegex,
 ): ChangeType? =
-    log(
-        fun(it: LogOp) {
-            it.range(previousTag, "HEAD")
-        },
-    )
+    gitAdapter.logWithRange("HEAD", "^$previousTag")
         .also { if (it.isEmpty()) return null }
         .map { it.changeType(minorRegex) ?: if (implicitPatch) ChangeType.Patch else null }
         .fold(null, ::highestPriority)
@@ -52,7 +51,7 @@ private fun highestPriority(
     else -> right
 }
 
-private fun Commit.changeType(versionRegex: VersionRegex) = versionRegex.changeType(shortMessage.lowercase())
+private fun CommitRef.changeType(versionRegex: VersionRegex) = versionRegex.changeType(fullMessage.trim())
 
 enum class ChangeType(val priority: Int) {
     Major(3) {

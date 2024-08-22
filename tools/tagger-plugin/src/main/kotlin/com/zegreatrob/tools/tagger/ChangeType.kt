@@ -1,14 +1,13 @@
 package com.zegreatrob.tools.tagger
 
-fun VersionRegex.changeType(message: String) =
-    when {
-        unified?.matches(message) == true -> findMatchType(message, unified)
-        major.matches(message) -> ChangeType.Major
-        minor.matches(message) -> ChangeType.Minor
-        patch.matches(message) -> ChangeType.Patch
-        none.matches(message) -> ChangeType.None
-        else -> null
-    }
+fun VersionRegex.changeType(message: String): ChangeType? = when {
+    unified?.containsMatchIn(message) == true -> findMatchType(message, unified)
+    major.matches(message) -> ChangeType.Major
+    minor.matches(message) -> ChangeType.Minor
+    patch.matches(message) -> ChangeType.Patch
+    none.matches(message) -> ChangeType.None
+    else -> null
+}
 
 private fun findMatchType(
     message: String,

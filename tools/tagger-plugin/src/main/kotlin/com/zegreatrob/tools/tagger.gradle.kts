@@ -14,6 +14,8 @@ plugins {
 
 val tagger = project.extensions.create("tagger", TaggerExtension::class, grgitService, project)
 
+tagger.workingDirectory.convention(project.rootDir)
+
 tasks {
     val exportToGithub = project.findProperty("exportToGithub")
     val previousVersion by registering(PreviousVersion::class) {

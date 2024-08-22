@@ -9,9 +9,7 @@ kotlin {
 
 dependencies {
     commonMainImplementation(platform(project(":dependency-bom")))
-    commonMainImplementation(project(":digger-core"))
-    commonMainImplementation(project(":digger-json"))
-    commonMainApi(project(":git-test"))
+    commonMainImplementation(project(":git-adapter"))
     "jvmMainApi"(libs.org.ajoberstar.grgit.grgit.core)
     "jvmMainApi"(kotlin("test-junit5", embeddedKotlinVersion))
     "jvmMainApi"("org.junit.jupiter:junit-jupiter-api")

@@ -1,7 +1,5 @@
-package com.zegreatrob.tools.digger
+package com.zegreatrob.tools.test.git
 
-import com.zegreatrob.tools.digger.json.ContributionParser.parseContribution
-import com.zegreatrob.tools.digger.json.ContributionParser.parseContributions
 import org.ajoberstar.grgit.Commit
 import org.ajoberstar.grgit.Grgit
 import org.ajoberstar.grgit.operation.MergeOp.Mode
@@ -59,7 +57,7 @@ fun Grgit.addTag(initialTag: String?): org.ajoberstar.grgit.Tag? = tag.add(
     },
 )
 
-fun Grgit.addCommitWithMessage(message: String): org.ajoberstar.grgit.Commit =
+fun Grgit.addCommitWithMessage(message: String): Commit =
     commit(
         fun(it: org.ajoberstar.grgit.operation.CommitOp) {
             it.author = org.ajoberstar.grgit.Person("Funky Testerson", "funk@test.io")
@@ -98,11 +96,3 @@ private fun disableGpgSign(projectDir: String) {
             it.write("[commit]\n        gpgsign = false")
         }
 }
-
-fun parseCurrentAuthors(output: String) = parseContribution(output)?.authors
-
-fun parseSemver(output: String) = parseContribution(output)?.semver
-
-fun parseStoryId(output: String) = parseContribution(output)?.storyId
-
-fun parseAll(output: String) = parseContributions(output)

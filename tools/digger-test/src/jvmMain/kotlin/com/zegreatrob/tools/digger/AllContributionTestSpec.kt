@@ -1,6 +1,14 @@
 package com.zegreatrob.tools.digger
 
 import com.zegreatrob.tools.digger.model.Contribution
+import com.zegreatrob.tools.test.git.addCommitWithMessage
+import com.zegreatrob.tools.test.git.addTag
+import com.zegreatrob.tools.test.git.defaultAuthors
+import com.zegreatrob.tools.test.git.delayLongEnoughToAffectGitDate
+import com.zegreatrob.tools.test.git.ffOnlyInBranch
+import com.zegreatrob.tools.test.git.initializeGitRepo
+import com.zegreatrob.tools.test.git.mergeInBranch
+import com.zegreatrob.tools.test.git.switchToNewBranch
 import kotlinx.datetime.toKotlinInstant
 import org.ajoberstar.grgit.Commit
 import org.ajoberstar.grgit.Tag

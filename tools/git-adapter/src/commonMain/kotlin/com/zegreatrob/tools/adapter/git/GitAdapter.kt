@@ -1,4 +1,6 @@
-package com.zegreatrob.tools.wrapper.git
+package com.zegreatrob.tools.adapter.git
+
+import kotlinx.datetime.Instant
 
 class GitAdapter(private val workingDirectory: String) {
 
@@ -30,7 +32,7 @@ class GitAdapter(private val workingDirectory: String) {
                 TagRef(
                     name = commaSplit.subList(0, commaSplit.size - 2).joinToString(""),
                     commitId = commaSplit.reversed()[1],
-                    dateTime = kotlinx.datetime.Instant.Companion.parse(commaSplit.last()),
+                    dateTime = Instant.parse(commaSplit.last()),
                 )
             } else {
                 null
@@ -76,7 +78,7 @@ class GitAdapter(private val workingDirectory: String) {
                 id = elements[0],
                 authorEmail = elements[1],
                 committerEmail = elements[2],
-                dateTime = kotlinx.datetime.Instant.Companion.parse(elements[3]),
+                dateTime = Instant.parse(elements[3]),
                 parents = elements[4].split(" ").filter { it.isNotEmpty() },
                 fullMessage = elements.subList(5, elements.size).joinToString("\n"),
             )

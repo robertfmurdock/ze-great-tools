@@ -1,11 +1,11 @@
 package com.zegreatrob.tools.digger.core
 
-import com.zegreatrob.tools.digger.addCommitWithMessage
-import com.zegreatrob.tools.digger.initializeGitRepo
-import com.zegreatrob.tools.digger.mergeInBranch
-import com.zegreatrob.tools.digger.switchToNewBranch
-import com.zegreatrob.tools.wrapper.git.CommitRef
-import com.zegreatrob.tools.wrapper.git.GitAdapter
+import com.zegreatrob.tools.adapter.git.CommitRef
+import com.zegreatrob.tools.adapter.git.GitAdapter
+import com.zegreatrob.tools.test.git.addCommitWithMessage
+import com.zegreatrob.tools.test.git.initializeGitRepo
+import com.zegreatrob.tools.test.git.mergeInBranch
+import com.zegreatrob.tools.test.git.switchToNewBranch
 import kotlinx.datetime.toKotlinInstant
 import org.ajoberstar.grgit.Commit
 import org.junit.jupiter.api.io.TempDir

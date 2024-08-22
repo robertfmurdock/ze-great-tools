@@ -1,8 +1,8 @@
 package com.zegreatrob.tools.digger
 
+import com.zegreatrob.tools.adapter.git.GitAdapter
 import com.zegreatrob.tools.digger.core.DiggerCore
 import com.zegreatrob.tools.digger.core.MessageDigger
-import com.zegreatrob.tools.wrapper.git.GitAdapter
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input

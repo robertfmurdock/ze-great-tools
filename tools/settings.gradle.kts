@@ -16,6 +16,7 @@ include("digger-model")
 include("digger-plugin")
 include("digger-test")
 include("git-adapter")
+include("git-test")
 include("tagger-plugin")
 include("tools-bom")
 

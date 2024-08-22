@@ -1,6 +1,6 @@
 package com.zegreatrob.tools.digger.core
 
-import com.zegreatrob.tools.wrapper.git.CommitRef
+import com.zegreatrob.tools.adapter.git.CommitRef
 
 fun allPaths(
     log: List<CommitRef>,

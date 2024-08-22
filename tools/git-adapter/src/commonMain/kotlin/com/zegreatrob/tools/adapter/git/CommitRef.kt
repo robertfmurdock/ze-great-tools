@@ -1,4 +1,4 @@
-package com.zegreatrob.tools.wrapper.git
+package com.zegreatrob.tools.adapter.git
 
 import kotlinx.datetime.Instant
 

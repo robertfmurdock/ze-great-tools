@@ -1,7 +1,7 @@
 package com.zegreatrob.tools.digger.core
 
-import com.zegreatrob.tools.wrapper.git.GitAdapter
-import com.zegreatrob.tools.wrapper.git.TagRef
+import com.zegreatrob.tools.adapter.git.GitAdapter
+import com.zegreatrob.tools.adapter.git.TagRef
 
 class DiggerCore(
     private val label: String?,

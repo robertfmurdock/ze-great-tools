@@ -1,9 +1,9 @@
-package com.zegreatrob.tools.digger.core
+package com.zegreatrob.tools.adapter.git
 
-import com.zegreatrob.tools.digger.addCommitWithMessage
-import com.zegreatrob.tools.digger.addTag
-import com.zegreatrob.tools.digger.delayLongEnoughToAffectGitDate
-import com.zegreatrob.tools.wrapper.git.GitAdapter
+import com.zegreatrob.tools.test.git.addCommitWithMessage
+import com.zegreatrob.tools.test.git.addTag
+import com.zegreatrob.tools.test.git.delayLongEnoughToAffectGitDate
+import com.zegreatrob.tools.test.git.initializeGitRepo
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.io.TempDir
 import java.io.File
@@ -21,7 +21,7 @@ class GitAdapterTest {
         wrapper = GitAdapter(projectDir.absolutePath)
     }
 
-    fun initializeGitRepo(commits: List<String>) = com.zegreatrob.tools.digger.initializeGitRepo(
+    fun initializeGitRepo(commits: List<String>) = initializeGitRepo(
         projectDirectoryPath = projectDir.absolutePath,
         addFileNames = emptySet(),
         commits = commits,

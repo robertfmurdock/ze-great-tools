@@ -36,6 +36,7 @@ tasks {
         }
     }
     assemble { dependsOn(provider { (getTasksByName("assemble", true) - this).toList() }) }
+    clean { dependsOn(provider { (getTasksByName("clean", true) - this).toList() }) }
     formatKotlinMain {
         exclude { spec -> spec.file.absolutePath.contains("generated-sources") }
     }

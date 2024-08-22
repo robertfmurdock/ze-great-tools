@@ -1,6 +1,8 @@
 <component name="ArtifactManager">
   <artifact type="jar" name="git-adapter-js">
     <output-path>$PROJECT_DIR$/tools/git-adapter/build/libs</output-path>
-    <root id="archive" name="git-adapter-js.jar" />
+    <root id="archive" name="git-adapter-js.jar">
+      <element id="module-output" name="tools.git-adapter.jsMain" />
+    </root>
   </artifact>
 </component>
