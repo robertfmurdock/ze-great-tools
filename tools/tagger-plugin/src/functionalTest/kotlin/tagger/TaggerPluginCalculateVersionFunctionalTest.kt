@@ -1,6 +1,7 @@
 package tagger
 
 import com.zegreatrob.tools.adapter.git.GitAdapter
+import com.zegreatrob.tools.adapter.git.runProcess
 import org.ajoberstar.grgit.Grgit
 import org.ajoberstar.grgit.operation.AddOp
 import org.ajoberstar.grgit.operation.BranchChangeOp
@@ -86,6 +87,9 @@ class TaggerPluginCalculateVersionFunctionalTest {
             remoteUrl = originDirectory.absolutePathString(),
         )
         grgit.push()
+
+        runProcess(listOf("git", "config", "user.email", "test@zegreatrob.com"), this.projectDir.absolutePath)
+        runProcess(listOf("git", "config", "user.name", "RoB as Test"), this.projectDir.absolutePath)
 
         val runner = GradleRunner.create()
         runner.forwardOutput()
