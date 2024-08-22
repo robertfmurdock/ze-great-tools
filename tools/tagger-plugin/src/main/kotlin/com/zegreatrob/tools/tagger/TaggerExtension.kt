@@ -1,6 +1,9 @@
 package com.zegreatrob.tools.tagger
 
 import com.zegreatrob.tools.adapter.git.GitAdapter
+import com.zegreatrob.tools.tagger.core.TaggerCore
+import com.zegreatrob.tools.tagger.core.calculateNextVersion
+import com.zegreatrob.tools.tagger.core.lastVersionAndTag
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.model.ObjectFactory
@@ -40,15 +43,15 @@ open class TaggerExtension(
     var majorRegex = objectFactory.property<Regex>().convention(Regex("\\[major].*", RegexOption.IGNORE_CASE))
 
     val gitAdapter get() = GitAdapter(workingDirectory.get().absolutePath)
+    val core get() = TaggerCore(GitAdapter(workingDirectory.get().absolutePath))
 
-    val lastVersionAndTag by lazy { lastVersionAndTag(gitAdapter) }
+    val lastVersionAndTag by lazy { core.lastVersionAndTag() }
 
     val version by lazy {
         val (previousVersionNumber, lastTagDescription) =
             lastVersionAndTag
                 ?: return@lazy "0.0.0"
-        calculateNextVersion(
-            adapter = gitAdapter,
+        core.calculateNextVersion(
             lastTagDescription = lastTagDescription,
             implicitPatch = implicitPatch.get(),
             versionRegex = versionRegex(),
@@ -56,8 +59,6 @@ open class TaggerExtension(
             releaseBranch = releaseBranch ?: throw GradleException("Please configure the tagger release branch."),
         )
     }
-
-    val isSnapshot get() = version.contains("SNAPSHOT")
 
     private fun versionRegex() =
         VersionRegex(

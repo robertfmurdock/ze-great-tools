@@ -51,11 +51,11 @@ tasks {
         )
     }
     register<CommitReport>("commitReport") {
-        this.taggerExtension = tagger
+        taggerExtension = tagger
     }
 
     val githubRelease by registering(Exec::class) {
-        enabled = with(tagger) { !isSnapshot && githubReleaseEnabled.get() }
+        enabled = with(tagger) { !version.contains("SNAPSHOT") && githubReleaseEnabled.get() }
         dependsOn(tag)
         val githubRepository = System.getenv("GITHUB_REPOSITORY")
         commandLine(
@@ -85,7 +85,8 @@ tasks {
 
     register<ReleaseVersion>("release") {
         taggerExtension = tagger
-        enabled = !tagger.isSnapshot
+        version = "${project.version}"
+        enabled = !tagger.version.contains("SNAPSHOT")
         dependsOn(assemble)
         mustRunAfter(check)
         finalizedBy(tag, githubRelease)

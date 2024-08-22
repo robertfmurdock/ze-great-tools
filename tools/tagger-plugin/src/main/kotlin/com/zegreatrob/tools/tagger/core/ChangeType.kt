@@ -1,14 +1,16 @@
-package com.zegreatrob.tools.tagger
+package com.zegreatrob.tools.tagger.core
 
 import com.zegreatrob.tools.adapter.git.CommitRef
 import com.zegreatrob.tools.adapter.git.GitAdapter
 import com.zegreatrob.tools.adapter.git.GitStatus
 import com.zegreatrob.tools.adapter.git.TagRef
+import com.zegreatrob.tools.tagger.VersionRegex
+import com.zegreatrob.tools.tagger.asSemverComponents
+import com.zegreatrob.tools.tagger.changeType
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 
-fun calculateNextVersion(
-    adapter: GitAdapter,
+fun TaggerCore.calculateNextVersion(
     lastTagDescription: String,
     implicitPatch: Boolean,
     versionRegex: VersionRegex,
@@ -88,7 +90,7 @@ fun GitStatus.canRelease(releaseBranch: String): Boolean =
         this.behind == 0 &&
         this.head == releaseBranch
 
-fun tagReport(adapter: GitAdapter) =
+fun TaggerCore.tagReport() =
     adapter.listTags()
         .groupBy { tag ->
             "${tag.dateTime.toLocalDateTime(TimeZone.currentSystemDefault()).year} Week ${tag.weekNumber()}"

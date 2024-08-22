@@ -1,8 +1,6 @@
-package com.zegreatrob.tools.tagger
+package com.zegreatrob.tools.tagger.core
 
-import com.zegreatrob.tools.adapter.git.GitAdapter
-
-fun lastVersionAndTag(adapter: GitAdapter): Pair<String, String>? {
+fun TaggerCore.lastVersionAndTag(): Pair<String, String>? {
     val description: String = adapter.describe(abbrev = 0)
         ?: return null
     val previousVersionNumber =
