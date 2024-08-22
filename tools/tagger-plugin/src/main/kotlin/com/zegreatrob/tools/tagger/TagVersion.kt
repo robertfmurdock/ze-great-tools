@@ -1,8 +1,6 @@
 package com.zegreatrob.tools.tagger
 
 import com.zegreatrob.tools.adapter.git.GitAdapter
-import org.ajoberstar.grgit.operation.PushOp
-import org.ajoberstar.grgit.operation.TagAddOp
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.tasks.Input
@@ -11,9 +9,6 @@ import org.gradle.api.tasks.TaskAction
 
 interface TaggerExtensionSyntax {
     var taggerExtension: TaggerExtension
-
-    @get:Internal
-    val grgit get() = taggerExtension.grgitServiceExtension.service.get().grgit
 
     @get:Internal
     val releaseBranch get() = taggerExtension.releaseBranch
@@ -41,21 +36,14 @@ open class TagVersion :
 
     @TaskAction
     fun execute() {
+        val gitAdapter = taggerExtension.gitAdapter
         if (
             !isSnapshot() &&
-            taggerExtension.gitAdapter.showTag("HEAD") == null &&
-            isOnReleaseBranch(taggerExtension.gitAdapter, releaseBranch)
+            gitAdapter.showTag("HEAD") == null &&
+            isOnReleaseBranch(gitAdapter, releaseBranch)
         ) {
-            this.grgit.tag.add(
-                fun(it: TagAddOp) {
-                    it.name = version
-                },
-            )
-            this.grgit.push(
-                fun(it: PushOp) {
-                    it.tags = true
-                },
-            )
+            gitAdapter.newAnnotatedTag(version, "HEAD")
+            gitAdapter.pushWithTags()
         } else {
             logger.warn("skipping tag")
         }

@@ -8,11 +8,10 @@ import com.zegreatrob.tools.tagger.TagVersion
 import com.zegreatrob.tools.tagger.TaggerExtension
 
 plugins {
-    id("org.ajoberstar.grgit.service")
     base
 }
 
-val tagger = project.extensions.create("tagger", TaggerExtension::class, grgitService, project)
+val tagger = project.extensions.create("tagger", TaggerExtension::class, project)
 
 tagger.workingDirectory.convention(project.rootDir)
 

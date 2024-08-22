@@ -14,6 +14,23 @@ class GitAdapter(private val workingDirectory: String) {
         workingDirectory,
     ).trim()
 
+    fun newAnnotatedTag(name: String, ref: String) {
+        runProcess(
+            listOf(
+                "git",
+                "tag",
+                "--annotate",
+                "--message=$name",
+                ref,
+            ),
+            workingDirectory,
+        )
+    }
+
+    fun pushWithTags() {
+        runProcess(listOf("git", "push", "--tags"), workingDirectory)
+    }
+
     fun listTags(): List<TagRef> {
         val outputText = runProcess(
             listOf(

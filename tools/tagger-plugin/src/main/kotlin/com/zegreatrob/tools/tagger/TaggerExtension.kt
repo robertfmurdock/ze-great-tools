@@ -1,7 +1,6 @@
 package com.zegreatrob.tools.tagger
 
 import com.zegreatrob.tools.adapter.git.GitAdapter
-import org.ajoberstar.grgit.gradle.GrgitServiceExtension
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.model.ObjectFactory
@@ -10,7 +9,6 @@ import org.gradle.kotlin.dsl.property
 import java.io.File
 
 open class TaggerExtension(
-    val grgitServiceExtension: GrgitServiceExtension,
     @Transient val rootProject: Project,
     objectFactory: ObjectFactory,
 ) {
