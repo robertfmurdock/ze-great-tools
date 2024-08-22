@@ -18,7 +18,6 @@ jobs:
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      GRGIT_USER: ${{ secrets.GITHUB_TOKEN }}
       ORG_GRADLE_PROJECT_signingKey: ${{ secrets.SIGNING_KEY }}
       ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.SIGNING_PASSWORD }}
       SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}

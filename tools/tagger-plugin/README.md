@@ -110,38 +110,14 @@ tagger {
 
 Naturally, all of the operations involving git and github will require appropriate permissions to be provided.
 
-Currently tagger uses Grgit under the hood, so you can change the git username and password using its environment variables:
+Tagger use the repository's git settings, so be sure to configure the username and email, and that the repository has sufficient permissions to push tags.
 
 ```bash
-export GRGIT_USER=your-git-user
-export GRGIT_PASS=your-git-password
+git config user.name "bot"
+git config user.email "bot@your-company.io"
 
 ./gradlew release -Pversion=${{ env.TAGGER_VERSION }}
 ```
-
-If you use Github Actions, this can be done using the "github token" as follows:
-
-```yml
-permissions:
-  contents: write
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    env:
-      GRGIT_USER: ${{ secrets.GITHUB_TOKEN }}
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-      - name: Setup Gradle
-        uses: gradle/gradle-build-action@v2
-      - name: Generate Version 🧮
-        run: ./gradlew calculateVersion -PexportToGithub=true --scan
-      - name: Build 🔨
-        run: ./gradlew release check -Pversion=${{ env.TAGGER_VERSION }} --scan
-```
-
-Make note that it must be granted permission to push tags, which can currently be done using `contents: write`.
 
 Publishing a github-release will require the GH_TOKEN environment variable to be set as well. See:
 
