@@ -21,6 +21,7 @@ class GitAdapter(private val workingDirectory: String) {
                 "tag",
                 "--annotate",
                 "--message=$name",
+                name,
                 ref,
             ),
             workingDirectory,
