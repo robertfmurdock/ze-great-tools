@@ -50,7 +50,6 @@ open class TaggerExtension(
             lastVersionAndTag
                 ?: return@lazy "0.0.0"
         calculateNextVersion(
-            grgit = grgit,
             adapter = GitAdapter(workingDirectory.get().absolutePath),
             lastTagDescription = lastTagDescription,
             implicitPatch = implicitPatch.get(),

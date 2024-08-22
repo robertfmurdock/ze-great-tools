@@ -2,13 +2,11 @@ package com.zegreatrob.tools.tagger
 
 import com.zegreatrob.tools.adapter.git.CommitRef
 import com.zegreatrob.tools.adapter.git.GitAdapter
-import org.ajoberstar.grgit.BranchStatus
+import com.zegreatrob.tools.adapter.git.GitStatus
 import org.ajoberstar.grgit.Grgit
 import org.ajoberstar.grgit.Tag
-import org.ajoberstar.grgit.operation.BranchStatusOp
 
 fun calculateNextVersion(
-    grgit: Grgit,
     adapter: GitAdapter,
     lastTagDescription: String,
     implicitPatch: Boolean,
@@ -22,7 +20,7 @@ fun calculateNextVersion(
             ?: previousVersionNumber
         )
 
-    return if (grgit.canRelease(releaseBranch) && currentVersionNumber != previousVersionNumber) {
+    return if (adapter.status().canRelease(releaseBranch) && currentVersionNumber != previousVersionNumber) {
         currentVersionNumber
     } else {
         "$currentVersionNumber-SNAPSHOT"
@@ -82,27 +80,11 @@ enum class ChangeType(val priority: Int) {
     abstract fun increment(components: List<Int>): String
 }
 
-fun Grgit.canRelease(releaseBranch: String): Boolean {
-    val currentBranch = branch.current()
-
-    val currentBranchStatus: BranchStatus? =
-        runCatching {
-            branch.status(
-                fun(it: BranchStatusOp) {
-                    it.name = currentBranch.name
-                },
-            )
-        }
-            .getOrNull()
-    return if (currentBranchStatus == null) {
-        false
-    } else {
-        status().isClean &&
-            currentBranchStatus.aheadCount == 0 &&
-            currentBranchStatus.behindCount == 0 &&
-            currentBranch.name == releaseBranch
-    }
-}
+fun GitStatus.canRelease(releaseBranch: String): Boolean =
+    this.isClean &&
+        this.ahead == 0 &&
+        this.behind == 0 &&
+        this.head == releaseBranch
 
 fun Grgit.tagReport() =
     tag.list()

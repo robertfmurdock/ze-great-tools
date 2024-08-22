@@ -83,4 +83,41 @@ class GitAdapter(private val workingDirectory: String) {
                 fullMessage = elements.subList(5, elements.size).joinToString("\n"),
             )
         }
+
+    fun status(): GitStatus = runProcess(
+        listOf(
+            "git",
+            "status",
+            "--porcelain=2",
+            "--branch",
+            "--ahead-behind",
+        ),
+        workingDirectory,
+    ).let { output ->
+        val lines = output.split("\n")
+        val head = statusValue(lines, "# branch.head")
+        val upstream = statusValue(lines, "# branch.upstream")
+        val (a, b) = statusValue(lines, "# branch.ab")?.split(" ") ?: listOf("-1", "-1")
+        GitStatus(
+            isClean = lines
+                .filterNot { it.startsWith("#") }
+                .filterNot(String::isBlank)
+                .isEmpty(),
+            ahead = a.toInt(),
+            behind = b.toInt(),
+            head = head ?: "",
+            upstream = upstream ?: "",
+        )
+    }
+
+    private fun statusValue(lines: List<String>, prefix: String) =
+        lines.find { it.startsWith(prefix) }?.substring(prefix.length + 1)
 }
+
+data class GitStatus(
+    val isClean: Boolean,
+    val ahead: Int,
+    val behind: Int,
+    val head: String,
+    val upstream: String,
+)
