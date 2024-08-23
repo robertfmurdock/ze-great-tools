@@ -29,9 +29,9 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
         setupWithDefaults()
 
         initializeGitRepo(
-            projectDirectoryPath = projectDir.absolutePath,
+            directory = projectDir.absolutePath,
             addFileNames = addFileNames,
-            listOf(
+            commits = listOf(
                 """here's a message
                 |
                 |
@@ -58,9 +58,9 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
         setupWithOverrides(label = label)
 
         initializeGitRepo(
-            projectDirectoryPath = projectDir.absolutePath,
+            directory = projectDir.absolutePath,
             addFileNames = addFileNames,
-            listOf("here's a message"),
+            commits = listOf("here's a message"),
         )
         val output = runCurrentContributionData()
         assertEquals(
@@ -74,9 +74,9 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
         setupWithDefaults()
 
         initializeGitRepo(
-            projectDirectoryPath = projectDir.absolutePath,
+            directory = projectDir.absolutePath,
             addFileNames = addFileNames,
-            listOf("here's a message"),
+            commits = listOf("here's a message"),
         )
         val output = runCurrentContributionData()
         assertEquals(
@@ -90,9 +90,9 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
         setupWithDefaults()
 
         initializeGitRepo(
-            projectDirectoryPath = projectDir.absolutePath,
+            directory = projectDir.absolutePath,
             addFileNames = addFileNames,
-            listOf(
+            commits = listOf(
                 """[patch] here's a message
                 |
                 |
@@ -112,9 +112,9 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
         setupWithDefaults()
 
         initializeGitRepo(
-            projectDirectoryPath = projectDir.absolutePath,
+            directory = projectDir.absolutePath,
             addFileNames = addFileNames,
-            listOf(
+            commits = listOf(
                 """[major] here's a message
                 |
                 |
@@ -139,9 +139,9 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
         setupWithDefaults()
 
         initializeGitRepo(
-            projectDirectoryPath = projectDir.absolutePath,
+            directory = projectDir.absolutePath,
             addFileNames = addFileNames,
-            listOf(
+            commits = listOf(
                 """here's a message
                 |
                 |
@@ -180,9 +180,9 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
         setupWithDefaults()
 
         val grgit = initializeGitRepo(
-            projectDirectoryPath = projectDir.absolutePath,
+            directory = projectDir.absolutePath,
             addFileNames = addFileNames,
-            listOf(
+            commits = listOf(
                 """here's a message
                 |
                 |
@@ -227,9 +227,9 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
         setupWithDefaults()
 
         val grgit = initializeGitRepo(
-            projectDirectoryPath = projectDir.absolutePath,
+            directory = projectDir.absolutePath,
             addFileNames = addFileNames,
-            listOf(
+            commits = listOf(
                 """here's a message
                 |
                 |
@@ -270,9 +270,9 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
 
         val grgit =
             initializeGitRepo(
-                projectDirectoryPath = projectDir.absolutePath,
+                directory = projectDir.absolutePath,
                 addFileNames = addFileNames,
-                listOf(
+                commits = listOf(
                     """here's a message
                 |
                 |
@@ -310,7 +310,7 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
         setupWithOverrides(majorRegex = ".*(big).*")
 
         initializeGitRepo(
-            projectDirectoryPath = projectDir.absolutePath,
+            directory = projectDir.absolutePath,
             addFileNames = addFileNames,
             commits = listOf("[patch] commit 1", "commit (big) 2", "[patch] commit 3"),
         )
@@ -325,7 +325,7 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
         setupWithOverrides(minorRegex = ".*mid.*")
 
         initializeGitRepo(
-            projectDirectoryPath = projectDir.absolutePath,
+            directory = projectDir.absolutePath,
             addFileNames = addFileNames,
             commits = listOf("[patch] commit 1", "commit (middle) 2", "[patch] commit 3"),
         )
@@ -340,7 +340,7 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
         setupWithOverrides(patchRegex = ".*tiny.*")
 
         initializeGitRepo(
-            projectDirectoryPath = projectDir.absolutePath,
+            directory = projectDir.absolutePath,
             addFileNames = addFileNames,
             commits = listOf("commit 1", "commit (tiny) 2", "commit 3"),
         )
@@ -354,7 +354,7 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
         setupWithOverrides(noneRegex = ".*(no).*")
 
         initializeGitRepo(
-            projectDirectoryPath = projectDir.absolutePath,
+            directory = projectDir.absolutePath,
             addFileNames = addFileNames,
             commits = listOf("commit (no) 1"),
         )
@@ -368,7 +368,7 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
         setupWithOverrides(storyRegex = ".*-(?<storyId>.*-.*)-.*")
 
         initializeGitRepo(
-            projectDirectoryPath = projectDir.absolutePath,
+            directory = projectDir.absolutePath,
             addFileNames = addFileNames,
             commits = listOf("commit -CowDog-99- 1"),
         )
@@ -383,7 +383,7 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
         setupWithOverrides(easeRegex = """.*\[(?<ease>[0-5])\].*""")
 
         initializeGitRepo(
-            projectDirectoryPath = projectDir.absolutePath,
+            directory = projectDir.absolutePath,
             addFileNames = addFileNames,
             commits = listOf("commit [4] 1"),
         )
@@ -413,7 +413,7 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
 
         grgit.mergeInBranch("branch2", "merge1")
 
-        grgit.checkout { it.branch = "main" }
+        grgit.checkout { it.branch = "master" }
         grgit.addCommitWithMessage("sixth")
 
         val merge2Commit = grgit.mergeInBranch("branch1", "merge2")
@@ -455,7 +455,7 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
 
         grgit.mergeInBranch("branch2", "merge1")
 
-        grgit.checkout { it.branch = "main" }
+        grgit.checkout { it.branch = "master" }
         grgit.addCommitWithMessage("sixth")
 
         val merge2Commit = grgit.mergeInBranch("branch1", "merge2")
@@ -483,14 +483,14 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
         grgit.addTag("release")
         grgit.switchToNewBranch("branch")
         val secondCommit = grgit.addCommitWithMessage("second")
-        grgit.checkout { it.branch = "main" }
+        grgit.checkout { it.branch = "master" }
         grgit.addCommitWithMessage("third")
         delayLongEnoughToAffectGitDate()
         grgit.addTag("release2")
         grgit.checkout { it.branch = "branch" }
         grgit.addCommitWithMessage("fourth")
         grgit.addCommitWithMessage("fifth")
-        grgit.checkout { it.branch = "main" }
+        grgit.checkout { it.branch = "master" }
         grgit.mergeInBranch("branch", "merge")
         val lastCommit = grgit.addCommitWithMessage("sixth")
         delayLongEnoughToAffectGitDate()
@@ -535,7 +535,7 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
     )
 
     fun initializeGitRepo(commits: List<String>) = initializeGitRepo(
-        projectDirectoryPath = projectDir.absolutePath,
+        directory = projectDir.absolutePath,
         addFileNames = addFileNames,
         commits = commits,
     )

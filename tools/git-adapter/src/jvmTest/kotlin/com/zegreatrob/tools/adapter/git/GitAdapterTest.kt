@@ -22,14 +22,14 @@ class GitAdapterTest {
     }
 
     fun initializeGitRepo(commits: List<String>) = initializeGitRepo(
-        projectDirectoryPath = projectDir.absolutePath,
+        directory = projectDir.absolutePath,
         addFileNames = emptySet(),
         commits = commits,
     )
 
     @Test
     fun `will include all tag segments from newest to oldest`() {
-        val grgit = initializeGitRepo(listOf("here's a message"))
+        val grgit = initializeGitRepo(commits = listOf("here's a message"))
         grgit.addTag("v1.0")
         delayLongEnoughToAffectGitDate()
         grgit.addCommitWithMessage("here's a message")

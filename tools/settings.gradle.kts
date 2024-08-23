@@ -19,6 +19,7 @@ include("git-adapter")
 include("git-test")
 include("tagger-core")
 include("tagger-plugin")
+include("tagger-test")
 include("tools-bom")
 
 includeBuild("../tools-plugins")

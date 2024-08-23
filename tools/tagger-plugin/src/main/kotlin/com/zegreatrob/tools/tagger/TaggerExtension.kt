@@ -43,7 +43,6 @@ open class TaggerExtension(
     @Input
     var majorRegex = objectFactory.property<Regex>().convention(Regex("\\[major].*", RegexOption.IGNORE_CASE))
 
-    val gitAdapter get() = GitAdapter(workingDirectory.get().absolutePath)
     val core get() = TaggerCore(GitAdapter(workingDirectory.get().absolutePath))
 
     val lastVersionAndTag by lazy { core.lastVersionAndTag() }

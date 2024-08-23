@@ -23,7 +23,7 @@ class AllPathsTest {
     @Test
     fun willHandleSimplePathsEasily() {
         val grgit = initializeGitRepo(
-            projectDirectoryPath = projectDir.absolutePath,
+            directory = projectDir.absolutePath,
             commits = listOf("first"),
             addFileNames = emptySet(),
         )
@@ -31,12 +31,12 @@ class AllPathsTest {
         grgit.switchToNewBranch("branch1")
 
         val secondCommit = grgit.addCommitWithMessage("second")
-        grgit.checkout { it.branch = "main" }
+        grgit.checkout { it.branch = "master" }
 
         val thirdCommit = grgit.addCommitWithMessage("third")
         grgit.checkout { it.branch = "branch1" }
         val fourthCommit = grgit.addCommitWithMessage("fourth")
-        grgit.checkout { it.branch = "main" }
+        grgit.checkout { it.branch = "master" }
         val mergeCommit = grgit.mergeInBranch("branch1", "merge")
 
         val log = diggerGitWrapper.log()
@@ -55,7 +55,7 @@ class AllPathsTest {
     @Test
     fun willIgnoreBranchesWhenOneParentIsInPreferredList() {
         val grgit = initializeGitRepo(
-            projectDirectoryPath = projectDir.absolutePath,
+            directory = projectDir.absolutePath,
             commits = listOf("first"),
             addFileNames = emptySet(),
         )
@@ -63,12 +63,12 @@ class AllPathsTest {
         grgit.switchToNewBranch("branch1")
 
         val secondCommit = grgit.addCommitWithMessage("second")
-        grgit.checkout { it.branch = "main" }
+        grgit.checkout { it.branch = "master" }
 
         grgit.addCommitWithMessage("third")
         grgit.checkout { it.branch = "branch1" }
         val fourthCommit = grgit.addCommitWithMessage("fourth")
-        grgit.checkout { it.branch = "main" }
+        grgit.checkout { it.branch = "master" }
         val mergeCommit = grgit.mergeInBranch("branch1", "merge")
 
         val log = diggerGitWrapper.log()
@@ -86,7 +86,7 @@ class AllPathsTest {
     @Test
     fun branchMergeBranchMergeFindsAllPaths() {
         val grgit = initializeGitRepo(
-            projectDirectoryPath = projectDir.absolutePath,
+            directory = projectDir.absolutePath,
             commits = listOf("first"),
             addFileNames = emptySet(),
         )
@@ -94,25 +94,25 @@ class AllPathsTest {
         grgit.switchToNewBranch("branch1")
         val secondCommit = grgit.addCommitWithMessage("second")
 
-        grgit.checkout { it.branch = "main" }
+        grgit.checkout { it.branch = "master" }
         val thirdCommit = grgit.addCommitWithMessage("third")
 
         grgit.checkout { it.branch = "branch1" }
         val fourthCommit = grgit.addCommitWithMessage("fourth")
-        grgit.checkout { it.branch = "main" }
+        grgit.checkout { it.branch = "master" }
         val mergeCommit1 = grgit.mergeInBranch("branch1", "merge")
         val fifthCommit = grgit.addCommitWithMessage("fifth")
 
         grgit.switchToNewBranch("branch2")
         val sixthCommit = grgit.addCommitWithMessage("sixth")
-        grgit.checkout { it.branch = "main" }
+        grgit.checkout { it.branch = "master" }
         val seventhCommit = grgit.addCommitWithMessage("seventh")
         val mergeCommit2 = grgit.mergeInBranch("branch2", "merge")
         val eighthCommit = grgit.addCommitWithMessage("eighth")
 
         grgit.switchToNewBranch("branch3")
         val ninthCommit = grgit.addCommitWithMessage("ninth")
-        grgit.checkout { it.branch = "main" }
+        grgit.checkout { it.branch = "master" }
         val tenthCommit = grgit.addCommitWithMessage("tenth")
         val mergeCommit3 = grgit.mergeInBranch("branch3", "merge")
 
@@ -222,7 +222,7 @@ class AllPathsTest {
     @Test
     fun willStopOnceFindingPathContainingAllPreferredCommits() {
         val grgit = initializeGitRepo(
-            projectDirectoryPath = projectDir.absolutePath,
+            directory = projectDir.absolutePath,
             commits = listOf("first"),
             addFileNames = emptySet(),
         )
@@ -230,25 +230,25 @@ class AllPathsTest {
         grgit.switchToNewBranch("branch1")
         grgit.addCommitWithMessage("second")
 
-        grgit.checkout { it.branch = "main" }
+        grgit.checkout { it.branch = "master" }
         val thirdCommit = grgit.addCommitWithMessage("third")
 
         grgit.checkout { it.branch = "branch1" }
         grgit.addCommitWithMessage("fourth")
-        grgit.checkout { it.branch = "main" }
+        grgit.checkout { it.branch = "master" }
         val mergeCommit1 = grgit.mergeInBranch("branch1", "merge")
         val fifthCommit = grgit.addCommitWithMessage("fifth")
 
         grgit.switchToNewBranch("branch2")
         val sixthCommit = grgit.addCommitWithMessage("sixth")
-        grgit.checkout { it.branch = "main" }
+        grgit.checkout { it.branch = "master" }
         grgit.addCommitWithMessage("seventh")
         val mergeCommit2 = grgit.mergeInBranch("branch2", "merge")
         val eighthCommit = grgit.addCommitWithMessage("eighth")
 
         grgit.switchToNewBranch("branch3")
         grgit.addCommitWithMessage("ninth")
-        grgit.checkout { it.branch = "main" }
+        grgit.checkout { it.branch = "master" }
         val tenthCommit = grgit.addCommitWithMessage("tenth")
         val mergeCommit3 = grgit.mergeInBranch("branch3", "merge")
 
@@ -281,7 +281,7 @@ class AllPathsTest {
     @Test
     fun mergeToBranchAndBackFindsAllPaths() {
         val grgit = initializeGitRepo(
-            projectDirectoryPath = projectDir.absolutePath,
+            directory = projectDir.absolutePath,
             commits = listOf("first"),
             addFileNames = emptySet(),
         )
@@ -289,14 +289,14 @@ class AllPathsTest {
         grgit.switchToNewBranch("branch")
         val secondCommit = grgit.addCommitWithMessage("second")
 
-        grgit.checkout { it.branch = "main" }
+        grgit.checkout { it.branch = "master" }
         val thirdCommit = grgit.addCommitWithMessage("third")
 
         grgit.checkout { it.branch = "branch" }
-        val mergeCommit1 = grgit.mergeInBranch("main", "merge")
+        val mergeCommit1 = grgit.mergeInBranch("master", "merge")
         val fourthCommit = grgit.addCommitWithMessage("fourth")
 
-        grgit.checkout { it.branch = "main" }
+        grgit.checkout { it.branch = "master" }
         val singleParentMerge = grgit.mergeInBranch("branch", "merge")
         val fifthCommit = grgit.addCommitWithMessage("fifth")
 
@@ -330,7 +330,7 @@ class AllPathsTest {
     @Test
     fun branchOnBranchOnBranchFindsAllPaths() {
         val grgit = initializeGitRepo(
-            projectDirectoryPath = projectDir.absolutePath,
+            directory = projectDir.absolutePath,
             commits = listOf("first"),
             addFileNames = emptySet(),
         )
@@ -338,19 +338,19 @@ class AllPathsTest {
         grgit.switchToNewBranch("branch1")
         val secondCommit = grgit.addCommitWithMessage("second")
 
-        grgit.checkout { it.branch = "main" }
+        grgit.checkout { it.branch = "master" }
         val thirdCommit = grgit.addCommitWithMessage("third")
 
         grgit.switchToNewBranch("branch2")
         val fourthCommit = grgit.addCommitWithMessage("forth")
 
-        grgit.checkout { it.branch = "main" }
+        grgit.checkout { it.branch = "master" }
         val fifthCommit = grgit.addCommitWithMessage("fifth")
 
         grgit.checkout { it.branch = "branch1" }
         val sixthCommit = grgit.addCommitWithMessage("sixth")
 
-        grgit.checkout { it.branch = "main" }
+        grgit.checkout { it.branch = "master" }
         val seventhCommit = grgit.addCommitWithMessage("seventh")
 
         grgit.checkout { it.branch = "branch2" }
@@ -358,7 +358,7 @@ class AllPathsTest {
         val merge1 = grgit.mergeInBranch("branch1", "merge")
         val ninthCommit = grgit.addCommitWithMessage("eighth")
 
-        grgit.checkout { it.branch = "main" }
+        grgit.checkout { it.branch = "master" }
         val merge2 = grgit.mergeInBranch("branch2", "merge")
 
         val log = diggerGitWrapper.log()

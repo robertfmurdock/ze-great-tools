@@ -30,6 +30,7 @@ dependencies {
     testImplementation(libs.org.ajoberstar.grgit.gradle.plugin)
     testImplementation(kotlin("test-junit5", embeddedKotlinVersion))
     "functionalTestImplementation"(platform(libs.org.junit.junit.bom))
+    "functionalTestImplementation"(project(":tagger-test"))
 }
 
 gradlePlugin {

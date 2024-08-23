@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="tagger-test-js">
+    <output-path>$PROJECT_DIR$/tools/tagger-test/build/libs</output-path>
+    <root id="archive" name="tagger-test-js.jar">
+      <element id="module-output" name="tools.tagger-test.jsMain" />
+    </root>
+  </artifact>
+</component>
