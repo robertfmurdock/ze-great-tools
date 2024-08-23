@@ -1,5 +1,7 @@
 package com.zegreatrob.tools.tagger.core
 
+import com.zegreatrob.tools.digger.core.MessageDigger
+
 data class VersionRegex(
     val none: Regex,
     val patch: Regex,
@@ -8,9 +10,9 @@ data class VersionRegex(
     val unified: Regex?,
 ) {
     object Defaults {
-        val none = Regex("\\[none].*", RegexOption.IGNORE_CASE)
-        val patch = Regex("\\[patch].*", RegexOption.IGNORE_CASE)
-        val minor = Regex("\\[minor].*", RegexOption.IGNORE_CASE)
-        val major = Regex("\\[major].*", RegexOption.IGNORE_CASE)
+        val none = MessageDigger.Defaults.noneRegex
+        val patch = MessageDigger.Defaults.patchRegex
+        val minor = MessageDigger.Defaults.minorRegex
+        val major = MessageDigger.Defaults.majorRegex
     }
 }

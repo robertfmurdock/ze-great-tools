@@ -19,10 +19,10 @@ class MessageDigger(
 
     @Suppress("RegExpRedundantEscape")
     object Defaults {
-        val majorRegex = Regex("\\[major\\]")
-        val minorRegex = Regex("\\[minor\\]")
-        val patchRegex = Regex("\\[patch\\]")
-        val noneRegex = Regex("\\[none\\]")
+        val majorRegex = Regex("\\[major\\]", RegexOption.IGNORE_CASE)
+        val minorRegex = Regex("\\[minor\\]", RegexOption.IGNORE_CASE)
+        val patchRegex = Regex("\\[patch\\]", RegexOption.IGNORE_CASE)
+        val noneRegex = Regex("\\[none\\]", RegexOption.IGNORE_CASE)
         val storyIdRegex = Regex("\\[(?<storyId>.*?)\\]")
         val easeRegex = Regex("-(?<ease>[1-5])-")
     }

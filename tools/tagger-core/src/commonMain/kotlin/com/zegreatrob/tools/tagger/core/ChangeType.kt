@@ -110,10 +110,10 @@ private fun TagRef.weekNumber() =
 
 fun VersionRegex.changeType(message: String): ChangeType? = when {
     unified?.containsMatchIn(message) == true -> findMatchType(message, unified)
-    major.matches(message) -> ChangeType.Major
-    minor.matches(message) -> ChangeType.Minor
-    patch.matches(message) -> ChangeType.Patch
-    none.matches(message) -> ChangeType.None
+    major.containsMatchIn(message) -> ChangeType.Major
+    minor.containsMatchIn(message) -> ChangeType.Minor
+    patch.containsMatchIn(message) -> ChangeType.Patch
+    none.containsMatchIn(message) -> ChangeType.None
     else -> null
 }
 

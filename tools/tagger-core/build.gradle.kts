@@ -17,6 +17,7 @@ kotlin {
 
 dependencies {
     commonMainApi(project(":git-adapter"))
+    commonMainImplementation(project(":digger-core"))
     commonTestImplementation(kotlin("test", embeddedKotlinVersion))
     "jvmTestImplementation"(kotlin("test-junit5", embeddedKotlinVersion))
 }
