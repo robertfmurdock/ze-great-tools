@@ -15,8 +15,8 @@ kotlin {
         compilations {
             "main" {
                 packageJson {
-                    name = "git-tagger"
-                    customField("package-name", "git-tagger")
+                    name = "git-semver-tagger"
+                    customField("package-name", "git-semver-tagger")
                     customField("author", "rob@continuousexcellence.io")
                     customField("license", "MIT")
                     customField("keywords", arrayOf("git", "contribution", "pair", "agile", "coaching", "statistics"))
