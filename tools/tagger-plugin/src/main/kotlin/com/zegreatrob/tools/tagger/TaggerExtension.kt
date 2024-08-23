@@ -32,30 +32,25 @@ open class TaggerExtension(
     var versionRegex = objectFactory.property<Regex?>().convention(null)
 
     @Input
-    var noneRegex = objectFactory.property<Regex>().convention(Regex("\\[none].*", RegexOption.IGNORE_CASE))
+    var noneRegex = objectFactory.property<Regex>().convention(VersionRegex.Defaults.none)
 
     @Input
-    var patchRegex = objectFactory.property<Regex>().convention(Regex("\\[patch].*", RegexOption.IGNORE_CASE))
+    var patchRegex = objectFactory.property<Regex>().convention(VersionRegex.Defaults.patch)
 
     @Input
-    var minorRegex = objectFactory.property<Regex>().convention(Regex("\\[minor].*", RegexOption.IGNORE_CASE))
+    var minorRegex = objectFactory.property<Regex>().convention(VersionRegex.Defaults.minor)
 
     @Input
-    var majorRegex = objectFactory.property<Regex>().convention(Regex("\\[major].*", RegexOption.IGNORE_CASE))
+    var majorRegex = objectFactory.property<Regex>().convention(VersionRegex.Defaults.major)
 
     val core get() = TaggerCore(GitAdapter(workingDirectory.get().absolutePath))
 
     val lastVersionAndTag by lazy { core.lastVersionAndTag() }
 
     val version by lazy {
-        val (previousVersionNumber, lastTagDescription) =
-            lastVersionAndTag
-                ?: return@lazy "0.0.0"
         core.calculateNextVersion(
-            lastTagDescription = lastTagDescription,
             implicitPatch = implicitPatch.get(),
             versionRegex = versionRegex(),
-            previousVersionNumber = previousVersionNumber,
             releaseBranch = releaseBranch ?: throw GradleException("Please configure the tagger release branch."),
         )
     }

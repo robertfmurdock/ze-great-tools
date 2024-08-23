@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="cli-tools-js">
+    <output-path>$PROJECT_DIR$/tools/cli-tools/build/libs</output-path>
+    <root id="archive" name="cli-tools-js.jar">
+      <element id="module-output" name="tools.cli-tools.jsMain" />
+    </root>
+  </artifact>
+</component>

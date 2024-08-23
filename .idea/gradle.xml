@@ -11,6 +11,7 @@
                 <projects>
                   <project path="$PROJECT_DIR$/tools" />
                   <project path="$PROJECT_DIR$/tools/certifier-plugin" />
+                  <project path="$PROJECT_DIR$/tools/cli-tools" />
                   <project path="$PROJECT_DIR$/tools/dependency-bom" />
                   <project path="$PROJECT_DIR$/tools/digger-cli" />
                   <project path="$PROJECT_DIR$/tools/digger-core" />
@@ -20,6 +21,7 @@
                   <project path="$PROJECT_DIR$/tools/digger-test" />
                   <project path="$PROJECT_DIR$/tools/git-adapter" />
                   <project path="$PROJECT_DIR$/tools/git-test" />
+                  <project path="$PROJECT_DIR$/tools/tagger-cli" />
                   <project path="$PROJECT_DIR$/tools/tagger-core" />
                   <project path="$PROJECT_DIR$/tools/tagger-plugin" />
                   <project path="$PROJECT_DIR$/tools/tagger-test" />
@@ -42,6 +44,7 @@
             <option value="$PROJECT_DIR$/tools" />
             <option value="$PROJECT_DIR$/tools-plugins" />
             <option value="$PROJECT_DIR$/tools/certifier-plugin" />
+            <option value="$PROJECT_DIR$/tools/cli-tools" />
             <option value="$PROJECT_DIR$/tools/dependency-bom" />
             <option value="$PROJECT_DIR$/tools/digger-cli" />
             <option value="$PROJECT_DIR$/tools/digger-core" />
@@ -51,6 +54,7 @@
             <option value="$PROJECT_DIR$/tools/digger-test" />
             <option value="$PROJECT_DIR$/tools/git-adapter" />
             <option value="$PROJECT_DIR$/tools/git-test" />
+            <option value="$PROJECT_DIR$/tools/tagger-cli" />
             <option value="$PROJECT_DIR$/tools/tagger-core" />
             <option value="$PROJECT_DIR$/tools/tagger-plugin" />
             <option value="$PROJECT_DIR$/tools/tagger-test" />

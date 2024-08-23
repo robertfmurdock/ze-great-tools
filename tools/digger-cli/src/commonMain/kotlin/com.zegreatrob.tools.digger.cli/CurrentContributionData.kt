@@ -5,6 +5,7 @@ import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.option
 import com.zegreatrob.tools.adapter.git.GitAdapter
+import com.zegreatrob.tools.cli.writeToFile
 import com.zegreatrob.tools.digger.core.DiggerCore
 import com.zegreatrob.tools.digger.core.MessageDigger
 import com.zegreatrob.tools.digger.json.toJsonString
@@ -41,5 +42,3 @@ class CurrentContributionData : CliktCommand() {
         .writeToFile(outputFile)
         .also { echo("Data written to $outputFile") }
 }
-
-expect fun String.writeToFile(outputFile: String)

@@ -15,12 +15,12 @@ kotlin {
         compilations {
             "main" {
                 packageJson {
-                    name = "git-digger"
-                    customField("package-name", "git-digger")
+                    name = "git-tagger"
+                    customField("package-name", "git-tagger")
                     customField("author", "rob@continuousexcellence.io")
                     customField("license", "MIT")
                     customField("keywords", arrayOf("git", "contribution", "pair", "agile", "coaching", "statistics"))
-                    customField("bin", mapOf("digger" to "kotlin/bin/digger"))
+                    customField("bin", mapOf("tagger" to "kotlin/bin/tagger"))
                     customField("homepage", "https://github.com/robertfmurdock/ze-great-tools")
                 }
             }
@@ -29,7 +29,7 @@ kotlin {
 }
 
 application {
-    mainClass.set("com.zegreatrob.tools.digger.cli.MainKt")
+    mainClass.set("com.zegreatrob.tools.tagger.cli.MainKt")
 }
 
 val mainNpmProjectDir = kotlin.js().compilations.getByName("main").npmProject.dir
@@ -37,11 +37,10 @@ val mainNpmProjectDir = kotlin.js().compilations.getByName("main").npmProject.di
 dependencies {
     commonMainImplementation(platform(project(":dependency-bom")))
     commonMainImplementation(project(":cli-tools"))
-    commonMainImplementation(project(":digger-core"))
-    commonMainImplementation(project(":digger-json"))
+    commonMainImplementation(project(":tagger-core"))
     commonMainImplementation("com.github.ajalt.clikt:clikt")
 
-    commonTestImplementation(project(":digger-test"))
+    commonTestImplementation(project(":tagger-test"))
 }
 
 tasks {
@@ -49,7 +48,7 @@ tasks {
         useJUnitPlatform()
     }
     withType<CreateStartScripts> {
-        applicationName = "digger"
+        applicationName = "tagger"
     }
     val jsCliTar by registering(Tar::class) {
         dependsOn(
@@ -62,7 +61,7 @@ tasks {
         )
         from(mainNpmProjectDir)
         compression = Compression.GZIP
-        archiveFileName.set("digger-cli-js.tgz")
+        archiveFileName.set("tagger-cli-js.tgz")
     }
     val jsLink by registering(Exec::class) {
         dependsOn(jsCliTar)

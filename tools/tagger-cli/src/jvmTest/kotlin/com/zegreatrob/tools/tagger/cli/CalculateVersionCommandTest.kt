@@ -1,0 +1,49 @@
+package com.zegreatrob.tools.tagger.cli
+
+import com.github.ajalt.clikt.testing.test
+import com.zegreatrob.tools.tagger.CalculateVersionTestSpec
+import org.junit.jupiter.api.io.TempDir
+import java.io.File
+import kotlin.test.BeforeTest
+
+class CalculateVersionCommandTest : CalculateVersionTestSpec {
+
+    @field:TempDir
+    override lateinit var projectDir: File
+
+    override val addFileNames: Set<String> = emptySet()
+    private lateinit var arguments: List<String>
+
+    @BeforeTest
+    fun setup() {
+        arguments = emptyList()
+    }
+
+    override fun setupWithDefaults() {
+        arguments += "--release-branch=master"
+        arguments += projectDir.absolutePath
+    }
+
+    override fun setupWithOverrides(
+        implicitPatch: Boolean?,
+        majorRegex: String?,
+        minorRegex: String?,
+        patchRegex: String?,
+        versionRegex: String?,
+        noneRegex: String?,
+    ) {
+        implicitPatch?.let { arguments += "--implicit-patch=$implicitPatch" }
+        versionRegex?.let { arguments += "--version-regex=$versionRegex" }
+        majorRegex?.let { arguments += "--major-regex=$majorRegex" }
+        minorRegex?.let { arguments += "--minor-regex=$minorRegex" }
+        patchRegex?.let { arguments += "--patch-regex=$patchRegex" }
+        noneRegex?.let { arguments += "--none-regex=$noneRegex" }
+        arguments += "--release-branch=master"
+        arguments += projectDir.absolutePath
+    }
+
+    override fun runCalculateVersion(): String = CalculateVersion()
+        .test(arguments)
+        .output
+        .trim()
+}

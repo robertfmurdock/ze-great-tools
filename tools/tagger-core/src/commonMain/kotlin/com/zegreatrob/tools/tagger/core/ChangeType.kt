@@ -8,12 +8,13 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 
 fun TaggerCore.calculateNextVersion(
-    lastTagDescription: String,
     implicitPatch: Boolean,
     versionRegex: VersionRegex,
-    previousVersionNumber: String,
     releaseBranch: String,
 ): String {
+    val (previousVersionNumber, lastTagDescription) = lastVersionAndTag()
+        ?: return "0.0.0"
+
     val incrementComponent = findAppropriateIncrement(adapter, lastTagDescription, implicitPatch, versionRegex)
     val currentVersionNumber = (
         incrementComponent?.increment(previousVersionNumber.asSemverComponents())

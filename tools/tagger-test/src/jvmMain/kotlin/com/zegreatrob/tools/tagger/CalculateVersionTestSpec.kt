@@ -11,7 +11,7 @@ import java.io.File
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-interface TaggerPluginCalculateVersionTestSpec {
+interface CalculateVersionTestSpec {
     var projectDir: File
     val addFileNames: Set<String>
 

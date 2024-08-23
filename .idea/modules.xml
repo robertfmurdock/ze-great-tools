@@ -2,10 +2,12 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/tools/cli-tools/tools.cli-tools.jvmMain.iml" filepath="$PROJECT_DIR$/.idea/modules/tools/cli-tools/tools.cli-tools.jvmMain.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/tools/digger-cli/tools.digger-cli.jvmTest.iml" filepath="$PROJECT_DIR$/.idea/modules/tools/digger-cli/tools.digger-cli.jvmTest.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/tools/digger-core/tools.digger-core.jvmTest.iml" filepath="$PROJECT_DIR$/.idea/modules/tools/digger-core/tools.digger-core.jvmTest.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/tools/digger-test/tools.digger-test.jvmMain.iml" filepath="$PROJECT_DIR$/.idea/modules/tools/digger-test/tools.digger-test.jvmMain.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/tools/git-test/tools.git-test.jvmMain.iml" filepath="$PROJECT_DIR$/.idea/modules/tools/git-test/tools.git-test.jvmMain.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/tools/tagger-cli/tools.tagger-cli.jvmTest.iml" filepath="$PROJECT_DIR$/.idea/modules/tools/tagger-cli/tools.tagger-cli.jvmTest.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/tools/tagger-test/tools.tagger-test.jvmMain.iml" filepath="$PROJECT_DIR$/.idea/modules/tools/tagger-test/tools.tagger-test.jvmMain.iml" />
     </modules>
   </component>

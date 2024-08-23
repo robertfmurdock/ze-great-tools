@@ -16,7 +16,7 @@ import kotlin.test.Test
 import kotlin.test.assertContains
 import kotlin.test.assertEquals
 
-class TaggerPluginCalculateVersionFunctionalTest : TaggerPluginCalculateVersionTestSpec {
+class TaggerPluginCalculateVersionFunctionalTest : CalculateVersionTestSpec {
     @field:TempDir
     override lateinit var projectDir: File
 

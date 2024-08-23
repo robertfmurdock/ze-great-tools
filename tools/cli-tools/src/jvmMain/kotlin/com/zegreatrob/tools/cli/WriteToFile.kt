@@ -1,4 +1,4 @@
-package com.zegreatrob.tools.digger.cli
+package com.zegreatrob.tools.cli
 
 import java.io.File
 
