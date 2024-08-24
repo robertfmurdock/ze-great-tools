@@ -9,7 +9,9 @@ import org.ajoberstar.grgit.operation.RemoteAddOp
 import org.ajoberstar.grgit.operation.TagAddOp
 import java.io.File
 import kotlin.test.Test
+import kotlin.test.assertContains
 import kotlin.test.assertEquals
+import kotlin.test.fail
 
 interface CalculateVersionTestSpec {
     var projectDir: File
@@ -37,14 +39,19 @@ interface CalculateVersionTestSpec {
         commits = commits,
     )
 
-    fun runCalculateVersion(): String
+    fun runCalculateVersion(): TestResult
+    fun runCalculateVersionSuccessfully(): String =
+        when (val result = runCalculateVersion()) {
+            is TestResult.Success -> result.message
+            is TestResult.Failure -> fail("Expected success but got ${result.reason}")
+        }
 
     @Test
     fun `calculating version with no tags produces zero version`() {
         setupWithDefaults()
 
         initializeGitRepo(listOf("init", "[patch] commit 1", "[patch] commit 2"))
-        val version = runCalculateVersion()
+        val version = runCalculateVersionSuccessfully()
 
         assertEquals("0.0.0", version)
     }
@@ -77,7 +84,7 @@ interface CalculateVersionTestSpec {
                 it.url = projectDir.absolutePath
             },
         )
-        val version = runCalculateVersion()
+        val version = runCalculateVersionSuccessfully()
 
         assertEquals("1.0.23-SNAPSHOT", version)
     }
@@ -87,7 +94,7 @@ interface CalculateVersionTestSpec {
         setupWithDefaults()
 
         initializeGitRepo(listOf("init", "[patch] commit 1", "[patch] commit 2"), initialTag = "1.2.3")
-        val version = runCalculateVersion()
+        val version = runCalculateVersionSuccessfully()
 
         assertEquals("1.2.4", version)
     }
@@ -97,7 +104,7 @@ interface CalculateVersionTestSpec {
         setupWithOverrides(implicitPatch = false)
 
         initializeGitRepo(commits = listOf("init", "commit 1", "commit 2"), initialTag = "1.2.3")
-        val version = runCalculateVersion()
+        val version = runCalculateVersionSuccessfully()
 
         assertEquals("1.2.3-SNAPSHOT", version)
     }
@@ -107,7 +114,7 @@ interface CalculateVersionTestSpec {
         setupWithOverrides(implicitPatch = false)
 
         initializeGitRepo(commits = listOf("init", "commit 1", "commit 2"), initialTag = "1.2.3-SNAPSHOT")
-        val version = runCalculateVersion()
+        val version = runCalculateVersionSuccessfully()
 
         assertEquals("1.2.3-SNAPSHOT", version)
     }
@@ -117,7 +124,7 @@ interface CalculateVersionTestSpec {
         setupWithOverrides(implicitPatch = true)
 
         initializeGitRepo(commits = listOf("init", "commit 1", "commit 2"), initialTag = "1.2.3")
-        val version = runCalculateVersion()
+        val version = runCalculateVersionSuccessfully()
 
         assertEquals("1.2.4", version)
     }
@@ -127,7 +134,7 @@ interface CalculateVersionTestSpec {
         setupWithOverrides(implicitPatch = true)
 
         initializeGitRepo(commits = listOf("init", "[none] commit 1", "commit 2"), initialTag = "1.2.3")
-        val version = runCalculateVersion()
+        val version = runCalculateVersionSuccessfully()
 
         assertEquals("1.2.4", version)
     }
@@ -137,7 +144,7 @@ interface CalculateVersionTestSpec {
         setupWithOverrides(implicitPatch = true)
 
         initializeGitRepo(commits = listOf("init", "[None] commit 1", "[none] commit 2"), initialTag = "1.2.3")
-        val version = runCalculateVersion()
+        val version = runCalculateVersionSuccessfully()
 
         assertEquals("1.2.3-SNAPSHOT", version)
     }
@@ -150,7 +157,7 @@ interface CalculateVersionTestSpec {
             commits = listOf("init", "[patch] commit 1", "[minor] commit 2", "[patch] commit 3"),
             initialTag = "1.2.3",
         )
-        val version = runCalculateVersion()
+        val version = runCalculateVersionSuccessfully()
 
         assertEquals("1.3.0", version)
     }
@@ -163,7 +170,7 @@ interface CalculateVersionTestSpec {
             commits = listOf("init", "[patch] commit 1", "commit (big) 2", "[patch] commit 3"),
             initialTag = "1.2.3",
         )
-        val version = runCalculateVersion()
+        val version = runCalculateVersionSuccessfully()
 
         assertEquals("2.0.0", version)
     }
@@ -180,7 +187,7 @@ interface CalculateVersionTestSpec {
             initialTag = "1.2.3",
         )
 
-        val version = runCalculateVersion()
+        val version = runCalculateVersionSuccessfully()
 
         assertEquals("2.0.0", version)
     }
@@ -196,7 +203,7 @@ interface CalculateVersionTestSpec {
             commits = listOf("init", "[patch] commit 1", "commit (middle) 2", "[patch] commit 3"),
             initialTag = "1.2.3",
         )
-        val version = runCalculateVersion()
+        val version = runCalculateVersionSuccessfully()
 
         assertEquals("1.3.0", version)
     }
@@ -209,7 +216,7 @@ interface CalculateVersionTestSpec {
             commits = listOf("init", "[patch] commit 1", "commit (middle) 2", "[patch] commit 3"),
             initialTag = "1.2.3",
         )
-        val version = runCalculateVersion()
+        val version = runCalculateVersionSuccessfully()
 
         assertEquals("1.3.0", version)
     }
@@ -219,7 +226,7 @@ interface CalculateVersionTestSpec {
         setupWithOverrides(implicitPatch = false, patchRegex = ".*(tiny).*")
 
         initializeGitRepo(commits = listOf("init", "commit 1", "commit (tiny) 2", "commit 3"), initialTag = "1.2.3")
-        val version = runCalculateVersion()
+        val version = runCalculateVersionSuccessfully()
 
         assertEquals("1.2.4", version)
     }
@@ -232,7 +239,7 @@ interface CalculateVersionTestSpec {
         )
 
         initializeGitRepo(commits = listOf("init", "commit 1", "commit (widdle) 2", "commit 3"), initialTag = "1.2.3")
-        val version = runCalculateVersion()
+        val version = runCalculateVersionSuccessfully()
 
         assertEquals("1.2.4", version)
     }
@@ -245,7 +252,7 @@ interface CalculateVersionTestSpec {
         )
 
         initializeGitRepo(commits = listOf("init", "commit (no) 1"), initialTag = "1.2.3")
-        val version = runCalculateVersion()
+        val version = runCalculateVersionSuccessfully()
 
         assertEquals("1.2.3-SNAPSHOT", version)
     }
@@ -258,7 +265,7 @@ interface CalculateVersionTestSpec {
         )
 
         initializeGitRepo(commits = listOf("init", "commit (no) 1"), initialTag = "1.2.3")
-        val version = runCalculateVersion()
+        val version = runCalculateVersionSuccessfully()
 
         assertEquals("1.2.3-SNAPSHOT", version)
     }
@@ -271,7 +278,22 @@ interface CalculateVersionTestSpec {
             commits = listOf("init", "[major] commit 1", "[minor] commit 2", "[patch] commit 3"),
             initialTag = "1.2.3",
         )
-        val version = runCalculateVersion()
+        val version = runCalculateVersionSuccessfully()
         assertEquals("2.0.0", version)
+    }
+
+    @Test
+    fun unifiedGroupWillReportErrorsWhenMissingGroupsWithCorrectNames() {
+        setupWithOverrides(implicitPatch = true, versionRegex = ".*")
+
+        initializeGitRepo(listOf("init", "commit (no) 1"), "1.2.3")
+        when (val result = runCalculateVersion()) {
+            is TestResult.Failure -> assertContains(
+                result.reason,
+                "version regex must include groups named 'major', 'minor', 'patch', and 'none'.",
+            )
+
+            is TestResult.Success -> fail("Should not have succeeded.")
+        }
     }
 }

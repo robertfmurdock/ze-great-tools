@@ -67,13 +67,10 @@ open class TaggerExtension(
 
 private fun Regex.validateVersionRegex() {
     if (
-        pattern.contains("?<major>") &&
-        pattern.contains("?<minor>") &&
-        pattern.contains("?<patch>") &&
-        pattern.contains("?<none>")
+        VersionRegex.containsAllGroups(pattern)
     ) {
         return
     } else {
-        throw GradleException("version regex must include groups named 'major', 'minor', 'patch', and 'none'.")
+        throw GradleException(VersionRegex.MISSING_GROUP_ERROR)
     }
 }

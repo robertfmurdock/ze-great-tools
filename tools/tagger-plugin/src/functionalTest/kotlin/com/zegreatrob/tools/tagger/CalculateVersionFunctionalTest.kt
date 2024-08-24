@@ -13,10 +13,9 @@ import kotlin.io.path.absolutePathString
 import kotlin.io.path.createTempDirectory
 import kotlin.test.BeforeTest
 import kotlin.test.Test
-import kotlin.test.assertContains
 import kotlin.test.assertEquals
 
-class TaggerPluginCalculateVersionFunctionalTest : CalculateVersionTestSpec {
+class CalculateVersionFunctionalTest : CalculateVersionTestSpec {
     @field:TempDir
     override lateinit var projectDir: File
 
@@ -114,32 +113,18 @@ class TaggerPluginCalculateVersionFunctionalTest : CalculateVersionTestSpec {
         assertEquals("1.0.0", gitAdapter.showTag("HEAD"))
     }
 
-    @Test
-    fun unifiedGroupWillReportErrorsWhenMissingGroupsWithCorrectNames() {
-        setupWithOverrides(implicitPatch = true, versionRegex = ".*")
-
-        initializeGitRepo(listOf("init", "commit (no) 1"), "1.2.3")
+    override fun runCalculateVersion(): TestResult {
         val runner = GradleRunner.create()
         runner.forwardOutput()
         runner.withPluginClasspath()
         runner.withArguments("calculateVersion", "-q")
         runner.withProjectDir(projectDir)
-        val result = runCatching { runner.build() }.exceptionOrNull()
-
-        assertContains(
-            charSequence = result.toString(),
-            other = "version regex must include groups named 'major', 'minor', 'patch', and 'none'.",
-        )
-    }
-
-    override fun runCalculateVersion(): String {
-        val runner = GradleRunner.create()
-        runner.forwardOutput()
-        runner.withPluginClasspath()
-        runner.withArguments("calculateVersion", "-q")
-        runner.withProjectDir(projectDir)
-        val result = runner.build()
-        return result.output.trim()
+        return try {
+            val result = runner.build()
+            result.output.trim().let(TestResult::Success)
+        } catch (e: Exception) {
+            TestResult.Failure(e.message!!)
+        }
     }
 
     private fun disableGpgSign(directory: File) {

@@ -2,6 +2,7 @@ package com.zegreatrob.tools.tagger.cli
 
 import com.github.ajalt.clikt.testing.test
 import com.zegreatrob.tools.tagger.CalculateVersionTestSpec
+import com.zegreatrob.tools.tagger.TestResult
 import org.junit.jupiter.api.io.TempDir
 import java.io.File
 import kotlin.test.BeforeTest
@@ -42,8 +43,16 @@ class CalculateVersionCommandTest : CalculateVersionTestSpec {
         arguments += projectDir.absolutePath
     }
 
-    override fun runCalculateVersion(): String = CalculateVersion()
-        .test(arguments)
-        .output
-        .trim()
+    override fun runCalculateVersion(): TestResult {
+        val test = CalculateVersion()
+            .test(arguments)
+        return if (test.statusCode == 0) {
+            test
+                .output
+                .trim()
+                .let { TestResult.Success(it) }
+        } else {
+            TestResult.Failure(test.output.trim())
+        }
+    }
 }
