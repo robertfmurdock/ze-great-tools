@@ -1,6 +1,7 @@
 package com.zegreatrob.tools.tagger
 
 import com.zegreatrob.tools.adapter.git.GitAdapter
+import com.zegreatrob.tools.adapter.git.runProcess
 import com.zegreatrob.tools.test.git.disableGpgSign
 import org.ajoberstar.grgit.Grgit
 import org.ajoberstar.grgit.operation.CommitOp
@@ -48,6 +49,9 @@ interface TagTestSpec {
             remoteUrl = originDirectory.absolutePathString(),
         )
         grgit.push()
+
+        runProcess(listOf("git", "config", "user.email", "test@zegreatrob.com"), this.projectDir.absolutePath)
+        runProcess(listOf("git", "config", "user.name", "RoB as Test"), this.projectDir.absolutePath)
 
         val expectedVersion = "1.0.0"
         val result = execute(expectedVersion)

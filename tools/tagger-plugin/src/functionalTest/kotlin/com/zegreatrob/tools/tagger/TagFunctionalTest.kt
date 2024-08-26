@@ -1,6 +1,5 @@
 package com.zegreatrob.tools.tagger
 
-import com.zegreatrob.tools.adapter.git.runProcess
 import org.gradle.testkit.runner.GradleRunner
 import org.junit.jupiter.api.io.TempDir
 import java.io.File
@@ -37,9 +36,6 @@ class TagFunctionalTest : TagTestSpec {
     }
 
     override fun execute(version: String): TestResult {
-        runProcess(listOf("git", "config", "user.email", "test@zegreatrob.com"), this.projectDir.absolutePath)
-        runProcess(listOf("git", "config", "user.name", "RoB as Test"), this.projectDir.absolutePath)
-
         val runner = GradleRunner.create()
         runner.forwardOutput()
         runner.withPluginClasspath()
