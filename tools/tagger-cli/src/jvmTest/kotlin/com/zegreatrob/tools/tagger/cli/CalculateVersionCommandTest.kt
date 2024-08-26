@@ -25,7 +25,7 @@ class CalculateVersionCommandTest : CalculateVersionTestSpec {
         arguments += projectDir.absolutePath
     }
 
-    override fun setupWithOverrides(
+    override fun configureWithOverrides(
         implicitPatch: Boolean?,
         majorRegex: String?,
         minorRegex: String?,
@@ -43,7 +43,7 @@ class CalculateVersionCommandTest : CalculateVersionTestSpec {
         arguments += projectDir.absolutePath
     }
 
-    override fun runCalculateVersion(): TestResult {
+    override fun execute(): TestResult {
         val test = CalculateVersion()
             .test(arguments)
         return if (test.statusCode == 0) {

@@ -18,7 +18,7 @@ interface CalculateVersionTestSpec {
     val addFileNames: Set<String>
 
     fun setupWithDefaults()
-    fun setupWithOverrides(
+    fun configureWithOverrides(
         implicitPatch: Boolean? = null,
         majorRegex: String? = null,
         minorRegex: String? = null,
@@ -39,9 +39,9 @@ interface CalculateVersionTestSpec {
         commits = commits,
     )
 
-    fun runCalculateVersion(): TestResult
+    fun execute(): TestResult
     fun runCalculateVersionSuccessfully(): String =
-        when (val result = runCalculateVersion()) {
+        when (val result = execute()) {
             is TestResult.Success -> result.message
             is TestResult.Failure -> fail("Expected success but got ${result.reason}")
         }
@@ -101,7 +101,7 @@ interface CalculateVersionTestSpec {
 
     @Test
     fun `given no implicit patch, calculating version with unlabeled commits does not increment`() {
-        setupWithOverrides(implicitPatch = false)
+        configureWithOverrides(implicitPatch = false)
 
         initializeGitRepo(commits = listOf("init", "commit 1", "commit 2"), initialTag = "1.2.3")
         val version = runCalculateVersionSuccessfully()
@@ -111,7 +111,7 @@ interface CalculateVersionTestSpec {
 
     @Test
     fun `given initial tag with suffix, ignore suffix and follow normal rules`() {
-        setupWithOverrides(implicitPatch = false)
+        configureWithOverrides(implicitPatch = false)
 
         initializeGitRepo(commits = listOf("init", "commit 1", "commit 2"), initialTag = "1.2.3-SNAPSHOT")
         val version = runCalculateVersionSuccessfully()
@@ -121,7 +121,7 @@ interface CalculateVersionTestSpec {
 
     @Test
     fun `given implicit patch, calculating version with unlabeled commits increments patch`() {
-        setupWithOverrides(implicitPatch = true)
+        configureWithOverrides(implicitPatch = true)
 
         initializeGitRepo(commits = listOf("init", "commit 1", "commit 2"), initialTag = "1.2.3")
         val version = runCalculateVersionSuccessfully()
@@ -131,7 +131,7 @@ interface CalculateVersionTestSpec {
 
     @Test
     fun `given implicit patch, calculating version with none and then unlabeled commits increments patch`() {
-        setupWithOverrides(implicitPatch = true)
+        configureWithOverrides(implicitPatch = true)
 
         initializeGitRepo(commits = listOf("init", "[none] commit 1", "commit 2"), initialTag = "1.2.3")
         val version = runCalculateVersionSuccessfully()
@@ -141,7 +141,7 @@ interface CalculateVersionTestSpec {
 
     @Test
     fun `given implicit patch, calculating version with None commits does not increment and is always snapshot`() {
-        setupWithOverrides(implicitPatch = true)
+        configureWithOverrides(implicitPatch = true)
 
         initializeGitRepo(commits = listOf("init", "[None] commit 1", "[none] commit 2"), initialTag = "1.2.3")
         val version = runCalculateVersionSuccessfully()
@@ -164,7 +164,7 @@ interface CalculateVersionTestSpec {
 
     @Test
     fun canReplaceMajorRegex() {
-        setupWithOverrides(implicitPatch = false, majorRegex = ".*(big).*")
+        configureWithOverrides(implicitPatch = false, majorRegex = ".*(big).*")
 
         initializeGitRepo(
             commits = listOf("init", "[patch] commit 1", "commit (big) 2", "[patch] commit 3"),
@@ -177,7 +177,7 @@ interface CalculateVersionTestSpec {
 
     @Test
     fun unifiedGroupRegexCanReplaceMajorRegex() {
-        setupWithOverrides(
+        configureWithOverrides(
             implicitPatch = false,
             versionRegex = "(?<major>.*big.*)?(?<minor>.*mid.*)?(?<patch>.*widdle.*)?(?<none>.*no.*)?",
         )
@@ -194,7 +194,7 @@ interface CalculateVersionTestSpec {
 
     @Test
     fun unifiedGroupCanReplaceMinorRegex() {
-        setupWithOverrides(
+        configureWithOverrides(
             implicitPatch = false,
             versionRegex = "(?<major>.*big.*)?(?<minor>.*mid.*)?(?<patch>.*widdle.*)?(?<none>.*no.*)?",
         )
@@ -210,7 +210,7 @@ interface CalculateVersionTestSpec {
 
     @Test
     fun canReplaceMinorRegex() {
-        setupWithOverrides(implicitPatch = false, minorRegex = ".*(middle).*")
+        configureWithOverrides(implicitPatch = false, minorRegex = ".*(middle).*")
 
         initializeGitRepo(
             commits = listOf("init", "[patch] commit 1", "commit (middle) 2", "[patch] commit 3"),
@@ -223,7 +223,7 @@ interface CalculateVersionTestSpec {
 
     @Test
     fun canReplacePatchRegex() {
-        setupWithOverrides(implicitPatch = false, patchRegex = ".*(tiny).*")
+        configureWithOverrides(implicitPatch = false, patchRegex = ".*(tiny).*")
 
         initializeGitRepo(commits = listOf("init", "commit 1", "commit (tiny) 2", "commit 3"), initialTag = "1.2.3")
         val version = runCalculateVersionSuccessfully()
@@ -233,7 +233,7 @@ interface CalculateVersionTestSpec {
 
     @Test
     fun unifiedGroupCanReplacePatchRegex() {
-        setupWithOverrides(
+        configureWithOverrides(
             implicitPatch = false,
             versionRegex = "(?<major>.*big.*)?(?<minor>.*mid.*)?(?<patch>.*widdle.*)?(?<none>.*no.*)?",
         )
@@ -246,7 +246,7 @@ interface CalculateVersionTestSpec {
 
     @Test
     fun canReplaceNoneRegex() {
-        setupWithOverrides(
+        configureWithOverrides(
             implicitPatch = true,
             noneRegex = ".*(no).*",
         )
@@ -259,7 +259,7 @@ interface CalculateVersionTestSpec {
 
     @Test
     fun unifiedGroupCanReplaceNoneRegex() {
-        setupWithOverrides(
+        configureWithOverrides(
             implicitPatch = true,
             versionRegex = "(?<major>.*big.*)?(?<minor>.*mid.*)?(?<patch>.*widdle.*)?(?<none>.*no.*)?",
         )
@@ -284,10 +284,10 @@ interface CalculateVersionTestSpec {
 
     @Test
     fun unifiedGroupWillReportErrorsWhenMissingGroupsWithCorrectNames() {
-        setupWithOverrides(implicitPatch = true, versionRegex = ".*")
+        configureWithOverrides(implicitPatch = true, versionRegex = ".*")
 
         initializeGitRepo(listOf("init", "commit (no) 1"), "1.2.3")
-        when (val result = runCalculateVersion()) {
+        when (val result = execute()) {
             is TestResult.Failure -> assertContains(
                 result.reason,
                 "version regex must include groups named 'major', 'minor', 'patch', and 'none'.",

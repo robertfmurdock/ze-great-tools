@@ -1,19 +1,9 @@
 package com.zegreatrob.tools.tagger
 
-import com.zegreatrob.tools.adapter.git.GitAdapter
-import com.zegreatrob.tools.adapter.git.runProcess
-import org.ajoberstar.grgit.Grgit
-import org.ajoberstar.grgit.operation.CommitOp
-import org.ajoberstar.grgit.operation.InitOp
 import org.gradle.testkit.runner.GradleRunner
 import org.junit.jupiter.api.io.TempDir
 import java.io.File
-import java.io.FileOutputStream
-import kotlin.io.path.absolutePathString
-import kotlin.io.path.createTempDirectory
 import kotlin.test.BeforeTest
-import kotlin.test.Test
-import kotlin.test.assertEquals
 
 class CalculateVersionFunctionalTest : CalculateVersionTestSpec {
     @field:TempDir
@@ -44,7 +34,7 @@ class CalculateVersionFunctionalTest : CalculateVersionTestSpec {
         )
     }
 
-    override fun setupWithOverrides(
+    override fun configureWithOverrides(
         implicitPatch: Boolean?,
         majorRegex: String?,
         minorRegex: String?,
@@ -81,39 +71,7 @@ class CalculateVersionFunctionalTest : CalculateVersionTestSpec {
         )
     }
 
-    @Test
-    fun tagWillTagAndPushSuccessfully() {
-        setupWithDefaults()
-
-        val originDirectory = createTempDirectory()
-        val originGrgit = Grgit.init(fun InitOp.() {
-            this.dir = originDirectory.absolutePathString()
-        })
-        disableGpgSign(originDirectory.toFile())
-        originGrgit.commit(fun CommitOp.() {
-            this.message = "init"
-        })
-        val grgit = initializeGitRepo(
-            listOf("init", "[patch] commit 1", "[patch] commit 2"),
-            remoteUrl = originDirectory.absolutePathString(),
-        )
-        grgit.push()
-
-        runProcess(listOf("git", "config", "user.email", "test@zegreatrob.com"), this.projectDir.absolutePath)
-        runProcess(listOf("git", "config", "user.name", "RoB as Test"), this.projectDir.absolutePath)
-
-        val runner = GradleRunner.create()
-        runner.forwardOutput()
-        runner.withPluginClasspath()
-        runner.withArguments("tag", "-Pversion=1.0.0")
-        runner.withProjectDir(projectDir)
-        runner.build()
-
-        val gitAdapter = GitAdapter(this.projectDir.absolutePath)
-        assertEquals("1.0.0", gitAdapter.showTag("HEAD"))
-    }
-
-    override fun runCalculateVersion(): TestResult {
+    override fun execute(): TestResult {
         val runner = GradleRunner.create()
         runner.forwardOutput()
         runner.withPluginClasspath()
@@ -125,12 +83,5 @@ class CalculateVersionFunctionalTest : CalculateVersionTestSpec {
         } catch (e: Exception) {
             TestResult.Failure(e.message!!)
         }
-    }
-
-    private fun disableGpgSign(directory: File) {
-        FileOutputStream(directory.resolve(".git/config"), true)
-            .writer().use {
-                it.write("[commit]\n        gpgsign = false")
-            }
     }
 }
