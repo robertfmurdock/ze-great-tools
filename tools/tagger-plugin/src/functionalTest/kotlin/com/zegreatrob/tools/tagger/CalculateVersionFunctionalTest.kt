@@ -21,7 +21,7 @@ class CalculateVersionFunctionalTest : CalculateVersionTestSpec {
         ignoreFile.writeText(".gradle")
     }
 
-    override fun setupWithDefaults() {
+    override fun configureWithDefaults() {
         buildFile.writeText(
             """
             plugins {

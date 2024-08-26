@@ -17,7 +17,7 @@ interface CalculateVersionTestSpec {
     var projectDir: File
     val addFileNames: Set<String>
 
-    fun setupWithDefaults()
+    fun configureWithDefaults()
     fun configureWithOverrides(
         implicitPatch: Boolean? = null,
         majorRegex: String? = null,
@@ -48,7 +48,7 @@ interface CalculateVersionTestSpec {
 
     @Test
     fun `calculating version with no tags produces zero version`() {
-        setupWithDefaults()
+        configureWithDefaults()
 
         initializeGitRepo(listOf("init", "[patch] commit 1", "[patch] commit 2"))
         val version = runCalculateVersionSuccessfully()
@@ -58,7 +58,7 @@ interface CalculateVersionTestSpec {
 
     @Test
     fun `calculating version when current commit already has tag will use tag`() {
-        setupWithDefaults()
+        configureWithDefaults()
 
         val grgit = Grgit.init(mapOf("dir" to projectDir.absolutePath))
         disableGpgSign(projectDir.absolutePath)
@@ -91,7 +91,7 @@ interface CalculateVersionTestSpec {
 
     @Test
     fun `calculating version with all patch commits only increments patch`() {
-        setupWithDefaults()
+        configureWithDefaults()
 
         initializeGitRepo(listOf("init", "[patch] commit 1", "[patch] commit 2"), initialTag = "1.2.3")
         val version = runCalculateVersionSuccessfully()
@@ -151,7 +151,7 @@ interface CalculateVersionTestSpec {
 
     @Test
     fun `calculating version with one minor commits only increments minor`() {
-        setupWithDefaults()
+        configureWithDefaults()
 
         initializeGitRepo(
             commits = listOf("init", "[patch] commit 1", "[minor] commit 2", "[patch] commit 3"),
@@ -272,7 +272,7 @@ interface CalculateVersionTestSpec {
 
     @Test
     fun `calculating version with one major commits only increments major`() {
-        setupWithDefaults()
+        configureWithDefaults()
 
         initializeGitRepo(
             commits = listOf("init", "[major] commit 1", "[minor] commit 2", "[patch] commit 3"),

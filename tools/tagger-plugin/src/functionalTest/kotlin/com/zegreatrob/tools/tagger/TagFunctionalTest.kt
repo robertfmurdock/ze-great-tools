@@ -6,7 +6,7 @@ import org.junit.jupiter.api.io.TempDir
 import java.io.File
 import kotlin.test.BeforeTest
 
-class TagAndPushFunctionalTest : TagAndPushTestSpec {
+class TagFunctionalTest : TagTestSpec {
 
     @field:TempDir
     override lateinit var projectDir: File
@@ -36,14 +36,14 @@ class TagAndPushFunctionalTest : TagAndPushTestSpec {
         )
     }
 
-    override fun execute(): TestResult {
+    override fun execute(version: String): TestResult {
         runProcess(listOf("git", "config", "user.email", "test@zegreatrob.com"), this.projectDir.absolutePath)
         runProcess(listOf("git", "config", "user.name", "RoB as Test"), this.projectDir.absolutePath)
 
         val runner = GradleRunner.create()
         runner.forwardOutput()
         runner.withPluginClasspath()
-        runner.withArguments("tag", "-Pversion=1.0.0")
+        runner.withArguments("tag", "-Pversion=$version")
         runner.withProjectDir(projectDir)
         return try {
             val result = runner.build()

@@ -10,8 +10,9 @@ import kotlin.io.path.absolutePathString
 import kotlin.io.path.createTempDirectory
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertIsNot
 
-interface TagAndPushTestSpec {
+interface TagTestSpec {
     var projectDir: File
     val addFileNames: Set<String>
 
@@ -28,7 +29,7 @@ interface TagAndPushTestSpec {
     )
 
     fun configureWithDefaults()
-    fun execute(): TestResult
+    fun execute(version: String): TestResult
 
     @Test
     fun tagWillTagAndPushSuccessfully() {
@@ -48,9 +49,11 @@ interface TagAndPushTestSpec {
         )
         grgit.push()
 
-        execute()
+        val expectedVersion = "1.0.0"
+        val result = execute(expectedVersion)
+        assertIsNot<TestResult.Failure>(result, message = "$result")
 
         val gitAdapter = GitAdapter(this.projectDir.absolutePath)
-        assertEquals("1.0.0", gitAdapter.showTag("HEAD"))
+        assertEquals(expectedVersion, gitAdapter.showTag("HEAD"))
     }
 }

@@ -20,7 +20,7 @@ class CalculateVersionCommandTest : CalculateVersionTestSpec {
         arguments = emptyList()
     }
 
-    override fun setupWithDefaults() {
+    override fun configureWithDefaults() {
         arguments += "--release-branch=master"
         arguments += projectDir.absolutePath
     }
