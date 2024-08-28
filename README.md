@@ -12,6 +12,7 @@
 
 [![Gradle Plugin Portal](https://img.shields.io/gradle-plugin-portal/v/com.zegreatrob.tools.tagger?label=Tagger%20Plugin)](https://plugins.gradle.org/plugin/com.zegreatrob.tools.tagger)
 [![Gradle Plugin Portal](https://img.shields.io/gradle-plugin-portal/v/com.zegreatrob.tools.digger?label=Digger%20Plugin)](https://plugins.gradle.org/plugin/com.zegreatrob.tools.digger)
+![NPM Version](https://img.shields.io/npm/v/git-semver-tagger?label=npm%20git-semver-tagger)
 ![NPM Version](https://img.shields.io/npm/v/git-digger?label=npm%20git-digger)
 
 Basic tools for continuous development and release.
@@ -31,6 +32,12 @@ An plugin extracting contribution information from a git repository.
 See its [README](tools/digger-plugin/README.md) for more.
 
 ## NPM Utilities
+
+### Tagger CLI
+
+A opinionated program for automatic semantic versioning via git tags and information in commits.
+
+See its [README](tools/tagger-cli/README.md) for more.
 
 ### Digger CLI
 
