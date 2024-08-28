@@ -14,7 +14,7 @@ You can install the tool using any NPM-like system.
 ```bash
 npm i -D git-digger # this will install it into a project as a dev dependency
 
-npx digger current-contribution-data $(pwd) # You can use npx to run a projects programs easily
+npx digger current-contribution-data $(pwd) # You can use npx to run a project's programs easily
 ```
 
 ### Global Example

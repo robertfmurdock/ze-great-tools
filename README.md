@@ -35,7 +35,7 @@ See its [README](tools/digger-plugin/README.md) for more.
 
 ### Tagger CLI
 
-A opinionated program for automatic semantic versioning via git tags and information in commits.
+An opinionated program for automatic semantic versioning via git tags and information in commits.
 
 See its [README](tools/tagger-cli/README.md) for more.
 
