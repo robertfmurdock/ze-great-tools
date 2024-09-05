@@ -17,7 +17,7 @@ class CalculateVersionCommandTest : CalculateVersionTestSpec {
 
     @BeforeTest
     fun setup() {
-        arguments = emptyList()
+        arguments = listOf("-q", "calculate-version")
     }
 
     override fun configureWithDefaults() {
@@ -44,7 +44,7 @@ class CalculateVersionCommandTest : CalculateVersionTestSpec {
     }
 
     override fun execute(): TestResult {
-        val test = CalculateVersion()
+        val test = cli()
             .test(arguments)
         return if (test.statusCode == 0) {
             test

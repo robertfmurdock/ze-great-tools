@@ -4,10 +4,10 @@ import com.github.ajalt.clikt.testing.test
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-class WelcomeTest {
+class TaggerTest {
     @Test
     fun quietWillSuppressWelcome() {
-        Welcome()
+        Tagger()
             .test("--quiet")
             .output
             .let {
@@ -17,7 +17,7 @@ class WelcomeTest {
 
     @Test
     fun quietHasShorthand() {
-        Welcome()
+        Tagger()
             .test("-q")
             .output
             .let {

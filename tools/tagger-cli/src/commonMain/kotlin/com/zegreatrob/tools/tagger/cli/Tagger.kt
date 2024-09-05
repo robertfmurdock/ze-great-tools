@@ -4,7 +4,7 @@ import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
 
-class Welcome : CliktCommand() {
+class Tagger : CliktCommand() {
 
     private val quiet by option("--quiet", "-q")
         .flag(default = false)

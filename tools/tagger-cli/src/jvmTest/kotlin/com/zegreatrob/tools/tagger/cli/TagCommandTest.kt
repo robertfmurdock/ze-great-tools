@@ -17,7 +17,7 @@ class TagCommandTest : TagTestSpec {
 
     @BeforeTest
     fun setup() {
-        arguments = emptyList()
+        arguments = listOf("-q", "tag")
     }
 
     override fun configureWithDefaults() {
@@ -27,7 +27,7 @@ class TagCommandTest : TagTestSpec {
 
     override fun execute(version: String): TestResult {
         arguments += "--version=$version"
-        val test = Tag()
+        val test = cli()
             .test(arguments)
         return if (test.statusCode == 0) {
             test
