@@ -20,6 +20,9 @@ open class TaggerExtension(
     var releaseBranch: String? = null
 
     @Input
+    var warningsAsErrors = objectFactory.property<Boolean>().convention(false)
+
+    @Input
     var workingDirectory = objectFactory.property<File>()
 
     @Input

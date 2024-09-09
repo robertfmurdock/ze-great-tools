@@ -25,6 +25,16 @@ class TagCommandTest : TagTestSpec {
         arguments += projectDir.absolutePath
     }
 
+    override fun configureWithOverrides(releaseBranch: String?, warningsAsErrors: Boolean?) {
+        if (releaseBranch != null) {
+            arguments += "--release-branch=$releaseBranch"
+        }
+        if (warningsAsErrors != null) {
+            arguments += "--warnings-as-errors=$warningsAsErrors"
+        }
+        arguments += projectDir.absolutePath
+    }
+
     override fun execute(version: String): TestResult {
         arguments += "--version=$version"
         val test = cli()

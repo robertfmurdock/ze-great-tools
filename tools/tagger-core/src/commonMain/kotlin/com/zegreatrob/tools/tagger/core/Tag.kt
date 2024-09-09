@@ -10,15 +10,13 @@ fun TaggerCore.tag(version: String, releaseBranch: String?): TagResult {
     val isNotOnReleaseBranch = headBranch != releaseBranch
     return if (isSnapshot || alreadyTagged || isNotOnReleaseBranch) {
         TagResult.Error(
-            "skipping tag due to ${
+            TagErrors.wrapper(
                 mapOf(
-                    isSnapshot to "being snapshot",
-                    alreadyTagged to "already tagged $headTag",
-                    isNotOnReleaseBranch to "not on release branch $releaseBranch - branch was $headBranch",
-                )
-                    .filterKeys { it }
-                    .values.joinToString(", ")
-            }",
+                    isSnapshot to TagErrors.BEING_SNAPSHOT,
+                    alreadyTagged to TagErrors.alreadyTagged(headTag),
+                    isNotOnReleaseBranch to TagErrors.skipMessageNotOnReleaseBranch(releaseBranch, headBranch),
+                ).filterKeys { it }.values.joinToString(", "),
+            ),
         )
     } else {
         adapter.newAnnotatedTag(version, "HEAD")

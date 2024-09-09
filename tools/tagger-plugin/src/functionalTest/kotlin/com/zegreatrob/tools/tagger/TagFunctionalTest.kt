@@ -35,6 +35,20 @@ class TagFunctionalTest : TagTestSpec {
         )
     }
 
+    override fun configureWithOverrides(releaseBranch: String?, warningsAsErrors: Boolean?) {
+        buildFile.writeText(
+            """
+            plugins {
+                id("com.zegreatrob.tools.tagger")
+            }
+            tagger {
+                ${if (releaseBranch != null) "releaseBranch = \"$releaseBranch\"" else ""}
+                ${if (warningsAsErrors != null) "warningsAsErrors.set($warningsAsErrors)" else ""}
+            }
+            """.trimIndent(),
+        )
+    }
+
     override fun execute(version: String): TestResult {
         val runner = GradleRunner.create()
         runner.forwardOutput()
@@ -45,7 +59,7 @@ class TagFunctionalTest : TagTestSpec {
             val result = runner.build()
             result.output.trim().let(TestResult::Success)
         } catch (e: Exception) {
-            TestResult.Failure(e.message!!)
+            TestResult.Failure(e.message!!.trim())
         }
     }
 }

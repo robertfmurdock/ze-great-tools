@@ -2,15 +2,19 @@ package com.zegreatrob.tools.tagger
 
 import com.zegreatrob.tools.adapter.git.GitAdapter
 import com.zegreatrob.tools.adapter.git.runProcess
+import com.zegreatrob.tools.tagger.core.TagErrors
 import com.zegreatrob.tools.test.git.disableGpgSign
 import org.ajoberstar.grgit.Grgit
 import org.ajoberstar.grgit.operation.CommitOp
 import org.ajoberstar.grgit.operation.InitOp
+import org.junit.jupiter.api.Assertions.assertNotEquals
 import java.io.File
 import kotlin.io.path.absolutePathString
 import kotlin.io.path.createTempDirectory
 import kotlin.test.Test
+import kotlin.test.assertContains
 import kotlin.test.assertEquals
+import kotlin.test.assertIs
 import kotlin.test.assertIsNot
 
 interface TagTestSpec {
@@ -30,6 +34,11 @@ interface TagTestSpec {
     )
 
     fun configureWithDefaults()
+    fun configureWithOverrides(
+        releaseBranch: String? = null,
+        warningsAsErrors: Boolean? = null,
+    )
+
     fun execute(version: String): TestResult
 
     @Test
@@ -59,5 +68,67 @@ interface TagTestSpec {
 
         val gitAdapter = GitAdapter(this.projectDir.absolutePath)
         assertEquals(expectedVersion, gitAdapter.showTag("HEAD"))
+    }
+
+    @Test
+    fun whenNotOnCorrectBranchAndWarningsAsErrorsTagWillNotDoAnythingAndError() {
+        configureWithOverrides(releaseBranch = "trunk", warningsAsErrors = true)
+
+        val originDirectory = createTempDirectory()
+        val originGrgit = Grgit.init(fun InitOp.() {
+            this.dir = originDirectory.absolutePathString()
+        })
+        disableGpgSign(originDirectory.absolutePathString())
+        originGrgit.commit(fun CommitOp.() {
+            this.message = "init"
+        })
+        val grgit = initializeGitRepo(
+            listOf("init", "[patch] commit 1", "[patch] commit 2"),
+            remoteUrl = originDirectory.absolutePathString(),
+        )
+        grgit.push()
+
+        runProcess(listOf("git", "config", "user.email", "test@zegreatrob.com"), this.projectDir.absolutePath)
+        runProcess(listOf("git", "config", "user.name", "RoB as Test"), this.projectDir.absolutePath)
+
+        val version = "1.0.0"
+        val result = execute(version)
+        assertContains(
+            charSequence = assertIs<TestResult.Failure>(result).reason,
+            other = TagErrors.wrapper(TagErrors.skipMessageNotOnReleaseBranch("trunk", "master")),
+        )
+        val gitAdapter = GitAdapter(this.projectDir.absolutePath)
+        assertNotEquals(version, gitAdapter.showTag("HEAD"))
+    }
+
+    @Test
+    fun whenNotOnCorrectBranchTagWillNotDoAnythingAndError() {
+        configureWithOverrides(releaseBranch = "trunk", warningsAsErrors = false)
+
+        val originDirectory = createTempDirectory()
+        val originGrgit = Grgit.init(fun InitOp.() {
+            this.dir = originDirectory.absolutePathString()
+        })
+        disableGpgSign(originDirectory.absolutePathString())
+        originGrgit.commit(fun CommitOp.() {
+            this.message = "init"
+        })
+        val grgit = initializeGitRepo(
+            listOf("init", "[patch] commit 1", "[patch] commit 2"),
+            remoteUrl = originDirectory.absolutePathString(),
+        )
+        grgit.push()
+
+        runProcess(listOf("git", "config", "user.email", "test@zegreatrob.com"), this.projectDir.absolutePath)
+        runProcess(listOf("git", "config", "user.name", "RoB as Test"), this.projectDir.absolutePath)
+
+        val version = "1.0.0"
+        val result = execute(version)
+        assertContains(
+            charSequence = assertIs<TestResult.Success>(result).message,
+            other = TagErrors.wrapper(TagErrors.skipMessageNotOnReleaseBranch("trunk", "master")),
+        )
+        val gitAdapter = GitAdapter(this.projectDir.absolutePath)
+        assertNotEquals(version, gitAdapter.showTag("HEAD"))
     }
 }

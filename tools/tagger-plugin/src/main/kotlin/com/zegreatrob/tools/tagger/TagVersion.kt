@@ -3,6 +3,7 @@ package com.zegreatrob.tools.tagger
 import com.zegreatrob.tools.tagger.core.TagResult
 import com.zegreatrob.tools.tagger.core.tag
 import org.gradle.api.DefaultTask
+import org.gradle.api.GradleException
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskAction
 
@@ -27,7 +28,11 @@ open class TagVersion :
     fun execute() {
         when (val result = taggerExtension.core.tag(version, taggerExtension.releaseBranch)) {
             TagResult.Success -> {}
-            is TagResult.Error -> logger.warn(result.message)
+            is TagResult.Error -> if (taggerExtension.warningsAsErrors.get()) {
+                throw GradleException(result.message)
+            } else {
+                logger.warn(result.message)
+            }
         }
     }
 }
