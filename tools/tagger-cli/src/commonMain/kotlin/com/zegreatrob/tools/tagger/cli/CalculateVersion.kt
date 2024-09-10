@@ -34,14 +34,20 @@ class CalculateVersion : CliktCommand() {
         TaggerCore(GitAdapter(dir))
             .calculateNextVersion(
                 implicitPatch = implicitPatch,
-                versionRegex = VersionRegex(
-                    none = Regex(noneRegex, RegexOption.IGNORE_CASE),
-                    patch = Regex(patchRegex, RegexOption.IGNORE_CASE),
-                    minor = Regex(minorRegex, RegexOption.IGNORE_CASE),
-                    major = Regex(majorRegex, RegexOption.IGNORE_CASE),
-                    unified = versionRegex?.let { Regex(it, RegexOption.IGNORE_CASE) },
-                ),
+                versionRegex = versionRegex(),
                 releaseBranch = releaseBranch ?: "",
-            ).let(::echo)
+            )
+            .run {
+                echo(version)
+                echo(snapshotReasons, err = true)
+            }
     }
+
+    private fun versionRegex() = VersionRegex(
+        none = Regex(noneRegex, RegexOption.IGNORE_CASE),
+        patch = Regex(patchRegex, RegexOption.IGNORE_CASE),
+        minor = Regex(minorRegex, RegexOption.IGNORE_CASE),
+        major = Regex(majorRegex, RegexOption.IGNORE_CASE),
+        unified = versionRegex?.let { Regex(it, RegexOption.IGNORE_CASE) },
+    )
 }

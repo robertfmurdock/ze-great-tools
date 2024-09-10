@@ -55,7 +55,7 @@ open class TaggerExtension(
             implicitPatch = implicitPatch.get(),
             versionRegex = versionRegex(),
             releaseBranch = releaseBranch ?: throw GradleException("Please configure the tagger release branch."),
-        )
+        ).version
     }
 
     private fun versionRegex() =

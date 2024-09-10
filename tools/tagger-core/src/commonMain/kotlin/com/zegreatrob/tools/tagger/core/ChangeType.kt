@@ -11,9 +11,9 @@ fun TaggerCore.calculateNextVersion(
     implicitPatch: Boolean,
     versionRegex: VersionRegex,
     releaseBranch: String,
-): String {
+): VersionResult {
     val (previousVersionNumber, lastTagDescription) = lastVersionAndTag()
-        ?: return "0.0.0"
+        ?: return VersionResult("0.0.0")
 
     val incrementComponent = findAppropriateIncrement(adapter, lastTagDescription, implicitPatch, versionRegex)
     val currentVersionNumber = (
@@ -21,13 +21,30 @@ fun TaggerCore.calculateNextVersion(
             ?: previousVersionNumber
         )
 
-    return if (adapter.status().canRelease(releaseBranch) && currentVersionNumber != previousVersionNumber
-    ) {
-        currentVersionNumber
+    val reasonsToUseSnapshot = snapshotReasons(releaseBranch, currentVersionNumber, previousVersionNumber)
+    return if (reasonsToUseSnapshot.isEmpty()) {
+        VersionResult(currentVersionNumber)
     } else {
-        "$currentVersionNumber-SNAPSHOT"
+        VersionResult("$currentVersionNumber-SNAPSHOT", reasonsToUseSnapshot)
     }
 }
+
+data class VersionResult(
+    val version: String,
+    val snapshotReasons: List<SnapshotReason> = emptyList(),
+)
+
+private fun TaggerCore.snapshotReasons(
+    releaseBranch: String,
+    currentVersionNumber: String,
+    previousVersionNumber: String,
+) = StatusCheck(
+    gitStatus = adapter.status(),
+    releaseBranch = releaseBranch,
+    currentVersionNumber = currentVersionNumber,
+    previousVersionNumber = previousVersionNumber,
+)
+    .let { statusCheck -> SnapshotReason.entries.filter { reason -> reason.reasonIsValid(statusCheck) } }
 
 private fun findAppropriateIncrement(
     gitAdapter: GitAdapter,
@@ -82,11 +99,33 @@ enum class ChangeType(val priority: Int) {
     abstract fun increment(components: List<Int>): String
 }
 
-fun GitStatus.canRelease(releaseBranch: String): Boolean =
-    this.isClean &&
-        this.ahead == 0 &&
-        this.behind == 0 &&
-        this.head == releaseBranch
+data class StatusCheck(
+    val gitStatus: GitStatus,
+    val releaseBranch: String,
+    val currentVersionNumber: String,
+    val previousVersionNumber: String,
+)
+
+enum class SnapshotReason {
+    DIRTY {
+        override fun StatusCheck.exists() = !gitStatus.isClean
+    },
+    AHEAD {
+        override fun StatusCheck.exists() = gitStatus.ahead != 0
+    },
+    BEHIND {
+        override fun StatusCheck.exists() = gitStatus.behind != 0
+    },
+    NOT_RELEASE_BRANCH {
+        override fun StatusCheck.exists() = gitStatus.head != releaseBranch
+    },
+    NO_NEW_VERSION {
+        override fun StatusCheck.exists() = currentVersionNumber == previousVersionNumber
+    }, ;
+
+    abstract fun StatusCheck.exists(): Boolean
+    fun reasonIsValid(check: StatusCheck): Boolean = check.exists()
+}
 
 fun TaggerCore.tagReport() =
     adapter.listTags()

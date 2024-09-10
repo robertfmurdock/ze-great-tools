@@ -48,7 +48,7 @@ class CalculateVersionCommandTest : CalculateVersionTestSpec {
             .test(arguments)
         return if (test.statusCode == 0) {
             test
-                .output
+                .stdout
                 .trim()
                 .let { TestResult.Success(it) }
         } else {
