@@ -13,7 +13,7 @@ jobs:
           ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
           fetch-depth: '25'
       - name: Setup Current Gradle
-        uses: gradle/actions/setup-gradle@v3
+        uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: current
       - run: gradle wrapper --distribution-type all
