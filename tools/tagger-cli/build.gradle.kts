@@ -3,6 +3,7 @@ import org.jetbrains.kotlin.gradle.targets.js.npm.npmProject
 plugins {
     application
     id("com.zegreatrob.tools.plugins.mp")
+    id("org.jetbrains.kotlin.plugin.serialization") version embeddedKotlinVersion
 }
 
 kotlin {
@@ -39,6 +40,7 @@ dependencies {
     commonMainImplementation(project(":cli-tools"))
     commonMainImplementation(project(":tagger-core"))
     commonMainImplementation("com.github.ajalt.clikt:clikt")
+    commonMainImplementation("org.jetbrains.kotlinx:kotlinx-serialization-json")
 
     commonTestImplementation(project(":tagger-test"))
 }

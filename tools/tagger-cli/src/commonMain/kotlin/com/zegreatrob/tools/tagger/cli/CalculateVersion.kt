@@ -1,6 +1,7 @@
 package com.zegreatrob.tools.tagger.cli
 
 import com.github.ajalt.clikt.core.CliktCommand
+import com.github.ajalt.clikt.core.context
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.options.check
 import com.github.ajalt.clikt.parameters.options.default
@@ -12,6 +13,11 @@ import com.zegreatrob.tools.tagger.core.VersionRegex
 import com.zegreatrob.tools.tagger.core.calculateNextVersion
 
 class CalculateVersion : CliktCommand() {
+
+    init {
+        context { valueSources(ConfigFileSource(envvarReader)) }
+    }
+
     private val dir by argument("git-repo")
     private val implicitPatch by option().boolean().default(true)
     private val releaseBranch by option()
