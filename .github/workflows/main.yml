@@ -27,10 +27,6 @@ jobs:
         with:
           fetch-depth: 0
           token: '${{ secrets.GITHUB_TOKEN }}'
-      - name: Set Up Git User
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "6215634+robertfmurdock@users.noreply.github.com"
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
