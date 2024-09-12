@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Assertions.assertNotEquals
 import java.io.File
 import kotlin.io.path.absolutePathString
 import kotlin.io.path.createTempDirectory
+import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertContains
 import kotlin.test.assertEquals
@@ -41,6 +42,12 @@ interface TagTestSpec {
 
     fun execute(version: String): TestResult
 
+    @BeforeTest
+    fun checkPrerequisites() {
+        assertEquals("/dev/null", System.getenv("GIT_CONFIG_GLOBAL"), "Ensure this is set for the test to work as intended")
+        assertEquals("/dev/null", System.getenv("GIT_CONFIG_SYSTEM"), "Ensure this is set for the test to work as intended")
+    }
+
     @Test
     fun tagWillTagAndPushSuccessfully() {
         configureWithDefaults()
@@ -68,6 +75,34 @@ interface TagTestSpec {
 
         val gitAdapter = GitAdapter(this.projectDir.absolutePath)
         assertEquals(expectedVersion, gitAdapter.showTag("HEAD"))
+    }
+
+    @Test
+    fun tagWillFailWhenUserEmailAndNameAreNotConfigured() {
+        configureWithOverrides(releaseBranch = "master", warningsAsErrors = true)
+
+        val originDirectory = createTempDirectory()
+        val originGrgit = Grgit.init(fun InitOp.() {
+            this.dir = originDirectory.absolutePathString()
+        })
+        disableGpgSign(originDirectory.absolutePathString())
+        originGrgit.commit(fun CommitOp.() {
+            this.message = "init"
+        })
+        val grgit = initializeGitRepo(
+            listOf("init", "[patch] commit 1", "[patch] commit 2"),
+            remoteUrl = originDirectory.absolutePathString(),
+        )
+        grgit.push()
+
+        val version = "1.0.0"
+        val result = execute(version)
+        assertContains(
+            charSequence = assertIs<TestResult.Failure>(result).reason,
+            other = "Committer identity unknown",
+        )
+        val gitAdapter = GitAdapter(this.projectDir.absolutePath)
+        assertNotEquals(version, gitAdapter.showTag("HEAD"))
     }
 
     @Test

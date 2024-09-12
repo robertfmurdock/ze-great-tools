@@ -19,8 +19,13 @@ fun TaggerCore.tag(version: String, releaseBranch: String?): TagResult {
             ),
         )
     } else {
-        adapter.newAnnotatedTag(version, "HEAD")
-        adapter.pushTags()
-        TagResult.Success
+        kotlin.runCatching { adapter.newAnnotatedTag(version, "HEAD") }
+            .map {
+                println("lol")
+                adapter.pushTags()
+                TagResult.Success
+            }.getOrElse {
+                TagResult.Error(it.message ?: "Unknown error during tagging")
+            }
     }
 }

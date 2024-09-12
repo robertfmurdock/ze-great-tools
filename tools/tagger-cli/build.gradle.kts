@@ -48,6 +48,8 @@ dependencies {
 tasks {
     withType(Test::class) {
         useJUnitPlatform()
+        environment("GIT_CONFIG_GLOBAL", "/dev/null")
+        environment("GIT_CONFIG_SYSTEM", "/dev/null")
     }
     withType<CreateStartScripts> {
         applicationName = "tagger"

@@ -1,5 +1,6 @@
 package com.zegreatrob.tools.test.git
 
+import com.zegreatrob.tools.adapter.git.runProcess
 import org.ajoberstar.grgit.Commit
 import org.ajoberstar.grgit.Grgit
 import org.ajoberstar.grgit.operation.AddOp
@@ -22,6 +23,8 @@ fun initializeGitRepo(
 ): Grgit {
     val grgit = Grgit.init(mapOf("dir" to directory))
     disableGpgSign(directory)
+    runProcess(listOf("git", "config", "user.useConfigOnly", "true"), directory)
+
     if (addFileNames.isNotEmpty()) {
         grgit.add(
             fun AddOp.() {
