@@ -28,7 +28,6 @@ class TagCommandConfigFileTest : TagTestSpec {
     override fun configureWithDefaults() {
         val config = TaggerConfig(releaseBranch = "master")
         Json.encodeToStream(config, File(projectDir, ".tagger").outputStream())
-        arguments += projectDir.absolutePath
     }
 
     override fun configureWithOverrides(
@@ -43,8 +42,6 @@ class TagCommandConfigFileTest : TagTestSpec {
         userEmail?.let { config = config.copy(userEmail = userEmail) }
         warningsAsErrors?.let { config = config.copy(warningsAsErrors = warningsAsErrors) }
         Json.encodeToStream(config, File(projectDir, ".tagger").outputStream())
-
-        arguments += projectDir.absolutePath
     }
 
     override fun execute(version: String): TestResult {

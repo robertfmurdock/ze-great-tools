@@ -4,6 +4,7 @@ import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.CliktError
 import com.github.ajalt.clikt.core.context
 import com.github.ajalt.clikt.parameters.arguments.argument
+import com.github.ajalt.clikt.parameters.arguments.optional
 import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.required
@@ -19,14 +20,16 @@ class Tag : CliktCommand() {
         context { valueSources(ConfigFileSource(envvarReader)) }
     }
 
-    private val dir by argument("git-repo")
+    private val gitRepoArgument by argument("git-repo").optional()
+    private val gitRepoOption by option("--git-repo", envvar = "PWD")
+    private val workingDirectory get() = gitRepoArgument ?: gitRepoOption ?: throw CliktError("No target directory")
     private val releaseBranch by option().required()
     private val version: String by option().required()
     private val userName: String? by option()
     private val userEmail: String? by option()
     private val warningsAsErrors by option().boolean().default(false)
     override fun run() {
-        TaggerCore(GitAdapter(dir))
+        TaggerCore(GitAdapter(workingDirectory))
             .tag(version, releaseBranch, userName, userEmail)
             .let {
                 when (it) {

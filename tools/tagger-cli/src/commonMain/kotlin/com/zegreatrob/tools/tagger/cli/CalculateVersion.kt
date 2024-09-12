@@ -1,8 +1,10 @@
 package com.zegreatrob.tools.tagger.cli
 
 import com.github.ajalt.clikt.core.CliktCommand
+import com.github.ajalt.clikt.core.CliktError
 import com.github.ajalt.clikt.core.context
 import com.github.ajalt.clikt.parameters.arguments.argument
+import com.github.ajalt.clikt.parameters.arguments.optional
 import com.github.ajalt.clikt.parameters.options.check
 import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.option
@@ -18,7 +20,9 @@ class CalculateVersion : CliktCommand() {
         context { valueSources(ConfigFileSource(envvarReader)) }
     }
 
-    private val dir by argument("git-repo")
+    private val gitRepoArgument by argument("git-repo").optional()
+    private val gitRepoOption by option("--git-repo", envvar = "PWD")
+    private val workingDirectory get() = gitRepoArgument ?: gitRepoOption ?: throw CliktError("No target directory")
     private val implicitPatch by option().boolean().default(true)
     private val releaseBranch by option()
     private val majorRegex by option().default(VersionRegex.Defaults.major.pattern)
@@ -31,7 +35,7 @@ class CalculateVersion : CliktCommand() {
     )
 
     override fun run() {
-        TaggerCore(GitAdapter(dir))
+        TaggerCore(GitAdapter(workingDirectory))
             .calculateNextVersion(
                 implicitPatch = implicitPatch,
                 versionRegex = versionRegex(),

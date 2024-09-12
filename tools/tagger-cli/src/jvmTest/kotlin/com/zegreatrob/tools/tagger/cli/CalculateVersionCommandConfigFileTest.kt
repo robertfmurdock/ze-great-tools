@@ -25,7 +25,6 @@ class CalculateVersionCommandConfigFileTest : CalculateVersionTestSpec {
     }
 
     override fun configureWithDefaults() {
-        arguments += projectDir.absolutePath
         val config = TaggerConfig(releaseBranch = "master")
         Json.encodeToStream(config, File(projectDir, ".tagger").outputStream())
     }
@@ -45,7 +44,6 @@ class CalculateVersionCommandConfigFileTest : CalculateVersionTestSpec {
         minorRegex?.let { config = config.copy(minorRegex = minorRegex) }
         patchRegex?.let { config = config.copy(patchRegex = patchRegex) }
         noneRegex?.let { config = config.copy(noneRegex = noneRegex) }
-        arguments += projectDir.absolutePath
         config = config.copy(releaseBranch = "master")
         Json.encodeToStream(config, File(projectDir, ".tagger").outputStream())
     }
