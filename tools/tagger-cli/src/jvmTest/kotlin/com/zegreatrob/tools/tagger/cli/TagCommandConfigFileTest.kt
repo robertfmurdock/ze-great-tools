@@ -1,7 +1,9 @@
+@file:OptIn(ExperimentalSerializationApi::class)
+
 package com.zegreatrob.tools.tagger.cli
 
 import com.github.ajalt.clikt.testing.test
-import com.zegreatrob.tools.tagger.CalculateVersionTestSpec
+import com.zegreatrob.tools.tagger.TagTestSpec
 import com.zegreatrob.tools.tagger.TestResult
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
@@ -10,52 +12,48 @@ import org.junit.jupiter.api.io.TempDir
 import java.io.File
 import kotlin.test.BeforeTest
 
-@ExperimentalSerializationApi
-class CalculateVersionCommandConfigFileTest : CalculateVersionTestSpec {
+class TagCommandConfigFileTest : TagTestSpec {
 
     @field:TempDir
     override lateinit var projectDir: File
 
-    override val addFileNames: Set<String> get() = setOf(projectDir.resolve(".tagger").name)
+    override val addFileNames: Set<String> = emptySet()
     private lateinit var arguments: List<String>
 
     @BeforeTest
     fun setup() {
-        arguments = listOf("-q", "calculate-version")
+        arguments = listOf("-q", "tag")
     }
 
     override fun configureWithDefaults() {
-        arguments += projectDir.absolutePath
         val config = TaggerConfig(releaseBranch = "master")
         Json.encodeToStream(config, File(projectDir, ".tagger").outputStream())
+        arguments += projectDir.absolutePath
     }
 
     override fun configureWithOverrides(
-        implicitPatch: Boolean?,
-        majorRegex: String?,
-        minorRegex: String?,
-        patchRegex: String?,
-        versionRegex: String?,
-        noneRegex: String?,
+        releaseBranch: String?,
+        userName: String?,
+        userEmail: String?,
+        warningsAsErrors: Boolean?,
     ) {
         var config = TaggerConfig()
-        implicitPatch?.let { config = config.copy(implicitPatch = implicitPatch) }
-        versionRegex?.let { config = config.copy(versionRegex = versionRegex) }
-        majorRegex?.let { config = config.copy(majorRegex = majorRegex) }
-        minorRegex?.let { config = config.copy(minorRegex = minorRegex) }
-        patchRegex?.let { config = config.copy(patchRegex = patchRegex) }
-        noneRegex?.let { config = config.copy(noneRegex = noneRegex) }
-        arguments += projectDir.absolutePath
-        config = config.copy(releaseBranch = "master")
+        releaseBranch?.let { config = config.copy(releaseBranch = releaseBranch) }
+        userName?.let { config = config.copy(userName = userName) }
+        userEmail?.let { config = config.copy(userEmail = userEmail) }
+        warningsAsErrors?.let { config = config.copy(warningsAsErrors = warningsAsErrors) }
         Json.encodeToStream(config, File(projectDir, ".tagger").outputStream())
+
+        arguments += projectDir.absolutePath
     }
 
-    override fun execute(): TestResult {
+    override fun execute(version: String): TestResult {
+        arguments += "--version=$version"
         val test = cli()
             .test(arguments, envvars = mapOf("PWD" to projectDir.absolutePath))
         return if (test.statusCode == 0) {
             test
-                .stdout
+                .output
                 .trim()
                 .let { TestResult.Success(it) }
         } else {

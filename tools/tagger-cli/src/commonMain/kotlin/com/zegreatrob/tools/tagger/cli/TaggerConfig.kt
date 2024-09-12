@@ -11,4 +11,7 @@ data class TaggerConfig(
     val patchRegex: String? = null,
     val versionRegex: String? = null,
     val noneRegex: String? = null,
+    val userName: String? = null,
+    val userEmail: String? = null,
+    val warningsAsErrors: Boolean? = null,
 )
