@@ -16,10 +16,12 @@ class Tag : CliktCommand() {
     private val dir by argument("git-repo")
     private val releaseBranch by option().required()
     private val version: String by option().required()
+    private val userName: String? by option()
+    private val userEmail: String? by option()
     private val warningsAsErrors by option().boolean().default(false)
     override fun run() {
         TaggerCore(GitAdapter(dir))
-            .tag(version, releaseBranch)
+            .tag(version, releaseBranch, userName, userEmail)
             .let {
                 when (it) {
                     TagResult.Success -> echo("Success!")

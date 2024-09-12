@@ -20,6 +20,12 @@ open class TaggerExtension(
     var releaseBranch: String? = null
 
     @Input
+    var userName: String? = null
+
+    @Input
+    var userEmail: String? = null
+
+    @Input
     var warningsAsErrors = objectFactory.property<Boolean>().convention(false)
 
     @Input

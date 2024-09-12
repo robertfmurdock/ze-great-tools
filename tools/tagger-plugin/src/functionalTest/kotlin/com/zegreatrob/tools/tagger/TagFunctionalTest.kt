@@ -35,7 +35,12 @@ class TagFunctionalTest : TagTestSpec {
         )
     }
 
-    override fun configureWithOverrides(releaseBranch: String?, warningsAsErrors: Boolean?) {
+    override fun configureWithOverrides(
+        releaseBranch: String?,
+        userName: String?,
+        userEmail: String?,
+        warningsAsErrors: Boolean?,
+    ) {
         buildFile.writeText(
             """
             plugins {
@@ -43,6 +48,8 @@ class TagFunctionalTest : TagTestSpec {
             }
             tagger {
                 ${if (releaseBranch != null) "releaseBranch = \"$releaseBranch\"" else ""}
+                ${if (userName != null) "userName = \"$userName\"" else ""}
+                ${if (userEmail != null) "userEmail = \"$userEmail\"" else ""}
                 ${if (warningsAsErrors != null) "warningsAsErrors.set($warningsAsErrors)" else ""}
             }
             """.trimIndent(),

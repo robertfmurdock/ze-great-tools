@@ -14,19 +14,23 @@ class GitAdapter(private val workingDirectory: String) {
         workingDirectory,
     ).trim()
 
-    fun newAnnotatedTag(name: String, ref: String) {
-        runProcess(
+    fun newAnnotatedTag(name: String, ref: String, userName: String?, userEmail: String?) {
+        val command = listOf("git") + inlineConfig("user.name", userName) + inlineConfig("user.email", userEmail) +
             listOf(
-                "git",
                 "tag",
                 "--annotate",
                 "--message=$name",
                 name,
                 ref,
-            ),
+            )
+        runProcess(
+            command,
             workingDirectory,
         )
     }
+
+    private fun inlineConfig(property: String, value: String?) =
+        if (value != null) listOf("-c", "$property=$value") else emptyList()
 
     fun pushTags() {
         runProcess(listOf("git", "push", "--tags"), workingDirectory)

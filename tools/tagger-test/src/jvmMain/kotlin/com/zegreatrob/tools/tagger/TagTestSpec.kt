@@ -37,6 +37,8 @@ interface TagTestSpec {
     fun configureWithDefaults()
     fun configureWithOverrides(
         releaseBranch: String? = null,
+        userName: String? = null,
+        userEmail: String? = null,
         warningsAsErrors: Boolean? = null,
     )
 
@@ -44,12 +46,20 @@ interface TagTestSpec {
 
     @BeforeTest
     fun checkPrerequisites() {
-        assertEquals("/dev/null", System.getenv("GIT_CONFIG_GLOBAL"), "Ensure this is set for the test to work as intended")
-        assertEquals("/dev/null", System.getenv("GIT_CONFIG_SYSTEM"), "Ensure this is set for the test to work as intended")
+        assertEquals(
+            "/dev/null",
+            System.getenv("GIT_CONFIG_GLOBAL"),
+            "Ensure this is set for the test to work as intended",
+        )
+        assertEquals(
+            "/dev/null",
+            System.getenv("GIT_CONFIG_SYSTEM"),
+            "Ensure this is set for the test to work as intended",
+        )
     }
 
     @Test
-    fun tagWillTagAndPushSuccessfully() {
+    fun whenUserNameAndEmailAreConfiguredTagWillTagAndPush() {
         configureWithDefaults()
 
         val originDirectory = createTempDirectory()
@@ -68,6 +78,32 @@ interface TagTestSpec {
 
         runProcess(listOf("git", "config", "user.email", "test@zegreatrob.com"), this.projectDir.absolutePath)
         runProcess(listOf("git", "config", "user.name", "RoB as Test"), this.projectDir.absolutePath)
+
+        val expectedVersion = "1.0.0"
+        val result = execute(expectedVersion)
+        assertIsNot<TestResult.Failure>(result, message = "$result")
+
+        val gitAdapter = GitAdapter(this.projectDir.absolutePath)
+        assertEquals(expectedVersion, gitAdapter.showTag("HEAD"))
+    }
+
+    @Test
+    fun whenUserNameAndEmailAreParametersTagWillTagAndPush() {
+        configureWithOverrides(releaseBranch = "master", userName = "RoB as Test", userEmail = "test@zegreatrob.com", warningsAsErrors = true)
+
+        val originDirectory = createTempDirectory()
+        val originGrgit = Grgit.init(fun InitOp.() {
+            this.dir = originDirectory.absolutePathString()
+        })
+        disableGpgSign(originDirectory.absolutePathString())
+        originGrgit.commit(fun CommitOp.() {
+            this.message = "init"
+        })
+        val grgit = initializeGitRepo(
+            listOf("init", "[patch] commit 1", "[patch] commit 2"),
+            remoteUrl = originDirectory.absolutePathString(),
+        )
+        grgit.push()
 
         val expectedVersion = "1.0.0"
         val result = execute(expectedVersion)

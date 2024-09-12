@@ -25,10 +25,10 @@ open class TagVersion :
     private fun isSnapshot() = version.contains("SNAPSHOT")
 
     @TaskAction
-    fun execute() {
-        when (val result = taggerExtension.core.tag(version, taggerExtension.releaseBranch)) {
+    fun execute() = taggerExtension.run {
+        when (val result = core.tag(this@TagVersion.version, releaseBranch, userName, userEmail)) {
             TagResult.Success -> {}
-            is TagResult.Error -> if (taggerExtension.warningsAsErrors.get()) {
+            is TagResult.Error -> if (warningsAsErrors.get()) {
                 throw GradleException(result.message)
             } else {
                 logger.warn(result.message)

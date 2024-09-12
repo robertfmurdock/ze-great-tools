@@ -25,9 +25,20 @@ class TagCommandTest : TagTestSpec {
         arguments += projectDir.absolutePath
     }
 
-    override fun configureWithOverrides(releaseBranch: String?, warningsAsErrors: Boolean?) {
+    override fun configureWithOverrides(
+        releaseBranch: String?,
+        userName: String?,
+        userEmail: String?,
+        warningsAsErrors: Boolean?,
+    ) {
         if (releaseBranch != null) {
             arguments += "--release-branch=$releaseBranch"
+        }
+        if (userName != null) {
+            arguments += "--user-name=$userName"
+        }
+        if (userEmail != null) {
+            arguments += "--user-email=$userEmail"
         }
         if (warningsAsErrors != null) {
             arguments += "--warnings-as-errors=$warningsAsErrors"

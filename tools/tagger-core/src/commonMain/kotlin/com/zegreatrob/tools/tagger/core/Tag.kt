@@ -2,7 +2,7 @@ package com.zegreatrob.tools.tagger.core
 
 private fun String.isSnapshot() = contains("SNAPSHOT")
 
-fun TaggerCore.tag(version: String, releaseBranch: String?): TagResult {
+fun TaggerCore.tag(version: String, releaseBranch: String?, userName: String?, userEmail: String?): TagResult {
     val isSnapshot = version.isSnapshot()
     val headTag = adapter.showTag("HEAD")
     val alreadyTagged = headTag != null
@@ -19,9 +19,8 @@ fun TaggerCore.tag(version: String, releaseBranch: String?): TagResult {
             ),
         )
     } else {
-        kotlin.runCatching { adapter.newAnnotatedTag(version, "HEAD") }
+        kotlin.runCatching { adapter.newAnnotatedTag(version, "HEAD", userName, userEmail) }
             .map {
-                println("lol")
                 adapter.pushTags()
                 TagResult.Success
             }.getOrElse {
