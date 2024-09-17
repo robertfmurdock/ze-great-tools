@@ -72,12 +72,20 @@ tasks {
         workingDir(mainNpmProjectDir)
         commandLine("npm", "link")
     }
+    val confirmTaggerCanRun by registering(Exec::class) {
+        dependsOn(jsCliTar)
+        workingDir(mainNpmProjectDir)
+        commandLine("kotlin/bin/tagger", "calculate-version")
+    }
     val jsPublish by registering(Exec::class) {
         dependsOn(jsCliTar)
         enabled = !isSnapshot()
         mustRunAfter(check)
         workingDir(mainNpmProjectDir)
         commandLine("npm", "publish")
+    }
+    check {
+        dependsOn(confirmTaggerCanRun)
     }
     publish {
         dependsOn(jsPublish)
