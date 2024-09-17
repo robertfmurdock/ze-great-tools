@@ -3,7 +3,6 @@ org-ajoberstar-grgit = "5.2.2"
 
 [libraries]
 com-benasher44-uuid = "com.benasher44:uuid:0.8.4"
-# @pin
 com-github-ajalt-clikt-clikt = "com.github.ajalt.clikt:clikt:4.4.0"
 # @keep
 org-ajoberstar-grgit-gradle-plugin = { module = "org.ajoberstar.grgit:org.ajoberstar.grgit.gradle.plugin", version.ref = "org-ajoberstar-grgit" }
