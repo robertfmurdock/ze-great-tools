@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="JavaScriptLibraryMappings">
+    <excludedPredefinedLibrary name="ze-great-tools/tools/build/js/node_modules" />
+    <excludedPredefinedLibrary name="ze-great-tools/tools/build/js/packages/tools-cli-tools-test/node_modules" />
+    <excludedPredefinedLibrary name="ze-great-tools/tools/build/js/packages/tools-digger-cli-test/node_modules" />
+    <excludedPredefinedLibrary name="ze-great-tools/tools/build/js/packages/tools-digger-cli/node_modules" />
+    <excludedPredefinedLibrary name="ze-great-tools/tools/build/js/packages/tools-digger-core-test/node_modules" />
+    <excludedPredefinedLibrary name="ze-great-tools/tools/build/js/packages/tools-digger-json-test/node_modules" />
+    <excludedPredefinedLibrary name="ze-great-tools/tools/build/js/packages/tools-digger-model-test/node_modules" />
+    <excludedPredefinedLibrary name="ze-great-tools/tools/build/js/packages/tools-digger-test-test/node_modules" />
+    <excludedPredefinedLibrary name="ze-great-tools/tools/build/js/packages/tools-git-adapter-test/node_modules" />
+    <excludedPredefinedLibrary name="ze-great-tools/tools/build/js/packages/tools-git-test-test/node_modules" />
+    <excludedPredefinedLibrary name="ze-great-tools/tools/build/js/packages/tools-tagger-cli-test/node_modules" />
+    <excludedPredefinedLibrary name="ze-great-tools/tools/build/js/packages/tools-tagger-cli/node_modules" />
+    <excludedPredefinedLibrary name="ze-great-tools/tools/build/js/packages/tools-tagger-core-test/node_modules" />
+    <excludedPredefinedLibrary name="ze-great-tools/tools/build/js/packages/tools-tagger-test-test/node_modules" />
+  </component>
+</project>
