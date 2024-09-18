@@ -1,6 +1,6 @@
 package com.zegreatrob.tools.tagger
 
-import com.zegreatrob.tools.test.git.disableGpgSign
+import com.zegreatrob.tools.adapter.git.GitAdapter
 import com.zegreatrob.tools.test.git.initializeGitRepo
 import org.ajoberstar.grgit.Grgit
 import org.ajoberstar.grgit.operation.AddOp
@@ -60,8 +60,10 @@ interface CalculateVersionTestSpec {
     fun `calculating version when current commit already has tag will use tag`() {
         configureWithDefaults()
 
-        val grgit = Grgit.init(mapOf("dir" to projectDir.absolutePath))
-        disableGpgSign(projectDir.absolutePath)
+        val gitAdapter = GitAdapter(projectDir.absolutePath)
+        gitAdapter.init()
+        gitAdapter.config("commit.gpgsign", "false")
+        val grgit = Grgit.open(mapOf("dir" to projectDir.absolutePath))
         grgit.add(
             fun(it: AddOp) {
                 it.patterns = setOf(".")

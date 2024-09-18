@@ -1,6 +1,6 @@
 package com.zegreatrob.tools.test.git
 
-import com.zegreatrob.tools.adapter.git.runProcess
+import com.zegreatrob.tools.adapter.git.GitAdapter
 import org.ajoberstar.grgit.Commit
 import org.ajoberstar.grgit.Grgit
 import org.ajoberstar.grgit.operation.AddOp
@@ -9,7 +9,6 @@ import org.ajoberstar.grgit.operation.CommitOp
 import org.ajoberstar.grgit.operation.MergeOp.Mode
 import org.ajoberstar.grgit.operation.RemoteAddOp
 import org.ajoberstar.grgit.operation.TagAddOp
-import java.io.FileOutputStream
 
 val defaultAuthors: List<String>
     get() = listOf("funk@test.io", "test@funk.edu")
@@ -21,10 +20,12 @@ fun initializeGitRepo(
     commits: List<String> = listOf(),
     initialTag: String? = null,
 ): Grgit {
-    val grgit = Grgit.init(mapOf("dir" to directory))
-    disableGpgSign(directory)
-    runProcess(listOf("git", "config", "user.useConfigOnly", "true"), directory)
+    val gitAdapter = GitAdapter(directory)
+    gitAdapter.init()
+    gitAdapter.config("commit.gpgsign", "false")
+    gitAdapter.config("user.useConfigOnly", "true")
 
+    val grgit = Grgit.open(mapOf("dir" to directory))
     if (addFileNames.isNotEmpty()) {
         grgit.add(
             fun AddOp.() {
@@ -93,11 +94,4 @@ fun Grgit.ffOnlyInBranch(branchName: String) {
         it.head = branchName
         it.setMode(Mode.ONLY_FF.name)
     }
-}
-
-fun disableGpgSign(projectDir: String) {
-    FileOutputStream("$projectDir/.git/config", true)
-        .writer().use {
-            it.write("[commit]\n        gpgsign = false")
-        }
 }

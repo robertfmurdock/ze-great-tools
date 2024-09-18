@@ -3,7 +3,6 @@ package com.zegreatrob.tools.tagger
 import com.zegreatrob.tools.adapter.git.GitAdapter
 import com.zegreatrob.tools.adapter.git.runProcess
 import com.zegreatrob.tools.tagger.core.TagErrors
-import com.zegreatrob.tools.test.git.disableGpgSign
 import org.ajoberstar.grgit.Grgit
 import org.ajoberstar.grgit.operation.CommitOp
 import org.ajoberstar.grgit.operation.InitOp
@@ -63,10 +62,11 @@ interface TagTestSpec {
         configureWithDefaults()
 
         val originDirectory = createTempDirectory()
-        val originGrgit = Grgit.init(fun InitOp.() {
-            this.dir = originDirectory.absolutePathString()
-        })
-        disableGpgSign(originDirectory.absolutePathString())
+        val originGitAdapter = GitAdapter(originDirectory.absolutePathString())
+        originGitAdapter.init()
+        val originGrgit = Grgit.open(mapOf("dir" to originDirectory.absolutePathString()))
+        originGitAdapter.disableGpgSign()
+
         originGrgit.commit(fun CommitOp.() {
             this.message = "init"
         })
@@ -87,15 +87,25 @@ interface TagTestSpec {
         assertEquals(expectedVersion, gitAdapter.showTag("HEAD"))
     }
 
+    fun GitAdapter.disableGpgSign() {
+        config("commit.gpgsign", "false")
+    }
+
     @Test
     fun whenUserNameAndEmailAreParametersTagWillTagAndPush() {
-        configureWithOverrides(releaseBranch = "master", userName = "RoB as Test", userEmail = "test@zegreatrob.com", warningsAsErrors = true)
+        configureWithOverrides(
+            releaseBranch = "master",
+            userName = "RoB as Test",
+            userEmail = "test@zegreatrob.com",
+            warningsAsErrors = true,
+        )
 
         val originDirectory = createTempDirectory()
         val originGrgit = Grgit.init(fun InitOp.() {
             this.dir = originDirectory.absolutePathString()
         })
-        disableGpgSign(originDirectory.absolutePathString())
+        val originGitAdapter = GitAdapter(originDirectory.absolutePathString())
+        originGitAdapter.disableGpgSign()
         originGrgit.commit(fun CommitOp.() {
             this.message = "init"
         })
@@ -121,7 +131,8 @@ interface TagTestSpec {
         val originGrgit = Grgit.init(fun InitOp.() {
             this.dir = originDirectory.absolutePathString()
         })
-        disableGpgSign(originDirectory.absolutePathString())
+        val originGitAdapter = GitAdapter(originDirectory.absolutePathString())
+        originGitAdapter.disableGpgSign()
         originGrgit.commit(fun CommitOp.() {
             this.message = "init"
         })
@@ -149,7 +160,8 @@ interface TagTestSpec {
         val originGrgit = Grgit.init(fun InitOp.() {
             this.dir = originDirectory.absolutePathString()
         })
-        disableGpgSign(originDirectory.absolutePathString())
+        val originGitAdapter = GitAdapter(originDirectory.absolutePathString())
+        originGitAdapter.disableGpgSign()
         originGrgit.commit(fun CommitOp.() {
             this.message = "init"
         })
@@ -180,7 +192,8 @@ interface TagTestSpec {
         val originGrgit = Grgit.init(fun InitOp.() {
             this.dir = originDirectory.absolutePathString()
         })
-        disableGpgSign(originDirectory.absolutePathString())
+        val originGitAdapter = GitAdapter(originDirectory.absolutePathString())
+        originGitAdapter.disableGpgSign()
         originGrgit.commit(fun CommitOp.() {
             this.message = "init"
         })

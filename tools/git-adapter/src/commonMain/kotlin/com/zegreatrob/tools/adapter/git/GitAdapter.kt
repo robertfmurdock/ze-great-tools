@@ -155,6 +155,14 @@ class GitAdapter(private val workingDirectory: String) {
         runProcess(listOf("git", "describe", "--abbrev=$abbrev"), workingDirectory)
             .trim()
     }.getOrNull()
+
+    fun init() {
+        runProcess(listOf("git", "init"), workingDirectory)
+    }
+
+    fun config(name: String, value: String) {
+        runProcess(listOf("git", "config", name, value), workingDirectory)
+    }
 }
 
 data class GitStatus(
