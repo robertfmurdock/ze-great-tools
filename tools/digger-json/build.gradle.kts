@@ -2,7 +2,7 @@
 
 plugins {
     id("com.zegreatrob.tools.plugins.mp")
-    id("org.jetbrains.kotlin.plugin.serialization") version embeddedKotlinVersion
+    alias(libs.plugins.org.jetbrains.kotlin.plugin.serialization)
 }
 
 group = "com.zegreatrob.tools"
@@ -21,13 +21,9 @@ dependencies {
     commonMainApi(project(":digger-model"))
     commonMainImplementation("org.jetbrains.kotlinx:kotlinx-serialization-json")
     commonTestImplementation(kotlin("test"))
-    "commonTestImplementation"("org.jetbrains.kotlin:kotlin-stdlib") {
-        version {
-            strictly(embeddedKotlinVersion)
-        }
-    }
+    "commonTestImplementation"("org.jetbrains.kotlin:kotlin-stdlib")
     commonTestImplementation("com.benasher44:uuid")
-    "jvmTestImplementation"(kotlin("test-junit5", embeddedKotlinVersion))
+    "jvmTestImplementation"(kotlin("test-junit5"))
 }
 
 tasks {

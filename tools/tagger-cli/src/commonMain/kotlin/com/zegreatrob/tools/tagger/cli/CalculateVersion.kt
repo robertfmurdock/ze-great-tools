@@ -17,7 +17,7 @@ import com.zegreatrob.tools.tagger.core.calculateNextVersion
 class CalculateVersion : CliktCommand() {
 
     init {
-        context { valueSources(ConfigFileSource(envvarReader)) }
+        context { valueSources(ConfigFileSource(readEnvvar)) }
     }
 
     private val gitRepoArgument by argument("git-repo").optional()
