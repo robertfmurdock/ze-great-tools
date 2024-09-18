@@ -163,6 +163,34 @@ class GitAdapter(private val workingDirectory: String) {
     fun config(name: String, value: String) {
         runProcess(listOf("git", "config", name, value), workingDirectory)
     }
+
+    fun add(vararg files: String) {
+        runProcess(listOf("git", "add") + files, workingDirectory)
+    }
+
+    fun commit(
+        message: String,
+        authorName: String,
+        authorEmail: String,
+        committerName: String,
+        committerEmail: String,
+    ) {
+        runProcess(
+            args = listOf(
+                "git",
+                "commit",
+                "--message=$message",
+                "--allow-empty",
+            ),
+            env = mapOf(
+                "GIT_AUTHOR_NAME" to authorName,
+                "GIT_AUTHOR_EMAIL" to authorEmail,
+                "GIT_COMMITTER_NAME" to committerName,
+                "GIT_COMMITTER_EMAIL" to committerEmail,
+            ),
+            workingDirectory = workingDirectory,
+        )
+    }
 }
 
 data class GitStatus(

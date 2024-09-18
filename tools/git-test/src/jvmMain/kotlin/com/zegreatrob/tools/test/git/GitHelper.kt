@@ -3,7 +3,6 @@ package com.zegreatrob.tools.test.git
 import com.zegreatrob.tools.adapter.git.GitAdapter
 import org.ajoberstar.grgit.Commit
 import org.ajoberstar.grgit.Grgit
-import org.ajoberstar.grgit.operation.AddOp
 import org.ajoberstar.grgit.operation.BranchChangeOp
 import org.ajoberstar.grgit.operation.CommitOp
 import org.ajoberstar.grgit.operation.MergeOp.Mode
@@ -25,16 +24,12 @@ fun initializeGitRepo(
     gitAdapter.config("commit.gpgsign", "false")
     gitAdapter.config("user.useConfigOnly", "true")
 
-    val grgit = Grgit.open(mapOf("dir" to directory))
     if (addFileNames.isNotEmpty()) {
-        grgit.add(
-            fun AddOp.() {
-                patterns = addFileNames
-            },
-        )
+        gitAdapter.add(files = addFileNames.toTypedArray())
     }
+    val grgit = Grgit.open(mapOf("dir" to directory))
     commits.forEachIndexed { index, message ->
-        grgit.addCommitWithMessage(message)
+        gitAdapter.addCommitWithMessage(message)
         if (index == 0 && initialTag != null) {
             grgit.addTag(initialTag)
         }
@@ -71,6 +66,16 @@ fun Grgit.addCommitWithMessage(message: String): Commit =
             it.message = message
         },
     )
+
+fun GitAdapter.addCommitWithMessage(message: String) {
+    commit(
+        message = message,
+        authorName = "Funky Testerson",
+        authorEmail = "funk@test.io",
+        committerName = "Testy Funkerson",
+        committerEmail = "test@funk.edu",
+    )
+}
 
 fun delayLongEnoughToAffectGitDate() {
     Thread.sleep(1000)
