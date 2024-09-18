@@ -15,8 +15,8 @@ plugins {
 }
 
 dependencies {
-    implementation(libs.org.jetbrains.kotlin.kotlin.stdlib)
-    implementation(kotlin("gradle-plugin", libs.versions.kotlin.get()))
+    implementation(kotlin("stdlib", embeddedKotlinVersion))
+    implementation(kotlin("gradle-plugin", embeddedKotlinVersion))
     implementation(libs.com.github.ben.manes.gradle.versions.plugin)
     implementation(libs.org.jmailen.gradle.kotlinter.gradle)
 }

@@ -17,8 +17,8 @@ kotlin {
 
 dependencies {
     commonMainApi(platform(project(":dependency-bom")))
-    commonTestImplementation(kotlin("test"))
-    "jvmTestImplementation"(kotlin("test-junit5"))
+    commonTestImplementation(kotlin("test", embeddedKotlinVersion))
+    "jvmTestImplementation"(kotlin("test-junit5", embeddedKotlinVersion))
 }
 
 tasks {

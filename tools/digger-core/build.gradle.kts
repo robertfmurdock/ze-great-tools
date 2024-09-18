@@ -18,8 +18,8 @@ kotlin {
 dependencies {
     commonMainApi(project(":digger-model"))
     commonMainApi(project(":git-adapter"))
-    commonTestImplementation(kotlin("test"))
-    "jvmTestImplementation"(kotlin("test-junit5"))
+    commonTestImplementation(kotlin("test", embeddedKotlinVersion))
+    "jvmTestImplementation"(kotlin("test-junit5", embeddedKotlinVersion))
     "jvmTestImplementation"(project(":digger-test"))
 }
 
