@@ -17,7 +17,7 @@ fun initializeGitRepo(
     addFileNames: Set<String>,
     commits: List<String> = listOf(),
     initialTag: String? = null,
-): Grgit {
+): Pair<Grgit, GitAdapter> {
     val gitAdapter = GitAdapter(directory)
     gitAdapter.init()
     gitAdapter.config("commit.gpgsign", "false")
@@ -42,7 +42,7 @@ fun initializeGitRepo(
             this.mode = BranchChangeOp.Mode.TRACK
         },
     )
-    return grgit
+    return grgit to gitAdapter
 }
 
 fun Grgit.addTag(initialTag: String?): org.ajoberstar.grgit.Tag? = tag.add(

@@ -70,7 +70,7 @@ interface TagTestSpec {
         originGrgit.commit(fun CommitOp.() {
             this.message = "init"
         })
-        val grgit = initializeGitRepo(
+        val (grgit, gitAdapter) = initializeGitRepo(
             listOf("init", "[patch] commit 1", "[patch] commit 2"),
             remoteUrl = originDirectory.absolutePathString(),
         )
@@ -83,7 +83,6 @@ interface TagTestSpec {
         val result = execute(expectedVersion)
         assertIsNot<TestResult.Failure>(result, message = "$result")
 
-        val gitAdapter = GitAdapter(this.projectDir.absolutePath)
         assertEquals(expectedVersion, gitAdapter.showTag("HEAD"))
     }
 
@@ -109,7 +108,7 @@ interface TagTestSpec {
         originGrgit.commit(fun CommitOp.() {
             this.message = "init"
         })
-        val grgit = initializeGitRepo(
+        val (grgit, gitAdapter) = initializeGitRepo(
             listOf("init", "[patch] commit 1", "[patch] commit 2"),
             remoteUrl = originDirectory.absolutePathString(),
         )
@@ -119,7 +118,6 @@ interface TagTestSpec {
         val result = execute(expectedVersion)
         assertIsNot<TestResult.Failure>(result, message = "$result")
 
-        val gitAdapter = GitAdapter(this.projectDir.absolutePath)
         assertEquals(expectedVersion, gitAdapter.showTag("HEAD"))
     }
 
@@ -136,7 +134,7 @@ interface TagTestSpec {
         originGrgit.commit(fun CommitOp.() {
             this.message = "init"
         })
-        val grgit = initializeGitRepo(
+        val (grgit, gitAdapter) = initializeGitRepo(
             listOf("init", "[patch] commit 1", "[patch] commit 2"),
             remoteUrl = originDirectory.absolutePathString(),
         )
@@ -148,7 +146,6 @@ interface TagTestSpec {
             charSequence = assertIs<TestResult.Failure>(result).reason,
             other = "Committer identity unknown",
         )
-        val gitAdapter = GitAdapter(this.projectDir.absolutePath)
         assertNotEquals(version, gitAdapter.showTag("HEAD"))
     }
 
@@ -165,7 +162,7 @@ interface TagTestSpec {
         originGrgit.commit(fun CommitOp.() {
             this.message = "init"
         })
-        val grgit = initializeGitRepo(
+        val (grgit, gitAdapter) = initializeGitRepo(
             listOf("init", "[patch] commit 1", "[patch] commit 2"),
             remoteUrl = originDirectory.absolutePathString(),
         )
@@ -180,7 +177,6 @@ interface TagTestSpec {
             charSequence = assertIs<TestResult.Failure>(result).reason,
             other = TagErrors.wrapper(TagErrors.skipMessageNotOnReleaseBranch("trunk", "master")),
         )
-        val gitAdapter = GitAdapter(this.projectDir.absolutePath)
         assertNotEquals(version, gitAdapter.showTag("HEAD"))
     }
 
@@ -197,7 +193,7 @@ interface TagTestSpec {
         originGrgit.commit(fun CommitOp.() {
             this.message = "init"
         })
-        val grgit = initializeGitRepo(
+        val (grgit, gitAdapter) = initializeGitRepo(
             listOf("init", "[patch] commit 1", "[patch] commit 2"),
             remoteUrl = originDirectory.absolutePathString(),
         )
@@ -212,7 +208,6 @@ interface TagTestSpec {
             charSequence = assertIs<TestResult.Success>(result).message,
             other = TagErrors.wrapper(TagErrors.skipMessageNotOnReleaseBranch("trunk", "master")),
         )
-        val gitAdapter = GitAdapter(this.projectDir.absolutePath)
         assertNotEquals(version, gitAdapter.showTag("HEAD"))
     }
 }

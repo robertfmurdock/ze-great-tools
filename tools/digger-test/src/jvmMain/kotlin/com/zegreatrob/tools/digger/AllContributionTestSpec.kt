@@ -31,7 +31,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
     @Test
     fun `will include all tag segments`() {
         setupWithDefaults()
-        val grgit = initializeGitRepo(
+        val (grgit, _) = initializeGitRepo(
             listOf(
                 """here's a message
                 |
@@ -83,7 +83,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
     @Test
     fun `will consider the path with the most tags, the trunk`() {
         setupWithDefaults()
-        val grgit = initializeGitRepo(listOf("here's a message"))
+        val (grgit, _) = initializeGitRepo(listOf("here's a message"))
         val firstCommit = grgit.head()
         val firstRelease = grgit.addTag("release1")
         delayLongEnoughToAffectGitDate()
@@ -129,7 +129,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
     @Test
     fun `will handle normal merge-into-branch-then-back case well`() {
         setupWithDefaults()
-        val grgit = initializeGitRepo(listOf("here's a message"))
+        val (grgit, _) = initializeGitRepo(listOf("here's a message"))
         val firstCommit = grgit.head()
         val firstRelease = grgit.addTag("release")
 
@@ -172,7 +172,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
     @Test
     fun `will handle normal merge-into-branch-then-ff-back case`() {
         setupWithDefaults()
-        val grgit = initializeGitRepo(listOf("here's a message"))
+        val (grgit, _) = initializeGitRepo(listOf("here's a message"))
         val firstCommit = grgit.head()
         val firstRelease = grgit.addTag("release-1")
 
@@ -224,7 +224,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
     @Test
     fun willHandleMergeBranches() {
         setupWithDefaults()
-        val grgit = initializeGitRepo(listOf("first"))
+        val (grgit, _) = initializeGitRepo(listOf("first"))
         val firstCommit = grgit.head()
 
         val firstRelease = grgit.addTag("release")
@@ -273,7 +273,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
         setupWithOverrides(
             tagRegex = "v(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?",
         )
-        val grgit = initializeGitRepo(listOf("first"))
+        val (grgit, _) = initializeGitRepo(listOf("first"))
         val firstCommit = grgit.head()
 
         val firstRelease = grgit.addTag("v1.2.8")
@@ -315,7 +315,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
     @Test
     fun `will handle merge commits on merged branches correctly`() {
         setupWithDefaults()
-        val grgit = initializeGitRepo(listOf("first"))
+        val (grgit, _) = initializeGitRepo(listOf("first"))
         val firstCommit = grgit.head()
 
         val firstRelease = grgit.addTag("release")
@@ -362,7 +362,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
     @Test
     fun `when merging multiple times from same branch, commits are only counted once`() {
         setupWithDefaults()
-        val grgit = initializeGitRepo(listOf("first"))
+        val (grgit, _) = initializeGitRepo(listOf("first"))
         val firstCommit = grgit.head()
         val firstRelease = grgit.addTag("release")
 
@@ -437,14 +437,13 @@ interface AllContributionTestSpec : SetupWithOverrides {
     @Test
     fun `will include ease of change`() {
         setupWithDefaults()
-        val grgit =
-            initializeGitRepo(
-                directory = projectDir.absolutePath,
-                addFileNames = addFileNames,
-                commits = listOf(
-                    "here's a message -4- more stuff",
-                ),
-            )
+        val (grgit, _) = initializeGitRepo(
+            directory = projectDir.absolutePath,
+            addFileNames = addFileNames,
+            commits = listOf(
+                "here's a message -4- more stuff",
+            ),
+        )
         val firstCommit = grgit.head()
 
         val tag = grgit.addTag("release")
@@ -474,7 +473,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
     @Test
     fun `will include story ids`() {
         setupWithDefaults()
-        val grgit = initializeGitRepo(commits = listOf("[DOGCOW-17] here's a message"))
+        val (grgit, _) = initializeGitRepo(commits = listOf("[DOGCOW-17] here's a message"))
         val firstCommit = grgit.head()
         val tag = grgit.addTag("release")
         val secondCommit = grgit.addCommitWithMessage("[DOGCOW-18] -3- here's a message")
@@ -501,7 +500,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
     @Test
     fun `will merge the same story id within a contribution`() {
         setupWithDefaults()
-        val grgit = initializeGitRepo(listOf("[DOGCOW-17] here's a message"))
+        val (grgit, _) = initializeGitRepo(listOf("[DOGCOW-17] here's a message"))
         val firstCommit = grgit.head()
         val secondCommit = grgit.addCommitWithMessage("[DOGCOW-17] -3- here's a message")
         val allOutput = runAllContributionData()
@@ -523,7 +522,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
     @Test
     fun `will merge the different story ids within a contribution`() {
         setupWithOverrides(label = "AwesomeProject")
-        val grgit = initializeGitRepo(commits = listOf("[DOGCOW-17] here's a message"))
+        val (grgit, _) = initializeGitRepo(commits = listOf("[DOGCOW-17] here's a message"))
         val firstCommit = grgit.head()
         val secondCommit = grgit.addCommitWithMessage("[DOGCOW-18] -3- here's a message")
 
@@ -548,7 +547,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
     @Test
     fun `will include flatten ease into largest number`() {
         setupWithDefaults()
-        val grgit = initializeGitRepo(listOf("here's a message -4- more stuff"))
+        val (grgit, _) = initializeGitRepo(listOf("here's a message -4- more stuff"))
         val firstCommit = grgit.head()
         val secondCommit = grgit.addCommitWithMessage("-3- here's a message")
         val allOutput = runAllContributionData()

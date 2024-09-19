@@ -29,7 +29,7 @@ class GitAdapterTest {
 
     @Test
     fun `will include all tag segments from newest to oldest`() {
-        val grgit = initializeGitRepo(commits = listOf("here's a message"))
+        val (grgit, _) = initializeGitRepo(commits = listOf("here's a message"))
         grgit.addTag("v1.0")
         delayLongEnoughToAffectGitDate()
         grgit.addCommitWithMessage("here's a message")

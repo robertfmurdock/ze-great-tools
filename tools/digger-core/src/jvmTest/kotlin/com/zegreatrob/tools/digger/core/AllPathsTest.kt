@@ -22,7 +22,7 @@ class AllPathsTest {
 
     @Test
     fun willHandleSimplePathsEasily() {
-        val grgit = initializeGitRepo(
+        val (grgit, _) = initializeGitRepo(
             directory = projectDir.absolutePath,
             commits = listOf("first"),
             addFileNames = emptySet(),
@@ -54,7 +54,7 @@ class AllPathsTest {
 
     @Test
     fun willIgnoreBranchesWhenOneParentIsInPreferredList() {
-        val grgit = initializeGitRepo(
+        val (grgit, _) = initializeGitRepo(
             directory = projectDir.absolutePath,
             commits = listOf("first"),
             addFileNames = emptySet(),
@@ -85,7 +85,7 @@ class AllPathsTest {
 
     @Test
     fun branchMergeBranchMergeFindsAllPaths() {
-        val grgit = initializeGitRepo(
+        val (grgit, _) = initializeGitRepo(
             directory = projectDir.absolutePath,
             commits = listOf("first"),
             addFileNames = emptySet(),
@@ -221,7 +221,7 @@ class AllPathsTest {
 
     @Test
     fun willStopOnceFindingPathContainingAllPreferredCommits() {
-        val grgit = initializeGitRepo(
+        val (grgit, _) = initializeGitRepo(
             directory = projectDir.absolutePath,
             commits = listOf("first"),
             addFileNames = emptySet(),
@@ -280,7 +280,7 @@ class AllPathsTest {
 
     @Test
     fun mergeToBranchAndBackFindsAllPaths() {
-        val grgit = initializeGitRepo(
+        val (grgit, _) = initializeGitRepo(
             directory = projectDir.absolutePath,
             commits = listOf("first"),
             addFileNames = emptySet(),
@@ -329,7 +329,7 @@ class AllPathsTest {
 
     @Test
     fun branchOnBranchOnBranchFindsAllPaths() {
-        val grgit = initializeGitRepo(
+        val (grgit, _) = initializeGitRepo(
             directory = projectDir.absolutePath,
             commits = listOf("first"),
             addFileNames = emptySet(),

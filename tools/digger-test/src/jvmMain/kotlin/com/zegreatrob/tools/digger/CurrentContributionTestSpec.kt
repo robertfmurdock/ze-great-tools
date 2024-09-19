@@ -179,7 +179,7 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
     fun `currentContributionData will include most recent tag range when head is tagged`() {
         setupWithDefaults()
 
-        val grgit = initializeGitRepo(
+        val (grgit, _) = initializeGitRepo(
             directory = projectDir.absolutePath,
             addFileNames = addFileNames,
             commits = listOf(
@@ -226,7 +226,7 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
     fun `when head is tagged currentContributionData will use include tag info`() {
         setupWithDefaults()
 
-        val grgit = initializeGitRepo(
+        val (grgit, _) = initializeGitRepo(
             directory = projectDir.absolutePath,
             addFileNames = addFileNames,
             commits = listOf(
@@ -268,19 +268,18 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
     fun `currentContributionData will not include authors from commits before last tag`() {
         setupWithDefaults()
 
-        val grgit =
-            initializeGitRepo(
-                directory = projectDir.absolutePath,
-                addFileNames = addFileNames,
-                commits = listOf(
-                    """here's a message
+        val (grgit, _) = initializeGitRepo(
+            directory = projectDir.absolutePath,
+            addFileNames = addFileNames,
+            commits = listOf(
+                """here's a message
                 |
                 |
                 |Co-authored-by: First Guy <first@guy.edu>
                 |Co-authored-by: Second Gui <second@gui.io>
-                    """.trimMargin(),
-                ),
-            )
+                """.trimMargin(),
+            ),
+        )
 
         grgit.addTag("release")
         grgit.addCommitWithMessage(
@@ -396,7 +395,7 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
     @Test
     fun `will handle merge commits on merged branches correctly`() {
         setupWithDefaults()
-        val grgit = initializeGitRepo(listOf("first"))
+        val (grgit, _) = initializeGitRepo(listOf("first"))
         grgit.head()
 
         grgit.addTag("release")
@@ -438,7 +437,7 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
         setupWithOverrides(
             tagRegex = "v(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?",
         )
-        val grgit = initializeGitRepo(listOf("first"))
+        val (grgit, _) = initializeGitRepo(listOf("first"))
         grgit.head()
 
         grgit.addTag("v1.0.0")
@@ -477,7 +476,7 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
     @Test
     fun `will correctly understand longer running branch`() {
         setupWithDefaults()
-        val grgit = initializeGitRepo(listOf("first"))
+        val (grgit, _) = initializeGitRepo(listOf("first"))
         grgit.head()
 
         grgit.addTag("release")
