@@ -191,6 +191,10 @@ class GitAdapter(private val workingDirectory: String) {
             workingDirectory = workingDirectory,
         )
     }
+
+    fun addRemote(name: String, url: String) {
+        runProcess(listOf("git", "remote", "add", name, url), workingDirectory)
+    }
 }
 
 data class GitStatus(

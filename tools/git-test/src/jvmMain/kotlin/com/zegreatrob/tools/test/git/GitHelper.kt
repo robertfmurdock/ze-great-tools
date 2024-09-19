@@ -6,7 +6,6 @@ import org.ajoberstar.grgit.Grgit
 import org.ajoberstar.grgit.operation.BranchChangeOp
 import org.ajoberstar.grgit.operation.CommitOp
 import org.ajoberstar.grgit.operation.MergeOp.Mode
-import org.ajoberstar.grgit.operation.RemoteAddOp
 import org.ajoberstar.grgit.operation.TagAddOp
 
 val defaultAuthors: List<String>
@@ -27,20 +26,15 @@ fun initializeGitRepo(
     if (addFileNames.isNotEmpty()) {
         gitAdapter.add(files = addFileNames.toTypedArray())
     }
-    val grgit = Grgit.open(mapOf("dir" to directory))
     commits.forEachIndexed { index, message ->
         gitAdapter.addCommitWithMessage(message)
         if (index == 0 && initialTag != null) {
-            grgit.addTag(initialTag)
+            gitAdapter.newAnnotatedTag(initialTag, "HEAD", "Funky Testerson", "funk@test.io")
         }
     }
 
-    grgit.remote.add(
-        fun RemoteAddOp.() {
-            this.name = "origin"
-            this.url = remoteUrl
-        },
-    )
+    gitAdapter.addRemote(name = "origin", url = remoteUrl)
+    val grgit = Grgit.open(mapOf("dir" to directory))
     grgit.pull()
     grgit.branch.change(
         fun BranchChangeOp.() {
