@@ -32,10 +32,9 @@ fun initializeGitRepo(
             gitAdapter.newAnnotatedTag(initialTag, "HEAD", "Funky Testerson", "funk@test.io")
         }
     }
-
     gitAdapter.addRemote(name = "origin", url = remoteUrl)
+    gitAdapter.fetch()
     val grgit = Grgit.open(mapOf("dir" to directory))
-    grgit.pull()
     grgit.branch.change(
         fun BranchChangeOp.() {
             this.name = "master"
