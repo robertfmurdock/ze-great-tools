@@ -84,6 +84,9 @@ interface AllContributionTestSpec : SetupWithOverrides {
     fun `will consider the path with the most tags, the trunk`() {
         setupWithDefaults()
         val (grgit, gitAdapter) = initializeGitRepo(listOf("here's a message"))
+        gitAdapter.config("user.name", "Test")
+        gitAdapter.config("user.email", "Test")
+
         val firstCommit = gitAdapter.show("HEAD")!!
         val firstRelease = grgit.addTag("release1")
         delayLongEnoughToAffectGitDate()
@@ -173,6 +176,9 @@ interface AllContributionTestSpec : SetupWithOverrides {
     fun `will handle normal merge-into-branch-then-ff-back case`() {
         setupWithDefaults()
         val (grgit, gitAdapter) = initializeGitRepo(listOf("here's a message"))
+        gitAdapter.config("user.name", "Test")
+        gitAdapter.config("user.email", "Test")
+
         val firstCommit = gitAdapter.show("HEAD")!!
         val firstRelease = grgit.addTag("release-1")
 
@@ -225,6 +231,9 @@ interface AllContributionTestSpec : SetupWithOverrides {
     fun willHandleMergeBranches() {
         setupWithDefaults()
         val (grgit, gitAdapter) = initializeGitRepo(listOf("first"))
+        gitAdapter.config("user.name", "Test")
+        gitAdapter.config("user.email", "Test")
+
         val firstCommit = gitAdapter.show("HEAD")!!
 
         val firstRelease = grgit.addTag("release")
@@ -274,6 +283,9 @@ interface AllContributionTestSpec : SetupWithOverrides {
             tagRegex = "v(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?",
         )
         val (grgit, gitAdapter) = initializeGitRepo(listOf("first"))
+        gitAdapter.config("user.name", "Test")
+        gitAdapter.config("user.email", "Test")
+
         val firstCommit = gitAdapter.show("HEAD")!!
 
         val firstRelease = grgit.addTag("v1.2.8")
@@ -316,6 +328,9 @@ interface AllContributionTestSpec : SetupWithOverrides {
     fun `will handle merge commits on merged branches correctly`() {
         setupWithDefaults()
         val (grgit, gitAdapter) = initializeGitRepo(listOf("first"))
+        gitAdapter.config("user.name", "Test")
+        gitAdapter.config("user.email", "Test")
+
         val firstCommit = gitAdapter.show("HEAD")!!
 
         val firstRelease = grgit.addTag("release")
@@ -363,6 +378,9 @@ interface AllContributionTestSpec : SetupWithOverrides {
     fun `when merging multiple times from same branch, commits are only counted once`() {
         setupWithDefaults()
         val (grgit, gitAdapter) = initializeGitRepo(listOf("first"))
+        gitAdapter.config("user.name", "Test")
+        gitAdapter.config("user.email", "Test")
+
         val firstCommit = gitAdapter.show("HEAD")!!
         val firstRelease = grgit.addTag("release")
 
