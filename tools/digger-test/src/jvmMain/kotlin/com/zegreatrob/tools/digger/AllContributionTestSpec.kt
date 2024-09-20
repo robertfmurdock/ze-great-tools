@@ -133,6 +133,9 @@ interface AllContributionTestSpec : SetupWithOverrides {
     fun `will handle normal merge-into-branch-then-back case well`() {
         setupWithDefaults()
         val (grgit, gitAdapter) = initializeGitRepo(listOf("here's a message"))
+        gitAdapter.config("user.name", "Test")
+        gitAdapter.config("user.email", "Test")
+
         val firstCommit = gitAdapter.show("HEAD")!!
         val firstRelease = grgit.addTag("release")
 
@@ -144,7 +147,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
 
         grgit.checkout { it.branch = "branch" }
         grgit.addCommitWithMessage("fourth")
-        grgit.mergeInBranch("master", "merge-to-branch")
+        gitAdapter.mergeInBranch("master", "merge-to-branch")
 
         grgit.checkout { it.branch = "master" }
 
@@ -345,7 +348,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
         grgit.checkout { it.branch = "branch1" }
         grgit.addCommitWithMessage("fifth")
 
-        grgit.mergeInBranch("branch2", "merge1")
+        gitAdapter.mergeInBranch("branch2", "merge1")
 
         grgit.checkout { it.branch = "master" }
         grgit.addCommitWithMessage("sixth")

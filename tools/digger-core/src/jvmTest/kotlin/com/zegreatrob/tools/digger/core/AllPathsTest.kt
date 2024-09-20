@@ -6,8 +6,6 @@ import com.zegreatrob.tools.test.git.addCommitWithMessage
 import com.zegreatrob.tools.test.git.initializeGitRepo
 import com.zegreatrob.tools.test.git.mergeInBranch
 import com.zegreatrob.tools.test.git.switchToNewBranch
-import kotlinx.datetime.toKotlinInstant
-import org.ajoberstar.grgit.Commit
 import org.junit.jupiter.api.io.TempDir
 import java.io.File
 import kotlin.test.Test
@@ -291,29 +289,32 @@ class AllPathsTest {
 
     @Test
     fun mergeToBranchAndBackFindsAllPaths() {
-        val (grgit, _) = initializeGitRepo(
+        val (grgit, gitAdapter) = initializeGitRepo(
             directory = projectDir.absolutePath,
             commits = listOf("first"),
             addFileNames = emptySet(),
         )
-        val firstCommit = grgit.head()
+        gitAdapter.config("user.name", "Test")
+        gitAdapter.config("user.email", "Test")
+
+        val firstCommit = gitAdapter.show("HEAD")!!
         grgit.switchToNewBranch("branch")
-        val secondCommit = grgit.addCommitWithMessage("second")
+        val secondCommit = gitAdapter.addCommitWithMessage("second")
 
         grgit.checkout { it.branch = "master" }
-        val thirdCommit = grgit.addCommitWithMessage("third")
+        val thirdCommit = gitAdapter.addCommitWithMessage("third")
 
         grgit.checkout { it.branch = "branch" }
-        val mergeCommit1 = grgit.mergeInBranch("master", "merge")
-        val fourthCommit = grgit.addCommitWithMessage("fourth")
+        val mergeCommit1 = gitAdapter.mergeInBranch("master", "merge")
+        val fourthCommit = gitAdapter.addCommitWithMessage("fourth")
 
         grgit.checkout { it.branch = "master" }
-        val singleParentMerge = grgit.mergeInBranch("branch", "merge")
-        val fifthCommit = grgit.addCommitWithMessage("fifth")
+        val singleParentMerge = gitAdapter.mergeInBranch("branch", "merge")
+        val fifthCommit = gitAdapter.addCommitWithMessage("fifth")
 
         val log = diggerGitWrapper.log()
 
-        val allPaths = allPaths(log, fifthCommit.toCommitRef())
+        val allPaths = allPaths(log, fifthCommit)
 
         assertExpectedPaths(
             setOf(
@@ -324,7 +325,7 @@ class AllPathsTest {
                     mergeCommit1,
                     thirdCommit,
                     firstCommit,
-                ).map { it.toCommitRef() },
+                ),
                 listOf(
                     fifthCommit,
                     singleParentMerge,
@@ -332,7 +333,7 @@ class AllPathsTest {
                     mergeCommit1,
                     secondCommit,
                     firstCommit,
-                ).map { it.toCommitRef() },
+                ),
             ),
             allPaths,
         )
@@ -428,13 +429,4 @@ class AllPathsTest {
         "actual had extra: ${(allPaths - expected).justIds().joinToString(",")}\n"
 
     private fun Set<List<CommitRef>>.justIds() = map { it.map(CommitRef::id) }.toSet()
-
-    private fun Commit.toCommitRef() = CommitRef(
-        id = id,
-        authorEmail = author.email,
-        committerEmail = committer.email,
-        dateTime = dateTime.toInstant().toKotlinInstant(),
-        parents = parentIds.toList(),
-        fullMessage = fullMessage,
-    )
 }
