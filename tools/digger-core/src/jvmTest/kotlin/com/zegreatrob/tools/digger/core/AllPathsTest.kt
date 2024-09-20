@@ -59,6 +59,8 @@ class AllPathsTest {
             commits = listOf("first"),
             addFileNames = emptySet(),
         )
+        gitAdapter.config("user.name", "Test")
+        gitAdapter.config("user.email", "Test")
         val firstCommit = gitAdapter.show("HEAD")!!
         grgit.switchToNewBranch("branch1")
 
