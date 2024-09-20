@@ -87,6 +87,19 @@ class GitAdapter(private val workingDirectory: String) {
     ).split(", ")
         .findByPrefix("tag: ")
 
+    fun show(ref: String): CommitRef? = parseLog(
+        runProcess(
+            listOf(
+                "git",
+                "show",
+                ref,
+                "--format=$gitLogFormat",
+                "--no-patch",
+            ),
+            workingDirectory,
+        ),
+    ).firstOrNull()
+
     fun logWithRange(begin: String, end: String? = null): List<CommitRef> = parseLog(
         runProcess(
             listOf(
@@ -105,7 +118,7 @@ class GitAdapter(private val workingDirectory: String) {
 
     private fun parseLog(outputText: String) = outputText
         .split("$commitSeparator\n")
-        .filter { it.isNotEmpty() }
+        .filter(String::isNotBlank)
         .map { commitEntry ->
             val elements = commitEntry.split("\n")
             CommitRef(
@@ -198,6 +211,13 @@ class GitAdapter(private val workingDirectory: String) {
 
     fun fetch() {
         runProcess(listOf("git", "fetch"), workingDirectory)
+    }
+
+    fun merge(branch: String, noCommit: Boolean) {
+        runProcess(
+            listOf("git", "merge") + (if (noCommit) listOf("--no-commit") else emptyList()) + listOf(branch),
+            workingDirectory,
+        )
     }
 }
 

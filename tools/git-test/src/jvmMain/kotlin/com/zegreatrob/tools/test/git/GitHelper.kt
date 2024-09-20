@@ -1,5 +1,6 @@
 package com.zegreatrob.tools.test.git
 
+import com.zegreatrob.tools.adapter.git.CommitRef
 import com.zegreatrob.tools.adapter.git.GitAdapter
 import org.ajoberstar.grgit.Commit
 import org.ajoberstar.grgit.Grgit
@@ -60,7 +61,7 @@ fun Grgit.addCommitWithMessage(message: String): Commit =
         },
     )
 
-fun GitAdapter.addCommitWithMessage(message: String) {
+fun GitAdapter.addCommitWithMessage(message: String): CommitRef {
     commit(
         message = message,
         authorName = "Funky Testerson",
@@ -68,6 +69,7 @@ fun GitAdapter.addCommitWithMessage(message: String) {
         committerName = "Testy Funkerson",
         committerEmail = "test@funk.edu",
     )
+    return show("HEAD")!!
 }
 
 fun delayLongEnoughToAffectGitDate() {
@@ -84,6 +86,11 @@ fun Grgit.mergeInBranch(branchName: String, message: String): Commit {
         it.head = branchName
         it.setMode("no-commit")
     }
+    return addCommitWithMessage(message)
+}
+
+fun GitAdapter.mergeInBranch(branchName: String, message: String): CommitRef {
+    merge(branch = branchName, noCommit = true)
     return addCommitWithMessage(message)
 }
 

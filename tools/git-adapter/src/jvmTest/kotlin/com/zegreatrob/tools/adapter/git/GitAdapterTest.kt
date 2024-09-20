@@ -1,7 +1,6 @@
 package com.zegreatrob.tools.adapter.git
 
 import com.zegreatrob.tools.test.git.addCommitWithMessage
-import com.zegreatrob.tools.test.git.addTag
 import com.zegreatrob.tools.test.git.delayLongEnoughToAffectGitDate
 import com.zegreatrob.tools.test.git.initializeGitRepo
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -29,14 +28,14 @@ class GitAdapterTest {
 
     @Test
     fun `will include all tag segments from newest to oldest`() {
-        val (grgit, _) = initializeGitRepo(commits = listOf("here's a message"))
-        grgit.addTag("v1.0")
+        val (_, gitAdapter) = initializeGitRepo(commits = listOf("here's a message"))
+        gitAdapter.newAnnotatedTag("v1.0", "HEAD", null, null)
         delayLongEnoughToAffectGitDate()
-        grgit.addCommitWithMessage("here's a message")
-        grgit.addTag("1.10")
+        gitAdapter.addCommitWithMessage("here's a message")
+        gitAdapter.newAnnotatedTag("1.10", "HEAD", null, null)
         delayLongEnoughToAffectGitDate()
-        grgit.addCommitWithMessage("here's a message")
-        grgit.addTag("1.101")
+        gitAdapter.addCommitWithMessage("here's a message")
+        gitAdapter.newAnnotatedTag("1.101", "HEAD", null, null)
 
         assertEquals(listOf("1.101", "1.10", "v1.0"), wrapper.listTags().map { it.name })
     }
