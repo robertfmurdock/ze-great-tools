@@ -29,6 +29,8 @@ class GitAdapterTest {
     @Test
     fun `will include all tag segments from newest to oldest`() {
         val (_, gitAdapter) = initializeGitRepo(commits = listOf("here's a message"))
+        gitAdapter.config("user.name", "Test")
+        gitAdapter.config("user.email", "Test")
         gitAdapter.newAnnotatedTag("v1.0", "HEAD", null, null)
         delayLongEnoughToAffectGitDate()
         gitAdapter.addCommitWithMessage("here's a message")
