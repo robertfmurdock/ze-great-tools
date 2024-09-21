@@ -3,8 +3,6 @@ package com.zegreatrob.tools.test.git
 import com.zegreatrob.tools.adapter.git.CommitRef
 import com.zegreatrob.tools.adapter.git.GitAdapter
 import com.zegreatrob.tools.adapter.git.TagRef
-import org.ajoberstar.grgit.Grgit
-import org.ajoberstar.grgit.operation.BranchChangeOp
 
 val defaultAuthors: List<String>
     get() = listOf("funk@test.io", "test@funk.edu")
@@ -32,14 +30,11 @@ fun initializeGitRepo(
     }
     gitAdapter.addRemote(name = "origin", url = remoteUrl)
     gitAdapter.fetch()
-    val grgit = Grgit.open(mapOf("dir" to directory))
-    grgit.branch.change(
-        fun BranchChangeOp.() {
-            this.name = "master"
-            this.startPoint = "origin/master"
-            this.mode = BranchChangeOp.Mode.TRACK
-        },
-    )
+    if (remoteUrl != directory) {
+        gitAdapter.push(true, upstream = "origin", branch = "master")
+    } else {
+        gitAdapter.setBranchUpstream("origin/master", "master")
+    }
     return gitAdapter
 }
 

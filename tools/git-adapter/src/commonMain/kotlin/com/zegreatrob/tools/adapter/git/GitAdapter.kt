@@ -238,8 +238,31 @@ class GitAdapter(private val workingDirectory: String) {
         )
     }
 
-    fun push() {
-        runProcess(listOf("git", "push"), workingDirectory)
+    fun push(force: Boolean = false, upstream: String? = null, branch: String? = null) {
+        runProcess(
+            listOf(
+                "git",
+                "push",
+            ) + (if (force) listOf("-f") else emptyList()) + (
+                if (upstream != null) {
+                    listOf(
+                        "--set-upstream",
+                        upstream,
+                    )
+                } else {
+                    emptyList()
+                }
+                ) + if (branch != null) {
+                listOf(branch)
+            } else {
+                emptyList()
+            },
+            workingDirectory,
+        )
+    }
+
+    fun setBranchUpstream(upstream: String, branch: String) {
+        runProcess(listOf("git", "branch", "--set-upstream-to=$upstream", branch), workingDirectory)
     }
 }
 

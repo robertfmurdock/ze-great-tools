@@ -62,11 +62,11 @@ interface TagTestSpec {
         configureWithDefaults()
 
         val originDirectory = createTempDirectory()
+        val originGrgit = Grgit.init(fun InitOp.() {
+            this.dir = originDirectory.absolutePathString()
+        })
         val originGitAdapter = GitAdapter(originDirectory.absolutePathString())
-        originGitAdapter.init()
-        val originGrgit = Grgit.open(mapOf("dir" to originDirectory.absolutePathString()))
         originGitAdapter.disableGpgSign()
-
         originGrgit.commit(fun CommitOp.() {
             this.message = "init"
         })
