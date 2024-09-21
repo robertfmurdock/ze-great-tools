@@ -178,7 +178,7 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
     fun `currentContributionData will include most recent tag range when head is tagged`() {
         setupWithDefaults()
 
-        val (_, gitAdapter) = initializeGitRepo(
+        val gitAdapter = initializeGitRepo(
             directory = projectDir.absolutePath,
             addFileNames = addFileNames,
             commits = listOf(
@@ -228,7 +228,7 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
     fun `when head is tagged currentContributionData will use include tag info`() {
         setupWithDefaults()
 
-        val (_, gitAdapter) = initializeGitRepo(
+        val gitAdapter = initializeGitRepo(
             directory = projectDir.absolutePath,
             addFileNames = addFileNames,
             commits = listOf(
@@ -273,7 +273,7 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
     fun `currentContributionData will not include authors from commits before last tag`() {
         setupWithDefaults()
 
-        val (_, gitAdapter) = initializeGitRepo(
+        val gitAdapter = initializeGitRepo(
             directory = projectDir.absolutePath,
             addFileNames = addFileNames,
             commits = listOf(
@@ -402,11 +402,9 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
     @Test
     fun `will handle merge commits on merged branches correctly`() {
         setupWithDefaults()
-        val (grgit, gitAdapter) = initializeGitRepo(listOf("first"))
+        val gitAdapter = initializeGitRepo(listOf("first"))
         gitAdapter.config("user.name", "Test")
         gitAdapter.config("user.email", "Test")
-
-        grgit.head()
 
         gitAdapter.addTag("release")
         gitAdapter.switchToNewBranch("branch2")
@@ -415,14 +413,14 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
         gitAdapter.switchToNewBranch("branch1")
         gitAdapter.addCommitWithMessage("third")
 
-        grgit.checkout { it.branch = "branch2" }
+        gitAdapter.checkout("branch2")
         gitAdapter.addCommitWithMessage("fourth")
-        grgit.checkout { it.branch = "branch1" }
+        gitAdapter.checkout("branch1")
         gitAdapter.addCommitWithMessage("fifth")
 
         gitAdapter.mergeInBranch("branch2", "merge1")
 
-        grgit.checkout { it.branch = "master" }
+        gitAdapter.checkout("master")
         gitAdapter.addCommitWithMessage("sixth")
 
         val merge2Commit = gitAdapter.mergeInBranch("branch1", "merge2")
@@ -447,10 +445,9 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
         setupWithOverrides(
             tagRegex = "v(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?",
         )
-        val (grgit, gitAdapter) = initializeGitRepo(listOf("first"))
+        val gitAdapter = initializeGitRepo(listOf("first"))
         gitAdapter.config("user.name", "Test")
         gitAdapter.config("user.email", "Test")
-        grgit.head()
 
         gitAdapter.addTag("v1.0.0")
         gitAdapter.switchToNewBranch("branch2")
@@ -459,14 +456,14 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
         gitAdapter.switchToNewBranch("branch1")
         gitAdapter.addCommitWithMessage("third")
 
-        grgit.checkout { it.branch = "branch2" }
+        gitAdapter.checkout("branch2")
         gitAdapter.addCommitWithMessage("fourth")
-        grgit.checkout { it.branch = "branch1" }
+        gitAdapter.checkout("branch1")
         gitAdapter.addCommitWithMessage("fifth")
 
         gitAdapter.mergeInBranch("branch2", "merge1")
 
-        grgit.checkout { it.branch = "master" }
+        gitAdapter.checkout("master")
         gitAdapter.addCommitWithMessage("sixth")
 
         val merge2Commit = gitAdapter.mergeInBranch("branch1", "merge2")
@@ -488,22 +485,21 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
     @Test
     fun `will correctly understand longer running branch`() {
         setupWithDefaults()
-        val (grgit, gitAdapter) = initializeGitRepo(listOf("first"))
+        val gitAdapter = initializeGitRepo(listOf("first"))
         gitAdapter.config("user.name", "Test")
         gitAdapter.config("user.email", "Test")
-        grgit.head()
 
         gitAdapter.addTag("release")
         gitAdapter.switchToNewBranch("branch")
         val secondCommit = gitAdapter.addCommitWithMessage("second")
-        grgit.checkout { it.branch = "master" }
+        gitAdapter.checkout("master")
         gitAdapter.addCommitWithMessage("third")
         delayLongEnoughToAffectGitDate()
         gitAdapter.addTag("release2")
-        grgit.checkout { it.branch = "branch" }
+        gitAdapter.checkout("branch")
         gitAdapter.addCommitWithMessage("fourth")
         gitAdapter.addCommitWithMessage("fifth")
-        grgit.checkout { it.branch = "master" }
+        gitAdapter.checkout("master")
         gitAdapter.mergeInBranch("branch", "merge")
         val lastCommit = gitAdapter.addCommitWithMessage("sixth")
         delayLongEnoughToAffectGitDate()

@@ -229,13 +229,17 @@ class GitAdapter(private val workingDirectory: String) {
 
     private fun inlineFlag(flag: String, enabled: Boolean) = (if (enabled) listOf(flag) else emptyList())
 
-    fun checkout(branch: String, newBranch: Boolean) {
+    fun checkout(branch: String, newBranch: Boolean = false) {
         runProcess(
             listOf("git", "checkout") + (if (newBranch) listOf("-b") else emptyList()) + listOf(
                 branch,
             ),
             workingDirectory,
         )
+    }
+
+    fun push() {
+        runProcess(listOf("git", "push"), workingDirectory)
     }
 }
 

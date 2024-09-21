@@ -70,11 +70,11 @@ interface TagTestSpec {
         originGrgit.commit(fun CommitOp.() {
             this.message = "init"
         })
-        val (grgit, gitAdapter) = initializeGitRepo(
+        val gitAdapter = initializeGitRepo(
             listOf("init", "[patch] commit 1", "[patch] commit 2"),
             remoteUrl = originDirectory.absolutePathString(),
         )
-        grgit.push()
+        gitAdapter.push()
 
         runProcess(listOf("git", "config", "user.email", "test@zegreatrob.com"), this.projectDir.absolutePath)
         runProcess(listOf("git", "config", "user.name", "RoB as Test"), this.projectDir.absolutePath)
@@ -108,11 +108,11 @@ interface TagTestSpec {
         originGrgit.commit(fun CommitOp.() {
             this.message = "init"
         })
-        val (grgit, gitAdapter) = initializeGitRepo(
+        val gitAdapter = initializeGitRepo(
             listOf("init", "[patch] commit 1", "[patch] commit 2"),
             remoteUrl = originDirectory.absolutePathString(),
         )
-        grgit.push()
+        gitAdapter.push()
 
         val expectedVersion = "1.0.0"
         val result = execute(expectedVersion)
@@ -134,11 +134,11 @@ interface TagTestSpec {
         originGrgit.commit(fun CommitOp.() {
             this.message = "init"
         })
-        val (grgit, gitAdapter) = initializeGitRepo(
+        val gitAdapter = initializeGitRepo(
             listOf("init", "[patch] commit 1", "[patch] commit 2"),
             remoteUrl = originDirectory.absolutePathString(),
         )
-        grgit.push()
+        gitAdapter.push()
 
         val version = "1.0.0"
         val result = execute(version)
@@ -162,11 +162,11 @@ interface TagTestSpec {
         originGrgit.commit(fun CommitOp.() {
             this.message = "init"
         })
-        val (grgit, gitAdapter) = initializeGitRepo(
+        val gitAdapter = initializeGitRepo(
             listOf("init", "[patch] commit 1", "[patch] commit 2"),
             remoteUrl = originDirectory.absolutePathString(),
         )
-        grgit.push()
+        gitAdapter.push()
 
         runProcess(listOf("git", "config", "user.email", "test@zegreatrob.com"), this.projectDir.absolutePath)
         runProcess(listOf("git", "config", "user.name", "RoB as Test"), this.projectDir.absolutePath)
@@ -193,11 +193,11 @@ interface TagTestSpec {
         originGrgit.commit(fun CommitOp.() {
             this.message = "init"
         })
-        val (grgit, gitAdapter) = initializeGitRepo(
+        val gitAdapter = initializeGitRepo(
             listOf("init", "[patch] commit 1", "[patch] commit 2"),
             remoteUrl = originDirectory.absolutePathString(),
         )
-        grgit.push()
+        gitAdapter.push()
 
         runProcess(listOf("git", "config", "user.email", "test@zegreatrob.com"), this.projectDir.absolutePath)
         runProcess(listOf("git", "config", "user.name", "RoB as Test"), this.projectDir.absolutePath)

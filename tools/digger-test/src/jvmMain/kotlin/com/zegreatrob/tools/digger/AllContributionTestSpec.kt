@@ -30,7 +30,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
     @Test
     fun `will include all tag segments`() {
         setupWithDefaults()
-        val (_, gitAdapter) = initializeGitRepo(
+        val gitAdapter = initializeGitRepo(
             listOf(
                 """here's a message
                 |
@@ -85,7 +85,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
     @Test
     fun `will consider the path with the most tags, the trunk`() {
         setupWithDefaults()
-        val (grgit, gitAdapter) = initializeGitRepo(listOf("here's a message"))
+        val gitAdapter = initializeGitRepo(listOf("here's a message"))
         gitAdapter.config("user.name", "Test")
         gitAdapter.config("user.email", "Test")
 
@@ -97,7 +97,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
         val secondCommit = gitAdapter.addCommitWithMessage("second")
         val midRelease = gitAdapter.addTag("release1-5")
         delayLongEnoughToAffectGitDate()
-        grgit.checkout { it.branch = "master" }
+        gitAdapter.checkout("master")
 
         val thirdCommit = gitAdapter.addCommitWithMessage("third")
 
@@ -134,7 +134,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
     @Test
     fun `will handle normal merge-into-branch-then-back case well`() {
         setupWithDefaults()
-        val (grgit, gitAdapter) = initializeGitRepo(listOf("here's a message"))
+        val gitAdapter = initializeGitRepo(listOf("here's a message"))
         gitAdapter.config("user.name", "Test")
         gitAdapter.config("user.email", "Test")
 
@@ -144,14 +144,14 @@ interface AllContributionTestSpec : SetupWithOverrides {
         gitAdapter.switchToNewBranch("branch")
         val secondCommit = gitAdapter.addCommitWithMessage("second")
 
-        grgit.checkout { it.branch = "master" }
+        gitAdapter.checkout("master")
         gitAdapter.addCommitWithMessage("third")
 
-        grgit.checkout { it.branch = "branch" }
+        gitAdapter.checkout("branch")
         gitAdapter.addCommitWithMessage("fourth")
         gitAdapter.mergeInBranch("master", "merge-to-branch")
 
-        grgit.checkout { it.branch = "master" }
+        gitAdapter.checkout("master")
 
         val mergeToMainCommit = gitAdapter.mergeInBranch("branch", "merge-to-main")
         delayLongEnoughToAffectGitDate()
@@ -180,7 +180,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
     @Test
     fun `will handle normal merge-into-branch-then-ff-back case`() {
         setupWithDefaults()
-        val (grgit, gitAdapter) = initializeGitRepo(listOf("here's a message"))
+        val gitAdapter = initializeGitRepo(listOf("here's a message"))
         gitAdapter.config("user.name", "Test")
         gitAdapter.config("user.email", "Test")
 
@@ -190,16 +190,16 @@ interface AllContributionTestSpec : SetupWithOverrides {
         gitAdapter.switchToNewBranch("branch")
         val secondCommit = gitAdapter.addCommitWithMessage("second")
 
-        grgit.checkout { it.branch = "master" }
+        gitAdapter.checkout("master")
         val thirdCommit = gitAdapter.addCommitWithMessage("third")
         delayLongEnoughToAffectGitDate()
         val secondRelease = gitAdapter.addTag("release-2")
 
-        grgit.checkout { it.branch = "branch" }
+        gitAdapter.checkout("branch")
         gitAdapter.addCommitWithMessage("fourth")
         val mergeInBranchCommit = gitAdapter.mergeInBranch("master", "merge-to-branch")
 
-        grgit.checkout { it.branch = "master" }
+        gitAdapter.checkout("master")
 
         gitAdapter.ffOnlyInBranch("branch")
         delayLongEnoughToAffectGitDate()
@@ -235,7 +235,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
     @Test
     fun willHandleMergeBranches() {
         setupWithDefaults()
-        val (grgit, gitAdapter) = initializeGitRepo(listOf("first"))
+        val gitAdapter = initializeGitRepo(listOf("first"))
         gitAdapter.config("user.name", "Test")
         gitAdapter.config("user.email", "Test")
 
@@ -245,14 +245,14 @@ interface AllContributionTestSpec : SetupWithOverrides {
         gitAdapter.switchToNewBranch("branch1")
         val secondCommit = gitAdapter.addCommitWithMessage("second")
 
-        grgit.checkout { it.branch = "master" }
+        gitAdapter.checkout("master")
         val thirdCommit = gitAdapter.addCommitWithMessage("third")
 
         delayLongEnoughToAffectGitDate()
         val secondRelease = gitAdapter.addTag("release2")
-        grgit.checkout { it.branch = "branch1" }
+        gitAdapter.checkout("branch1")
         gitAdapter.addCommitWithMessage("fourth")
-        grgit.checkout { it.branch = "master" }
+        gitAdapter.checkout("master")
         val mergeCommit = gitAdapter.mergeInBranch("branch1", "merge")
         delayLongEnoughToAffectGitDate()
         val thirdRelease = gitAdapter.addTag("release3")
@@ -287,7 +287,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
         setupWithOverrides(
             tagRegex = "v(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?",
         )
-        val (grgit, gitAdapter) = initializeGitRepo(listOf("first"))
+        val gitAdapter = initializeGitRepo(listOf("first"))
         gitAdapter.config("user.name", "Test")
         gitAdapter.config("user.email", "Test")
 
@@ -297,14 +297,14 @@ interface AllContributionTestSpec : SetupWithOverrides {
         gitAdapter.switchToNewBranch("branch1")
         val secondCommit = gitAdapter.addCommitWithMessage("second")
 
-        grgit.checkout { it.branch = "master" }
+        gitAdapter.checkout("master")
         gitAdapter.addCommitWithMessage("third")
 
         delayLongEnoughToAffectGitDate()
         gitAdapter.addTag("unrelated-tag")
-        grgit.checkout { it.branch = "branch1" }
+        gitAdapter.checkout("branch1")
         gitAdapter.addCommitWithMessage("fourth")
-        grgit.checkout { it.branch = "master" }
+        gitAdapter.checkout("master")
         val mergeCommit = gitAdapter.mergeInBranch("branch1", "merge")
         delayLongEnoughToAffectGitDate()
         val thirdRelease = gitAdapter.addTag("v20.176.37")
@@ -332,7 +332,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
     @Test
     fun `will handle merge commits on merged branches correctly`() {
         setupWithDefaults()
-        val (grgit, gitAdapter) = initializeGitRepo(listOf("first"))
+        val gitAdapter = initializeGitRepo(listOf("first"))
         gitAdapter.config("user.name", "Test")
         gitAdapter.config("user.email", "Test")
 
@@ -345,14 +345,14 @@ interface AllContributionTestSpec : SetupWithOverrides {
         gitAdapter.switchToNewBranch("branch1")
         gitAdapter.addCommitWithMessage("third")
 
-        grgit.checkout { it.branch = "branch2" }
+        gitAdapter.checkout("branch2")
         gitAdapter.addCommitWithMessage("fourth")
-        grgit.checkout { it.branch = "branch1" }
+        gitAdapter.checkout("branch1")
         gitAdapter.addCommitWithMessage("fifth")
 
         gitAdapter.mergeInBranch("branch2", "merge1")
 
-        grgit.checkout { it.branch = "master" }
+        gitAdapter.checkout("master")
         gitAdapter.addCommitWithMessage("sixth")
 
         val merge2Commit = gitAdapter.mergeInBranch("branch1", "merge2")
@@ -382,7 +382,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
     @Test
     fun `when merging multiple times from same branch, commits are only counted once`() {
         setupWithDefaults()
-        val (grgit, gitAdapter) = initializeGitRepo(listOf("first"))
+        val gitAdapter = initializeGitRepo(listOf("first"))
         gitAdapter.config("user.name", "Test")
         gitAdapter.config("user.email", "Test")
 
@@ -392,15 +392,15 @@ interface AllContributionTestSpec : SetupWithOverrides {
         gitAdapter.switchToNewBranch("branch1")
         val secondCommit = gitAdapter.addCommitWithMessage("second")
 
-        grgit.checkout { it.branch = "master" }
+        gitAdapter.checkout("master")
         gitAdapter.addCommitWithMessage("third")
         val merge1Commit = gitAdapter.mergeInBranch("branch1", "merge1")
         delayLongEnoughToAffectGitDate()
         val secondRelease = gitAdapter.addTag("release2")
 
-        grgit.checkout { it.branch = "branch1" }
+        gitAdapter.checkout("branch1")
         val fourthCommit = gitAdapter.addCommitWithMessage("fourth")
-        grgit.checkout { it.branch = "master" }
+        gitAdapter.checkout("master")
         val merge2Commit = gitAdapter.mergeInBranch("branch1", "merge2")
         delayLongEnoughToAffectGitDate()
         val thirdRelease = gitAdapter.addTag("release3")
@@ -460,7 +460,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
     @Test
     fun `will include ease of change`() {
         setupWithDefaults()
-        val (_, gitAdapter) = initializeGitRepo(
+        val gitAdapter = initializeGitRepo(
             directory = projectDir.absolutePath,
             addFileNames = addFileNames,
             commits = listOf(
@@ -499,7 +499,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
     @Test
     fun `will include story ids`() {
         setupWithDefaults()
-        val (_, gitAdapter) = initializeGitRepo(commits = listOf("[DOGCOW-17] here's a message"))
+        val gitAdapter = initializeGitRepo(commits = listOf("[DOGCOW-17] here's a message"))
         gitAdapter.config("user.name", "Test")
         gitAdapter.config("user.email", "Test")
 
@@ -529,7 +529,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
     @Test
     fun `will merge the same story id within a contribution`() {
         setupWithDefaults()
-        val (_, gitAdapter) = initializeGitRepo(listOf("[DOGCOW-17] here's a message"))
+        val gitAdapter = initializeGitRepo(listOf("[DOGCOW-17] here's a message"))
         val firstCommit = gitAdapter.show("HEAD")!!
         val secondCommit = gitAdapter.addCommitWithMessage("[DOGCOW-17] -3- here's a message")
         val allOutput = runAllContributionData()
@@ -551,7 +551,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
     @Test
     fun `will merge the different story ids within a contribution`() {
         setupWithOverrides(label = "AwesomeProject")
-        val (_, gitAdapter) = initializeGitRepo(commits = listOf("[DOGCOW-17] here's a message"))
+        val gitAdapter = initializeGitRepo(commits = listOf("[DOGCOW-17] here's a message"))
         val firstCommit = gitAdapter.show("HEAD")!!
         val secondCommit = gitAdapter.addCommitWithMessage("[DOGCOW-18] -3- here's a message")
 
@@ -576,7 +576,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
     @Test
     fun `will include flatten ease into largest number`() {
         setupWithDefaults()
-        val (_, gitAdapter) = initializeGitRepo(listOf("here's a message -4- more stuff"))
+        val gitAdapter = initializeGitRepo(listOf("here's a message -4- more stuff"))
         val firstCommit = gitAdapter.show("HEAD")!!
         val secondCommit = gitAdapter.addCommitWithMessage("-3- here's a message")
         val allOutput = runAllContributionData()
