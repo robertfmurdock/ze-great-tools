@@ -6,7 +6,6 @@ import com.zegreatrob.tools.digger.DiggerExtension
 import com.zegreatrob.tools.digger.HeadTask
 
 plugins {
-    id("org.ajoberstar.grgit.service")
     base
 }
 

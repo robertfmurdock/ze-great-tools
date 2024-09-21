@@ -25,7 +25,6 @@ testing {
 configurations["functionalTestImplementation"].extendsFrom(configurations["testImplementation"])
 
 dependencies {
-    implementation(libs.org.ajoberstar.grgit.gradle.plugin)
     testImplementation(kotlin("test-junit5", embeddedKotlinVersion))
     "functionalTestImplementation"(platform(libs.org.junit.junit.bom))
 }

@@ -27,7 +27,6 @@ configurations["functionalTestImplementation"].extendsFrom(configurations["testI
 dependencies {
     implementation(project(":git-adapter"))
     implementation(project(":tagger-core"))
-    testImplementation(libs.org.ajoberstar.grgit.gradle.plugin)
     testImplementation(kotlin("test-junit5", embeddedKotlinVersion))
     "functionalTestImplementation"(platform(libs.org.junit.junit.bom))
     "functionalTestImplementation"(project(":tagger-test"))
