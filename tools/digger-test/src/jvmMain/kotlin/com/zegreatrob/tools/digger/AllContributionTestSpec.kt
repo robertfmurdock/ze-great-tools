@@ -143,10 +143,10 @@ interface AllContributionTestSpec : SetupWithOverrides {
         val secondCommit = gitAdapter.addCommitWithMessage("second")
 
         grgit.checkout { it.branch = "master" }
-        grgit.addCommitWithMessage("third")
+        gitAdapter.addCommitWithMessage("third")
 
         grgit.checkout { it.branch = "branch" }
-        grgit.addCommitWithMessage("fourth")
+        gitAdapter.addCommitWithMessage("fourth")
         gitAdapter.mergeInBranch("master", "merge-to-branch")
 
         grgit.checkout { it.branch = "master" }
@@ -194,7 +194,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
         val secondRelease = grgit.addTag("release-2")
 
         grgit.checkout { it.branch = "branch" }
-        grgit.addCommitWithMessage("fourth")
+        gitAdapter.addCommitWithMessage("fourth")
         val mergeInBranchCommit = gitAdapter.mergeInBranch("master", "merge-to-branch")
 
         grgit.checkout { it.branch = "master" }
@@ -249,7 +249,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
         delayLongEnoughToAffectGitDate()
         val secondRelease = grgit.addTag("release2")
         grgit.checkout { it.branch = "branch1" }
-        grgit.addCommitWithMessage("fourth")
+        gitAdapter.addCommitWithMessage("fourth")
         grgit.checkout { it.branch = "master" }
         val mergeCommit = gitAdapter.mergeInBranch("branch1", "merge")
         delayLongEnoughToAffectGitDate()
@@ -296,12 +296,12 @@ interface AllContributionTestSpec : SetupWithOverrides {
         val secondCommit = gitAdapter.addCommitWithMessage("second")
 
         grgit.checkout { it.branch = "master" }
-        grgit.addCommitWithMessage("third")
+        gitAdapter.addCommitWithMessage("third")
 
         delayLongEnoughToAffectGitDate()
         grgit.addTag("unrelated-tag")
         grgit.checkout { it.branch = "branch1" }
-        grgit.addCommitWithMessage("fourth")
+        gitAdapter.addCommitWithMessage("fourth")
         grgit.checkout { it.branch = "master" }
         val mergeCommit = gitAdapter.mergeInBranch("branch1", "merge")
         delayLongEnoughToAffectGitDate()
@@ -341,17 +341,17 @@ interface AllContributionTestSpec : SetupWithOverrides {
         val secondCommit = gitAdapter.addCommitWithMessage("second")
 
         grgit.switchToNewBranch("branch1")
-        grgit.addCommitWithMessage("third")
+        gitAdapter.addCommitWithMessage("third")
 
         grgit.checkout { it.branch = "branch2" }
-        grgit.addCommitWithMessage("fourth")
+        gitAdapter.addCommitWithMessage("fourth")
         grgit.checkout { it.branch = "branch1" }
-        grgit.addCommitWithMessage("fifth")
+        gitAdapter.addCommitWithMessage("fifth")
 
         gitAdapter.mergeInBranch("branch2", "merge1")
 
         grgit.checkout { it.branch = "master" }
-        grgit.addCommitWithMessage("sixth")
+        gitAdapter.addCommitWithMessage("sixth")
 
         val merge2Commit = gitAdapter.mergeInBranch("branch1", "merge2")
         delayLongEnoughToAffectGitDate()

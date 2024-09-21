@@ -2,10 +2,8 @@ package com.zegreatrob.tools.test.git
 
 import com.zegreatrob.tools.adapter.git.CommitRef
 import com.zegreatrob.tools.adapter.git.GitAdapter
-import org.ajoberstar.grgit.Commit
 import org.ajoberstar.grgit.Grgit
 import org.ajoberstar.grgit.operation.BranchChangeOp
-import org.ajoberstar.grgit.operation.CommitOp
 import org.ajoberstar.grgit.operation.MergeOp.Mode
 import org.ajoberstar.grgit.operation.TagAddOp
 
@@ -52,15 +50,6 @@ fun Grgit.addTag(initialTag: String?): org.ajoberstar.grgit.Tag? = tag.add(
     },
 )
 
-fun Grgit.addCommitWithMessage(message: String): Commit =
-    commit(
-        fun(it: CommitOp) {
-            it.author = org.ajoberstar.grgit.Person("Funky Testerson", "funk@test.io")
-            it.committer = org.ajoberstar.grgit.Person("Testy Funkerson", "test@funk.edu")
-            it.message = message
-        },
-    )
-
 fun GitAdapter.addCommitWithMessage(message: String): CommitRef {
     commit(
         message = message,
@@ -79,14 +68,6 @@ fun delayLongEnoughToAffectGitDate() {
 fun Grgit.switchToNewBranch(name: String) {
     branch.add { it.name = name }
     checkout { it.branch = name }
-}
-
-fun Grgit.mergeInBranch(branchName: String, message: String): Commit {
-    merge {
-        it.head = branchName
-        it.setMode("no-commit")
-    }
-    return addCommitWithMessage(message)
 }
 
 fun GitAdapter.mergeInBranch(branchName: String, message: String): CommitRef {
