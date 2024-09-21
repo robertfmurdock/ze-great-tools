@@ -1,12 +1,8 @@
 package com.zegreatrob.tools.tagger
 
 import com.zegreatrob.tools.adapter.git.GitAdapter
+import com.zegreatrob.tools.test.git.addCommitWithMessage
 import com.zegreatrob.tools.test.git.initializeGitRepo
-import org.ajoberstar.grgit.Grgit
-import org.ajoberstar.grgit.operation.AddOp
-import org.ajoberstar.grgit.operation.CommitOp
-import org.ajoberstar.grgit.operation.RemoteAddOp
-import org.ajoberstar.grgit.operation.TagAddOp
 import java.io.File
 import kotlin.test.Test
 import kotlin.test.assertContains
@@ -63,29 +59,11 @@ interface CalculateVersionTestSpec {
         val gitAdapter = GitAdapter(projectDir.absolutePath)
         gitAdapter.init()
         gitAdapter.config("commit.gpgsign", "false")
-        val grgit = Grgit.open(mapOf("dir" to projectDir.absolutePath))
-        grgit.add(
-            fun(it: AddOp) {
-                it.patterns = setOf(".")
-            },
-        )
-        grgit.commit(
-            fun(it: CommitOp) {
-                it.message = "test commit"
-            },
-        )
-        grgit.tag.add(
-            fun(it: TagAddOp) {
-                it.name = "1.0.23"
-            },
-        )
-        grgit.checkout(mapOf<String?, Any>("branch" to "main", "createBranch" to true))
-        grgit.remote.add(
-            fun(it: RemoteAddOp) {
-                it.name = "origin"
-                it.url = projectDir.absolutePath
-            },
-        )
+        gitAdapter.add(".")
+        gitAdapter.addCommitWithMessage("test commit")
+        gitAdapter.newAnnotatedTag("1.0.23", "HEAD", null, null)
+        gitAdapter.checkout("main", newBranch = true)
+        gitAdapter.addRemote("origin", projectDir.absolutePath)
         val version = runCalculateVersionSuccessfully()
 
         assertEquals("1.0.23-SNAPSHOT", version)

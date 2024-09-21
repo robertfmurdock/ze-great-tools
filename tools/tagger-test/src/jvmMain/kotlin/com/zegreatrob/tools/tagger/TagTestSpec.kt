@@ -3,9 +3,7 @@ package com.zegreatrob.tools.tagger
 import com.zegreatrob.tools.adapter.git.GitAdapter
 import com.zegreatrob.tools.adapter.git.runProcess
 import com.zegreatrob.tools.tagger.core.TagErrors
-import org.ajoberstar.grgit.Grgit
-import org.ajoberstar.grgit.operation.CommitOp
-import org.ajoberstar.grgit.operation.InitOp
+import com.zegreatrob.tools.test.git.addCommitWithMessage
 import org.junit.jupiter.api.Assertions.assertNotEquals
 import java.io.File
 import kotlin.io.path.absolutePathString
@@ -62,14 +60,11 @@ interface TagTestSpec {
         configureWithDefaults()
 
         val originDirectory = createTempDirectory()
-        val originGrgit = Grgit.init(fun InitOp.() {
-            this.dir = originDirectory.absolutePathString()
-        })
         val originGitAdapter = GitAdapter(originDirectory.absolutePathString())
+        originGitAdapter.init()
+        originGitAdapter.config("receive.denyCurrentBranch", "ignore")
         originGitAdapter.disableGpgSign()
-        originGrgit.commit(fun CommitOp.() {
-            this.message = "init"
-        })
+        originGitAdapter.addCommitWithMessage("init")
         val gitAdapter = initializeGitRepo(
             listOf("init", "[patch] commit 1", "[patch] commit 2"),
             remoteUrl = originDirectory.absolutePathString(),
@@ -100,14 +95,11 @@ interface TagTestSpec {
         )
 
         val originDirectory = createTempDirectory()
-        val originGrgit = Grgit.init(fun InitOp.() {
-            this.dir = originDirectory.absolutePathString()
-        })
         val originGitAdapter = GitAdapter(originDirectory.absolutePathString())
+        originGitAdapter.init()
+        originGitAdapter.config("receive.denyCurrentBranch", "ignore")
         originGitAdapter.disableGpgSign()
-        originGrgit.commit(fun CommitOp.() {
-            this.message = "init"
-        })
+        originGitAdapter.addCommitWithMessage("init")
         val gitAdapter = initializeGitRepo(
             listOf("init", "[patch] commit 1", "[patch] commit 2"),
             remoteUrl = originDirectory.absolutePathString(),
@@ -126,14 +118,11 @@ interface TagTestSpec {
         configureWithOverrides(releaseBranch = "master", warningsAsErrors = true)
 
         val originDirectory = createTempDirectory()
-        val originGrgit = Grgit.init(fun InitOp.() {
-            this.dir = originDirectory.absolutePathString()
-        })
         val originGitAdapter = GitAdapter(originDirectory.absolutePathString())
+        originGitAdapter.init()
+        originGitAdapter.config("receive.denyCurrentBranch", "ignore")
         originGitAdapter.disableGpgSign()
-        originGrgit.commit(fun CommitOp.() {
-            this.message = "init"
-        })
+        originGitAdapter.addCommitWithMessage("init")
         val gitAdapter = initializeGitRepo(
             listOf("init", "[patch] commit 1", "[patch] commit 2"),
             remoteUrl = originDirectory.absolutePathString(),
@@ -154,14 +143,11 @@ interface TagTestSpec {
         configureWithOverrides(releaseBranch = "trunk", warningsAsErrors = true)
 
         val originDirectory = createTempDirectory()
-        val originGrgit = Grgit.init(fun InitOp.() {
-            this.dir = originDirectory.absolutePathString()
-        })
         val originGitAdapter = GitAdapter(originDirectory.absolutePathString())
+        originGitAdapter.init()
+        originGitAdapter.config("receive.denyCurrentBranch", "ignore")
         originGitAdapter.disableGpgSign()
-        originGrgit.commit(fun CommitOp.() {
-            this.message = "init"
-        })
+        originGitAdapter.addCommitWithMessage("init")
         val gitAdapter = initializeGitRepo(
             listOf("init", "[patch] commit 1", "[patch] commit 2"),
             remoteUrl = originDirectory.absolutePathString(),
@@ -185,14 +171,11 @@ interface TagTestSpec {
         configureWithOverrides(releaseBranch = "trunk", warningsAsErrors = false)
 
         val originDirectory = createTempDirectory()
-        val originGrgit = Grgit.init(fun InitOp.() {
-            this.dir = originDirectory.absolutePathString()
-        })
         val originGitAdapter = GitAdapter(originDirectory.absolutePathString())
+        originGitAdapter.init()
+        originGitAdapter.config("receive.denyCurrentBranch", "ignore")
         originGitAdapter.disableGpgSign()
-        originGrgit.commit(fun CommitOp.() {
-            this.message = "init"
-        })
+        originGitAdapter.addCommitWithMessage("init")
         val gitAdapter = initializeGitRepo(
             listOf("init", "[patch] commit 1", "[patch] commit 2"),
             remoteUrl = originDirectory.absolutePathString(),
