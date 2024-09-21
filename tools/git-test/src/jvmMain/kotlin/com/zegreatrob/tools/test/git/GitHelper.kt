@@ -6,7 +6,6 @@ import com.zegreatrob.tools.adapter.git.TagRef
 import org.ajoberstar.grgit.Grgit
 import org.ajoberstar.grgit.operation.BranchChangeOp
 import org.ajoberstar.grgit.operation.MergeOp.Mode
-import org.ajoberstar.grgit.operation.TagAddOp
 
 val defaultAuthors: List<String>
     get() = listOf("funk@test.io", "test@funk.edu")
@@ -44,12 +43,6 @@ fun initializeGitRepo(
     )
     return grgit to gitAdapter
 }
-
-fun Grgit.addTag(initialTag: String?): org.ajoberstar.grgit.Tag? = tag.add(
-    fun(it: TagAddOp) {
-        it.name = initialTag
-    },
-)
 
 fun GitAdapter.addTag(initialTag: String): TagRef {
     newAnnotatedTag(initialTag, "HEAD", null, null)

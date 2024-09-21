@@ -1,6 +1,7 @@
 package com.zegreatrob.tools.digger
 
 import com.zegreatrob.tools.adapter.git.CommitRef
+import com.zegreatrob.tools.adapter.git.TagRef
 import com.zegreatrob.tools.digger.json.ContributionParser.parseContribution
 import com.zegreatrob.tools.digger.model.Contribution
 import com.zegreatrob.tools.test.git.addCommitWithMessage
@@ -10,8 +11,6 @@ import com.zegreatrob.tools.test.git.delayLongEnoughToAffectGitDate
 import com.zegreatrob.tools.test.git.initializeGitRepo
 import com.zegreatrob.tools.test.git.mergeInBranch
 import com.zegreatrob.tools.test.git.switchToNewBranch
-import kotlinx.datetime.toKotlinInstant
-import org.ajoberstar.grgit.Tag
 import java.io.File
 import java.lang.Thread.sleep
 import kotlin.test.Test
@@ -179,7 +178,7 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
     fun `currentContributionData will include most recent tag range when head is tagged`() {
         setupWithDefaults()
 
-        val (grgit, gitAdapter) = initializeGitRepo(
+        val (_, gitAdapter) = initializeGitRepo(
             directory = projectDir.absolutePath,
             addFileNames = addFileNames,
             commits = listOf(
@@ -191,7 +190,10 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
                 """.trimMargin(),
             ),
         )
-        grgit.addTag("earlier")
+        gitAdapter.config("user.name", "Test")
+        gitAdapter.config("user.email", "Test")
+
+        gitAdapter.addTag("earlier")
 
         gitAdapter.addCommitWithMessage(
             """another
@@ -207,7 +209,7 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
                 |Co-authored-by: 4th Guy <fourth@guy.edu>
             """.trimMargin(),
         )
-        grgit.addTag("now")
+        gitAdapter.addTag("now")
 
         val output = runCurrentContributionData()
 
@@ -226,7 +228,7 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
     fun `when head is tagged currentContributionData will use include tag info`() {
         setupWithDefaults()
 
-        val (grgit, gitAdapter) = initializeGitRepo(
+        val (_, gitAdapter) = initializeGitRepo(
             directory = projectDir.absolutePath,
             addFileNames = addFileNames,
             commits = listOf(
@@ -238,7 +240,10 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
                 """.trimMargin(),
             ),
         )
-        grgit.addTag("earlier")
+        gitAdapter.config("user.name", "Test")
+        gitAdapter.config("user.email", "Test")
+
+        gitAdapter.addTag("earlier")
 
         gitAdapter.addCommitWithMessage(
             """another
@@ -255,20 +260,20 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
             """.trimMargin(),
         )
         sleep(1000)
-        val nowTag = grgit.addTag("now")
+        val nowTag = gitAdapter.addTag("now")
 
         val output = runCurrentContributionData()
 
         val contribution = parseContribution(output)
-        assertEquals(nowTag?.name, contribution?.tagName)
-        assertEquals(nowTag?.dateTime?.toInstant()?.toKotlinInstant(), contribution?.tagDateTime)
+        assertEquals(nowTag.name, contribution?.tagName)
+        assertEquals(nowTag.dateTime, contribution?.tagDateTime)
     }
 
     @Test
     fun `currentContributionData will not include authors from commits before last tag`() {
         setupWithDefaults()
 
-        val (grgit, gitAdapter) = initializeGitRepo(
+        val (_, gitAdapter) = initializeGitRepo(
             directory = projectDir.absolutePath,
             addFileNames = addFileNames,
             commits = listOf(
@@ -280,8 +285,10 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
                 """.trimMargin(),
             ),
         )
+        gitAdapter.config("user.name", "Test")
+        gitAdapter.config("user.email", "Test")
 
-        grgit.addTag("release")
+        gitAdapter.addTag("release")
         gitAdapter.addCommitWithMessage(
             """here's a message
                 |
@@ -401,7 +408,7 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
 
         grgit.head()
 
-        grgit.addTag("release")
+        gitAdapter.addTag("release")
         grgit.switchToNewBranch("branch2")
         val secondCommit = gitAdapter.addCommitWithMessage("second")
 
@@ -420,7 +427,7 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
 
         val merge2Commit = gitAdapter.mergeInBranch("branch1", "merge2")
         delayLongEnoughToAffectGitDate()
-        val secondRelease = grgit.addTag("release2")
+        val secondRelease = gitAdapter.addTag("release2")
 
         val allOutput = runCurrentContributionData()
         assertEquals(
@@ -445,7 +452,7 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
         gitAdapter.config("user.email", "Test")
         grgit.head()
 
-        grgit.addTag("v1.0.0")
+        gitAdapter.addTag("v1.0.0")
         grgit.switchToNewBranch("branch2")
         val secondCommit = gitAdapter.addCommitWithMessage("second")
 
@@ -486,13 +493,13 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
         gitAdapter.config("user.email", "Test")
         grgit.head()
 
-        grgit.addTag("release")
+        gitAdapter.addTag("release")
         grgit.switchToNewBranch("branch")
         val secondCommit = gitAdapter.addCommitWithMessage("second")
         grgit.checkout { it.branch = "master" }
         gitAdapter.addCommitWithMessage("third")
         delayLongEnoughToAffectGitDate()
-        grgit.addTag("release2")
+        gitAdapter.addTag("release2")
         grgit.checkout { it.branch = "branch" }
         gitAdapter.addCommitWithMessage("fourth")
         gitAdapter.addCommitWithMessage("fifth")
@@ -500,7 +507,7 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
         gitAdapter.mergeInBranch("branch", "merge")
         val lastCommit = gitAdapter.addCommitWithMessage("sixth")
         delayLongEnoughToAffectGitDate()
-        val thirdRelease = grgit.addTag("release3")
+        val thirdRelease = gitAdapter.addTag("release3")
 
         val allOutput = runCurrentContributionData()
         assertEquals(
@@ -517,7 +524,7 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
 
     private fun toContribution(
         lastCommit: CommitRef,
-        tag: Tag? = null,
+        tag: TagRef? = null,
         firstCommit: CommitRef = lastCommit,
         expectedAuthors: List<String>,
         expectedEase: Int? = null,
@@ -535,7 +542,7 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
         ease = expectedEase,
         storyId = expectedStoryId,
         tagName = tag?.name,
-        tagDateTime = tag?.dateTime?.toInstant()?.toKotlinInstant(),
+        tagDateTime = tag?.dateTime,
         commitCount = expectedCommitCount,
         semver = expectedSemver,
     )

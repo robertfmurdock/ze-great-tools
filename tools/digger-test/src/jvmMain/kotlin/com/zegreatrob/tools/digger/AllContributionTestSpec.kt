@@ -301,7 +301,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
         gitAdapter.addCommitWithMessage("third")
 
         delayLongEnoughToAffectGitDate()
-        grgit.addTag("unrelated-tag")
+        gitAdapter.addTag("unrelated-tag")
         grgit.checkout { it.branch = "branch1" }
         gitAdapter.addCommitWithMessage("fourth")
         grgit.checkout { it.branch = "master" }
