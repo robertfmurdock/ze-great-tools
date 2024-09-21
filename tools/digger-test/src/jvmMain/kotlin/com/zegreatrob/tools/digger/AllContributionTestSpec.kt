@@ -92,7 +92,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
         val firstCommit = gitAdapter.show("HEAD")!!
         val firstRelease = gitAdapter.addTag("release1")
         delayLongEnoughToAffectGitDate()
-        grgit.switchToNewBranch("branch")
+        gitAdapter.switchToNewBranch("branch")
 
         val secondCommit = gitAdapter.addCommitWithMessage("second")
         val midRelease = gitAdapter.addTag("release1-5")
@@ -141,7 +141,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
         val firstCommit = gitAdapter.show("HEAD")!!
         val firstRelease = gitAdapter.addTag("release")
 
-        grgit.switchToNewBranch("branch")
+        gitAdapter.switchToNewBranch("branch")
         val secondCommit = gitAdapter.addCommitWithMessage("second")
 
         grgit.checkout { it.branch = "master" }
@@ -187,7 +187,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
         val firstCommit = gitAdapter.show("HEAD")!!
         val firstRelease = gitAdapter.addTag("release-1")
 
-        grgit.switchToNewBranch("branch")
+        gitAdapter.switchToNewBranch("branch")
         val secondCommit = gitAdapter.addCommitWithMessage("second")
 
         grgit.checkout { it.branch = "master" }
@@ -201,7 +201,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
 
         grgit.checkout { it.branch = "master" }
 
-        grgit.ffOnlyInBranch("branch")
+        gitAdapter.ffOnlyInBranch("branch")
         delayLongEnoughToAffectGitDate()
         val thirdRelease = gitAdapter.addTag("release-3")
 
@@ -242,7 +242,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
         val firstCommit = gitAdapter.show("HEAD")!!
 
         val firstRelease = gitAdapter.addTag("release")
-        grgit.switchToNewBranch("branch1")
+        gitAdapter.switchToNewBranch("branch1")
         val secondCommit = gitAdapter.addCommitWithMessage("second")
 
         grgit.checkout { it.branch = "master" }
@@ -294,7 +294,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
         val firstCommit = gitAdapter.show("HEAD")!!
 
         val firstRelease = gitAdapter.addTag("v1.2.8")
-        grgit.switchToNewBranch("branch1")
+        gitAdapter.switchToNewBranch("branch1")
         val secondCommit = gitAdapter.addCommitWithMessage("second")
 
         grgit.checkout { it.branch = "master" }
@@ -339,10 +339,10 @@ interface AllContributionTestSpec : SetupWithOverrides {
         val firstCommit = gitAdapter.show("HEAD")!!
 
         val firstRelease = gitAdapter.addTag("release")
-        grgit.switchToNewBranch("branch2")
+        gitAdapter.switchToNewBranch("branch2")
         val secondCommit = gitAdapter.addCommitWithMessage("second")
 
-        grgit.switchToNewBranch("branch1")
+        gitAdapter.switchToNewBranch("branch1")
         gitAdapter.addCommitWithMessage("third")
 
         grgit.checkout { it.branch = "branch2" }
@@ -389,7 +389,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
         val firstCommit = gitAdapter.show("HEAD")!!
         val firstRelease = gitAdapter.addTag("release")
 
-        grgit.switchToNewBranch("branch1")
+        gitAdapter.switchToNewBranch("branch1")
         val secondCommit = gitAdapter.addCommitWithMessage("second")
 
         grgit.checkout { it.branch = "master" }

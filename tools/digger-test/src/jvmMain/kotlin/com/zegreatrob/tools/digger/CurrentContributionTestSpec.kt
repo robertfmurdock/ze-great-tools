@@ -409,10 +409,10 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
         grgit.head()
 
         gitAdapter.addTag("release")
-        grgit.switchToNewBranch("branch2")
+        gitAdapter.switchToNewBranch("branch2")
         val secondCommit = gitAdapter.addCommitWithMessage("second")
 
-        grgit.switchToNewBranch("branch1")
+        gitAdapter.switchToNewBranch("branch1")
         gitAdapter.addCommitWithMessage("third")
 
         grgit.checkout { it.branch = "branch2" }
@@ -453,10 +453,10 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
         grgit.head()
 
         gitAdapter.addTag("v1.0.0")
-        grgit.switchToNewBranch("branch2")
+        gitAdapter.switchToNewBranch("branch2")
         val secondCommit = gitAdapter.addCommitWithMessage("second")
 
-        grgit.switchToNewBranch("branch1")
+        gitAdapter.switchToNewBranch("branch1")
         gitAdapter.addCommitWithMessage("third")
 
         grgit.checkout { it.branch = "branch2" }
@@ -494,7 +494,7 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
         grgit.head()
 
         gitAdapter.addTag("release")
-        grgit.switchToNewBranch("branch")
+        gitAdapter.switchToNewBranch("branch")
         val secondCommit = gitAdapter.addCommitWithMessage("second")
         grgit.checkout { it.branch = "master" }
         gitAdapter.addCommitWithMessage("third")

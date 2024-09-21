@@ -5,7 +5,6 @@ import com.zegreatrob.tools.adapter.git.GitAdapter
 import com.zegreatrob.tools.adapter.git.TagRef
 import org.ajoberstar.grgit.Grgit
 import org.ajoberstar.grgit.operation.BranchChangeOp
-import org.ajoberstar.grgit.operation.MergeOp.Mode
 
 val defaultAuthors: List<String>
     get() = listOf("funk@test.io", "test@funk.edu")
@@ -64,19 +63,15 @@ fun delayLongEnoughToAffectGitDate() {
     Thread.sleep(1000)
 }
 
-fun Grgit.switchToNewBranch(name: String) {
-    branch.add { it.name = name }
-    checkout { it.branch = name }
+fun GitAdapter.switchToNewBranch(name: String) {
+    checkout(branch = name, newBranch = true)
 }
 
 fun GitAdapter.mergeInBranch(branchName: String, message: String): CommitRef {
-    merge(branch = branchName, noCommit = true)
+    merge(branch = branchName, noCommit = true, ffOnly = false)
     return addCommitWithMessage(message)
 }
 
-fun Grgit.ffOnlyInBranch(branchName: String) {
-    merge {
-        it.head = branchName
-        it.setMode(Mode.ONLY_FF.name)
-    }
+fun GitAdapter.ffOnlyInBranch(branchName: String) {
+    merge(branch = branchName, noCommit = false, ffOnly = true)
 }

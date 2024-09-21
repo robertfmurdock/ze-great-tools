@@ -218,9 +218,22 @@ class GitAdapter(private val workingDirectory: String) {
         runProcess(listOf("git", "fetch"), workingDirectory)
     }
 
-    fun merge(branch: String, noCommit: Boolean) {
+    fun merge(branch: String, noCommit: Boolean, ffOnly: Boolean) {
         runProcess(
-            listOf("git", "merge") + (if (noCommit) listOf("--no-commit") else emptyList()) + listOf(branch),
+            listOf("git", "merge") + inlineFlag("--no-commit", noCommit) + inlineFlag("--ff-only", ffOnly) + listOf(
+                branch,
+            ),
+            workingDirectory,
+        )
+    }
+
+    private fun inlineFlag(flag: String, enabled: Boolean) = (if (enabled) listOf(flag) else emptyList())
+
+    fun checkout(branch: String, newBranch: Boolean) {
+        runProcess(
+            listOf("git", "checkout") + (if (newBranch) listOf("-b") else emptyList()) + listOf(
+                branch,
+            ),
             workingDirectory,
         )
     }

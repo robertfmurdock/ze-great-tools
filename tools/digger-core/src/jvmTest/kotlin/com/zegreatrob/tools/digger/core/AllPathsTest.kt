@@ -29,7 +29,7 @@ class AllPathsTest {
         gitAdapter.config("user.email", "Test")
 
         val firstCommit = gitAdapter.show("HEAD")!!
-        grgit.switchToNewBranch("branch1")
+        gitAdapter.switchToNewBranch("branch1")
 
         val secondCommit = gitAdapter.addCommitWithMessage("second")
         grgit.checkout { it.branch = "master" }
@@ -63,7 +63,7 @@ class AllPathsTest {
         gitAdapter.config("user.name", "Test")
         gitAdapter.config("user.email", "Test")
         val firstCommit = gitAdapter.show("HEAD")!!
-        grgit.switchToNewBranch("branch1")
+        gitAdapter.switchToNewBranch("branch1")
 
         val secondCommit = gitAdapter.addCommitWithMessage("second")
         grgit.checkout { it.branch = "master" }
@@ -97,7 +97,7 @@ class AllPathsTest {
         gitAdapter.config("user.email", "Test")
 
         val firstCommit = gitAdapter.show("HEAD")!!
-        grgit.switchToNewBranch("branch1")
+        gitAdapter.switchToNewBranch("branch1")
         val secondCommit = gitAdapter.addCommitWithMessage("second")
 
         grgit.checkout { it.branch = "master" }
@@ -109,14 +109,14 @@ class AllPathsTest {
         val mergeCommit1 = gitAdapter.mergeInBranch("branch1", "merge")
         val fifthCommit = gitAdapter.addCommitWithMessage("fifth")
 
-        grgit.switchToNewBranch("branch2")
+        gitAdapter.switchToNewBranch("branch2")
         val sixthCommit = gitAdapter.addCommitWithMessage("sixth")
         grgit.checkout { it.branch = "master" }
         val seventhCommit = gitAdapter.addCommitWithMessage("seventh")
         val mergeCommit2 = gitAdapter.mergeInBranch("branch2", "merge")
         val eighthCommit = gitAdapter.addCommitWithMessage("eighth")
 
-        grgit.switchToNewBranch("branch3")
+        gitAdapter.switchToNewBranch("branch3")
         val ninthCommit = gitAdapter.addCommitWithMessage("ninth")
         grgit.checkout { it.branch = "master" }
         val tenthCommit = gitAdapter.addCommitWithMessage("tenth")
@@ -236,7 +236,7 @@ class AllPathsTest {
         gitAdapter.config("user.email", "Test")
 
         val firstCommit = gitAdapter.show("HEAD")!!
-        grgit.switchToNewBranch("branch1")
+        gitAdapter.switchToNewBranch("branch1")
         gitAdapter.addCommitWithMessage("second")
 
         grgit.checkout { it.branch = "master" }
@@ -248,14 +248,14 @@ class AllPathsTest {
         val mergeCommit1 = gitAdapter.mergeInBranch("branch1", "merge")
         val fifthCommit = gitAdapter.addCommitWithMessage("fifth")
 
-        grgit.switchToNewBranch("branch2")
+        gitAdapter.switchToNewBranch("branch2")
         val sixthCommit = gitAdapter.addCommitWithMessage("sixth")
         grgit.checkout { it.branch = "master" }
         gitAdapter.addCommitWithMessage("seventh")
         val mergeCommit2 = gitAdapter.mergeInBranch("branch2", "merge")
         val eighthCommit = gitAdapter.addCommitWithMessage("eighth")
 
-        grgit.switchToNewBranch("branch3")
+        gitAdapter.switchToNewBranch("branch3")
         gitAdapter.addCommitWithMessage("ninth")
         grgit.checkout { it.branch = "master" }
         val tenthCommit = gitAdapter.addCommitWithMessage("tenth")
@@ -298,7 +298,7 @@ class AllPathsTest {
         gitAdapter.config("user.email", "Test")
 
         val firstCommit = gitAdapter.show("HEAD")!!
-        grgit.switchToNewBranch("branch")
+        gitAdapter.switchToNewBranch("branch")
         val secondCommit = gitAdapter.addCommitWithMessage("second")
 
         grgit.checkout { it.branch = "master" }
@@ -350,13 +350,13 @@ class AllPathsTest {
         gitAdapter.config("user.email", "Test")
 
         val firstCommit = gitAdapter.show("HEAD")!!
-        grgit.switchToNewBranch("branch1")
+        gitAdapter.switchToNewBranch("branch1")
         val secondCommit = gitAdapter.addCommitWithMessage("second")
 
         grgit.checkout { it.branch = "master" }
         val thirdCommit = gitAdapter.addCommitWithMessage("third")
 
-        grgit.switchToNewBranch("branch2")
+        gitAdapter.switchToNewBranch("branch2")
         val fourthCommit = gitAdapter.addCommitWithMessage("forth")
 
         grgit.checkout { it.branch = "master" }
