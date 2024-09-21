@@ -48,6 +48,10 @@ class GitAdapter(private val workingDirectory: String) {
             ),
             workingDirectory,
         )
+        return parseTagRefs(outputText)
+    }
+
+    private fun parseTagRefs(outputText: String): List<TagRef> {
         val output = outputText.split("\n").mapNotNull {
             val commaSplit = it.split(",")
             if (commaSplit.size >= 3) {
@@ -75,17 +79,18 @@ class GitAdapter(private val workingDirectory: String) {
         ),
     )
 
-    fun showTag(ref: String): String? = runProcess(
+    fun showTag(ref: String): TagRef? = runProcess(
         listOf(
             "git",
-            "show",
-            ref,
-            "--format=%D",
-            "--no-patch",
+            "--no-pager",
+            "tag",
+            "--list",
+            "--format=%(refname:strip=2),%(*objectname),%(creatordate:iso-strict)",
+            "--points-at=$ref",
         ),
         workingDirectory,
-    ).split(", ")
-        .findByPrefix("tag: ")
+    ).let(::parseTagRefs)
+        .firstOrNull()
 
     fun show(ref: String): CommitRef? = parseLog(
         runProcess(

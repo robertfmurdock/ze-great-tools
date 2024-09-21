@@ -1,6 +1,7 @@
 package com.zegreatrob.tools.digger
 
 import com.zegreatrob.tools.adapter.git.CommitRef
+import com.zegreatrob.tools.adapter.git.TagRef
 import com.zegreatrob.tools.digger.model.Contribution
 import com.zegreatrob.tools.test.git.addCommitWithMessage
 import com.zegreatrob.tools.test.git.addTag
@@ -10,8 +11,6 @@ import com.zegreatrob.tools.test.git.ffOnlyInBranch
 import com.zegreatrob.tools.test.git.initializeGitRepo
 import com.zegreatrob.tools.test.git.mergeInBranch
 import com.zegreatrob.tools.test.git.switchToNewBranch
-import kotlinx.datetime.toKotlinInstant
-import org.ajoberstar.grgit.Tag
 import java.io.File
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -31,7 +30,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
     @Test
     fun `will include all tag segments`() {
         setupWithDefaults()
-        val (grgit, gitAdapter) = initializeGitRepo(
+        val (_, gitAdapter) = initializeGitRepo(
             listOf(
                 """here's a message
                 |
@@ -41,9 +40,12 @@ interface AllContributionTestSpec : SetupWithOverrides {
                 """.trimMargin(),
             ),
         )
+        gitAdapter.config("user.name", "Test")
+        gitAdapter.config("user.email", "Test")
+
         val firstCommit = gitAdapter.show("HEAD")!!
 
-        val firstRelease = grgit.addTag("release")
+        val firstRelease = gitAdapter.addTag("release")
         val secondCommit =
             gitAdapter.addCommitWithMessage(
                 """here's a message
@@ -88,19 +90,19 @@ interface AllContributionTestSpec : SetupWithOverrides {
         gitAdapter.config("user.email", "Test")
 
         val firstCommit = gitAdapter.show("HEAD")!!
-        val firstRelease = grgit.addTag("release1")
+        val firstRelease = gitAdapter.addTag("release1")
         delayLongEnoughToAffectGitDate()
         grgit.switchToNewBranch("branch")
 
         val secondCommit = gitAdapter.addCommitWithMessage("second")
-        val midRelease = grgit.addTag("release1-5")
+        val midRelease = gitAdapter.addTag("release1-5")
         delayLongEnoughToAffectGitDate()
         grgit.checkout { it.branch = "master" }
 
         val thirdCommit = gitAdapter.addCommitWithMessage("third")
 
         val mergeCommit = gitAdapter.mergeInBranch("branch", "merge")
-        val release2 = grgit.addTag("release-2")
+        val release2 = gitAdapter.addTag("release-2")
 
         val allOutput = runAllContributionData()
         assertEquals(
@@ -137,7 +139,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
         gitAdapter.config("user.email", "Test")
 
         val firstCommit = gitAdapter.show("HEAD")!!
-        val firstRelease = grgit.addTag("release")
+        val firstRelease = gitAdapter.addTag("release")
 
         grgit.switchToNewBranch("branch")
         val secondCommit = gitAdapter.addCommitWithMessage("second")
@@ -153,7 +155,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
 
         val mergeToMainCommit = gitAdapter.mergeInBranch("branch", "merge-to-main")
         delayLongEnoughToAffectGitDate()
-        val release2 = grgit.addTag("release-2")
+        val release2 = gitAdapter.addTag("release-2")
 
         val allOutput = runAllContributionData()
         assertEquals(
@@ -183,7 +185,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
         gitAdapter.config("user.email", "Test")
 
         val firstCommit = gitAdapter.show("HEAD")!!
-        val firstRelease = grgit.addTag("release-1")
+        val firstRelease = gitAdapter.addTag("release-1")
 
         grgit.switchToNewBranch("branch")
         val secondCommit = gitAdapter.addCommitWithMessage("second")
@@ -191,7 +193,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
         grgit.checkout { it.branch = "master" }
         val thirdCommit = gitAdapter.addCommitWithMessage("third")
         delayLongEnoughToAffectGitDate()
-        val secondRelease = grgit.addTag("release-2")
+        val secondRelease = gitAdapter.addTag("release-2")
 
         grgit.checkout { it.branch = "branch" }
         gitAdapter.addCommitWithMessage("fourth")
@@ -201,7 +203,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
 
         grgit.ffOnlyInBranch("branch")
         delayLongEnoughToAffectGitDate()
-        val thirdRelease = grgit.addTag("release-3")
+        val thirdRelease = gitAdapter.addTag("release-3")
 
         val allOutput = runAllContributionData()
         assertEquals(
@@ -239,7 +241,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
 
         val firstCommit = gitAdapter.show("HEAD")!!
 
-        val firstRelease = grgit.addTag("release")
+        val firstRelease = gitAdapter.addTag("release")
         grgit.switchToNewBranch("branch1")
         val secondCommit = gitAdapter.addCommitWithMessage("second")
 
@@ -247,13 +249,13 @@ interface AllContributionTestSpec : SetupWithOverrides {
         val thirdCommit = gitAdapter.addCommitWithMessage("third")
 
         delayLongEnoughToAffectGitDate()
-        val secondRelease = grgit.addTag("release2")
+        val secondRelease = gitAdapter.addTag("release2")
         grgit.checkout { it.branch = "branch1" }
         gitAdapter.addCommitWithMessage("fourth")
         grgit.checkout { it.branch = "master" }
         val mergeCommit = gitAdapter.mergeInBranch("branch1", "merge")
         delayLongEnoughToAffectGitDate()
-        val thirdRelease = grgit.addTag("release3")
+        val thirdRelease = gitAdapter.addTag("release3")
 
         val allOutput = runAllContributionData()
         assertEquals(
@@ -291,7 +293,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
 
         val firstCommit = gitAdapter.show("HEAD")!!
 
-        val firstRelease = grgit.addTag("v1.2.8")
+        val firstRelease = gitAdapter.addTag("v1.2.8")
         grgit.switchToNewBranch("branch1")
         val secondCommit = gitAdapter.addCommitWithMessage("second")
 
@@ -305,7 +307,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
         grgit.checkout { it.branch = "master" }
         val mergeCommit = gitAdapter.mergeInBranch("branch1", "merge")
         delayLongEnoughToAffectGitDate()
-        val thirdRelease = grgit.addTag("v20.176.37")
+        val thirdRelease = gitAdapter.addTag("v20.176.37")
 
         val allOutput = runAllContributionData()
         assertEquals(
@@ -336,7 +338,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
 
         val firstCommit = gitAdapter.show("HEAD")!!
 
-        val firstRelease = grgit.addTag("release")
+        val firstRelease = gitAdapter.addTag("release")
         grgit.switchToNewBranch("branch2")
         val secondCommit = gitAdapter.addCommitWithMessage("second")
 
@@ -355,7 +357,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
 
         val merge2Commit = gitAdapter.mergeInBranch("branch1", "merge2")
         delayLongEnoughToAffectGitDate()
-        val thirdRelease = grgit.addTag("release3")
+        val thirdRelease = gitAdapter.addTag("release3")
 
         val allOutput = runAllContributionData()
         assertEquals(
@@ -385,7 +387,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
         gitAdapter.config("user.email", "Test")
 
         val firstCommit = gitAdapter.show("HEAD")!!
-        val firstRelease = grgit.addTag("release")
+        val firstRelease = gitAdapter.addTag("release")
 
         grgit.switchToNewBranch("branch1")
         val secondCommit = gitAdapter.addCommitWithMessage("second")
@@ -394,14 +396,14 @@ interface AllContributionTestSpec : SetupWithOverrides {
         gitAdapter.addCommitWithMessage("third")
         val merge1Commit = gitAdapter.mergeInBranch("branch1", "merge1")
         delayLongEnoughToAffectGitDate()
-        val secondRelease = grgit.addTag("release2")
+        val secondRelease = gitAdapter.addTag("release2")
 
         grgit.checkout { it.branch = "branch1" }
         val fourthCommit = gitAdapter.addCommitWithMessage("fourth")
         grgit.checkout { it.branch = "master" }
         val merge2Commit = gitAdapter.mergeInBranch("branch1", "merge2")
         delayLongEnoughToAffectGitDate()
-        val thirdRelease = grgit.addTag("release3")
+        val thirdRelease = gitAdapter.addTag("release3")
 
         val allOutput = runAllContributionData()
         assertEquals(
@@ -432,7 +434,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
 
     private fun toContribution(
         lastCommit: CommitRef,
-        tag: Tag? = null,
+        tag: TagRef? = null,
         firstCommit: CommitRef = lastCommit,
         expectedAuthors: List<String>,
         expectedEase: Int? = null,
@@ -450,7 +452,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
         ease = expectedEase,
         storyId = expectedStoryId,
         tagName = tag?.name,
-        tagDateTime = tag?.dateTime?.toInstant()?.toKotlinInstant(),
+        tagDateTime = tag?.dateTime,
         commitCount = expectedCommitCount,
         semver = expectedSemver,
     )
@@ -458,16 +460,19 @@ interface AllContributionTestSpec : SetupWithOverrides {
     @Test
     fun `will include ease of change`() {
         setupWithDefaults()
-        val (grgit, gitAdapter) = initializeGitRepo(
+        val (_, gitAdapter) = initializeGitRepo(
             directory = projectDir.absolutePath,
             addFileNames = addFileNames,
             commits = listOf(
                 "here's a message -4- more stuff",
             ),
         )
+        gitAdapter.config("user.name", "Test")
+        gitAdapter.config("user.email", "Test")
+
         val firstCommit = gitAdapter.show("HEAD")!!
 
-        val tag = grgit.addTag("release")
+        val tag = gitAdapter.addTag("release")
         val secondCommit =
             gitAdapter.addCommitWithMessage(
                 "-3- here's a message",
@@ -494,9 +499,12 @@ interface AllContributionTestSpec : SetupWithOverrides {
     @Test
     fun `will include story ids`() {
         setupWithDefaults()
-        val (grgit, gitAdapter) = initializeGitRepo(commits = listOf("[DOGCOW-17] here's a message"))
+        val (_, gitAdapter) = initializeGitRepo(commits = listOf("[DOGCOW-17] here's a message"))
+        gitAdapter.config("user.name", "Test")
+        gitAdapter.config("user.email", "Test")
+
         val firstCommit = gitAdapter.show("HEAD")!!
-        val tag = grgit.addTag("release")
+        val tag = gitAdapter.addTag("release")
         val secondCommit = gitAdapter.addCommitWithMessage("[DOGCOW-18] -3- here's a message")
         val allOutput = runAllContributionData()
         assertEquals(

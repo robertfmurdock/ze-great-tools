@@ -83,7 +83,7 @@ interface TagTestSpec {
         val result = execute(expectedVersion)
         assertIsNot<TestResult.Failure>(result, message = "$result")
 
-        assertEquals(expectedVersion, gitAdapter.showTag("HEAD"))
+        assertEquals(expectedVersion, gitAdapter.showTag("HEAD")?.name)
     }
 
     fun GitAdapter.disableGpgSign() {
@@ -118,7 +118,7 @@ interface TagTestSpec {
         val result = execute(expectedVersion)
         assertIsNot<TestResult.Failure>(result, message = "$result")
 
-        assertEquals(expectedVersion, gitAdapter.showTag("HEAD"))
+        assertEquals(expectedVersion, gitAdapter.showTag("HEAD")?.name)
     }
 
     @Test

@@ -464,7 +464,7 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
 
         val merge2Commit = gitAdapter.mergeInBranch("branch1", "merge2")
         delayLongEnoughToAffectGitDate()
-        grgit.addTag("ignore-me")
+        gitAdapter.addTag("ignore-me")
 
         val allOutput = runCurrentContributionData()
         assertEquals(

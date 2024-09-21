@@ -13,7 +13,7 @@ fun TaggerCore.tag(version: String, releaseBranch: String?, userName: String?, u
             TagErrors.wrapper(
                 mapOf(
                     isSnapshot to TagErrors.BEING_SNAPSHOT,
-                    alreadyTagged to TagErrors.alreadyTagged(headTag),
+                    alreadyTagged to TagErrors.alreadyTagged(headTag?.name),
                     isNotOnReleaseBranch to TagErrors.skipMessageNotOnReleaseBranch(releaseBranch, headBranch),
                 ).filterKeys { it }.values.joinToString(", "),
             ),

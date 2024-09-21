@@ -2,6 +2,7 @@ package com.zegreatrob.tools.test.git
 
 import com.zegreatrob.tools.adapter.git.CommitRef
 import com.zegreatrob.tools.adapter.git.GitAdapter
+import com.zegreatrob.tools.adapter.git.TagRef
 import org.ajoberstar.grgit.Grgit
 import org.ajoberstar.grgit.operation.BranchChangeOp
 import org.ajoberstar.grgit.operation.MergeOp.Mode
@@ -49,6 +50,11 @@ fun Grgit.addTag(initialTag: String?): org.ajoberstar.grgit.Tag? = tag.add(
         it.name = initialTag
     },
 )
+
+fun GitAdapter.addTag(initialTag: String): TagRef {
+    newAnnotatedTag(initialTag, "HEAD", null, null)
+    return showTag("HEAD")!!
+}
 
 fun GitAdapter.addCommitWithMessage(message: String): CommitRef {
     commit(
