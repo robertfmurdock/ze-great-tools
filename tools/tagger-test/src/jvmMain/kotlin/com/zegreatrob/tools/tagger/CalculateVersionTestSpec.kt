@@ -76,7 +76,7 @@ interface CalculateVersionTestSpec {
         gitAdapter.config("commit.gpgsign", "false")
         gitAdapter.add(".")
         gitAdapter.addCommitWithMessage("test commit")
-        gitAdapter.newAnnotatedTag("1.0.23", "HEAD", null, null)
+        gitAdapter.newAnnotatedTag("1.0.23", "HEAD", "test", "test")
         gitAdapter.checkout("main", newBranch = true)
         gitAdapter.addRemote("origin", projectDir.absolutePath)
         val version = runCalculateVersionSuccessfully()
