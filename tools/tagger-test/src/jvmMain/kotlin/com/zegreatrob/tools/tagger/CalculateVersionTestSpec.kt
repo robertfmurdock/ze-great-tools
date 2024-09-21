@@ -4,6 +4,7 @@ import com.zegreatrob.tools.adapter.git.GitAdapter
 import com.zegreatrob.tools.test.git.addCommitWithMessage
 import com.zegreatrob.tools.test.git.initializeGitRepo
 import java.io.File
+import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertContains
 import kotlin.test.assertEquals
@@ -34,6 +35,20 @@ interface CalculateVersionTestSpec {
         initialTag = initialTag,
         commits = commits,
     )
+
+    @BeforeTest
+    fun checkPrerequisites() {
+        assertEquals(
+            "/dev/null",
+            System.getenv("GIT_CONFIG_GLOBAL"),
+            "Ensure this is set for the test to work as intended",
+        )
+        assertEquals(
+            "/dev/null",
+            System.getenv("GIT_CONFIG_SYSTEM"),
+            "Ensure this is set for the test to work as intended",
+        )
+    }
 
     fun execute(): TestResult
     fun runCalculateVersionSuccessfully(): String =

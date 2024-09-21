@@ -14,7 +14,13 @@ fun initializeGitRepo(
     commits: List<String> = listOf(),
     initialTag: String? = null,
 ): GitAdapter {
-    val gitAdapter = GitAdapter(directory)
+    val gitAdapter = GitAdapter(
+        directory,
+        mapOf(
+            "GIT_CONFIG_GLOBAL" to (System.getenv("GIT_CONFIG_GLOBAL") ?: ""),
+            "GIT_CONFIG_SYSTEM" to (System.getenv("GIT_CONFIG_SYSTEM") ?: ""),
+        ),
+    )
     gitAdapter.init()
     gitAdapter.config("commit.gpgsign", "false")
     gitAdapter.config("user.useConfigOnly", "true")

@@ -2,7 +2,7 @@ package com.zegreatrob.tools.adapter.git
 
 import kotlinx.datetime.Instant
 
-class GitAdapter(private val workingDirectory: String) {
+class GitAdapter(private val workingDirectory: String, private val env: Map<String, String> = emptyMap()) {
 
     fun headCommitId(): String = runProcess(
         listOf(
@@ -11,21 +11,36 @@ class GitAdapter(private val workingDirectory: String) {
             "rev-parse",
             "HEAD",
         ),
-        workingDirectory,
     ).trim()
 
+    private fun runProcess(args: List<String>, env: Map<String, String> = emptyMap()) =
+        runProcess(args, workingDirectory, env.plus(this.env))
+
     fun newAnnotatedTag(name: String, ref: String, userName: String?, userEmail: String?) {
-        val command = listOf("git") + inlineConfig("user.name", userName) + inlineConfig("user.email", userEmail) +
-            listOf(
-                "tag",
-                "--annotate",
-                "--message=$name",
-                name,
-                ref,
-            )
         runProcess(
-            command,
-            workingDirectory,
+            listOf("git") + inlineConfig("user.name", userName) + inlineConfig("user.email", userEmail) +
+                listOf(
+                    "tag",
+                    "--annotate",
+                    "--message=$name",
+                    name,
+                    ref,
+                ),
+            env = emptyMap<String, String>()
+                .plus(
+                    if (userName != null) {
+                        mapOf("GIT_COMMITTER_NAME" to userName)
+                    } else {
+                        emptyMap()
+                    },
+                )
+                .plus(
+                    if (userEmail != null) {
+                        mapOf("GIT_COMMITTER_EMAIL" to userEmail)
+                    } else {
+                        emptyMap()
+                    },
+                ),
         )
     }
 
@@ -33,11 +48,11 @@ class GitAdapter(private val workingDirectory: String) {
         if (value != null) listOf("-c", "$property=$value") else emptyList()
 
     fun pushTags() {
-        runProcess(listOf("git", "push", "--tags"), workingDirectory)
+        runProcess(listOf("git", "push", "--tags"))
     }
 
-    fun listTags(): List<TagRef> {
-        val outputText = runProcess(
+    fun listTags(): List<TagRef> = parseTagRefs(
+        runProcess(
             listOf(
                 "git",
                 "--no-pager",
@@ -46,10 +61,8 @@ class GitAdapter(private val workingDirectory: String) {
                 "--sort=-taggerdate",
                 "--format=%(refname:strip=2),%(*objectname),%(creatordate:iso-strict)",
             ),
-            workingDirectory,
-        )
-        return parseTagRefs(outputText)
-    }
+        ),
+    )
 
     private fun parseTagRefs(outputText: String): List<TagRef> {
         val output = outputText.split("\n").mapNotNull {
@@ -75,7 +88,6 @@ class GitAdapter(private val workingDirectory: String) {
                 "log",
                 "--format=$gitLogFormat",
             ),
-            workingDirectory,
         ),
     )
 
@@ -88,7 +100,6 @@ class GitAdapter(private val workingDirectory: String) {
             "--format=%(refname:strip=2),%(*objectname),%(creatordate:iso-strict)",
             "--points-at=$ref",
         ),
-        workingDirectory,
     ).let(::parseTagRefs)
         .firstOrNull()
 
@@ -101,7 +112,6 @@ class GitAdapter(private val workingDirectory: String) {
                 "--format=$gitLogFormat",
                 "--no-patch",
             ),
-            workingDirectory,
         ),
     ).firstOrNull()
 
@@ -114,7 +124,6 @@ class GitAdapter(private val workingDirectory: String) {
                 "--format=$gitLogFormat",
                 begin,
             ) + if (end != null) listOf(end) else emptyList(),
-            workingDirectory,
         ),
     )
 
@@ -144,7 +153,6 @@ class GitAdapter(private val workingDirectory: String) {
             "--branch",
             "--ahead-behind",
         ),
-        workingDirectory,
     )
         .let { output ->
             val lines = output.split("\n")
@@ -170,20 +178,20 @@ class GitAdapter(private val workingDirectory: String) {
         find { it.startsWith(prefix) }?.substring(prefix.length)
 
     fun describe(abbrev: Int): String? = runCatching {
-        runProcess(listOf("git", "describe", "--abbrev=$abbrev"), workingDirectory)
+        runProcess(listOf("git", "describe", "--abbrev=$abbrev"))
             .trim()
     }.getOrNull()
 
     fun init() {
-        runProcess(listOf("git", "init"), workingDirectory)
+        runProcess(listOf("git", "init"))
     }
 
     fun config(name: String, value: String) {
-        runProcess(listOf("git", "config", name, value), workingDirectory)
+        runProcess(listOf("git", "config", name, value))
     }
 
     fun add(vararg files: String) {
-        runProcess(listOf("git", "add") + files, workingDirectory)
+        runProcess(listOf("git", "add") + files)
     }
 
     fun commit(
@@ -206,16 +214,15 @@ class GitAdapter(private val workingDirectory: String) {
                 "GIT_COMMITTER_NAME" to committerName,
                 "GIT_COMMITTER_EMAIL" to committerEmail,
             ),
-            workingDirectory = workingDirectory,
         )
     }
 
     fun addRemote(name: String, url: String) {
-        runProcess(listOf("git", "remote", "add", name, url), workingDirectory)
+        runProcess(listOf("git", "remote", "add", name, url))
     }
 
     fun fetch() {
-        runProcess(listOf("git", "fetch"), workingDirectory)
+        runProcess(listOf("git", "fetch"))
     }
 
     fun merge(branch: String, noCommit: Boolean, ffOnly: Boolean) {
@@ -223,7 +230,6 @@ class GitAdapter(private val workingDirectory: String) {
             listOf("git", "merge") + inlineFlag("--no-commit", noCommit) + inlineFlag("--ff-only", ffOnly) + listOf(
                 branch,
             ),
-            workingDirectory,
         )
     }
 
@@ -234,7 +240,6 @@ class GitAdapter(private val workingDirectory: String) {
             listOf("git", "checkout") + (if (newBranch) listOf("-b") else emptyList()) + listOf(
                 branch,
             ),
-            workingDirectory,
         )
     }
 
@@ -257,19 +262,10 @@ class GitAdapter(private val workingDirectory: String) {
             } else {
                 emptyList()
             },
-            workingDirectory,
         )
     }
 
     fun setBranchUpstream(upstream: String, branch: String) {
-        runProcess(listOf("git", "branch", "--set-upstream-to=$upstream", branch), workingDirectory)
+        runProcess(listOf("git", "branch", "--set-upstream-to=$upstream", branch))
     }
 }
-
-data class GitStatus(
-    val isClean: Boolean,
-    val ahead: Int,
-    val behind: Int,
-    val head: String,
-    val upstream: String,
-)
