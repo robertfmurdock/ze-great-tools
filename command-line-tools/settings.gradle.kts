@@ -5,7 +5,7 @@ pluginManagement {
     }
 }
 
-rootProject.name = "cli-tools"
+rootProject.name = "command-line-tools"
 
 include("digger-cli")
 include("tagger-cli")

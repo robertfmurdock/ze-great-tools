@@ -1,8 +1,6 @@
 package com.zegreatrob.tools.plugins
 
 import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
-import org.gradle.kotlin.dsl.repositories
-import org.gradle.kotlin.dsl.withType
 
 plugins {
     id("com.github.ben-manes.versions")
@@ -11,6 +9,8 @@ plugins {
 repositories {
     mavenCentral()
 }
+
+group = "com.zegreatrob.tools"
 
 tasks {
     withType<DependencyUpdatesTask> {

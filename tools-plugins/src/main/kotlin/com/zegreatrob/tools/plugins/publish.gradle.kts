@@ -1,7 +1,7 @@
 package com.zegreatrob.tools.plugins
 
 import java.nio.charset.Charset
-import java.util.Base64
+import java.util.*
 
 plugins {
     `maven-publish`
@@ -11,8 +11,6 @@ plugins {
 repositories {
     mavenCentral()
 }
-
-group = "com.zegreatrob.tools"
 
 afterEvaluate {
     publishing.publications.withType<MavenPublication>().forEach {
@@ -62,4 +60,19 @@ signing {
 
 tasks {
     publish { finalizedBy("::closeAndReleaseSonatypeStagingRepository") }
+    val javadocJar by creating(Jar::class) {
+        archiveClassifier.set("javadoc")
+        from("${rootDir.absolutePath}/javadocs")
+    }
+    publishing.publications {
+        withType<MavenPublication> { artifact(javadocJar) }
+    }
+}
+
+afterEvaluate {
+    tasks {
+        withType<PublishToMavenRepository> {
+            mustRunAfter(withType<Sign>())
+        }
+    }
 }

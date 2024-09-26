@@ -3,7 +3,6 @@ import org.jetbrains.kotlin.gradle.targets.js.npm.npmProject
 plugins {
     application
     id("com.zegreatrob.tools.plugins.mp")
-    id("org.jetbrains.kotlin.plugin.serialization") version embeddedKotlinVersion
 }
 
 kotlin {
@@ -16,12 +15,12 @@ kotlin {
         compilations {
             "main" {
                 packageJson {
-                    name = "git-semver-tagger"
-                    customField("package-name", "git-semver-tagger")
+                    name = "git-digger"
+                    customField("package-name", "git-digger")
                     customField("author", "rob@continuousexcellence.io")
                     customField("license", "MIT")
                     customField("keywords", arrayOf("git", "contribution", "pair", "agile", "coaching", "statistics"))
-                    customField("bin", mapOf("tagger" to "kotlin/bin/tagger"))
+                    customField("bin", mapOf("digger" to "kotlin/bin/digger"))
                     customField("homepage", "https://github.com/robertfmurdock/ze-great-tools")
                 }
             }
@@ -30,18 +29,18 @@ kotlin {
 }
 
 application {
-    mainClass.set("com.zegreatrob.tools.tagger.cli.MainKt")
+    mainClass.set("com.zegreatrob.tools.digger.cli.MainKt")
 }
 
 val mainNpmProjectDir = kotlin.js().compilations.getByName("main").npmProject.dir
 
 dependencies {
-    commonMainImplementation(platform(libs.org.jetbrains.kotlinx.kotlinx.serialization.bom))
     commonMainImplementation("com.zegreatrob.tools:cli-tools")
-    commonMainImplementation("com.zegreatrob.tools:tagger-core")
+    commonMainImplementation("com.zegreatrob.tools:digger-core")
+    commonMainImplementation("com.zegreatrob.tools:digger-json")
     commonMainImplementation(libs.com.github.ajalt.clikt.clikt)
-    commonMainImplementation("org.jetbrains.kotlinx:kotlinx-serialization-json")
-    commonTestImplementation("com.zegreatrob.tools:tagger-test")
+
+    commonTestImplementation("com.zegreatrob.tools:digger-test")
 }
 
 tasks {
@@ -51,7 +50,7 @@ tasks {
         environment("GIT_CONFIG_SYSTEM", "/dev/null")
     }
     withType<CreateStartScripts> {
-        applicationName = "tagger"
+        applicationName = "digger"
     }
     val jsCliTar by registering(Tar::class) {
         dependsOn(
@@ -64,17 +63,12 @@ tasks {
         )
         from(mainNpmProjectDir)
         compression = Compression.GZIP
-        archiveFileName.set("tagger-cli-js.tgz")
+        archiveFileName.set("digger-cli-js.tgz")
     }
     val jsLink by registering(Exec::class) {
         dependsOn(jsCliTar)
         workingDir(mainNpmProjectDir)
         commandLine("npm", "link")
-    }
-    val confirmTaggerCanRun by registering(Exec::class) {
-        dependsOn(jsCliTar)
-        workingDir(mainNpmProjectDir)
-        commandLine("kotlin/bin/tagger", "calculate-version")
     }
     val jsPublish by registering(Exec::class) {
         dependsOn(jsCliTar)
@@ -83,10 +77,7 @@ tasks {
         workingDir(mainNpmProjectDir)
         commandLine("npm", "publish")
     }
-    check {
-        dependsOn(confirmTaggerCanRun)
-    }
-    publish {
+    val publish by creating {
         dependsOn(jsPublish)
         mustRunAfter(check)
     }

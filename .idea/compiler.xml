@@ -2,6 +2,12 @@
 <project version="4">
   <component name="CompilerConfiguration">
     <bytecodeTargetLevel target="1.6">
+      <module name="cli-tools.digger-cli" target="11" />
+      <module name="cli-tools.digger-cli.main" target="11" />
+      <module name="cli-tools.digger-cli.test" target="11" />
+      <module name="cli-tools.tagger-cli" target="11" />
+      <module name="cli-tools.tagger-cli.main" target="11" />
+      <module name="cli-tools.tagger-cli.test" target="11" />
       <module name="com.zegreatrob.tools.tools.digger-cli" target="11" />
       <module name="com.zegreatrob.tools.tools.digger-cli.main" target="11" />
       <module name="com.zegreatrob.tools.tools.digger-cli.test" target="11" />

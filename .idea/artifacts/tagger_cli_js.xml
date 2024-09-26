@@ -1,8 +1,6 @@
 <component name="ArtifactManager">
   <artifact type="jar" name="tagger-cli-js">
-    <output-path>$PROJECT_DIR$/cli-tools/tagger-cli/build/libs</output-path>
-    <root id="archive" name="tagger-cli-js.jar">
-      <element id="module-output" name="cli-tools.tagger-cli.jsMain" />
-    </root>
+    <output-path>$PROJECT_DIR$/command-line-tools/tagger-cli/build/libs</output-path>
+    <root id="archive" name="tagger-cli-js.jar" />
   </artifact>
 </component>

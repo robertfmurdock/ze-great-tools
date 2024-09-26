@@ -2,6 +2,7 @@
 
 plugins {
     id("com.zegreatrob.tools.plugins.mp")
+    id("com.zegreatrob.tools.plugins.publish")
     id("org.jetbrains.kotlin.plugin.serialization") version embeddedKotlinVersion
 }
 

@@ -23,7 +23,7 @@ tasks {
         dependsOn(provider { gradle.includedBuilds.map { it.task(":assemble") }.toList() })
     }
     release {
-        dependsOn(provider { gradle.includedBuild("cli-tools").task(":release") })
+        dependsOn(provider { gradle.includedBuild("command-line-tools").task(":release") })
         dependsOn(provider { gradle.includedBuild("tools").task(":release") })
         finalizedBy(currentContributionData)
     }

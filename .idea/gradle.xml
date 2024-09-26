@@ -7,11 +7,11 @@
         <compositeConfiguration>
           <compositeBuild compositeDefinitionSource="SCRIPT">
             <builds>
-              <build path="$PROJECT_DIR$/cli-tools" name="cli-tools">
+              <build path="$PROJECT_DIR$/command-line-tools" name="cli-tools">
                 <projects>
-                  <project path="$PROJECT_DIR$/cli-tools" />
-                  <project path="$PROJECT_DIR$/cli-tools/digger-cli" />
-                  <project path="$PROJECT_DIR$/cli-tools/tagger-cli" />
+                  <project path="$PROJECT_DIR$/command-line-tools" />
+                  <project path="$PROJECT_DIR$/command-line-tools/digger-cli" />
+                  <project path="$PROJECT_DIR$/command-line-tools/tagger-cli" />
                 </projects>
               </build>
               <build path="$PROJECT_DIR$/tools" name="tools">
@@ -46,9 +46,9 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
-            <option value="$PROJECT_DIR$/cli-tools" />
-            <option value="$PROJECT_DIR$/cli-tools/digger-cli" />
-            <option value="$PROJECT_DIR$/cli-tools/tagger-cli" />
+            <option value="$PROJECT_DIR$/command-line-tools" />
+            <option value="$PROJECT_DIR$/command-line-tools/digger-cli" />
+            <option value="$PROJECT_DIR$/command-line-tools/tagger-cli" />
             <option value="$PROJECT_DIR$/tools" />
             <option value="$PROJECT_DIR$/tools-plugins" />
             <option value="$PROJECT_DIR$/tools/certifier-plugin" />
