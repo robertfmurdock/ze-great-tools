@@ -1,0 +1,6 @@
+[libraries]
+com-github-ajalt-clikt-clikt = "com.github.ajalt.clikt:clikt:4.4.0"
+org-jetbrains-kotlinx-kotlinx-serialization-bom = "org.jetbrains.kotlinx:kotlinx-serialization-bom:1.6.3"
+
+[plugins]
+nl-littlerobots-version-catalog-update = "nl.littlerobots.version-catalog-update:0.8.4"

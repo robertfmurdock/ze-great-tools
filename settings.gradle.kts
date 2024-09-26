@@ -12,6 +12,7 @@ plugins {
 rootProject.name = "ze-great-tools"
 includeBuild("tools-plugins")
 includeBuild("tools")
+includeBuild("cli-tools")
 
 develocity {
     buildScan {

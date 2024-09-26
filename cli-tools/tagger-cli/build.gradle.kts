@@ -36,13 +36,12 @@ application {
 val mainNpmProjectDir = kotlin.js().compilations.getByName("main").npmProject.dir
 
 dependencies {
-    commonMainImplementation(platform(project(":dependency-bom")))
-    commonMainImplementation(project(":cli-tools"))
-    commonMainImplementation(project(":tagger-core"))
-    commonMainImplementation("com.github.ajalt.clikt:clikt")
+    commonMainImplementation(platform(libs.org.jetbrains.kotlinx.kotlinx.serialization.bom))
+    commonMainImplementation("com.zegreatrob.tools:cli-tools")
+    commonMainImplementation("com.zegreatrob.tools:tagger-core")
+    commonMainImplementation(libs.com.github.ajalt.clikt.clikt)
     commonMainImplementation("org.jetbrains.kotlinx:kotlinx-serialization-json")
-
-    commonTestImplementation(project(":tagger-test"))
+    commonTestImplementation("com.zegreatrob.tools:tagger-test")
 }
 
 tasks {

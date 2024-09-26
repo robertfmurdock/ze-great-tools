@@ -35,13 +35,12 @@ application {
 val mainNpmProjectDir = kotlin.js().compilations.getByName("main").npmProject.dir
 
 dependencies {
-    commonMainImplementation(platform(project(":dependency-bom")))
-    commonMainImplementation(project(":cli-tools"))
-    commonMainImplementation(project(":digger-core"))
-    commonMainImplementation(project(":digger-json"))
-    commonMainImplementation("com.github.ajalt.clikt:clikt")
+    commonMainImplementation("com.zegreatrob.tools:cli-tools")
+    commonMainImplementation("com.zegreatrob.tools:digger-core")
+    commonMainImplementation("com.zegreatrob.tools:digger-json")
+    commonMainImplementation(libs.com.github.ajalt.clikt.clikt)
 
-    commonTestImplementation(project(":digger-test"))
+    commonTestImplementation("com.zegreatrob.tools:digger-test")
 }
 
 tasks {

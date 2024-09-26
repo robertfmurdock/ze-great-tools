@@ -1,8 +1,8 @@
 <component name="ArtifactManager">
   <artifact type="jar" name="digger-cli-jvm">
-    <output-path>$PROJECT_DIR$/tools/digger-cli/build/libs</output-path>
+    <output-path>$PROJECT_DIR$/cli-tools/digger-cli/build/libs</output-path>
     <root id="archive" name="digger-cli-jvm.jar">
-      <element id="module-output" name="tools.digger-cli.jvmMain" />
+      <element id="module-output" name="cli-tools.digger-cli.jvmMain" />
     </root>
   </artifact>
 </component>
