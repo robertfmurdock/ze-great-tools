@@ -7,7 +7,7 @@
         <compositeConfiguration>
           <compositeBuild compositeDefinitionSource="SCRIPT">
             <builds>
-              <build path="$PROJECT_DIR$/command-line-tools" name="cli-tools">
+              <build path="$PROJECT_DIR$/command-line-tools" name="command-line-tools">
                 <projects>
                   <project path="$PROJECT_DIR$/command-line-tools" />
                   <project path="$PROJECT_DIR$/command-line-tools/digger-cli" />

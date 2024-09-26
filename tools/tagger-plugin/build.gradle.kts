@@ -81,8 +81,6 @@ signing {
     sign(publishing.publications)
 }
 
-group = "com.zegreatrob.tools"
-
 afterEvaluate {
     publishing.publications.withType<MavenPublication>().forEach {
         with(it) {

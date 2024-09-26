@@ -6,8 +6,8 @@ plugins {
 dependencies {
     constraints {
         api(project(":digger-core"))
-        api(project(":digger-model"))
         api(project(":digger-json"))
+        api(project(":digger-model"))
         api(project(":digger-plugin"))
         api(project(":tagger-plugin"))
     }

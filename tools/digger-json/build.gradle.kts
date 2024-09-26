@@ -1,8 +1,7 @@
 @file:Suppress("UnstableApiUsage")
 
 plugins {
-    id("com.zegreatrob.tools.plugins.mp")
-    id("com.zegreatrob.tools.plugins.publish")
+    id("com.zegreatrob.tools.plugins.library")
     id("org.jetbrains.kotlin.plugin.serialization") version embeddedKotlinVersion
 }
 
