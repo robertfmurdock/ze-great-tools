@@ -12,6 +12,8 @@ repositories {
     mavenCentral()
 }
 
+group = "com.zegreatrob.tools"
+
 afterEvaluate {
     publishing.publications.withType<MavenPublication>().forEach {
         with(it) {
