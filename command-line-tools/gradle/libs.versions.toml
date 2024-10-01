@@ -1,5 +1,7 @@
 [libraries]
+# @pin
 com-github-ajalt-clikt-clikt = "com.github.ajalt.clikt:clikt:4.4.0"
+# @pin
 org-jetbrains-kotlinx-kotlinx-serialization-bom = "org.jetbrains.kotlinx:kotlinx-serialization-bom:1.6.3"
 
 [plugins]

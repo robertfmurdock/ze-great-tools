@@ -12,7 +12,6 @@ dependencies {
     api(platform(libs.org.junit.junit.bom))
     constraints {
         api(libs.com.benasher44.uuid)
-        api(libs.com.github.ajalt.clikt.clikt)
         api(libs.org.jetbrains.kotlinx.kotlinx.datetime)
     }
 }
