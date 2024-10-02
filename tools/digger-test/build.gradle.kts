@@ -12,7 +12,9 @@ dependencies {
     commonMainImplementation(project(":digger-core"))
     commonMainImplementation(project(":digger-json"))
     commonMainApi(project(":git-test"))
-    "jvmMainApi"(kotlin("test-junit5", embeddedKotlinVersion))
-    "jvmMainApi"("org.junit.jupiter:junit-jupiter-api")
-    "jvmMainApi"("org.junit.jupiter:junit-jupiter-engine")
+    commonMainApi(kotlin("test", embeddedKotlinVersion))
+    "jvmMainImplementation"(kotlin("test-junit5", embeddedKotlinVersion))
+    "jvmMainImplementation"("org.junit.jupiter:junit-jupiter-api")
+    "jvmMainImplementation"("org.junit.jupiter:junit-jupiter-engine")
+
 }

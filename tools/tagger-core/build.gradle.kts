@@ -19,13 +19,10 @@ dependencies {
     commonMainApi(project(":git-adapter"))
     commonMainImplementation(project(":digger-core"))
     commonTestImplementation(kotlin("test", embeddedKotlinVersion))
-    "jvmTestImplementation"(kotlin("test-junit5", embeddedKotlinVersion))
+    "jvmTestImplementation"(kotlin("test-junit", embeddedKotlinVersion))
 }
 
 tasks {
-    named<Test>("jvmTest") {
-        useJUnitPlatform()
-    }
     formatKotlinCommonMain {
         exclude { spec -> spec.file.absolutePath.contains("generated-sources") }
     }

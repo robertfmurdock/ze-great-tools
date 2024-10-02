@@ -17,6 +17,7 @@ kotlin {
         nodejs {
             useCommonJs()
             binaries.executable()
+            testTask { useMocha { timeout = "10s" } }
         }
         compilations {
             "main" {
@@ -38,11 +39,11 @@ val mainNpmProjectDir = kotlin.js().compilations.getByName("main").npmProject.di
 
 dependencies {
     commonMainImplementation(platform(libs.org.jetbrains.kotlinx.kotlinx.serialization.bom))
-    commonMainImplementation("com.zegreatrob.tools:cli-tools:$version")
-    commonMainImplementation("com.zegreatrob.tools:tagger-core:$version")
+    commonMainImplementation("com.zegreatrob.tools:cli-tools")
+    commonMainImplementation("com.zegreatrob.tools:tagger-core")
     commonMainImplementation(libs.com.github.ajalt.clikt.clikt)
     commonMainImplementation("org.jetbrains.kotlinx:kotlinx-serialization-json")
-    commonTestImplementation("com.zegreatrob.tools:tagger-test:$version")
+    commonTestImplementation("com.zegreatrob.tools:tagger-test")
 }
 
 tasks {

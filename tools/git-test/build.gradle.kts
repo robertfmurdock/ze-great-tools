@@ -10,7 +10,7 @@ kotlin {
 dependencies {
     commonMainImplementation(platform(project(":dependency-bom")))
     commonMainImplementation(project(":git-adapter"))
-    "jvmMainApi"(kotlin("test-junit5", embeddedKotlinVersion))
-    "jvmMainApi"("org.junit.jupiter:junit-jupiter-api")
-    "jvmMainApi"("org.junit.jupiter:junit-jupiter-engine")
+    commonMainImplementation(kotlin("test"))
+    commonMainImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")
+    commonMainApi("org.jetbrains.kotlinx:kotlinx-coroutines-test")
 }

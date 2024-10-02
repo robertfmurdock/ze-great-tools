@@ -18,6 +18,7 @@ kotlin {
         nodejs {
             useCommonJs()
             binaries.executable()
+            testTask { useMocha { timeout = "10s" } }
         }
         compilations {
             "main" {
@@ -42,12 +43,15 @@ kotlin {
 val mainNpmProjectDir = kotlin.js().compilations.getByName("main").npmProject.dir
 
 dependencies {
-    commonMainImplementation("com.zegreatrob.tools:cli-tools:$version")
-    commonMainImplementation("com.zegreatrob.tools:digger-core:$version")
-    commonMainImplementation("com.zegreatrob.tools:digger-json:$version")
+    commonMainImplementation("com.zegreatrob.tools:cli-tools")
+    commonMainImplementation("com.zegreatrob.tools:digger-core")
+    commonMainImplementation("com.zegreatrob.tools:digger-json")
     commonMainImplementation(libs.com.github.ajalt.clikt.clikt)
 
-    commonTestImplementation("com.zegreatrob.tools:digger-test:$version")
+    commonTestImplementation("com.zegreatrob.tools:digger-test")
+    "jvmTestImplementation"(kotlin("test-junit5"))
+    "jvmTestImplementation"("org.junit.jupiter:junit-jupiter-api")
+    "jvmTestImplementation"("org.junit.jupiter:junit-jupiter-engine")
 }
 
 tasks {
