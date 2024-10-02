@@ -11,4 +11,3 @@ include("digger-cli")
 include("tagger-cli")
 
 includeBuild("../tools")
-includeBuild("../tools-plugins")

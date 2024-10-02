@@ -1,8 +1,15 @@
+
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.targets.js.npm.npmProject
 
 plugins {
-    application
-    id("com.zegreatrob.tools.plugins.mp")
+    alias(libs.plugins.org.jetbrains.kotlin.multiplatform)
+    alias(libs.plugins.org.jmailen.kotlinter)
+    alias(libs.plugins.com.github.ben.manes.versions)
+}
+
+repositories {
+    mavenCentral()
 }
 
 kotlin {
@@ -26,21 +33,21 @@ kotlin {
             }
         }
     }
-}
-
-application {
-    mainClass.set("com.zegreatrob.tools.digger.cli.MainKt")
+    @OptIn(ExperimentalKotlinGradlePluginApi::class)
+    compilerOptions {
+        allWarningsAsErrors = true
+    }
 }
 
 val mainNpmProjectDir = kotlin.js().compilations.getByName("main").npmProject.dir
 
 dependencies {
-    commonMainImplementation("com.zegreatrob.tools:cli-tools")
-    commonMainImplementation("com.zegreatrob.tools:digger-core")
-    commonMainImplementation("com.zegreatrob.tools:digger-json")
+    commonMainImplementation("com.zegreatrob.tools:cli-tools:$version")
+    commonMainImplementation("com.zegreatrob.tools:digger-core:$version")
+    commonMainImplementation("com.zegreatrob.tools:digger-json:$version")
     commonMainImplementation(libs.com.github.ajalt.clikt.clikt)
 
-    commonTestImplementation("com.zegreatrob.tools:digger-test")
+    commonTestImplementation("com.zegreatrob.tools:digger-test:$version")
 }
 
 tasks {

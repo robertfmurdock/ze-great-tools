@@ -1,9 +1,14 @@
 import org.jetbrains.kotlin.gradle.targets.js.npm.npmProject
 
 plugins {
-    application
-    id("com.zegreatrob.tools.plugins.mp")
-    id("org.jetbrains.kotlin.plugin.serialization") version embeddedKotlinVersion
+    alias(libs.plugins.org.jetbrains.kotlin.multiplatform)
+    alias(libs.plugins.org.jmailen.kotlinter)
+    alias(libs.plugins.com.github.ben.manes.versions)
+    alias(libs.plugins.org.jetbrains.kotlin.plugin.serialization)
+}
+
+repositories {
+    mavenCentral()
 }
 
 kotlin {
@@ -29,19 +34,15 @@ kotlin {
     }
 }
 
-application {
-    mainClass.set("com.zegreatrob.tools.tagger.cli.MainKt")
-}
-
 val mainNpmProjectDir = kotlin.js().compilations.getByName("main").npmProject.dir
 
 dependencies {
     commonMainImplementation(platform(libs.org.jetbrains.kotlinx.kotlinx.serialization.bom))
-    commonMainImplementation("com.zegreatrob.tools:cli-tools")
-    commonMainImplementation("com.zegreatrob.tools:tagger-core")
+    commonMainImplementation("com.zegreatrob.tools:cli-tools:$version")
+    commonMainImplementation("com.zegreatrob.tools:tagger-core:$version")
     commonMainImplementation(libs.com.github.ajalt.clikt.clikt)
     commonMainImplementation("org.jetbrains.kotlinx:kotlinx-serialization-json")
-    commonTestImplementation("com.zegreatrob.tools:tagger-test")
+    commonTestImplementation("com.zegreatrob.tools:tagger-test:$version")
 }
 
 tasks {
