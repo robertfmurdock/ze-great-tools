@@ -21,6 +21,7 @@ fun initializeGitRepo(
     val gitAdapter = GitAdapter(
         directory,
         mapOf(
+            "PATH" to (getEnvironmentVariable("PATH") ?: ""),
             "GIT_CONFIG_GLOBAL" to (getEnvironmentVariable("GIT_CONFIG_GLOBAL") ?: ""),
             "GIT_CONFIG_SYSTEM" to (getEnvironmentVariable("GIT_CONFIG_SYSTEM") ?: ""),
         ),

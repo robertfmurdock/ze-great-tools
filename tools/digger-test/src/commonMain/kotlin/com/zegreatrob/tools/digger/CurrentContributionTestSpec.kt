@@ -8,11 +8,13 @@ import com.zegreatrob.tools.test.git.addCommitWithMessage
 import com.zegreatrob.tools.test.git.addTag
 import com.zegreatrob.tools.test.git.defaultAuthors
 import com.zegreatrob.tools.test.git.delayLongEnoughToAffectGitDate
+import com.zegreatrob.tools.test.git.getEnvironmentVariable
 import com.zegreatrob.tools.test.git.initializeGitRepo
 import com.zegreatrob.tools.test.git.mergeInBranch
 import com.zegreatrob.tools.test.git.sleep
 import com.zegreatrob.tools.test.git.switchToNewBranch
 import kotlinx.coroutines.test.runTest
+import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -22,6 +24,20 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
 
     fun setupWithDefaults()
     fun runCurrentContributionData(): String
+
+    @BeforeTest
+    fun checkPrerequisites() {
+        assertEquals(
+            "/dev/null",
+            getEnvironmentVariable("GIT_CONFIG_GLOBAL"),
+            "Ensure this is set for the test to work as intended",
+        )
+        assertEquals(
+            "/dev/null",
+            getEnvironmentVariable("GIT_CONFIG_SYSTEM"),
+            "Ensure this is set for the test to work as intended",
+        )
+    }
 
     @Test
     fun currentContributionDataWillShowAuthorsAndCoAuthorsCaseInsensitive() {

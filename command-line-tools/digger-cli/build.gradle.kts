@@ -18,7 +18,11 @@ kotlin {
         nodejs {
             useCommonJs()
             binaries.executable()
-            testTask { useMocha { timeout = "10s" } }
+            testTask {
+                useMocha { timeout = "10s" }
+                environment("GIT_CONFIG_GLOBAL", "/dev/null")
+                environment("GIT_CONFIG_SYSTEM", "/dev/null")
+            }
         }
         compilations {
             "main" {
