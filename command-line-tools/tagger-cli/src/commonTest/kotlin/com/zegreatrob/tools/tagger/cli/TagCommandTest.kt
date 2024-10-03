@@ -3,14 +3,11 @@ package com.zegreatrob.tools.tagger.cli
 import com.github.ajalt.clikt.testing.test
 import com.zegreatrob.tools.tagger.TagTestSpec
 import com.zegreatrob.tools.tagger.TestResult
-import org.junit.jupiter.api.io.TempDir
-import java.io.File
 import kotlin.test.BeforeTest
 
 class TagCommandTest : TagTestSpec {
 
-    @field:TempDir
-    override lateinit var projectDir: File
+    override lateinit var projectDir: String
 
     override val addFileNames: Set<String> = emptySet()
     private lateinit var arguments: List<String>
@@ -22,7 +19,7 @@ class TagCommandTest : TagTestSpec {
 
     override fun configureWithDefaults() {
         arguments += "--release-branch=master"
-        arguments += projectDir.absolutePath
+        arguments += projectDir
     }
 
     override fun configureWithOverrides(
@@ -43,7 +40,7 @@ class TagCommandTest : TagTestSpec {
         if (warningsAsErrors != null) {
             arguments += "--warnings-as-errors=$warningsAsErrors"
         }
-        arguments += projectDir.absolutePath
+        arguments += projectDir
     }
 
     override fun execute(version: String): TestResult {

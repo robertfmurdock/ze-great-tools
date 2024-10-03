@@ -17,7 +17,11 @@ kotlin {
         nodejs {
             useCommonJs()
             binaries.executable()
-            testTask { useMocha { timeout = "10s" } }
+            testTask {
+                useMocha { timeout = "10s" }
+                environment("GIT_CONFIG_GLOBAL", "/dev/null")
+                environment("GIT_CONFIG_SYSTEM", "/dev/null")
+            }
         }
         compilations {
             "main" {
@@ -44,6 +48,7 @@ dependencies {
     commonMainImplementation(libs.com.github.ajalt.clikt.clikt)
     commonMainImplementation("org.jetbrains.kotlinx:kotlinx-serialization-json")
     commonTestImplementation("com.zegreatrob.tools:tagger-test")
+    commonTestImplementation(kotlin("test"))
 }
 
 tasks {

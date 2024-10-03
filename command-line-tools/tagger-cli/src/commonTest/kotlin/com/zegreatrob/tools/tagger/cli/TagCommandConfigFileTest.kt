@@ -1,22 +1,19 @@
-@file:OptIn(ExperimentalSerializationApi::class)
-
 package com.zegreatrob.tools.tagger.cli
 
 import com.github.ajalt.clikt.testing.test
+import com.zegreatrob.tools.cli.writeToFile
 import com.zegreatrob.tools.tagger.TagTestSpec
 import com.zegreatrob.tools.tagger.TestResult
-import kotlinx.serialization.ExperimentalSerializationApi
+import com.zegreatrob.tools.test.git.getEnvironmentVariable
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.encodeToStream
-import org.junit.jupiter.api.io.TempDir
-import java.io.File
 import kotlin.test.BeforeTest
 
 class TagCommandConfigFileTest : TagTestSpec {
 
-    @field:TempDir
-    override lateinit var projectDir: File
+    override lateinit var projectDir: String
 
+    private val taggerFile get() = "$projectDir/.tagger"
     override val addFileNames: Set<String> = emptySet()
     private lateinit var arguments: List<String>
 
@@ -27,7 +24,8 @@ class TagCommandConfigFileTest : TagTestSpec {
 
     override fun configureWithDefaults() {
         val config = TaggerConfig(releaseBranch = "master")
-        Json.encodeToStream(config, File(projectDir, ".tagger").outputStream())
+        Json.encodeToString(config)
+            .writeToFile(taggerFile)
     }
 
     override fun configureWithOverrides(
@@ -41,13 +39,21 @@ class TagCommandConfigFileTest : TagTestSpec {
         userName?.let { config = config.copy(userName = userName) }
         userEmail?.let { config = config.copy(userEmail = userEmail) }
         warningsAsErrors?.let { config = config.copy(warningsAsErrors = warningsAsErrors) }
-        Json.encodeToStream(config, File(projectDir, ".tagger").outputStream())
+        Json.encodeToString(config)
+            .writeToFile(taggerFile)
     }
 
     override fun execute(version: String): TestResult {
         arguments += "--version=$version"
         val test = cli()
-            .test(arguments, envvars = mapOf("PWD" to projectDir.absolutePath))
+            .test(
+                arguments,
+                envvars = mapOf("PWD" to projectDir) + mapOf(
+                    "PATH" to (getEnvironmentVariable("PATH") ?: ""),
+                    "GIT_CONFIG_GLOBAL" to (getEnvironmentVariable("GIT_CONFIG_GLOBAL") ?: ""),
+                    "GIT_CONFIG_SYSTEM" to (getEnvironmentVariable("GIT_CONFIG_SYSTEM") ?: ""),
+                ),
+            )
         return if (test.statusCode == 0) {
             test
                 .output

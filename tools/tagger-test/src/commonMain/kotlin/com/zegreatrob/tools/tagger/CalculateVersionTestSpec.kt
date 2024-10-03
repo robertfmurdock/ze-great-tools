@@ -2,8 +2,11 @@ package com.zegreatrob.tools.tagger
 
 import com.zegreatrob.tools.adapter.git.GitAdapter
 import com.zegreatrob.tools.test.git.addCommitWithMessage
+import com.zegreatrob.tools.test.git.createTempDirectory
+import com.zegreatrob.tools.test.git.getEnvironmentVariable
 import com.zegreatrob.tools.test.git.initializeGitRepo
-import java.io.File
+import com.zegreatrob.tools.test.git.removeDirectory
+import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertContains
@@ -11,8 +14,18 @@ import kotlin.test.assertEquals
 import kotlin.test.fail
 
 interface CalculateVersionTestSpec {
-    var projectDir: File
+    var projectDir: String
     val addFileNames: Set<String>
+
+    @BeforeTest
+    fun setUpProjectDir() {
+        projectDir = createTempDirectory()
+    }
+
+    @AfterTest
+    fun deleteProjectDir() {
+        removeDirectory(projectDir)
+    }
 
     fun configureWithDefaults()
     fun configureWithOverrides(
@@ -27,9 +40,9 @@ interface CalculateVersionTestSpec {
     fun initializeGitRepo(
         commits: List<String>,
         initialTag: String? = null,
-        remoteUrl: String = projectDir.absolutePath,
+        remoteUrl: String = projectDir,
     ) = initializeGitRepo(
-        directory = projectDir.absolutePath,
+        directory = projectDir,
         remoteUrl = remoteUrl,
         addFileNames = addFileNames,
         initialTag = initialTag,
@@ -40,12 +53,12 @@ interface CalculateVersionTestSpec {
     fun checkPrerequisites() {
         assertEquals(
             "/dev/null",
-            System.getenv("GIT_CONFIG_GLOBAL"),
+            getEnvironmentVariable("GIT_CONFIG_GLOBAL"),
             "Ensure this is set for the test to work as intended",
         )
         assertEquals(
             "/dev/null",
-            System.getenv("GIT_CONFIG_SYSTEM"),
+            getEnvironmentVariable("GIT_CONFIG_SYSTEM"),
             "Ensure this is set for the test to work as intended",
         )
     }
@@ -58,7 +71,7 @@ interface CalculateVersionTestSpec {
         }
 
     @Test
-    fun `calculating version with no tags produces zero version`() {
+    fun calculatingVersionWithNoTagsProducesZeroVersion() {
         configureWithDefaults()
 
         initializeGitRepo(listOf("init", "[patch] commit 1", "[patch] commit 2"))
@@ -68,24 +81,24 @@ interface CalculateVersionTestSpec {
     }
 
     @Test
-    fun `calculating version when current commit already has tag will use tag`() {
+    fun calculatingVersionWhenCurrentCommitAlreadyHasTagWillUseTag() {
         configureWithDefaults()
 
-        val gitAdapter = GitAdapter(projectDir.absolutePath)
+        val gitAdapter = GitAdapter(projectDir)
         gitAdapter.init()
         gitAdapter.config("commit.gpgsign", "false")
         gitAdapter.add(".")
         gitAdapter.addCommitWithMessage("test commit")
         gitAdapter.newAnnotatedTag("1.0.23", "HEAD", "test", "test")
         gitAdapter.checkout("main", newBranch = true)
-        gitAdapter.addRemote("origin", projectDir.absolutePath)
+        gitAdapter.addRemote("origin", projectDir)
         val version = runCalculateVersionSuccessfully()
 
         assertEquals("1.0.23-SNAPSHOT", version)
     }
 
     @Test
-    fun `calculating version with all patch commits only increments patch`() {
+    fun calculatingVersionWithAllPatchCommitsOnlyIncrementsPatch() {
         configureWithDefaults()
 
         initializeGitRepo(listOf("init", "[patch] commit 1", "[patch] commit 2"), initialTag = "1.2.3")
@@ -95,7 +108,7 @@ interface CalculateVersionTestSpec {
     }
 
     @Test
-    fun `given no implicit patch, calculating version with unlabeled commits does not increment`() {
+    fun givenNoImplicitPatchCalculatingVersionWithUnlabeledCommitsDoesNotIncrement() {
         configureWithOverrides(implicitPatch = false)
 
         initializeGitRepo(commits = listOf("init", "commit 1", "commit 2"), initialTag = "1.2.3")
@@ -105,7 +118,7 @@ interface CalculateVersionTestSpec {
     }
 
     @Test
-    fun `given initial tag with suffix, ignore suffix and follow normal rules`() {
+    fun givenInitialTagWithSuffixIgnoreSuffixAndFollowNormalRules() {
         configureWithOverrides(implicitPatch = false)
 
         initializeGitRepo(commits = listOf("init", "commit 1", "commit 2"), initialTag = "1.2.3-SNAPSHOT")
@@ -115,7 +128,7 @@ interface CalculateVersionTestSpec {
     }
 
     @Test
-    fun `given implicit patch, calculating version with unlabeled commits increments patch`() {
+    fun givenImplicitPatchCalculatingVersionWithUnlabeledCommitsIncrementsPatch() {
         configureWithOverrides(implicitPatch = true)
 
         initializeGitRepo(commits = listOf("init", "commit 1", "commit 2"), initialTag = "1.2.3")
@@ -125,7 +138,7 @@ interface CalculateVersionTestSpec {
     }
 
     @Test
-    fun `given implicit patch, calculating version with none and then unlabeled commits increments patch`() {
+    fun givenImplicitPatchCalculatingVersionWithNoneAndThenUnlabeledCommitsIncrementsPatch() {
         configureWithOverrides(implicitPatch = true)
 
         initializeGitRepo(commits = listOf("init", "[none] commit 1", "commit 2"), initialTag = "1.2.3")
@@ -135,7 +148,7 @@ interface CalculateVersionTestSpec {
     }
 
     @Test
-    fun `given implicit patch, calculating version with None commits does not increment and is always snapshot`() {
+    fun givenImplicitPatchCalculatingVersionWithNoneCommitsDoesNotIncrementAndIsAlwaysSnapshot() {
         configureWithOverrides(implicitPatch = true)
 
         initializeGitRepo(commits = listOf("init", "[None] commit 1", "[none] commit 2"), initialTag = "1.2.3")
@@ -145,7 +158,7 @@ interface CalculateVersionTestSpec {
     }
 
     @Test
-    fun `calculating version with one minor commits only increments minor`() {
+    fun calculatingVersionWithOneMinorCommitsOnlyIncrementsMinor() {
         configureWithDefaults()
 
         initializeGitRepo(
@@ -266,7 +279,7 @@ interface CalculateVersionTestSpec {
     }
 
     @Test
-    fun `calculating version with one major commits only increments major`() {
+    fun calculatingVersionWithOneMajorCommitsOnlyIncrementsMajor() {
         configureWithDefaults()
 
         initializeGitRepo(

@@ -1,28 +1,25 @@
 package com.zegreatrob.tools.tagger
 
 import org.gradle.testkit.runner.GradleRunner
-import org.junit.jupiter.api.io.TempDir
 import java.io.File
-import kotlin.test.BeforeTest
 
 class CalculateVersionFunctionalTest : CalculateVersionTestSpec {
-    @field:TempDir
-    override lateinit var projectDir: File
+    override lateinit var projectDir: String
 
-    private val buildFile by lazy { projectDir.resolve("build.gradle.kts") }
-    private val settingsFile by lazy { projectDir.resolve("settings.gradle") }
-    private val ignoreFile by lazy { projectDir.resolve(".gitignore") }
+    private val buildFile by lazy { "$projectDir/${"build.gradle.kts"}" }
+    private val settingsFile by lazy { "$projectDir/${"settings.gradle"}" }
+    private val ignoreFile by lazy { "$projectDir/${".gitignore"}" }
     override val addFileNames: Set<String>
-        get() = setOf(buildFile, settingsFile, ignoreFile).map { it.name }.toSet()
+        get() = setOf(buildFile, settingsFile, ignoreFile).map { it.split("/").last() }.toSet()
 
-    @BeforeTest
-    fun setup() {
-        settingsFile.writeText("")
-        ignoreFile.writeText(".gradle")
+    private fun setup() {
+        File(settingsFile).writeText("")
+        File(ignoreFile).writeText(".gradle")
     }
 
     override fun configureWithDefaults() {
-        buildFile.writeText(
+        setup()
+        File(buildFile).writeText(
             """
             plugins {
                 id("com.zegreatrob.tools.tagger")
@@ -42,7 +39,8 @@ class CalculateVersionFunctionalTest : CalculateVersionTestSpec {
         versionRegex: String?,
         noneRegex: String?,
     ) {
-        buildFile.writeText(
+        setup()
+        File(buildFile).writeText(
             """
             plugins {
                 id("com.zegreatrob.tools.tagger")
@@ -76,7 +74,7 @@ class CalculateVersionFunctionalTest : CalculateVersionTestSpec {
         runner.forwardOutput()
         runner.withPluginClasspath()
         runner.withArguments("calculateVersion", "-q")
-        runner.withProjectDir(projectDir)
+        runner.withProjectDir(File(projectDir))
         return try {
             val result = runner.build()
             result.output.trim().let(TestResult::Success)

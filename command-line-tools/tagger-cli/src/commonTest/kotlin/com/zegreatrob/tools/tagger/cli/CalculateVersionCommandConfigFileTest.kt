@@ -1,22 +1,21 @@
 package com.zegreatrob.tools.tagger.cli
 
 import com.github.ajalt.clikt.testing.test
+import com.zegreatrob.tools.cli.writeToFile
 import com.zegreatrob.tools.tagger.CalculateVersionTestSpec
 import com.zegreatrob.tools.tagger.TestResult
 import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.encodeToStream
-import org.junit.jupiter.api.io.TempDir
-import java.io.File
 import kotlin.test.BeforeTest
 
 @ExperimentalSerializationApi
 class CalculateVersionCommandConfigFileTest : CalculateVersionTestSpec {
 
-    @field:TempDir
-    override lateinit var projectDir: File
+    override lateinit var projectDir: String
 
-    override val addFileNames: Set<String> get() = setOf(projectDir.resolve(".tagger").name)
+    private val taggerFile get() = "$projectDir/.tagger"
+    override val addFileNames: Set<String> get() = setOf(taggerFile.split("/").last())
     private lateinit var arguments: List<String>
 
     @BeforeTest
@@ -26,7 +25,8 @@ class CalculateVersionCommandConfigFileTest : CalculateVersionTestSpec {
 
     override fun configureWithDefaults() {
         val config = TaggerConfig(releaseBranch = "master")
-        Json.encodeToStream(config, File(projectDir, ".tagger").outputStream())
+        Json.encodeToString(config)
+            .writeToFile(taggerFile)
     }
 
     override fun configureWithOverrides(
@@ -45,12 +45,13 @@ class CalculateVersionCommandConfigFileTest : CalculateVersionTestSpec {
         patchRegex?.let { config = config.copy(patchRegex = patchRegex) }
         noneRegex?.let { config = config.copy(noneRegex = noneRegex) }
         config = config.copy(releaseBranch = "master")
-        Json.encodeToStream(config, File(projectDir, ".tagger").outputStream())
+        Json.encodeToString(config)
+            .writeToFile(taggerFile)
     }
 
     override fun execute(): TestResult {
         val test = cli()
-            .test(arguments, envvars = mapOf("PWD" to projectDir.absolutePath))
+            .test(arguments, envvars = mapOf("PWD" to projectDir))
         return if (test.statusCode == 0) {
             test
                 .stdout

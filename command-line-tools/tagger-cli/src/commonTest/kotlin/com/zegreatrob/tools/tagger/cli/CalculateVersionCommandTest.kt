@@ -3,14 +3,11 @@ package com.zegreatrob.tools.tagger.cli
 import com.github.ajalt.clikt.testing.test
 import com.zegreatrob.tools.tagger.CalculateVersionTestSpec
 import com.zegreatrob.tools.tagger.TestResult
-import org.junit.jupiter.api.io.TempDir
-import java.io.File
 import kotlin.test.BeforeTest
 
 class CalculateVersionCommandTest : CalculateVersionTestSpec {
 
-    @field:TempDir
-    override lateinit var projectDir: File
+    override lateinit var projectDir: String
 
     override val addFileNames: Set<String> = emptySet()
     private lateinit var arguments: List<String>
@@ -22,7 +19,7 @@ class CalculateVersionCommandTest : CalculateVersionTestSpec {
 
     override fun configureWithDefaults() {
         arguments += "--release-branch=master"
-        arguments += projectDir.absolutePath
+        arguments += projectDir
     }
 
     override fun configureWithOverrides(
@@ -40,7 +37,7 @@ class CalculateVersionCommandTest : CalculateVersionTestSpec {
         patchRegex?.let { arguments += "--patch-regex=$patchRegex" }
         noneRegex?.let { arguments += "--none-regex=$noneRegex" }
         arguments += "--release-branch=master"
-        arguments += projectDir.absolutePath
+        arguments += projectDir
     }
 
     override fun execute(): TestResult {
