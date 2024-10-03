@@ -1,24 +1,28 @@
 package com.zegreatrob.tools.digger
 
 import org.gradle.testkit.runner.GradleRunner
-import org.junit.jupiter.api.io.TempDir
 import java.io.File
 
 class AllContributionFunctionalTest : AllContributionTestSpec {
-    @field:TempDir
-    override lateinit var projectDir: File
+    override lateinit var projectDir: String
 
-    private val buildFile by lazy { projectDir.resolve("build.gradle.kts") }
-    private val allOutput by lazy { projectDir.resolve("build/digger/all.json") }
-    private val settingsFile by lazy { projectDir.resolve("settings.gradle") }
-    private val ignoreFile by lazy { projectDir.resolve(".gitignore") }
+    private val buildFile by lazy { "$projectDir/build.gradle.kts" }
+    private val allOutput by lazy { "$projectDir/build/digger/all.json" }
+    private val settingsFile by lazy { "$projectDir/settings.gradle" }
+    private val ignoreFile by lazy { "$projectDir/.gitignore" }
 
-    override val addFileNames by lazy { setOf(settingsFile.name, buildFile.name, ignoreFile.name) }
+    override val addFileNames by lazy {
+        setOf(
+            settingsFile.split("/").last(),
+            buildFile.split("/").last(),
+            ignoreFile.split("/").last(),
+        )
+    }
 
     override fun setupWithDefaults() {
-        settingsFile.writeText("")
-        ignoreFile.writeText(".gradle")
-        buildFile.writeText(
+        File(settingsFile).writeText("")
+        File(ignoreFile).writeText(".gradle")
+        File(buildFile).writeText(
             """
             plugins {
                 id("com.zegreatrob.tools.digger")
@@ -37,9 +41,9 @@ class AllContributionFunctionalTest : AllContributionTestSpec {
         easeRegex: String?,
         tagRegex: String?,
     ) {
-        settingsFile.writeText("")
-        ignoreFile.writeText(".gradle")
-        buildFile.writeText(
+        File(settingsFile).writeText("")
+        File(ignoreFile).writeText(".gradle")
+        File(buildFile).writeText(
             """
             plugins {
                 id("com.zegreatrob.tools.digger")
@@ -63,8 +67,8 @@ class AllContributionFunctionalTest : AllContributionTestSpec {
             .forwardOutput()
             .withPluginClasspath()
             .withArguments("allContributionData", "-q")
-            .withProjectDir(projectDir)
+            .withProjectDir(File(projectDir))
             .build()
-        return allOutput.readText()
+        return File(allOutput).readText()
     }
 }

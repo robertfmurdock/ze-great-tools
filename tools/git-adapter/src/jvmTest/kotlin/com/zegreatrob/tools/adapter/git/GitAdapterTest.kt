@@ -3,6 +3,7 @@ package com.zegreatrob.tools.adapter.git
 import com.zegreatrob.tools.test.git.addCommitWithMessage
 import com.zegreatrob.tools.test.git.delayLongEnoughToAffectGitDate
 import com.zegreatrob.tools.test.git.initializeGitRepo
+import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.io.TempDir
 import java.io.File
@@ -27,7 +28,7 @@ class GitAdapterTest {
     )
 
     @Test
-    fun `will include all tag segments from newest to oldest`() {
+    fun `will include all tag segments from newest to oldest`() = runTest {
         val gitAdapter = initializeGitRepo(commits = listOf("here's a message"))
         gitAdapter.config("user.name", "Test")
         gitAdapter.config("user.email", "Test")

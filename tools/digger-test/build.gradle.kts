@@ -3,7 +3,9 @@ plugins {
 }
 
 kotlin {
-    jvm { withJava() }
+    jvm {
+        withJava()
+    }
     js(IR) { nodejs() }
 }
 
@@ -16,5 +18,10 @@ dependencies {
     "jvmMainImplementation"(kotlin("test-junit5", embeddedKotlinVersion))
     "jvmMainImplementation"("org.junit.jupiter:junit-jupiter-api")
     "jvmMainImplementation"("org.junit.jupiter:junit-jupiter-engine")
+}
 
+tasks {
+    withType(Test::class) {
+        useJUnitPlatform()
+    }
 }

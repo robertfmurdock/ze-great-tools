@@ -53,8 +53,10 @@ tasks {
         dependsOn(testing.suites.named("functionalTest"))
     }
     publish { finalizedBy("::closeAndReleaseSonatypeStagingRepository") }
-    named<Test>("test") {
+    withType(Test::class) {
         useJUnitPlatform()
+        environment("GIT_CONFIG_GLOBAL", "/dev/null")
+        environment("GIT_CONFIG_SYSTEM", "/dev/null")
     }
     formatKotlinMain {
         exclude { spec -> spec.file.absolutePath.contains("generated-sources") }

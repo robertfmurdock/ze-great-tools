@@ -5,13 +5,16 @@ import com.zegreatrob.tools.adapter.git.TagRef
 import com.zegreatrob.tools.digger.model.Contribution
 import com.zegreatrob.tools.test.git.addCommitWithMessage
 import com.zegreatrob.tools.test.git.addTag
+import com.zegreatrob.tools.test.git.createTempDirectory
 import com.zegreatrob.tools.test.git.defaultAuthors
 import com.zegreatrob.tools.test.git.delayLongEnoughToAffectGitDate
 import com.zegreatrob.tools.test.git.ffOnlyInBranch
 import com.zegreatrob.tools.test.git.initializeGitRepo
 import com.zegreatrob.tools.test.git.mergeInBranch
+import com.zegreatrob.tools.test.git.removeDirectory
 import com.zegreatrob.tools.test.git.switchToNewBranch
 import kotlinx.coroutines.test.runTest
+import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -26,6 +29,15 @@ interface AllContributionTestSpec : SetupWithOverrides {
         addFileNames = addFileNames,
         commits = commits,
     )
+
+    @BeforeTest
+    fun setupProjectDir() {
+        projectDir = createTempDirectory()
+    }
+
+    fun tearDown() {
+        removeDirectory(projectDir)
+    }
 
     @Test
     fun willIncludeAllTagSegments() {

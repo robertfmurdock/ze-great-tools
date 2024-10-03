@@ -1,4 +1,4 @@
-package com.zegreatrob.tools.cli
+package com.zegreatrob.tools.test.git
 
 private val fs = js("require('node:fs')")
 private val path = js("require('node:path')")

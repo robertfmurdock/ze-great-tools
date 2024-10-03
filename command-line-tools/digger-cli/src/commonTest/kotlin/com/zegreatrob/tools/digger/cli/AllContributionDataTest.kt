@@ -1,28 +1,21 @@
 package com.zegreatrob.tools.digger.cli
 
 import com.github.ajalt.clikt.testing.test
-import com.zegreatrob.tools.cli.createTempDirectory
 import com.zegreatrob.tools.cli.readFromFile
-import com.zegreatrob.tools.cli.removeDirectory
 import com.zegreatrob.tools.digger.AllContributionTestSpec
+import kotlin.test.BeforeTest
 
 class AllContributionDataTest : AllContributionTestSpec {
 
     override lateinit var projectDir: String
 
     override val addFileNames: Set<String> = emptySet()
-    private lateinit var outputFile: String
     private lateinit var arguments: List<String>
+    private val outputFile: String get() = "$projectDir/temp-file.json"
 
-    @kotlin.test.BeforeTest
+    @BeforeTest
     fun setup() {
-        projectDir = createTempDirectory()
         arguments = emptyList()
-        outputFile = "$projectDir/temp-file.json"
-    }
-
-    fun tearDown() {
-        removeDirectory(projectDir)
     }
 
     override fun setupWithDefaults() {

@@ -6,11 +6,13 @@ import com.zegreatrob.tools.digger.json.ContributionParser.parseContribution
 import com.zegreatrob.tools.digger.model.Contribution
 import com.zegreatrob.tools.test.git.addCommitWithMessage
 import com.zegreatrob.tools.test.git.addTag
+import com.zegreatrob.tools.test.git.createTempDirectory
 import com.zegreatrob.tools.test.git.defaultAuthors
 import com.zegreatrob.tools.test.git.delayLongEnoughToAffectGitDate
 import com.zegreatrob.tools.test.git.getEnvironmentVariable
 import com.zegreatrob.tools.test.git.initializeGitRepo
 import com.zegreatrob.tools.test.git.mergeInBranch
+import com.zegreatrob.tools.test.git.removeDirectory
 import com.zegreatrob.tools.test.git.sleep
 import com.zegreatrob.tools.test.git.switchToNewBranch
 import kotlinx.coroutines.test.runTest
@@ -24,6 +26,15 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
 
     fun setupWithDefaults()
     fun runCurrentContributionData(): String
+
+    @BeforeTest
+    fun setupProjectDir() {
+        projectDir = createTempDirectory()
+    }
+
+    fun tearDown() {
+        removeDirectory(projectDir)
+    }
 
     @BeforeTest
     fun checkPrerequisites() {

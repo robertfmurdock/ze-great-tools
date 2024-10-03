@@ -1,3 +1,3 @@
-package com.zegreatrob.tools.cli
+package com.zegreatrob.tools.test.git
 
 expect fun removeDirectory(directoryPath: String)

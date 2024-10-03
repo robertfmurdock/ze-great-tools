@@ -1,4 +1,4 @@
-package com.zegreatrob.tools.cli
+package com.zegreatrob.tools.test.git
 
 import kotlin.js.json
 
