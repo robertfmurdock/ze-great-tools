@@ -29,17 +29,7 @@ class Tag : CliktCommand() {
     private val userEmail: String? by option()
     private val warningsAsErrors by option().boolean().default(false)
     override fun run() {
-        TaggerCore(
-            GitAdapter(
-                workingDirectory,
-                env =
-                listOfNotNull(
-                    currentContext.readEnvvar("GIT_CONFIG_GLOBAL")?.let { "GIT_CONFIG_GLOBAL" to it },
-                    currentContext.readEnvvar("GIT_CONFIG_SYSTEM")?.let { "GIT_CONFIG_SYSTEM" to it },
-                ).toMap(),
-
-            ),
-        )
+        TaggerCore(GitAdapter(workingDirectory))
             .tag(version, releaseBranch, userName, userEmail)
             .let {
                 when (it) {

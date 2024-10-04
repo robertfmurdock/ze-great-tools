@@ -84,7 +84,14 @@ interface CalculateVersionTestSpec {
     fun calculatingVersionWhenCurrentCommitAlreadyHasTagWillUseTag() {
         configureWithDefaults()
 
-        val gitAdapter = GitAdapter(projectDir)
+        val gitAdapter = GitAdapter(
+            projectDir,
+            mapOf(
+                "PATH" to (getEnvironmentVariable("PATH") ?: ""),
+                "GIT_CONFIG_GLOBAL" to (getEnvironmentVariable("GIT_CONFIG_GLOBAL") ?: ""),
+                "GIT_CONFIG_SYSTEM" to (getEnvironmentVariable("GIT_CONFIG_SYSTEM") ?: ""),
+            ),
+        )
         gitAdapter.init()
         gitAdapter.config("commit.gpgsign", "false")
         gitAdapter.add(".")

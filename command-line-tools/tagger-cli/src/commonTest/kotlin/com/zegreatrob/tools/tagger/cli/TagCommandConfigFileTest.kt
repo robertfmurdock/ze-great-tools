@@ -4,7 +4,6 @@ import com.github.ajalt.clikt.testing.test
 import com.zegreatrob.tools.cli.writeToFile
 import com.zegreatrob.tools.tagger.TagTestSpec
 import com.zegreatrob.tools.tagger.TestResult
-import com.zegreatrob.tools.test.git.getEnvironmentVariable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlin.test.BeforeTest
@@ -46,14 +45,7 @@ class TagCommandConfigFileTest : TagTestSpec {
     override fun execute(version: String): TestResult {
         arguments += "--version=$version"
         val test = cli()
-            .test(
-                arguments,
-                envvars = mapOf("PWD" to projectDir) + mapOf(
-                    "PATH" to (getEnvironmentVariable("PATH") ?: ""),
-                    "GIT_CONFIG_GLOBAL" to (getEnvironmentVariable("GIT_CONFIG_GLOBAL") ?: ""),
-                    "GIT_CONFIG_SYSTEM" to (getEnvironmentVariable("GIT_CONFIG_SYSTEM") ?: ""),
-                ),
-            )
+            .test(arguments, envvars = mapOf("PWD" to projectDir))
         return if (test.statusCode == 0) {
             test
                 .output

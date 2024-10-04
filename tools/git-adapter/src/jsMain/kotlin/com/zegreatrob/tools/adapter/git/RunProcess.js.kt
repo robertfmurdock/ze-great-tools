@@ -16,6 +16,10 @@ actual fun runProcess(args: List<String>, workingDirectory: String, env: Map<Str
             "env" to env.toJson(),
         ),
     )
+    if (spawn.status != 0) {
+        throw Exception(spawn.stderr?.toString("utf8").unsafeCast<String>())
+    }
+
     return spawn.stdout?.toString("utf8").unsafeCast<String>()
 }
 
