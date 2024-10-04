@@ -1,5 +1,6 @@
 package com.zegreatrob.tools.digger.cli
 
+import com.github.ajalt.clikt.core.main
 import com.github.ajalt.clikt.core.subcommands
 import com.zegreatrob.tools.cli.platformArgCorrection
 
