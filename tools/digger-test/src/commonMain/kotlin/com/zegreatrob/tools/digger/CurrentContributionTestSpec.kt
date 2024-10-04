@@ -16,6 +16,7 @@ import com.zegreatrob.tools.test.git.removeDirectory
 import com.zegreatrob.tools.test.git.sleep
 import com.zegreatrob.tools.test.git.switchToNewBranch
 import kotlinx.coroutines.test.runTest
+import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -32,6 +33,7 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
         projectDir = createTempDirectory()
     }
 
+    @AfterTest
     fun tearDown() {
         removeDirectory(projectDir)
     }

@@ -26,6 +26,11 @@ interface TagTestSpec {
         projectDir = createTempDirectory()
     }
 
+    @AfterTest
+    fun deleteProjectDir() {
+        removeDirectory(projectDir)
+    }
+
     @BeforeTest
     fun checkPrerequisites() {
         assertEquals(
@@ -38,11 +43,6 @@ interface TagTestSpec {
             getEnvironmentVariable("GIT_CONFIG_SYSTEM"),
             "Ensure this is set for the test to work as intended",
         )
-    }
-
-    @AfterTest
-    fun deleteProjectDir() {
-        removeDirectory(projectDir)
     }
 
     fun initializeGitRepo(
