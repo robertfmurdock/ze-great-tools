@@ -66,7 +66,7 @@ fun GitAdapter.addCommitWithMessage(message: String): CommitRef {
 }
 
 suspend fun delayLongEnoughToAffectGitDate() {
-    withContext(Dispatchers.Default) {
+    withContext(Dispatchers.Unconfined) {
         delay(1.seconds)
     }
 }
