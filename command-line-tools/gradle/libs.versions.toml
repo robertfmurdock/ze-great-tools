@@ -1,5 +1,5 @@
 [libraries]
-com-github-ajalt-clikt-clikt = "com.github.ajalt.clikt:clikt:5.0.0"
+com-github-ajalt-clikt-clikt = "com.github.ajalt.clikt:clikt:5.0.1"
 org-jetbrains-kotlinx-kotlinx-serialization-bom = "org.jetbrains.kotlinx:kotlinx-serialization-bom:1.7.3"
 
 [plugins]
