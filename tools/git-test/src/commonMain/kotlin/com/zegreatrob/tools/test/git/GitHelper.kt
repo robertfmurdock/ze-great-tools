@@ -3,10 +3,6 @@ package com.zegreatrob.tools.test.git
 import com.zegreatrob.tools.adapter.git.CommitRef
 import com.zegreatrob.tools.adapter.git.GitAdapter
 import com.zegreatrob.tools.adapter.git.TagRef
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.withContext
-import kotlin.time.Duration.Companion.seconds
 
 val defaultAuthors: List<String>
     get() = listOf("funk@test.io", "test@funk.edu")
@@ -65,11 +61,7 @@ fun GitAdapter.addCommitWithMessage(message: String): CommitRef {
     return show("HEAD")!!
 }
 
-suspend fun delayLongEnoughToAffectGitDate() {
-    withContext(Dispatchers.Unconfined) {
-        delay(1.seconds)
-    }
-}
+expect suspend fun delayLongEnoughToAffectGitDate()
 
 fun GitAdapter.switchToNewBranch(name: String) {
     checkout(branch = name, newBranch = true)
