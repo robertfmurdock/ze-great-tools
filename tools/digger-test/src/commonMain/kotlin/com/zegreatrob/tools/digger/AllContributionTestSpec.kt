@@ -18,6 +18,7 @@ import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.time.Duration.Companion.minutes
 
 interface AllContributionTestSpec : SetupWithOverrides {
     var projectDir: String
@@ -344,7 +345,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
     }
 
     @Test
-    fun willHandleMergeCommitsOnMergedBranchesCorrectly() = runTest {
+    fun willHandleMergeCommitsOnMergedBranchesCorrectly() = runTest(timeout = 5.minutes) {
         setupWithDefaults()
         val gitAdapter = initializeGitRepo(listOf("first"))
         gitAdapter.config("user.name", "Test")
