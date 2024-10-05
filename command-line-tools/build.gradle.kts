@@ -48,5 +48,4 @@ tasks {
     }
 }
 
-
 fun Project.isSnapshot() = version.toString().contains("SNAPSHOT")

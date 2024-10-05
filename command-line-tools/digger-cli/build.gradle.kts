@@ -1,5 +1,6 @@
 
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
+import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootPlugin
 import org.jetbrains.kotlin.gradle.targets.js.npm.npmProject
 
 plugins {
@@ -99,3 +100,12 @@ tasks {
 }
 
 fun Project.isSnapshot() = version.toString().contains("SNAPSHOT")
+
+
+NodeJsRootPlugin.apply(project.rootProject)
+project.rootProject.tasks.named("kotlinNpmInstall") {
+    dependsOn(gradle.includedBuild("tools").task(":kotlinNpmInstall"))
+}
+project.rootProject.tasks.named("kotlinNodeJsSetup") {
+    dependsOn(provider { gradle.includedBuild("tools").task(":kotlinNodeJsSetup") })
+}
