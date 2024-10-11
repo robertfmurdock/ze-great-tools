@@ -1,4 +1,6 @@
+import org.apache.tools.ant.filters.ReplaceTokens
 import org.jetbrains.kotlin.gradle.targets.js.npm.npmProject
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     alias(libs.plugins.org.jetbrains.kotlin.multiplatform)
@@ -11,6 +13,8 @@ repositories {
     mavenCentral()
 }
 
+val generatedDirectory = project.layout.buildDirectory.dir("generated-sources/templates/kotlin/main")
+
 kotlin {
     jvm { withJava() }
     js(IR) {
@@ -19,6 +23,7 @@ kotlin {
             binaries.executable()
             testTask {
                 useMocha { timeout = "10s" }
+                environment("EXPECTED_VERSION", "${project.version}")
                 environment("GIT_CONFIG_GLOBAL", "/dev/null")
                 environment("GIT_CONFIG_SYSTEM", "/dev/null")
             }
@@ -54,6 +59,7 @@ dependencies {
 tasks {
     withType(Test::class) {
         useJUnitPlatform()
+        environment("EXPECTED_VERSION", project.version)
         environment("GIT_CONFIG_GLOBAL", "/dev/null")
         environment("GIT_CONFIG_SYSTEM", "/dev/null")
     }
@@ -96,6 +102,20 @@ tasks {
     val publish by creating {
         dependsOn(jsPublish)
         mustRunAfter(check)
+    }
+    val copyTemplates by registering(Copy::class) {
+        inputs.property("version", rootProject.version)
+        filteringCharset = "UTF-8"
+        from(project.projectDir.resolve("src/commonMain/templates")) {
+            filter<ReplaceTokens>("tokens" to mapOf("TAGGER_VERSION" to rootProject.version))
+        }
+        into(generatedDirectory)
+    }
+    withType<KotlinCompile> {
+        dependsOn(copyTemplates)
+    }
+    kotlin.sourceSets {
+        commonMain { kotlin.srcDir(copyTemplates) }
     }
 }
 
