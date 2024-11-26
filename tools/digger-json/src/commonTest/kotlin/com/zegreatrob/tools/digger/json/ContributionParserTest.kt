@@ -82,23 +82,22 @@ class ContributionParserTest {
         assertEquals(contributions, loaded)
     }
 
-    private fun stubContribution() =
-        Contribution(
-            lastCommit = "${uuid4()}",
-            firstCommit = "${uuid4()}",
-            authors = listOf("${uuid4()}"),
-            dateTime =
-            randomInstant(),
-            firstCommitDateTime =
-            randomInstant(),
-            ease = Random.nextInt(),
-            storyId = "${uuid4()}",
-            semver = "${uuid4()}",
-            label = "${uuid4()}",
-            tagDateTime = randomInstant(),
-            tagName = "${uuid4()}",
-            commitCount = Random.nextInt(10),
-        )
+    private fun stubContribution() = Contribution(
+        lastCommit = "${uuid4()}",
+        firstCommit = "${uuid4()}",
+        authors = listOf("${uuid4()}"),
+        dateTime =
+        randomInstant(),
+        firstCommitDateTime =
+        randomInstant(),
+        ease = Random.nextInt(),
+        storyId = "${uuid4()}",
+        semver = "${uuid4()}",
+        label = "${uuid4()}",
+        tagDateTime = randomInstant(),
+        tagName = "${uuid4()}",
+        commitCount = Random.nextInt(10),
+    )
 
     private fun randomInstant() = Instant.fromEpochMilliseconds(
         epochMilliseconds =

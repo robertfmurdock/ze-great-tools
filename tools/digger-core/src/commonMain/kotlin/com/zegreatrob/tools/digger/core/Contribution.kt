@@ -44,10 +44,9 @@ private fun mergedStoryIds(messageDigResults: List<CommitInspectionResult>) = me
         }
     }
 
-private fun CommitRef.commitInspectionResult(digResult: MessageDigResult) =
-    CommitInspectionResult(
-        storyId = digResult.storyId,
-        ease = digResult.ease,
-        authors = listOf(committerEmail, authorEmail) + digResult.coauthors,
-        semver = digResult.semver,
-    )
+private fun CommitRef.commitInspectionResult(digResult: MessageDigResult) = CommitInspectionResult(
+    storyId = digResult.storyId,
+    ease = digResult.ease,
+    authors = listOf(committerEmail, authorEmail) + digResult.coauthors,
+    semver = digResult.semver,
+)

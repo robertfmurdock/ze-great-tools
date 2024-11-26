@@ -11,19 +11,18 @@ class DiggerCore(
 ) {
     private fun tagRefs() = gitWrapper.listTags().filter { tagRegex.matches(it.name) }
 
-    fun currentContributionData() =
-        with(gitWrapper) {
-            val (currentTag, previousTag) = currentRelevantTags(
-                headCommitId = headCommitId(),
-                lastTwoTags = tagRefs().take(2),
+    fun currentContributionData() = with(gitWrapper) {
+        val (currentTag, previousTag) = currentRelevantTags(
+            headCommitId = headCommitId(),
+            lastTwoTags = tagRefs().take(2),
+        )
+        messageDigger.contribution(currentContributionCommits(previousTag))
+            .copy(
+                label = label,
+                tagName = currentTag?.name,
+                tagDateTime = currentTag?.dateTime,
             )
-            messageDigger.contribution(currentContributionCommits(previousTag))
-                .copy(
-                    label = label,
-                    tagName = currentTag?.name,
-                    tagDateTime = currentTag?.dateTime,
-                )
-        }
+    }
 
     private fun currentRelevantTags(
         headCommitId: String,

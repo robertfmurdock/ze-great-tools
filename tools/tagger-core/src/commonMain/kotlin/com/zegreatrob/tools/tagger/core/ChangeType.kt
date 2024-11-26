@@ -51,12 +51,11 @@ private fun findAppropriateIncrement(
     previousTag: String,
     implicitPatch: Boolean,
     minorRegex: VersionRegex,
-): ChangeType? =
-    gitAdapter.logWithRange("HEAD", "^$previousTag")
-        .also { if (it.isEmpty()) return null }
-        .map { it.changeType(minorRegex) ?: if (implicitPatch) ChangeType.Patch else null }
-        .fold(null, ::highestPriority)
-        ?: if (implicitPatch) ChangeType.Patch else ChangeType.None
+): ChangeType? = gitAdapter.logWithRange("HEAD", "^$previousTag")
+    .also { if (it.isEmpty()) return null }
+    .map { it.changeType(minorRegex) ?: if (implicitPatch) ChangeType.Patch else null }
+    .fold(null, ::highestPriority)
+    ?: if (implicitPatch) ChangeType.Patch else ChangeType.None
 
 private fun highestPriority(
     left: ChangeType?,
@@ -127,25 +126,23 @@ enum class SnapshotReason {
     fun reasonIsValid(check: StatusCheck): Boolean = check.exists()
 }
 
-fun TaggerCore.tagReport() =
-    adapter.listTags()
-        .groupBy { tag ->
-            "${tag.dateTime.toLocalDateTime(TimeZone.currentSystemDefault()).year} Week ${tag.weekNumber()}"
-        }
-        .toList()
-        .sortedBy { (key) -> key }
-        .joinToString("\n") { (key, value) ->
-            "$key has ${value.size} tags [${value.joinToString { tag -> tag.name }}]"
-        }
-
-private fun TagRef.weekNumber() =
-    "${dateTime.toLocalDateTime(TimeZone.currentSystemDefault()).dayOfYear / 7}".let {
-        if (it.length == 1) {
-            "0$it"
-        } else {
-            it
-        }
+fun TaggerCore.tagReport() = adapter.listTags()
+    .groupBy { tag ->
+        "${tag.dateTime.toLocalDateTime(TimeZone.currentSystemDefault()).year} Week ${tag.weekNumber()}"
     }
+    .toList()
+    .sortedBy { (key) -> key }
+    .joinToString("\n") { (key, value) ->
+        "$key has ${value.size} tags [${value.joinToString { tag -> tag.name }}]"
+    }
+
+private fun TagRef.weekNumber() = "${dateTime.toLocalDateTime(TimeZone.currentSystemDefault()).dayOfYear / 7}".let {
+    if (it.length == 1) {
+        "0$it"
+    } else {
+        it
+    }
+}
 
 fun VersionRegex.changeType(message: String): ChangeType? = when {
     unified?.containsMatchIn(message) == true -> findMatchType(message, unified)
@@ -170,6 +167,5 @@ private fun findMatchType(
     }
 }
 
-private fun MatchGroupCollection?.groupExists(groupName: String): Boolean =
-    runCatching { this?.get(groupName) != null }
-        .getOrDefault(false)
+private fun MatchGroupCollection?.groupExists(groupName: String): Boolean = runCatching { this?.get(groupName) != null }
+    .getOrDefault(false)

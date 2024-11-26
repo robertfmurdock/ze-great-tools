@@ -62,25 +62,22 @@ private fun Regex.cleaned(): String {
     }
 }
 
-private fun Sequence<MatchResult>.messageDigResult() =
-    MessageDigResult(
-        coauthors = mapNotNull { it.groups["coAuthors"]?.value }.toList(),
-        semver = mapNotNull { getSemver(it) }.maxOrNull(),
-        storyId = firstNotNullOfOrNull { it.groups["storyId"] }?.value,
-        ease = firstNotNullOfOrNull { it.groups["ease"] }?.value?.toIntOrNull(),
-    )
+private fun Sequence<MatchResult>.messageDigResult() = MessageDigResult(
+    coauthors = mapNotNull { it.groups["coAuthors"]?.value }.toList(),
+    semver = mapNotNull { getSemver(it) }.maxOrNull(),
+    storyId = firstNotNullOfOrNull { it.groups["storyId"] }?.value,
+    ease = firstNotNullOfOrNull { it.groups["ease"] }?.value?.toIntOrNull(),
+)
 
-private fun getSemver(it: MatchResult) =
-    when {
-        it.groupMatches("major") -> SemverType.Major
-        it.groupMatches("minor") -> SemverType.Minor
-        it.groupMatches("patch") -> SemverType.Patch
-        it.groupMatches("none") -> SemverType.None
-        else -> null
-    }
+private fun getSemver(it: MatchResult) = when {
+    it.groupMatches("major") -> SemverType.Major
+    it.groupMatches("minor") -> SemverType.Minor
+    it.groupMatches("patch") -> SemverType.Patch
+    it.groupMatches("none") -> SemverType.None
+    else -> null
+}
 
-private fun MatchResult.groupMatches(groupName: String) =
-    runCatching { this@groupMatches.groups[groupName] }
-        .getOrNull() != null
+private fun MatchResult.groupMatches(groupName: String) = runCatching { this@groupMatches.groups[groupName] }
+    .getOrNull() != null
 
 fun List<SemverType>.highestPrioritySemver() = maxOrNull()
