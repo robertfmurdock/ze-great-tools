@@ -13,8 +13,7 @@ class GitAdapter(private val workingDirectory: String, private val env: Map<Stri
         ),
     ).trim()
 
-    private fun runProcess(args: List<String>, env: Map<String, String> = emptyMap()) =
-        runProcess(args, workingDirectory, env.plus(this.env))
+    private fun runProcess(args: List<String>, env: Map<String, String> = emptyMap()) = runProcess(args, workingDirectory, env.plus(this.env))
 
     fun newAnnotatedTag(name: String, ref: String, userName: String?, userEmail: String?) {
         runProcess(
@@ -44,8 +43,7 @@ class GitAdapter(private val workingDirectory: String, private val env: Map<Stri
         )
     }
 
-    private fun inlineConfig(property: String, value: String?) =
-        if (value != null) listOf("-c", "$property=$value") else emptyList()
+    private fun inlineConfig(property: String, value: String?) = if (value != null) listOf("-c", "$property=$value") else emptyList()
 
     fun pushTags() {
         runProcess(listOf("git", "push", "--tags"))
@@ -174,8 +172,7 @@ class GitAdapter(private val workingDirectory: String, private val env: Map<Stri
             )
         }
 
-    private fun List<String>.findByPrefix(prefix: String) =
-        find { it.startsWith(prefix) }?.substring(prefix.length)
+    private fun List<String>.findByPrefix(prefix: String) = find { it.startsWith(prefix) }?.substring(prefix.length)
 
     fun describe(abbrev: Int): String? = runCatching {
         runProcess(listOf("git", "describe", "--abbrev=$abbrev"))

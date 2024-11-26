@@ -64,14 +64,13 @@ open class TaggerExtension(
         ).version
     }
 
-    private fun versionRegex() =
-        VersionRegex(
-            none = noneRegex.get(),
-            patch = patchRegex.get(),
-            minor = minorRegex.get(),
-            major = majorRegex.get(),
-            unified = versionRegex.orNull?.also { it.validateVersionRegex() },
-        )
+    private fun versionRegex() = VersionRegex(
+        none = noneRegex.get(),
+        patch = patchRegex.get(),
+        minor = minorRegex.get(),
+        major = majorRegex.get(),
+        unified = versionRegex.orNull?.also { it.validateVersionRegex() },
+    )
 }
 
 private fun Regex.validateVersionRegex() {

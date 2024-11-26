@@ -30,7 +30,6 @@ fun GitAdapter.sortIntoTagSets(
         }
     }.filter { it.second.isNotEmpty() }
 
-private fun List<TagRef>.tagPairs(): List<Pair<TagRef?, TagRef?>> =
-    listOf(Pair(null, firstOrNull())) + mapIndexed { index, commitRef ->
-        commitRef to getOrNull(index + 1)
-    }
+private fun List<TagRef>.tagPairs(): List<Pair<TagRef?, TagRef?>> = listOf(Pair(null, firstOrNull())) + mapIndexed { index, commitRef ->
+    commitRef to getOrNull(index + 1)
+}

@@ -32,30 +32,27 @@ object ContributionParser {
         ignoreUnknownKeys = true
     }
 
-    fun parseContributions(jsonString: String) =
-        json.decodeFromString<Array<ContributionJson>>(jsonString)
-            .map(ContributionJson::toModel)
+    fun parseContributions(jsonString: String) = json.decodeFromString<Array<ContributionJson>>(jsonString)
+        .map(ContributionJson::toModel)
 
-    fun parseContribution(jsonString: String) =
-        json.decodeFromString<ContributionJson?>(jsonString)
-            ?.toModel()
+    fun parseContribution(jsonString: String) = json.decodeFromString<ContributionJson?>(jsonString)
+        ?.toModel()
 }
 
-private fun Contribution.toJsonModel() =
-    ContributionJson(
-        lastCommit = lastCommit,
-        firstCommit = firstCommit,
-        authors = authors,
-        dateTime = dateTime,
-        firstCommitDateTime = firstCommitDateTime,
-        ease = ease,
-        storyId = storyId,
-        semver = semver,
-        label = label,
-        tagName = tagName,
-        tagDateTime = tagDateTime,
-        commitCount = commitCount,
-    )
+private fun Contribution.toJsonModel() = ContributionJson(
+    lastCommit = lastCommit,
+    firstCommit = firstCommit,
+    authors = authors,
+    dateTime = dateTime,
+    firstCommitDateTime = firstCommitDateTime,
+    ease = ease,
+    storyId = storyId,
+    semver = semver,
+    label = label,
+    tagName = tagName,
+    tagDateTime = tagDateTime,
+    commitCount = commitCount,
+)
 
 private fun ContributionJson.toModel() = Contribution(
     lastCommit = lastCommit,

@@ -64,11 +64,10 @@ interface CalculateVersionTestSpec {
     }
 
     fun execute(): TestResult
-    fun runCalculateVersionSuccessfully(): String =
-        when (val result = execute()) {
-            is TestResult.Success -> result.message
-            is TestResult.Failure -> fail("Expected success but got ${result.reason}")
-        }
+    fun runCalculateVersionSuccessfully(): String = when (val result = execute()) {
+        is TestResult.Success -> result.message
+        is TestResult.Failure -> fail("Expected success but got ${result.reason}")
+    }
 
     @Test
     fun calculatingVersionWithNoTagsProducesZeroVersion() {

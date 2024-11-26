@@ -7,6 +7,5 @@ object TagErrors {
 
     const val BEING_SNAPSHOT = "being snapshot"
     fun alreadyTagged(headTag: String?) = "already tagged $headTag"
-    fun skipMessageNotOnReleaseBranch(releaseBranch: String?, headBranch: String) =
-        "not on release branch $releaseBranch - branch was $headBranch"
+    fun skipMessageNotOnReleaseBranch(releaseBranch: String?, headBranch: String) = "not on release branch $releaseBranch - branch was $headBranch"
 }
