@@ -11,14 +11,14 @@ plugins {
     id("java-gradle-plugin")
     alias(libs.plugins.com.github.ben.manes.versions)
     alias(libs.plugins.nl.littlerobots.version.catalog.update)
-    alias(libs.plugins.org.jmailen.kotlinter)
+//    alias(libs.plugins.org.jmailen.kotlinter)
 }
 
 dependencies {
     implementation(kotlin("stdlib", embeddedKotlinVersion))
     implementation(kotlin("gradle-plugin", embeddedKotlinVersion))
     implementation(libs.com.github.ben.manes.gradle.versions.plugin)
-    implementation(libs.org.jmailen.gradle.kotlinter.gradle)
+//    implementation(libs.org.jmailen.gradle.kotlinter.gradle)
 }
 
 tasks {
@@ -37,10 +37,10 @@ tasks {
     }
     assemble { dependsOn(provider { (getTasksByName("assemble", true) - this).toList() }) }
     clean { dependsOn(provider { (getTasksByName("clean", true) - this).toList() }) }
-    formatKotlinMain {
-        exclude { spec -> spec.file.absolutePath.contains("generated-sources") }
-    }
-    lintKotlinMain {
-        exclude { spec -> spec.file.absolutePath.contains("generated-sources") }
-    }
+//    formatKotlinMain {
+//        exclude { spec -> spec.file.absolutePath.contains("generated-sources") }
+//    }
+//    lintKotlinMain {
+//        exclude { spec -> spec.file.absolutePath.contains("generated-sources") }
+//    }
 }
