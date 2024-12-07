@@ -29,10 +29,10 @@ tasks {
         environment("GIT_CONFIG_GLOBAL", "/dev/null")
         environment("GIT_CONFIG_SYSTEM", "/dev/null")
     }
-    formatKotlinCommonMain {
-        exclude { spec -> spec.file.absolutePath.contains("generated-sources") }
-    }
-    lintKotlinCommonMain {
-        exclude { spec -> spec.file.absolutePath.contains("generated-sources") }
-    }
+//    formatKotlinCommonMain {
+//        exclude { spec -> spec.file.absolutePath.contains("generated-sources") }
+//    }
+//    lintKotlinCommonMain {
+//        exclude { spec -> spec.file.absolutePath.contains("generated-sources") }
+//    }
 }

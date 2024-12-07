@@ -19,9 +19,9 @@ tasks {
     create("collectResults") {
         dependsOn(provider { (getTasksByName("collectResults", true) - this).toList() })
     }
-    register("formatKotlin") {
-        dependsOn(provider { (getTasksByName("formatKotlin", true) - this).toList() })
-    }
+//    register("formatKotlin") {
+//        dependsOn(provider { (getTasksByName("formatKotlin", true) - this).toList() })
+//    }
     register("release") {
         mustRunAfter(check)
         finalizedBy(provider { (getTasksByName("publish", true)).toList() })
