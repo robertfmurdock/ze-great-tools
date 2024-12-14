@@ -7,7 +7,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     alias(libs.plugins.org.jetbrains.kotlin.multiplatform)
-//    alias(libs.plugins.org.jmailen.kotlinter)
+    alias(libs.plugins.org.jmailen.kotlinter)
     alias(libs.plugins.com.github.ben.manes.versions)
 }
 

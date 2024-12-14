@@ -53,12 +53,12 @@ tasks {
     named<Test>("test") {
         useJUnitPlatform()
     }
-//    formatKotlinMain {
-//        exclude { spec -> spec.file.absolutePath.contains("generated-sources") }
-//    }
-//    lintKotlinMain {
-//        exclude { spec -> spec.file.absolutePath.contains("generated-sources") }
-//    }
+    formatKotlinMain {
+        exclude { spec -> spec.file.absolutePath.contains("generated-sources") }
+    }
+    lintKotlinMain {
+        exclude { spec -> spec.file.absolutePath.contains("generated-sources") }
+    }
 }
 
 

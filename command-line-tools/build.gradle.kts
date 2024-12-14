@@ -10,7 +10,7 @@ repositories {
 plugins {
     base
     alias(libs.plugins.org.jetbrains.kotlin.multiplatform) apply false
-//    alias(libs.plugins.org.jmailen.kotlinter)
+    alias(libs.plugins.org.jmailen.kotlinter)
     alias(libs.plugins.com.github.ben.manes.versions)
     alias(libs.plugins.nl.littlerobots.version.catalog.update)
 }
@@ -24,9 +24,9 @@ tasks {
     create("collectResults") {
         dependsOn(provider { (getTasksByName("collectResults", true) - this).toList() })
     }
-//    register("formatKotlin") {
-//        dependsOn(provider { (getTasksByName("formatKotlin", true) - this).toList() })
-//    }
+    register("formatKotlin") {
+        dependsOn(provider { (getTasksByName("formatKotlin", true) - this).toList() })
+    }
     register("release") {
         mustRunAfter(check)
         finalizedBy(provider { (getTasksByName("publish", true)).toList() })

@@ -36,9 +36,9 @@ tasks {
     create("versionCatalogUpdate") {
         dependsOn(provider { gradle.includedBuilds.map { it.task(":versionCatalogUpdate") }.toList() })
     }
-//    register("formatKotlin") {
-//        dependsOn(provider { gradle.includedBuilds.map { it.task(":formatKotlin") }.toList() })
-//    }
+    register("formatKotlin") {
+        dependsOn(provider { gradle.includedBuilds.map { it.task(":formatKotlin") }.toList() })
+    }
     val testBuilds = listOf(
         gradle.includedBuild("tools"),
     )
