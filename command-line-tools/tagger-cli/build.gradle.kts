@@ -105,7 +105,7 @@ tasks {
     check {
         dependsOn(confirmTaggerCanRun)
     }
-    val publish by creating {
+    val publish by registering {
         dependsOn(jsPublish)
         mustRunAfter(check)
     }
