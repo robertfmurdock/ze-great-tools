@@ -21,7 +21,7 @@ tasks {
     assemble { dependsOn(provider { (getTasksByName("assemble", true) - this).toList() }) }
     check { dependsOn(provider { (getTasksByName("check", true) - this).toList() }) }
     clean { dependsOn(provider { (getTasksByName("clean", true) - this).toList() }) }
-    create("collectResults") {
+    register("collectResults") {
         dependsOn(provider { (getTasksByName("collectResults", true) - this).toList() })
     }
     register("formatKotlin") {

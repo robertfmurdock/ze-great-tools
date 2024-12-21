@@ -29,7 +29,7 @@ class TaggerPluginTest {
             .build()
         rootProject.plugins.apply("com.zegreatrob.tools.tagger")
         val rootCheck = rootProject.tasks.named("check").get()
-        val innerProject1Check = innerProject1.tasks.create("check")
+        val innerProject1Check = innerProject1.tasks.register("check")
 
         val tagTask = rootProject.tasks.findByName("tag")!!
 
@@ -40,7 +40,7 @@ class TaggerPluginTest {
         )
         assertTrue(
             tagTask.mustRunAfter.getDependencies(tagTask)
-                .contains(innerProject1Check),
+                .contains(innerProject1Check.get()),
             "Did not run after inner project check",
         )
     }

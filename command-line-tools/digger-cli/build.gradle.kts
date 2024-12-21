@@ -99,7 +99,7 @@ tasks {
         workingDir(mainNpmProjectDir)
         commandLine("npm", "publish")
     }
-    val publish by creating {
+    val publish by registering {
         dependsOn(jsPublish)
         mustRunAfter(check)
     }

@@ -33,7 +33,7 @@ tasks {
     clean {
         dependsOn(provider { gradle.includedBuilds.map { it.task(":clean") }.toList() })
     }
-    create("versionCatalogUpdate") {
+    register("versionCatalogUpdate") {
         dependsOn(provider { gradle.includedBuilds.map { it.task(":versionCatalogUpdate") }.toList() })
     }
     register("formatKotlin") {
@@ -42,7 +42,7 @@ tasks {
     val testBuilds = listOf(
         gradle.includedBuild("tools"),
     )
-    create<Copy>("collectResults") {
+    register<Copy>("collectResults") {
         dependsOn(provider { (getTasksByName("collectResults", true) - this).toList() })
         dependsOn(provider { testBuilds.map { it.task(":collectResults") } })
         from(testBuilds.map { it.projectDir.resolve("build/test-output") })

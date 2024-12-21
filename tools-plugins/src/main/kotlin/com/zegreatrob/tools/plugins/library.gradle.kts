@@ -6,10 +6,10 @@ plugins {
 }
 
 tasks {
-    val javadocJar by creating(Jar::class) {
+    val javadocJar by registering(Jar::class, fun Jar.() {
         archiveClassifier.set("javadoc")
         from("${rootDir.absolutePath}/javadocs")
-    }
+    })
     publishing.publications {
         withType<MavenPublication> { artifact(javadocJar) }
     }
