@@ -1,6 +1,6 @@
 [libraries]
 com-github-ajalt-clikt-clikt = "com.github.ajalt.clikt:clikt:5.0.2"
-org-jetbrains-kotlinx-kotlinx-serialization-bom = "org.jetbrains.kotlinx:kotlinx-serialization-bom:1.7.3"
+org-jetbrains-kotlinx-kotlinx-serialization-bom = "org.jetbrains.kotlinx:kotlinx-serialization-bom:1.8.0"
 
 [plugins]
 com-github-ben-manes-versions = "com.github.ben-manes.versions:0.51.0"
