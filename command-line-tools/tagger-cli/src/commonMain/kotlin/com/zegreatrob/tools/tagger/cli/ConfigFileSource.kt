@@ -37,7 +37,7 @@ class ConfigFileSource(val envvarReader: (key: String) -> String?) : ValueSource
                 }
             }
             return ValueSource.Invocation.just(cursor.jsonPrimitive.content)
-        } catch (e: IllegalArgumentException) {
+        } catch (_: IllegalArgumentException) {
             return emptyList()
         }
     }
