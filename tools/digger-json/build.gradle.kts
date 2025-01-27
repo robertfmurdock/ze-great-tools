@@ -1,4 +1,8 @@
 @file:Suppress("UnstableApiUsage")
+@file:OptIn(ExperimentalKotlinGradlePluginApi::class)
+
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
+
 
 plugins {
     id("com.zegreatrob.tools.plugins.library")
@@ -13,7 +17,10 @@ repositories {
 
 kotlin {
     jvm()
-    js(IR) { nodejs() }
+    js(IR) {
+        compilerOptions { target = "es2015" }
+        nodejs()
+    }
 }
 
 dependencies {

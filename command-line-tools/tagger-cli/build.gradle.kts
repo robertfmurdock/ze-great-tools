@@ -20,8 +20,8 @@ val generatedDirectory = project.layout.buildDirectory.dir("generated-sources/te
 kotlin {
     jvm { withJava() }
     js(IR) {
+        compilerOptions { target = "es2015" }
         nodejs {
-            useCommonJs()
             binaries.executable()
             testTask {
                 useMocha { timeout = "10s" }

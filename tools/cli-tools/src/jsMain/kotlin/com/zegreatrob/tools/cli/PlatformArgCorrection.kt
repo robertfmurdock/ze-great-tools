@@ -1,6 +1,8 @@
 package com.zegreatrob.tools.cli
 
-private val process = js("require('node:process')")
+@JsModule("node:process")
+@JsNonModule
+private external val process: dynamic
 
 actual fun platformArgCorrection(args: Array<String>): Array<String> {
     val argv = process.argv.unsafeCast<Array<String>>()

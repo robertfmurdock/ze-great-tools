@@ -3,7 +3,9 @@ package com.zegreatrob.tools.adapter.git
 import kotlin.js.Json
 import kotlin.js.json
 
-private val childProcess = js("require('node:child_process')")
+@JsModule("node:child_process")
+@JsNonModule
+private external val childProcess: dynamic
 
 actual fun runProcess(args: List<String>, workingDirectory: String, env: Map<String, String>): String {
     val program = args.first()
