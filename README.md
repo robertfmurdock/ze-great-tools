@@ -37,10 +37,10 @@ See its [README](tools/digger-plugin/README.md) for more.
 
 An opinionated program for automatic semantic versioning via git tags and information in commits.
 
-See its [README](tools/tagger-cli/README.md) for more.
+See its [README](command-line-tools/tagger-cli/README.md) for more.
 
 ### Digger CLI
 
 A program for extracting contribution information from a git repository.
 
-See its [README](tools/digger-cli/README.md) for more.
+See its [README](command-line-tools/digger-cli/README.md) for more.
