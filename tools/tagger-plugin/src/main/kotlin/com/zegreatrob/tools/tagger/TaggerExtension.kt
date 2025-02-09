@@ -54,15 +54,13 @@ open class TaggerExtension(
 
     val core get() = TaggerCore(GitAdapter(workingDirectory.get().absolutePath))
 
-    val lastVersionAndTag by lazy { core.lastVersionAndTag() }
+    fun lastVersionAndTag() = core.lastVersionAndTag()
 
-    val version by lazy {
-        core.calculateNextVersion(
-            implicitPatch = implicitPatch.get(),
-            versionRegex = versionRegex(),
-            releaseBranch = releaseBranch ?: throw GradleException("Please configure the tagger release branch."),
-        ).version
-    }
+    fun calculateVersion() = core.calculateNextVersion(
+        implicitPatch = implicitPatch.get(),
+        versionRegex = versionRegex(),
+        releaseBranch = releaseBranch ?: throw GradleException("Please configure the tagger release branch."),
+    ).version
 
     private fun versionRegex() = VersionRegex(
         none = noneRegex.get(),

@@ -87,7 +87,7 @@ tasks {
         compression = Compression.GZIP
         archiveFileName.set("digger-cli-js.tgz")
     }
-    val jsLink by registering(Exec::class) {
+    register<Exec>("jsLink") {
         dependsOn(jsCliTar)
         workingDir(mainNpmProjectDir)
         commandLine("npm", "link")
@@ -99,7 +99,7 @@ tasks {
         workingDir(mainNpmProjectDir)
         commandLine("npm", "publish")
     }
-    val publish by registering {
+    register("publish") {
         dependsOn(jsPublish)
         mustRunAfter(check)
     }

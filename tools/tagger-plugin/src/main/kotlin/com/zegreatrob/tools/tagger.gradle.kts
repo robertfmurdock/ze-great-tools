@@ -17,7 +17,7 @@ tagger.workingDirectory.convention(project.rootDir)
 
 tasks {
     val exportToGithub = project.findProperty("exportToGithub")
-    val previousVersion by registering(PreviousVersion::class) {
+    register<PreviousVersion>("previousVersion") {
         this.taggerExtension = tagger
     }
     val calculateVersion by registering(CalculateVersion::class) {
@@ -55,7 +55,7 @@ tasks {
     }
 
     val githubRelease by registering(Exec::class) {
-        enabled = with(tagger) { !version.contains("SNAPSHOT") && githubReleaseEnabled.get() }
+        enabled = !version.toString().contains("SNAPSHOT") && tagger.githubReleaseEnabled.get()
         dependsOn(tag)
         val githubRepository = System.getenv("GITHUB_REPOSITORY")
         commandLine(
@@ -69,11 +69,11 @@ tasks {
             "X-GitHub-Api-Version: 2022-11-28",
             "/repos/$githubRepository/releases",
             "-f",
-            "tag_name=${tagger.version}",
+            "tag_name=${project.version}",
             "-f",
-            "name=${tagger.version}",
+            "name=${project.version}",
             "-f",
-            "body=${tagger.version}",
+            "body=${project.version}",
             "-F",
             "draft=false",
             "-F",
@@ -86,7 +86,7 @@ tasks {
     register<ReleaseVersion>("release") {
         taggerExtension = tagger
         version = "${project.version}"
-        enabled = !tagger.version.contains("SNAPSHOT")
+        enabled = !project.version.toString().contains("SNAPSHOT")
         dependsOn(assemble)
         mustRunAfter(check)
         finalizedBy(tag, githubRelease)

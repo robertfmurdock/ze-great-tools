@@ -12,6 +12,6 @@ open class PreviousVersion :
 
     @TaskAction
     fun execute() {
-        logger.quiet(taggerExtension.lastVersionAndTag?.first)
+        logger.quiet(taggerExtension.lastVersionAndTag()?.first)
     }
 }

@@ -16,11 +16,12 @@ open class CalculateVersion :
 
     @TaskAction
     fun execute() {
-        logger.quiet(taggerExtension.version)
+        val version = taggerExtension.calculateVersion()
+        logger.quiet(version)
         val githubEnvFile = System.getenv("GITHUB_ENV")
         if (exportToGithubEnv && githubEnvFile != null) {
             FileOutputStream(githubEnvFile, true)
-                .write("TAGGER_VERSION=${taggerExtension.version}".toByteArray())
+                .write("TAGGER_VERSION=$version".toByteArray())
         }
     }
 }
