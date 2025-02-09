@@ -17,14 +17,12 @@ digger.workingDirectory.convention(project.rootDir)
 val exportToGithub = project.findProperty("exportToGithub")
 val diggerBuildDirectory: Provider<Directory> = layout.buildDirectory.dir("digger")
 
-logger.warn("The 'digger' gradle plugin is current experimental. Be warned each update may make breaking changes.")
-
 tasks {
     val gitHead by registering(HeadTask::class) {
         this.diggerExtension = digger
         outputFile.set(diggerBuildDirectory.map { it.file("head") })
     }
-    val currentContributionData by registering(CurrentContributionData::class) {
+    register<CurrentContributionData>("currentContributionData") {
         this.diggerExtension = digger
         dependsOn(gitHead)
         inputs.file(gitHead.map { it.outputFile })
@@ -33,7 +31,7 @@ tasks {
             exportToGithubEnv = true
         }
     }
-    val allContributionData by registering(AllContributionData::class) {
+    register<AllContributionData>("allContributionData") {
         this.diggerExtension = digger
         dependsOn(gitHead)
         inputs.file(gitHead.map { it.outputFile })
