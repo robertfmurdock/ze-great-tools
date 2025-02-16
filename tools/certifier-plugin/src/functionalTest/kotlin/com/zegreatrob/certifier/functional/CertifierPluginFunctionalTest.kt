@@ -5,6 +5,7 @@ import org.junit.jupiter.api.io.TempDir
 import java.io.File
 import kotlin.test.BeforeTest
 import kotlin.test.Test
+import kotlin.test.assertContains
 
 class CertifierPluginFunctionalTest {
     @field:TempDir
@@ -31,7 +32,7 @@ class CertifierPluginFunctionalTest {
             }
 
             tasks {
-                register("installCert", com.zegreatrob.tools.certifier.InstallCertificate::class) {
+                installCert {
                     jdkSelector = "20"
                     certificatePath = "$certificatePath"
                 }
@@ -46,5 +47,58 @@ class CertifierPluginFunctionalTest {
         runner.withArguments("installCert")
         runner.withProjectDir(projectDir)
         runner.build()
+    }
+
+    @Test
+    fun `will emit error when no jdk selected`() {
+        val certificatePath = this.javaClass.getResource("/localhost.crt")?.toURI()?.path
+
+        buildFile.writeText(
+            """
+            plugins {
+                id("com.zegreatrob.tools.certifier")
+            }
+
+            tasks {
+                installCert {
+                    certificatePath = "$certificatePath"
+                }
+            }
+
+            """.trimIndent(),
+        )
+
+        val runner = GradleRunner.create()
+        runner.forwardOutput()
+        runner.withPluginClasspath()
+        runner.withArguments("installCert")
+        runner.withProjectDir(projectDir)
+        val result = runner.buildAndFail()
+        assertContains(result.output, "property 'jdkSelector' doesn't have a configured value")
+    }
+
+    @Test
+    fun `will emit error when no certificate selected`() {
+        buildFile.writeText(
+            """
+            plugins {
+                id("com.zegreatrob.tools.certifier")
+            }
+
+            tasks {
+                installCert {
+                    jdkSelector = "20"
+                }
+            }
+            """.trimIndent(),
+        )
+
+        val runner = GradleRunner.create()
+        runner.forwardOutput()
+        runner.withPluginClasspath()
+        runner.withArguments("installCert")
+        runner.withProjectDir(projectDir)
+        val result = runner.buildAndFail()
+        assertContains(result.output, "property 'certificatePath' doesn't have a configured value")
     }
 }
