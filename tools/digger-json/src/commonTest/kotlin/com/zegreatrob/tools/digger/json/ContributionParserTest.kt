@@ -1,6 +1,7 @@
+@file:OptIn(ExperimentalUuidApi::class)
+
 package com.zegreatrob.tools.digger.json
 
-import com.benasher44.uuid.uuid4
 import com.zegreatrob.tools.digger.model.Contribution
 import kotlinx.datetime.Instant
 import kotlinx.serialization.json.Json
@@ -10,6 +11,8 @@ import kotlinx.serialization.json.put
 import kotlin.random.Random
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 
 class ContributionParserTest {
     @Test
@@ -83,19 +86,19 @@ class ContributionParserTest {
     }
 
     private fun stubContribution() = Contribution(
-        lastCommit = "${uuid4()}",
-        firstCommit = "${uuid4()}",
-        authors = listOf("${uuid4()}"),
+        lastCommit = "${Uuid.random()}",
+        firstCommit = "${Uuid.random()}",
+        authors = listOf("${Uuid.random()}"),
         dateTime =
         randomInstant(),
         firstCommitDateTime =
         randomInstant(),
         ease = Random.nextInt(),
-        storyId = "${uuid4()}",
-        semver = "${uuid4()}",
-        label = "${uuid4()}",
+        storyId = "${Uuid.random()}",
+        semver = "${Uuid.random()}",
+        label = "${Uuid.random()}",
         tagDateTime = randomInstant(),
-        tagName = "${uuid4()}",
+        tagName = "${Uuid.random()}",
         commitCount = Random.nextInt(10),
     )
 
