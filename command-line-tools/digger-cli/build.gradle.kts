@@ -99,8 +99,12 @@ tasks {
         workingDir(mainNpmProjectDir)
         commandLine("npm", "publish")
     }
+    val copyReadme by registering(Copy::class) {
+        from(layout.projectDirectory.file("README.md"))
+        into(mainNpmProjectDir)
+    }
     register("publish") {
-        dependsOn(jsPublish)
+        dependsOn(jsPublish, copyReadme)
         mustRunAfter(check)
     }
     val copyTemplates by registering(Copy::class) {

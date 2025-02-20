@@ -1,4 +1,3 @@
-
 import org.apache.tools.ant.filters.ReplaceTokens
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.targets.js.npm.npmProject
@@ -85,7 +84,7 @@ tasks {
         compression = Compression.GZIP
         archiveFileName.set("tagger-cli-js.tgz")
     }
-    val jsLink by registering(Exec::class) {
+    register("jsLink", Exec::class) {
         dependsOn(jsCliTar)
         workingDir(mainNpmProjectDir)
         commandLine("npm", "link")
@@ -95,8 +94,12 @@ tasks {
         workingDir(mainNpmProjectDir)
         commandLine("kotlin/bin/tagger", "calculate-version")
     }
+    val copyReadme by registering(Copy::class) {
+        from(layout.projectDirectory.file("README.md"))
+        into(mainNpmProjectDir)
+    }
     val jsPublish by registering(Exec::class) {
-        dependsOn(jsCliTar)
+        dependsOn(jsCliTar, copyReadme)
         enabled = !isSnapshot()
         mustRunAfter(check)
         workingDir(mainNpmProjectDir)
@@ -105,7 +108,7 @@ tasks {
     check {
         dependsOn(confirmTaggerCanRun)
     }
-    val publish by registering {
+    register("publish") {
         dependsOn(jsPublish)
         mustRunAfter(check)
     }
