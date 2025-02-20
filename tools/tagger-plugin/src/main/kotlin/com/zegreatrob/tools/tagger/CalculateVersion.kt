@@ -1,6 +1,8 @@
 package com.zegreatrob.tools.tagger
 
+import com.zegreatrob.tools.tagger.core.VersionResult
 import org.gradle.api.DefaultTask
+import org.gradle.api.GradleException
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskAction
 import java.io.FileOutputStream
@@ -16,12 +18,19 @@ open class CalculateVersion :
 
     @TaskAction
     fun execute() {
-        val version = taggerExtension.calculateVersion()
-        logger.quiet(version)
-        val githubEnvFile = System.getenv("GITHUB_ENV")
-        if (exportToGithubEnv && githubEnvFile != null) {
-            FileOutputStream(githubEnvFile, true)
-                .write("TAGGER_VERSION=$version".toByteArray())
+        val result = taggerExtension.calculateVersion()
+        when (result) {
+            is VersionResult.Failure ->
+                throw GradleException(result.reasons.joinToString("\n") { it.message })
+
+            is VersionResult.Success -> {
+                logger.quiet(result.version)
+                val githubEnvFile = System.getenv("GITHUB_ENV")
+                if (exportToGithubEnv && githubEnvFile != null) {
+                    FileOutputStream(githubEnvFile, true)
+                        .write("TAGGER_VERSION=$result".toByteArray())
+                }
+            }
         }
     }
 }

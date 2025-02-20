@@ -12,8 +12,12 @@ fun TaggerCore.calculateNextVersion(
     versionRegex: VersionRegex,
     releaseBranch: String,
 ): VersionResult {
+    val gitStatus = this.adapter.status()
+    if (gitStatus.upstream.isEmpty()) {
+        return VersionResult.Failure(listOf(FailureVersionReasons.NoRemote))
+    }
     val (previousVersionNumber, lastTagDescription) = lastVersionAndTag()
-        ?: return VersionResult("0.0.0")
+        ?: return VersionResult.Success("0.0.0")
 
     val incrementComponent = findAppropriateIncrement(adapter, lastTagDescription, implicitPatch, versionRegex)
     val currentVersionNumber = (
@@ -21,25 +25,26 @@ fun TaggerCore.calculateNextVersion(
             ?: previousVersionNumber
         )
 
-    val reasonsToUseSnapshot = snapshotReasons(releaseBranch, currentVersionNumber, previousVersionNumber)
+    val reasonsToUseSnapshot = snapshotReasons(
+        releaseBranch,
+        currentVersionNumber,
+        previousVersionNumber,
+        gitStatus,
+    )
     return if (reasonsToUseSnapshot.isEmpty()) {
-        VersionResult(currentVersionNumber)
+        VersionResult.Success(currentVersionNumber)
     } else {
-        VersionResult("$currentVersionNumber-SNAPSHOT", reasonsToUseSnapshot)
+        VersionResult.Success("$currentVersionNumber-SNAPSHOT", reasonsToUseSnapshot)
     }
 }
 
-data class VersionResult(
-    val version: String,
-    val snapshotReasons: List<SnapshotReason> = emptyList(),
-)
-
-private fun TaggerCore.snapshotReasons(
+private fun snapshotReasons(
     releaseBranch: String,
     currentVersionNumber: String,
     previousVersionNumber: String,
+    gitStatus: GitStatus,
 ) = StatusCheck(
-    gitStatus = adapter.status(),
+    gitStatus = gitStatus,
     releaseBranch = releaseBranch,
     currentVersionNumber = currentVersionNumber,
     previousVersionNumber = previousVersionNumber,

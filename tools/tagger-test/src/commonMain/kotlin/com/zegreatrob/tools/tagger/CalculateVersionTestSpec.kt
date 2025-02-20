@@ -64,13 +64,14 @@ interface CalculateVersionTestSpec {
     }
 
     fun execute(): TestResult
+
     fun runCalculateVersionSuccessfully(): String = when (val result = execute()) {
         is TestResult.Success -> result.message
         is TestResult.Failure -> fail("Expected success but got ${result.reason}")
     }
 
     @Test
-    fun calculatingVersionWithNoTagsProducesZeroVersion() {
+    fun withNoTagsProducesZeroVersion() {
         configureWithDefaults()
 
         initializeGitRepo(listOf("init", "[patch] commit 1", "[patch] commit 2"))
@@ -80,7 +81,26 @@ interface CalculateVersionTestSpec {
     }
 
     @Test
-    fun calculatingVersionWhenCurrentCommitAlreadyHasTagWillUseTag() {
+    fun whenNoRemoteProduceError() {
+        configureWithDefaults()
+
+        initializeGitRepo(
+            directory = projectDir,
+            remoteUrl = null,
+            addFileNames = addFileNames,
+            commits = listOf<String>("init", "commit (no) 1"),
+        )
+        when (val result = execute()) {
+            is TestResult.Failure -> assertContains(
+                result.reason,
+                "Inappropriate configuration: repository has no remote.",
+            )
+            is TestResult.Success -> fail("Should not have succeeded.")
+        }
+    }
+
+    @Test
+    fun whenCurrentCommitAlreadyHasTagWillUseTag() {
         configureWithDefaults()
 
         val gitAdapter = GitAdapter(
@@ -97,14 +117,16 @@ interface CalculateVersionTestSpec {
         gitAdapter.addCommitWithMessage("test commit")
         gitAdapter.newAnnotatedTag("1.0.23", "HEAD", "test", "test")
         gitAdapter.checkout("main", newBranch = true)
-        gitAdapter.addRemote("origin", projectDir)
+        gitAdapter.addRemote(name = "origin", url = projectDir)
+        gitAdapter.fetch()
+        gitAdapter.setBranchUpstream("origin/main", "main")
         val version = runCalculateVersionSuccessfully()
 
         assertEquals("1.0.23-SNAPSHOT", version)
     }
 
     @Test
-    fun calculatingVersionWithAllPatchCommitsOnlyIncrementsPatch() {
+    fun withAllPatchCommitsOnlyIncrementsPatch() {
         configureWithDefaults()
 
         initializeGitRepo(listOf("init", "[patch] commit 1", "[patch] commit 2"), initialTag = "1.2.3")
@@ -164,7 +186,7 @@ interface CalculateVersionTestSpec {
     }
 
     @Test
-    fun calculatingVersionWithOneMinorCommitsOnlyIncrementsMinor() {
+    fun withOneMinorCommitsOnlyIncrementsMinor() {
         configureWithDefaults()
 
         initializeGitRepo(

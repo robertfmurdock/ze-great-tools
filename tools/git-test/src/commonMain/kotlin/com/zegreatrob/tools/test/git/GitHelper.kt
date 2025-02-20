@@ -13,7 +13,7 @@ val defaultAuthors: List<String>
 
 fun initializeGitRepo(
     directory: String,
-    remoteUrl: String = directory,
+    remoteUrl: String? = directory,
     addFileNames: Set<String>,
     commits: List<String> = listOf(),
     initialTag: String? = null,
@@ -39,12 +39,14 @@ fun initializeGitRepo(
             gitAdapter.newAnnotatedTag(initialTag, "HEAD", "Funky Testerson", "funk@test.io")
         }
     }
-    gitAdapter.addRemote(name = "origin", url = remoteUrl)
-    gitAdapter.fetch()
-    if (remoteUrl != directory) {
-        gitAdapter.push(true, upstream = "origin", branch = "master")
-    } else {
-        gitAdapter.setBranchUpstream("origin/master", "master")
+    if (remoteUrl != null) {
+        gitAdapter.addRemote(name = "origin", url = remoteUrl)
+        gitAdapter.fetch()
+        if (remoteUrl != directory) {
+            gitAdapter.push(true, upstream = "origin", branch = "master")
+        } else {
+            gitAdapter.setBranchUpstream("origin/master", "master")
+        }
     }
     return gitAdapter
 }

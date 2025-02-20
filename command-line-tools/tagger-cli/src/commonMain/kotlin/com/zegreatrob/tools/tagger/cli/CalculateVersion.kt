@@ -10,8 +10,10 @@ import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.boolean
 import com.zegreatrob.tools.adapter.git.GitAdapter
+import com.zegreatrob.tools.tagger.core.SnapshotReason
 import com.zegreatrob.tools.tagger.core.TaggerCore
 import com.zegreatrob.tools.tagger.core.VersionRegex
+import com.zegreatrob.tools.tagger.core.VersionResult
 import com.zegreatrob.tools.tagger.core.calculateNextVersion
 
 class CalculateVersion : CliktCommand() {
@@ -42,9 +44,21 @@ class CalculateVersion : CliktCommand() {
                 releaseBranch = releaseBranch ?: "",
             )
             .run {
-                echo(version)
-                echo(snapshotReasons, err = true)
+                when (this) {
+                    is VersionResult.Success -> output(message = version, errorMessage = snapshotReasons)
+                    is VersionResult.Failure -> throw CliktError(this.reasons.joinToString("\n") { it.message })
+                }
             }
+    }
+
+    private fun output(
+        message: String,
+        errorMessage: List<SnapshotReason>,
+    ) {
+        echo(message)
+        if (errorMessage.isNotEmpty()) {
+            echo(errorMessage, err = true)
+        }
     }
 
     private fun versionRegex() = VersionRegex(
