@@ -17,24 +17,16 @@ open class CalculateVersion :
     var exportToGithubEnv: Boolean = false
 
     @TaskAction
-    fun execute() {
-        val result = taggerExtension.calculateVersion()
-        when (result) {
-            is VersionResult.Failure ->
-                throw GradleException(result.reasons.joinToString("\n") { it.message })
-
-            is VersionResult.Success -> {
-                result.outputSuccess()
-            }
-        }
+    fun execute() = when (val result = taggerExtension.calculateVersion()) {
+        is VersionResult.Success -> result.outputSuccess()
+        is VersionResult.Failure -> throw GradleException(result.message)
     }
 
     private fun VersionResult.Success.outputSuccess() {
         logger.quiet(version)
         val githubEnvFile = System.getenv("GITHUB_ENV")
         if (exportToGithubEnv && githubEnvFile != null) {
-            FileOutputStream(githubEnvFile, true)
-                .write("TAGGER_VERSION=$version".toByteArray())
+            FileOutputStream(githubEnvFile, true).write("TAGGER_VERSION=$version".toByteArray())
         }
     }
 }

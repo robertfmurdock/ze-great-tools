@@ -17,7 +17,7 @@ fun TaggerCore.calculateNextVersion(
         return VersionResult.Failure(listOf(FailureVersionReasons.NoRemote))
     }
     val (previousVersionNumber, lastTagDescription) = lastVersionAndTag()
-        ?: return VersionResult.Success("0.0.0")
+        ?: return VersionResult.Failure(listOf(FailureVersionReasons.NoTagsExist))
 
     val incrementComponent = findAppropriateIncrement(adapter, lastTagDescription, implicitPatch, versionRegex)
     val currentVersionNumber = (

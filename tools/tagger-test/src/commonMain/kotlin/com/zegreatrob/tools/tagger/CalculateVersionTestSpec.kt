@@ -71,13 +71,18 @@ interface CalculateVersionTestSpec {
     }
 
     @Test
-    fun withNoTagsProducesZeroVersion() {
+    fun withNoTagsProducesError() {
         configureWithDefaults()
 
         initializeGitRepo(listOf("init", "[patch] commit 1", "[patch] commit 2"))
-        val version = runCalculateVersionSuccessfully()
-
-        assertEquals("0.0.0", version)
+        when (val result = execute()) {
+            is TestResult.Failure ->
+                assertContains(
+                    result.reason,
+                    Regex("Inappropriate configuration: repository has no tags.\\s*\n\\s*If this is a new repository, use `tag` to set the initial version."),
+                )
+            is TestResult.Success -> fail("Should not have succeeded.")
+        }
     }
 
     @Test

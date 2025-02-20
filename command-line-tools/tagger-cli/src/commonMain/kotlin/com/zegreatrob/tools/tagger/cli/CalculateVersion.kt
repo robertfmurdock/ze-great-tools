@@ -46,7 +46,7 @@ class CalculateVersion : CliktCommand() {
             .run {
                 when (this) {
                     is VersionResult.Success -> output(message = version, errorMessage = snapshotReasons)
-                    is VersionResult.Failure -> throw CliktError(this.reasons.joinToString("\n") { it.message })
+                    is VersionResult.Failure -> throw CliktError(message)
                 }
             }
     }
