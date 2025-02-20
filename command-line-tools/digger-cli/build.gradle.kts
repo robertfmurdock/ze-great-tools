@@ -1,4 +1,3 @@
-
 import org.apache.tools.ant.filters.ReplaceTokens
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootPlugin
@@ -75,6 +74,7 @@ tasks {
         applicationName = "digger"
     }
     val copyReadme by registering(Copy::class) {
+        dependsOn("jsPackageJson", ":kotlinNpmInstall")
         from(layout.projectDirectory.file("README.md"))
         into(mainNpmProjectDir)
     }

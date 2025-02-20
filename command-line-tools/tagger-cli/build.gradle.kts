@@ -72,6 +72,7 @@ tasks {
         applicationName = "tagger"
     }
     val copyReadme by registering(Copy::class) {
+        dependsOn("jsPackageJson", ":kotlinNpmInstall")
         from(layout.projectDirectory.file("README.md"))
         into(mainNpmProjectDir)
     }
