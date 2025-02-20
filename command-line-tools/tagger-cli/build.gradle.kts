@@ -71,8 +71,13 @@ tasks {
     withType<CreateStartScripts> {
         applicationName = "tagger"
     }
+    val copyReadme by registering(Copy::class) {
+        from(layout.projectDirectory.file("README.md"))
+        into(mainNpmProjectDir)
+    }
     val jsCliTar by registering(Tar::class) {
         dependsOn(
+            copyReadme,
             "jsPackageJson",
             ":kotlinNpmInstall",
             "compileKotlinJs",
@@ -94,12 +99,8 @@ tasks {
         workingDir(mainNpmProjectDir)
         commandLine("kotlin/bin/tagger", "calculate-version")
     }
-    val copyReadme by registering(Copy::class) {
-        from(layout.projectDirectory.file("README.md"))
-        into(mainNpmProjectDir)
-    }
     val jsPublish by registering(Exec::class) {
-        dependsOn(jsCliTar, copyReadme)
+        dependsOn(jsCliTar)
         enabled = !isSnapshot()
         mustRunAfter(check)
         workingDir(mainNpmProjectDir)

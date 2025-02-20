@@ -74,8 +74,13 @@ tasks {
     withType<CreateStartScripts> {
         applicationName = "digger"
     }
+    val copyReadme by registering(Copy::class) {
+        from(layout.projectDirectory.file("README.md"))
+        into(mainNpmProjectDir)
+    }
     val jsCliTar by registering(Tar::class) {
         dependsOn(
+            copyReadme,
             "jsPackageJson",
             ":kotlinNpmInstall",
             "compileKotlinJs",
@@ -99,12 +104,8 @@ tasks {
         workingDir(mainNpmProjectDir)
         commandLine("npm", "publish")
     }
-    val copyReadme by registering(Copy::class) {
-        from(layout.projectDirectory.file("README.md"))
-        into(mainNpmProjectDir)
-    }
     register("publish") {
-        dependsOn(jsPublish, copyReadme)
+        dependsOn(jsPublish)
         mustRunAfter(check)
     }
     val copyTemplates by registering(Copy::class) {
