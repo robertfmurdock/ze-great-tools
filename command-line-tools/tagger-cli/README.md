@@ -37,7 +37,7 @@ The `tag` command will create a tag with the given version and push it back to t
 
 We recommend this command only is run after the build is validated. Use discernment to decide if it should happen before publication of artifacts, or afterward.
 
-g## Help
+### Help
 
 For a full listing of the available options in the program, please use the built-in help command.
 
