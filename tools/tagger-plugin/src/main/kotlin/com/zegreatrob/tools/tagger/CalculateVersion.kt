@@ -24,13 +24,17 @@ open class CalculateVersion :
                 throw GradleException(result.reasons.joinToString("\n") { it.message })
 
             is VersionResult.Success -> {
-                logger.quiet(result.version)
-                val githubEnvFile = System.getenv("GITHUB_ENV")
-                if (exportToGithubEnv && githubEnvFile != null) {
-                    FileOutputStream(githubEnvFile, true)
-                        .write("TAGGER_VERSION=$result".toByteArray())
-                }
+                result.outputSuccess()
             }
+        }
+    }
+
+    private fun VersionResult.Success.outputSuccess() {
+        logger.quiet(version)
+        val githubEnvFile = System.getenv("GITHUB_ENV")
+        if (exportToGithubEnv && githubEnvFile != null) {
+            FileOutputStream(githubEnvFile, true)
+                .write("TAGGER_VERSION=$version".toByteArray())
         }
     }
 }
