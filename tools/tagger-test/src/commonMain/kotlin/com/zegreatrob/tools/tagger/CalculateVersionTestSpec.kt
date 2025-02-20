@@ -131,6 +131,21 @@ interface CalculateVersionTestSpec {
     }
 
     @Test
+    fun whenPreviousTagDoesNotHaveThreeNumbersWillError() {
+        configureWithDefaults()
+
+        initializeGitRepo(listOf("init", "[patch] commit 1", "[patch] commit 2"), initialTag = "1.2")
+
+        when (val result = execute()) {
+            is TestResult.Failure -> assertContains(
+                result.reason,
+                "Inappropriate configuration: the most recent tag did not have all three semver components.",
+            )
+            is TestResult.Success -> fail("Should not have succeeded.")
+        }
+    }
+
+    @Test
     fun withAllPatchCommitsOnlyIncrementsPatch() {
         configureWithDefaults()
 

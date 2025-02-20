@@ -6,4 +6,5 @@ enum class FailureVersionReasons(val message: String) {
         """repository has no tags.
 If this is a new repository, use `tag` to set the initial version.""",
     ),
+    VersionMissingElements("the most recent tag did not have all three semver components."),
 }
