@@ -45,6 +45,7 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       - uses: testspace-com/setup-testspace@v1
+        if: ${{ github.ref == 'refs/heads/master' }}
         with:
           domain: robertfmurdock
       - name: Version
@@ -71,6 +72,6 @@ jobs:
           path: |
             build/test-output/
       - name: Push result to Testspace server
-        if: always()
+        if: ${{ github.ref == 'refs/heads/master' && always()}}
         run: |
           testspace $(find . -path *test-results* -name *.xml)
