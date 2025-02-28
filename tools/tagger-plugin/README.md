@@ -26,7 +26,7 @@ The tagger plugin adds a few tasks to your project.
 
 ### CalculateVersion
 
-The `calculateVersion` task will generate a new version number based on all of the commits since the last tag, and output it.
+The `calculateVersion` task will generate a new version number based on all the commits since the last tag, and output it.
 
 For example:
 
@@ -44,7 +44,7 @@ For example, this will output the version to an environment variable:
 export NEW_VERSION=$(./gradlew calculateVersion -q)
 ```
 
-If you use github, then there's a special argument that will automatically export it to a Github Actions environment variable that will survive multiple tasks:
+If you use GitHub, then there's a special argument that will automatically export it to a GitHub Actions environment variable that will survive multiple tasks:
 
 ```bash
       - name: Generate Version 🧮
@@ -53,7 +53,7 @@ If you use github, then there's a special argument that will automatically expor
         run: ./gradlew release check -Pversion=${{ env.TAGGER_VERSION }} --scan
 ```
 
-As you can see, this will export to a Github Actions environment variable called "TAGGER_VERSION", which can be used to set the correct version number for subsequent builds.
+As you can see, this will export to a GitHub Actions environment variable called "TAGGER_VERSION", which can be used to set the correct version number for subsequent builds.
 
 By default, tagger will look for `[none]`, `[patch]`, `[minor]`, and `[major]` in commit messages in order to determine the correct next version.
 
@@ -80,7 +80,7 @@ tagger {
 
 In order to correctly generate the version number, the local git repository must be able to see the last relevant tag. This means a shallow git clone that only includes new commits will not be able to generate the correct version numbers.
 
-With github actions, this can be fixed by configuration of `checkout` action:
+With GitHub actions, this can be fixed by configuration of `checkout` action:
 
 ```yml
       - uses: actions/checkout@v3
@@ -100,7 +100,7 @@ Usage:
 ./gradlew release check -Pversion=${{ env.TAGGER_VERSION }} --scan
 ```
 
-It can also be configured to publish a github release.
+It can also be configured to publish a GitHub release.
 
 ```kotlin
 tagger {
@@ -108,7 +108,7 @@ tagger {
 }
 ```
 
-Naturally, all of the operations involving git and github will require appropriate permissions to be provided.
+Naturally, all the operations involving git and GitHub will require appropriate permissions to be provided.
 
 Tagger use the repository's git settings, so be sure to configure the username and email, and that the repository has sufficient permissions to push tags.
 
