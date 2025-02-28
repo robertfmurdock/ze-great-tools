@@ -42,5 +42,5 @@ We recommend this command only is run after the build is validated. Use discernm
 For a full listing of the available options in the program, please use the built-in help command.
 
 ```bash
-digger --help
+tagger --help
 ```
