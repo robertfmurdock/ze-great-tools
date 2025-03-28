@@ -5,7 +5,7 @@ org-jetbrains-kotlinx-kotlinx-serialization-bom = "org.jetbrains.kotlinx:kotlinx
 
 [plugins]
 com-github-ben-manes-versions = "com.github.ben-manes.versions:0.52.0"
-nl-littlerobots-version-catalog-update = "nl.littlerobots.version-catalog-update:0.8.5"
+nl-littlerobots-version-catalog-update = "nl.littlerobots.version-catalog-update:1.0.0"
 org-jetbrains-kotlin-multiplatform = "org.jetbrains.kotlin.multiplatform:2.1.20"
 org-jetbrains-kotlin-plugin-serialization = "org.jetbrains.kotlin.plugin.serialization:2.1.20"
 org-jmailen-kotlinter = "org.jmailen.kotlinter:5.0.1"
