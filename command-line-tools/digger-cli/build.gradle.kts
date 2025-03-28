@@ -17,7 +17,7 @@ repositories {
 val generatedDirectory = project.layout.buildDirectory.dir("generated-sources/templates/kotlin/main")
 
 kotlin {
-    jvm { withJava() }
+    jvm()
     js(IR) {
         nodejs {
             useCommonJs()
