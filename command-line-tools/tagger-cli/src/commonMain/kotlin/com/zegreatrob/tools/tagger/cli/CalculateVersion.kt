@@ -26,6 +26,7 @@ class CalculateVersion : CliktCommand() {
     private val gitRepoOption by option("--git-repo", envvar = "PWD")
     private val workingDirectory get() = gitRepoArgument ?: gitRepoOption ?: throw CliktError("No target directory")
     private val implicitPatch by option().boolean().default(true)
+    private val disableDetached by option().boolean().default(true)
     private val releaseBranch by option()
     private val majorRegex by option().default(VersionRegex.Defaults.major.pattern)
     private val minorRegex by option().default(VersionRegex.Defaults.minor.pattern)
@@ -40,6 +41,7 @@ class CalculateVersion : CliktCommand() {
         TaggerCore(GitAdapter(workingDirectory))
             .calculateNextVersion(
                 implicitPatch = implicitPatch,
+                disableDetached = disableDetached,
                 versionRegex = versionRegex(),
                 releaseBranch = releaseBranch ?: "",
             )

@@ -9,11 +9,12 @@ import kotlinx.datetime.toLocalDateTime
 
 fun TaggerCore.calculateNextVersion(
     implicitPatch: Boolean,
+    disableDetached: Boolean,
     versionRegex: VersionRegex,
     releaseBranch: String,
 ): VersionResult {
     val gitStatus = this.adapter.status()
-    if (gitStatus.upstream.isEmpty()) {
+    if (disableDetached && gitStatus.upstream.isEmpty()) {
         return VersionResult.Failure(listOf(FailureVersionReasons.NoRemote))
     }
     val (previousVersionNumber, lastTagDescription) = lastVersionAndTag()

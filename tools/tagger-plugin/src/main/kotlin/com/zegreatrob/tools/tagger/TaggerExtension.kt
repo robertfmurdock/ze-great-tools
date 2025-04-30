@@ -35,6 +35,9 @@ open class TaggerExtension(
     var implicitPatch = objectFactory.property<Boolean>().convention(true)
 
     @Input
+    var disableDetached = objectFactory.property<Boolean>().convention(true)
+
+    @Input
     var githubReleaseEnabled = objectFactory.property<Boolean>().convention(false)
 
     @Input
@@ -59,6 +62,7 @@ open class TaggerExtension(
     fun calculateVersion() = core.calculateNextVersion(
         implicitPatch = implicitPatch.get(),
         versionRegex = versionRegex(),
+        disableDetached = disableDetached.get(),
         releaseBranch = releaseBranch ?: throw GradleException("Please configure the tagger release branch."),
     )
 

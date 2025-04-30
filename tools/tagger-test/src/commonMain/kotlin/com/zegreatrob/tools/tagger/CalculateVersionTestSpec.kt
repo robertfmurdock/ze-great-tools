@@ -30,6 +30,7 @@ interface CalculateVersionTestSpec {
     fun configureWithDefaults()
     fun configureWithOverrides(
         implicitPatch: Boolean? = null,
+        disableDetached: Boolean? = null,
         majorRegex: String? = null,
         minorRegex: String? = null,
         patchRegex: String? = null,
@@ -81,6 +82,7 @@ interface CalculateVersionTestSpec {
                     result.reason,
                     Regex("Inappropriate configuration: repository has no tags.\\s*\n\\s*If this is a new repository, use `tag` to set the initial version."),
                 )
+
             is TestResult.Success -> fail("Should not have succeeded.")
         }
     }
@@ -100,8 +102,23 @@ interface CalculateVersionTestSpec {
                 result.reason,
                 "Inappropriate configuration: repository has no remote.",
             )
+
             is TestResult.Success -> fail("Should not have succeeded.")
         }
+    }
+
+    @Test
+    fun whenNoRemoteButDisableDetachedIsFalseDoNotError() {
+        configureWithOverrides(disableDetached = false)
+        initializeGitRepo(
+            directory = projectDir,
+            remoteUrl = null,
+            addFileNames = addFileNames,
+            commits = listOf<String>("init", "commit (no) 1"),
+            initialTag = "1.2.3",
+        )
+        val version = runCalculateVersionSuccessfully()
+        assertEquals("1.2.4-SNAPSHOT", version)
     }
 
     @Test
@@ -141,6 +158,7 @@ interface CalculateVersionTestSpec {
                 result.reason,
                 "Inappropriate configuration: the most recent tag did not have all three semver components.",
             )
+
             is TestResult.Success -> fail("Should not have succeeded.")
         }
     }

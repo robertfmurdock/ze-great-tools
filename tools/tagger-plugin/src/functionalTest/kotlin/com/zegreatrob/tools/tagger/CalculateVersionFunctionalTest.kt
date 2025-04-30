@@ -33,6 +33,7 @@ class CalculateVersionFunctionalTest : CalculateVersionTestSpec {
 
     override fun configureWithOverrides(
         implicitPatch: Boolean?,
+        disableDetached: Boolean?,
         majorRegex: String?,
         minorRegex: String?,
         patchRegex: String?,
@@ -48,6 +49,7 @@ class CalculateVersionFunctionalTest : CalculateVersionTestSpec {
             tagger {
                 releaseBranch = "master"
                 ${if (implicitPatch != null) "implicitPatch.set($implicitPatch)" else ""}
+                ${if (disableDetached != null) "disableDetached.set($disableDetached)" else ""}
                 ${if (majorRegex != null) "majorRegex.set(Regex(\"${majorRegex.replace("\\", "\\\\")}\"))" else ""}
                 ${if (minorRegex != null) "minorRegex.set(Regex(\"${minorRegex.replace("\\", "\\\\")}\"))" else ""}
                 ${if (patchRegex != null) "patchRegex.set(Regex(\"${patchRegex.replace("\\", "\\\\")}\"))" else ""}
