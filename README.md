@@ -44,3 +44,4 @@ See its [README](command-line-tools/tagger-cli/README.md) for more.
 A program for extracting contribution information from a git repository.
 
 See its [README](command-line-tools/digger-cli/README.md) for more.
+
