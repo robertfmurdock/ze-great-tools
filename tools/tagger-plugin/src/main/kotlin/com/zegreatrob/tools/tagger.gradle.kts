@@ -20,19 +20,12 @@ tasks {
     register<PreviousVersion>("previousVersion") {
         this.taggerExtension = tagger
     }
-    val calculateVersion by registering(CalculateVersion::class) {
+    register<CalculateVersion>("calculateVersion") {
         this.taggerExtension = tagger
         exportToGithub?.let {
             exportToGithubEnv = true
         }
     }
-    check {
-        dependsOn(calculateVersion)
-        dependsOn(
-            provider { (project.getTasksByName("check", true) - check.get()).toList() },
-        )
-    }
-
     val tag by registering(TagVersion::class) {
         taggerExtension = tagger
         version = "${project.version}"
