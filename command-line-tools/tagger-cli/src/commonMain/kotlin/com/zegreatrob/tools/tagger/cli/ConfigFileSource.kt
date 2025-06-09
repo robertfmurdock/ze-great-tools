@@ -4,6 +4,7 @@ import com.github.ajalt.clikt.core.Context
 import com.github.ajalt.clikt.parameters.options.Option
 import com.github.ajalt.clikt.sources.ValueSource
 import com.zegreatrob.tools.cli.readFromFile
+import com.zegreatrob.tools.tagger.json.TaggerConfig
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement

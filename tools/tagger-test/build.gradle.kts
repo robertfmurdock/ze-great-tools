@@ -9,7 +9,9 @@ kotlin {
 
 dependencies {
     commonMainImplementation(platform(project(":dependency-bom")))
+    commonMainImplementation(project(":tagger-json"))
     commonMainImplementation(project(":tagger-core"))
+    commonMainImplementation("org.jetbrains.kotlinx:kotlinx-serialization-json")
     commonMainApi(project(":git-test"))
     commonMainApi(kotlin("test", embeddedKotlinVersion))
     "jvmMainImplementation"(kotlin("test-junit5", embeddedKotlinVersion))

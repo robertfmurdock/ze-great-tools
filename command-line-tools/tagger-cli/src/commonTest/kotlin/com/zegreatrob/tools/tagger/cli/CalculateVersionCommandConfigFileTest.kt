@@ -4,6 +4,7 @@ import com.github.ajalt.clikt.testing.test
 import com.zegreatrob.tools.cli.writeToFile
 import com.zegreatrob.tools.tagger.CalculateVersionTestSpec
 import com.zegreatrob.tools.tagger.TestResult
+import com.zegreatrob.tools.tagger.json.TaggerConfig
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json

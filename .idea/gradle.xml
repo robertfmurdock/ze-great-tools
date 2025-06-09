@@ -28,6 +28,7 @@
                   <project path="$PROJECT_DIR$/tools/git-adapter" />
                   <project path="$PROJECT_DIR$/tools/git-test" />
                   <project path="$PROJECT_DIR$/tools/tagger-core" />
+                  <project path="$PROJECT_DIR$/tools/tagger-json" />
                   <project path="$PROJECT_DIR$/tools/tagger-plugin" />
                   <project path="$PROJECT_DIR$/tools/tagger-test" />
                   <project path="$PROJECT_DIR$/tools/tools-bom" />
@@ -62,6 +63,7 @@
             <option value="$PROJECT_DIR$/tools/git-adapter" />
             <option value="$PROJECT_DIR$/tools/git-test" />
             <option value="$PROJECT_DIR$/tools/tagger-core" />
+            <option value="$PROJECT_DIR$/tools/tagger-json" />
             <option value="$PROJECT_DIR$/tools/tagger-plugin" />
             <option value="$PROJECT_DIR$/tools/tagger-test" />
             <option value="$PROJECT_DIR$/tools/tools-bom" />

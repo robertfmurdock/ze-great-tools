@@ -54,6 +54,7 @@ val mainNpmProjectDir = kotlin.js().compilations.getByName("main").npmProject.di
 dependencies {
     commonMainImplementation(platform(libs.org.jetbrains.kotlinx.kotlinx.serialization.bom))
     commonMainImplementation("com.zegreatrob.tools:cli-tools")
+    commonMainImplementation("com.zegreatrob.tools:tagger-json")
     commonMainImplementation("com.zegreatrob.tools:tagger-core")
     commonMainImplementation(libs.com.github.ajalt.clikt.clikt)
     commonMainImplementation("org.jetbrains.kotlinx:kotlinx-serialization-json")
