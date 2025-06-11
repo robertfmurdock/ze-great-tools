@@ -7,6 +7,7 @@ import kotlin.test.BeforeTest
 
 class GenerateSettingsFileCommandTest : GenerateSettingsFileTestSpec {
 
+    override lateinit var projectDir: String
     private lateinit var arguments: List<String>
 
     @BeforeTest
@@ -14,9 +15,10 @@ class GenerateSettingsFileCommandTest : GenerateSettingsFileTestSpec {
         arguments = listOf("-q", "generate-settings-file")
     }
 
-    override fun execute(): TestResult {
+    override fun execute(file: String?): TestResult {
+        file?.let { arguments += "--file=$file" }
         val test = cli()
-            .test(arguments)
+            .test(arguments, envvars = mapOf("PWD" to projectDir))
         return if (test.statusCode == 0) {
             test
                 .output

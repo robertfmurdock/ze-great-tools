@@ -11,6 +11,7 @@ dependencies {
     commonMainImplementation(platform(project(":dependency-bom")))
     commonMainImplementation(project(":tagger-json"))
     commonMainImplementation(project(":tagger-core"))
+    commonMainImplementation(project(":cli-tools"))
     commonMainImplementation("org.jetbrains.kotlinx:kotlinx-serialization-json")
     commonMainApi(project(":git-test"))
     commonMainApi(kotlin("test", embeddedKotlinVersion))
