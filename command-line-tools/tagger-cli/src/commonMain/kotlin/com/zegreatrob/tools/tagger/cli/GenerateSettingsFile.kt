@@ -21,13 +21,14 @@ class GenerateSettingsFile : CliktCommand(name = "generate-settings-file") {
         if (file == null) {
             echo(jsonString)
         } else {
+            val fileName = file?.ifBlank { ".tagger" }
             val pwd = currentContext.readEnvvar("PWD")
-            val outputFile = "$pwd/.tagger"
+            val outputFile = "$pwd/$fileName"
             if (readFromFile(outputFile) != null) {
                 throw CliktError("File already exists.")
             } else {
                 jsonString.writeToFile(outputFile)
-                echo("Saved to .tagger")
+                echo("Saved to $fileName")
             }
         }
     }

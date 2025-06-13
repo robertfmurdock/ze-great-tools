@@ -53,6 +53,19 @@ interface GenerateSettingsFileTestSpec {
     }
 
     @Test
+    fun willGenerateSettingsFileFileWithArgumentAtSpecifiedLocation() {
+        val fileName = "tagger-settings.json"
+        val result = execute(file = fileName)
+
+        val json = kotlinx.serialization.json.Json {
+            prettyPrint = true
+            encodeDefaults = true
+        }
+        assertEquals(TestResult.Success("Saved to $fileName"), result)
+        assertEquals(runtimeDefaultConfig, readFromFile("$projectDir/$fileName")?.let(json::decodeFromString))
+    }
+
+    @Test
     fun whenFileAlreadyExistsWillNotGenerateSettingsFileFileWithArgument() {
         "Something already here".writeToFile(taggerFile)
         val result = execute(file = "")
