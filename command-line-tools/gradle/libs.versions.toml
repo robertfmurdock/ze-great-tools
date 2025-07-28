@@ -8,4 +8,5 @@ com-github-ben-manes-versions = "com.github.ben-manes.versions:0.52.0"
 nl-littlerobots-version-catalog-update = "nl.littlerobots.version-catalog-update:1.0.0"
 org-jetbrains-kotlin-multiplatform = "org.jetbrains.kotlin.multiplatform:2.2.0"
 org-jetbrains-kotlin-plugin-serialization = "org.jetbrains.kotlin.plugin.serialization:2.2.0"
+# @pin
 org-jmailen-kotlinter = "org.jmailen.kotlinter:5.1.1"
