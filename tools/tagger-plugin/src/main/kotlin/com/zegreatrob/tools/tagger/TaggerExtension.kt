@@ -41,7 +41,7 @@ open class TaggerExtension(
     var githubReleaseEnabled = objectFactory.property<Boolean>().convention(false)
 
     @Input
-    var versionRegex = objectFactory.property<Regex?>().convention(null)
+    var versionRegex = objectFactory.property<Regex>().convention(null)
 
     @Input
     var noneRegex = objectFactory.property<Regex>().convention(VersionRegex.Defaults.none)

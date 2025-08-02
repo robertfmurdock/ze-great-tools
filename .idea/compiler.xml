@@ -27,10 +27,16 @@
       <module name="tools.digger-core.test" target="11" />
       <module name="tools.digger-json.main" target="11" />
       <module name="tools.digger-json.test" target="11" />
+      <module name="tools.digger-test.main" target="11" />
+      <module name="tools.digger-test.test" target="11" />
       <module name="tools.digger.main" target="17" />
       <module name="tools.digger.test" target="17" />
+      <module name="tools.git-test.main" target="11" />
+      <module name="tools.git-test.test" target="11" />
       <module name="tools.tagger-cli.main" target="11" />
       <module name="tools.tagger-cli.test" target="11" />
+      <module name="tools.tagger-test.main" target="11" />
+      <module name="tools.tagger-test.test" target="11" />
     </bytecodeTargetLevel>
   </component>
 </project>

@@ -8,10 +8,10 @@ import org.gradle.jvm.toolchain.JavaLanguageVersion
 import org.gradle.jvm.toolchain.JavaToolchainService
 import org.gradle.kotlin.dsl.property
 import org.gradle.process.ExecResult
+import org.gradle.process.ProcessExecutionException
 import org.gradle.process.internal.DefaultExecSpec
 import org.gradle.process.internal.ExecAction
 import org.gradle.process.internal.ExecActionFactory
-import org.gradle.process.internal.ExecException
 import java.io.ByteArrayOutputStream
 import javax.inject.Inject
 
@@ -50,7 +50,7 @@ constructor(
         execSpec.copyTo(execAction)
         try {
             objectFactory.property(ExecResult::class.java).set(execAction.execute())
-        } catch (_: ExecException) {
+        } catch (_: ProcessExecutionException) {
             val results = outStream.toString()
             if (!results.contains("already exists")) {
                 throw Exception("Unexpected error.\n$results")
