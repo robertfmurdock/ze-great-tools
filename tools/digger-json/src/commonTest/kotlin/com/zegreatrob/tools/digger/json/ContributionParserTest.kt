@@ -3,7 +3,6 @@
 package com.zegreatrob.tools.digger.json
 
 import com.zegreatrob.tools.digger.model.Contribution
-import kotlinx.datetime.Instant
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.jsonObject
@@ -11,6 +10,7 @@ import kotlinx.serialization.json.put
 import kotlin.random.Random
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.time.Instant
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 

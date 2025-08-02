@@ -5,6 +5,7 @@ plugins {
 kotlin {
     jvm()
     js(IR) { nodejs() }
+    sourceSets.all { languageSettings.optIn("kotlin.time.ExperimentalTime") }
 }
 
 dependencies {

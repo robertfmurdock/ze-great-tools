@@ -1,5 +1,7 @@
 @file:Suppress("UnstableApiUsage")
 
+import org.jmailen.gradle.kotlinter.tasks.FormatTask
+import org.jmailen.gradle.kotlinter.tasks.LintTask
 import java.nio.charset.Charset
 import java.util.*
 
@@ -58,10 +60,10 @@ tasks {
         environment("GIT_CONFIG_GLOBAL", "/dev/null")
         environment("GIT_CONFIG_SYSTEM", "/dev/null")
     }
-    formatKotlinMain {
+    withType<FormatTask> {
         exclude { spec -> spec.file.absolutePath.contains("generated-sources") }
     }
-    lintKotlinMain {
+    withType<LintTask> {
         exclude { spec -> spec.file.absolutePath.contains("generated-sources") }
     }
 }

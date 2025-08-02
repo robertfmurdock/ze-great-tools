@@ -1,10 +1,7 @@
 [libraries]
-# @pin
-org-jetbrains-kotlinx-kotlinx-coroutines-bom = "org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.9.0"
-# @pin
-org-jetbrains-kotlinx-kotlinx-datetime = "org.jetbrains.kotlinx:kotlinx-datetime:0.6.2"
-# @pin
-org-jetbrains-kotlinx-kotlinx-serialization-bom = "org.jetbrains.kotlinx:kotlinx-serialization-bom:1.7.3"
+org-jetbrains-kotlinx-kotlinx-coroutines-bom = "org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.10.2"
+org-jetbrains-kotlinx-kotlinx-datetime = "org.jetbrains.kotlinx:kotlinx-datetime:0.7.1"
+org-jetbrains-kotlinx-kotlinx-serialization-bom = "org.jetbrains.kotlinx:kotlinx-serialization-bom:1.9.0"
 org-junit-junit-bom = "org.junit:junit-bom:5.13.4"
 
 [plugins]

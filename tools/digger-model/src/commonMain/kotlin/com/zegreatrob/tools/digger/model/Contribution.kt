@@ -1,6 +1,9 @@
+@file:OptIn(ExperimentalTime::class)
+
 package com.zegreatrob.tools.digger.model
 
-import kotlinx.datetime.Instant
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
 data class Contribution(
     val lastCommit: String,

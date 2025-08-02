@@ -1,5 +1,9 @@
 @file:Suppress("UnstableApiUsage")
 
+import org.jmailen.gradle.kotlinter.tasks.FormatTask
+import org.jmailen.gradle.kotlinter.tasks.LintTask
+
+
 plugins {
     id("com.zegreatrob.tools.plugins.library")
     id("org.jetbrains.kotlin.plugin.serialization") version embeddedKotlinVersion
@@ -14,6 +18,7 @@ repositories {
 kotlin {
     jvm()
     js(IR) { nodejs() }
+    sourceSets.all { languageSettings.optIn("kotlin.time.ExperimentalTime") }
 }
 
 dependencies {
@@ -33,10 +38,10 @@ tasks {
     named<Test>("jvmTest") {
         useJUnitPlatform()
     }
-    formatKotlinCommonMain {
+    withType<FormatTask> {
         exclude { spec -> spec.file.absolutePath.contains("generated-sources") }
     }
-    lintKotlinCommonMain {
+    withType<LintTask> {
         exclude { spec -> spec.file.absolutePath.contains("generated-sources") }
     }
 }

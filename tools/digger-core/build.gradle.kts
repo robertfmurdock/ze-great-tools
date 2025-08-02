@@ -1,5 +1,9 @@
 @file:Suppress("UnstableApiUsage")
 
+import org.jmailen.gradle.kotlinter.tasks.FormatTask
+import org.jmailen.gradle.kotlinter.tasks.LintTask
+
+
 plugins {
     id("com.zegreatrob.tools.plugins.library")
 }
@@ -13,6 +17,7 @@ repositories {
 kotlin {
     jvm()
     js(IR) { nodejs() }
+    sourceSets.all { languageSettings.optIn("kotlin.time.ExperimentalTime") }
 }
 
 dependencies {
@@ -29,10 +34,10 @@ tasks {
         environment("GIT_CONFIG_GLOBAL", "/dev/null")
         environment("GIT_CONFIG_SYSTEM", "/dev/null")
     }
-    formatKotlinCommonMain {
+    withType<FormatTask> {
         exclude { spec -> spec.file.absolutePath.contains("generated-sources") }
     }
-    lintKotlinCommonMain {
+    withType<LintTask> {
         exclude { spec -> spec.file.absolutePath.contains("generated-sources") }
     }
 }

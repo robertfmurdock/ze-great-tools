@@ -1,6 +1,6 @@
 package com.zegreatrob.tools.adapter.git
 
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 class GitAdapter(private val workingDirectory: String, private val env: Map<String, String> = emptyMap()) {
 
