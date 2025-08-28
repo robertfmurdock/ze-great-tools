@@ -15,8 +15,9 @@ class GenerateSettingsFileCommandTest : GenerateSettingsFileTestSpec {
         arguments = listOf("-q", "generate-settings-file")
     }
 
-    override fun execute(file: String?): TestResult {
+    override fun execute(file: String?, merge: Boolean?): TestResult {
         file?.let { arguments += "--file=$file" }
+        merge?.let { arguments += "--merge=$merge" }
         val test = cli()
             .test(arguments, envvars = mapOf("PWD" to projectDir))
         return if (test.statusCode == 0) {

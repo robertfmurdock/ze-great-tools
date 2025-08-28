@@ -2,10 +2,11 @@ package com.zegreatrob.tools.tagger
 
 import com.zegreatrob.tools.cli.readFromFile
 import com.zegreatrob.tools.cli.writeToFile
+import com.zegreatrob.tools.tagger.json.TaggerConfig
 import com.zegreatrob.tools.tagger.json.runtimeDefaultConfig
 import com.zegreatrob.tools.test.git.createTempDirectory
 import com.zegreatrob.tools.test.git.removeDirectory
-import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -27,13 +28,13 @@ interface GenerateSettingsFileTestSpec {
         removeDirectory(projectDir)
     }
 
-    fun execute(file: String? = null): TestResult
+    fun execute(file: String? = null, merge: Boolean? = null): TestResult
 
     @Test
     fun willGenerateSettingsFileToStandardOutByDefault() {
         val result = execute()
 
-        val json = kotlinx.serialization.json.Json {
+        val json = Json {
             prettyPrint = true
             encodeDefaults = true
         }
@@ -44,7 +45,7 @@ interface GenerateSettingsFileTestSpec {
     fun willGenerateSettingsFileFileWithArgument() {
         val result = execute(file = "")
 
-        val json = kotlinx.serialization.json.Json {
+        val json = Json {
             prettyPrint = true
             encodeDefaults = true
         }
@@ -57,7 +58,7 @@ interface GenerateSettingsFileTestSpec {
         val fileName = "tagger-settings.json"
         val result = execute(file = fileName)
 
-        val json = kotlinx.serialization.json.Json {
+        val json = Json {
             prettyPrint = true
             encodeDefaults = true
         }
@@ -71,5 +72,29 @@ interface GenerateSettingsFileTestSpec {
         val result = execute(file = "")
 
         assertEquals(TestResult.Failure("File already exists."), result)
+    }
+
+    @Test
+    fun givenMergeArgumentWhenFileAlreadyExistsWillNotGenerateSettingsFileFileWithArgument() {
+        Json.encodeToString(
+            TaggerConfig(
+                releaseBranch = "jim",
+                implicitPatch = false,
+                userName = "jimbo",
+            )
+        )
+            .writeToFile(taggerFile)
+        execute(merge = true)
+        val result = execute(file = "")
+        assertEquals(result is TestResult.Success, true, "$result")
+
+        assertEquals(
+            runtimeDefaultConfig.copy(
+                releaseBranch = "jim",
+                implicitPatch = false,
+                userName = "jimbo",
+            ),
+            readFromFile(taggerFile)?.let(Json::decodeFromString)
+        )
     }
 }
