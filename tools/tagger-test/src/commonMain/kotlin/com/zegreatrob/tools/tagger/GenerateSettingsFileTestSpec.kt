@@ -81,7 +81,7 @@ interface GenerateSettingsFileTestSpec {
                 releaseBranch = "jim",
                 implicitPatch = false,
                 userName = "jimbo",
-            )
+            ),
         )
             .writeToFile(taggerFile)
         execute(merge = true)
@@ -94,7 +94,7 @@ interface GenerateSettingsFileTestSpec {
                 implicitPatch = false,
                 userName = "jimbo",
             ),
-            readFromFile(taggerFile)?.let(Json::decodeFromString)
+            readFromFile(taggerFile)?.let(Json::decodeFromString),
         )
     }
 }

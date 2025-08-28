@@ -26,7 +26,6 @@ class GenerateSettingsFile : CliktCommand(name = "generate-settings-file") {
         }
         val defaultConfig = prettyJsonFormatter.encodeToJsonElement(runtimeDefaultConfig)
 
-
         if (file == null) {
             echo(prettyJsonFormatter.encodeToString(defaultConfig))
         } else {
@@ -51,7 +50,7 @@ class GenerateSettingsFile : CliktCommand(name = "generate-settings-file") {
 
     private fun mergeJson(
         defaultConfig: JsonElement,
-        originalData: JsonElement
+        originalData: JsonElement,
     ): JsonObject {
         val mergeData = buildJsonObject {
             defaultConfig.jsonObject.forEach { (key, value) ->
@@ -63,9 +62,8 @@ class GenerateSettingsFile : CliktCommand(name = "generate-settings-file") {
                         originalValue
                     } else {
                         value
-                    }
+                    },
                 )
-
             }
         }
         return mergeData
