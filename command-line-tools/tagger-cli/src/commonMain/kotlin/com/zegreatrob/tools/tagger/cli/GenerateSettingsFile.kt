@@ -25,26 +25,26 @@ class GenerateSettingsFile : CliktCommand(name = "generate-settings-file") {
             encodeDefaults = true
         }
         val defaultConfig = prettyJsonFormatter.encodeToJsonElement(runtimeDefaultConfig)
+        val fileName = file.orEmpty().ifBlank { ".tagger" }
+        val pwd = currentContext.readEnvvar("PWD")
+        val settingsFile = "$pwd/$fileName"
+        val existingFileData = readFromFile(settingsFile)
+        val outputConfig = if (existingFileData != null) {
+            if (merge == true) {
+                val originalData = prettyJsonFormatter.parseToJsonElement(existingFileData)
+                mergeJson(defaultConfig, originalData)
+            } else {
+                throw CliktError("File already exists.")
+            }
+        } else {
+            defaultConfig
+        }
 
         if (file == null) {
-            echo(prettyJsonFormatter.encodeToString(defaultConfig))
+            echo(prettyJsonFormatter.encodeToString(outputConfig))
         } else {
-            val fileName = file?.ifBlank { ".tagger" }
-            val pwd = currentContext.readEnvvar("PWD")
-            val outputFile = "$pwd/$fileName"
-            val existingFileData = readFromFile(outputFile)
-            if (existingFileData != null) {
-                if (merge == true) {
-                    val originalData = prettyJsonFormatter.parseToJsonElement(existingFileData)
-                    val mergeData = mergeJson(defaultConfig, originalData)
-                    prettyJsonFormatter.encodeToString(mergeData).writeToFile(outputFile)
-                } else {
-                    throw CliktError("File already exists.")
-                }
-            } else {
-                prettyJsonFormatter.encodeToString(defaultConfig).writeToFile(outputFile)
-                echo("Saved to $fileName")
-            }
+            prettyJsonFormatter.encodeToString(outputConfig).writeToFile(settingsFile)
+            echo("Saved to $fileName")
         }
     }
 

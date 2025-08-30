@@ -14,7 +14,6 @@ fun allPaths(
     var currentPath = emptyList<CommitRef>()
     val pendingCommits = mutableListOf<Pair<CommitRef, Int?>>(firstTagCommit to null)
     val pathCache = mutableMapOf<CommitRef, List<List<CommitRef>>>()
-    println("")
     while (pendingCommits.isNotEmpty() && allPaths.size < 20000 && (preferredCommitIds.isEmpty() || allPaths.size == 0)) {
         val currentEntry = pendingCommits.last()
         val (currentCommit, child) = currentEntry
@@ -51,7 +50,6 @@ fun allPaths(
         allPaths.removeAll { !it.map(CommitRef::id).containsAll(preferredCommitIds) }
         reportState(allPaths, pendingCommits, pathCache)
     }
-    println("")
     return allPaths
 }
 

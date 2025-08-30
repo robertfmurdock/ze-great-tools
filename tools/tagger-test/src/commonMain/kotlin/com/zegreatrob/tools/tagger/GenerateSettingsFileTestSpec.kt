@@ -30,27 +30,25 @@ interface GenerateSettingsFileTestSpec {
 
     fun execute(file: String? = null, merge: Boolean? = null): TestResult
 
+    val prettyJson
+        get() = Json {
+            prettyPrint = true
+            encodeDefaults = true
+        }
+
     @Test
     fun willGenerateSettingsFileToStandardOutByDefault() {
         val result = execute()
 
-        val json = Json {
-            prettyPrint = true
-            encodeDefaults = true
-        }
-        assertEquals(TestResult.Success(json.encodeToString(runtimeDefaultConfig)), result)
+        assertEquals(TestResult.Success(prettyJson.encodeToString(runtimeDefaultConfig)), result)
     }
 
     @Test
     fun willGenerateSettingsFileFileWithArgument() {
         val result = execute(file = "")
 
-        val json = Json {
-            prettyPrint = true
-            encodeDefaults = true
-        }
         assertEquals(TestResult.Success("Saved to .tagger"), result)
-        assertEquals(runtimeDefaultConfig, readFromFile(taggerFile)?.let(json::decodeFromString))
+        assertEquals(runtimeDefaultConfig, readFromFile(taggerFile)?.let(prettyJson::decodeFromString))
     }
 
     @Test
@@ -58,12 +56,8 @@ interface GenerateSettingsFileTestSpec {
         val fileName = "tagger-settings.json"
         val result = execute(file = fileName)
 
-        val json = Json {
-            prettyPrint = true
-            encodeDefaults = true
-        }
         assertEquals(TestResult.Success("Saved to $fileName"), result)
-        assertEquals(runtimeDefaultConfig, readFromFile("$projectDir/$fileName")?.let(json::decodeFromString))
+        assertEquals(runtimeDefaultConfig, readFromFile("$projectDir/$fileName")?.let(prettyJson::decodeFromString))
     }
 
     @Test
@@ -95,6 +89,31 @@ interface GenerateSettingsFileTestSpec {
                 userName = "jimbo",
             ),
             readFromFile(taggerFile)?.let(Json::decodeFromString),
+        )
+    }
+
+    @Test
+    fun givenMergeArgumentWillMergeExistingFileIntoOutput() {
+        Json.encodeToString(
+            TaggerConfig(
+                releaseBranch = "jim",
+                implicitPatch = false,
+                userName = "jimbo",
+            ),
+        )
+            .writeToFile(taggerFile)
+        val result = execute(merge = true)
+        assertEquals(
+            TestResult.Success(
+                prettyJson.encodeToString(
+                    runtimeDefaultConfig.copy(
+                        releaseBranch = "jim",
+                        implicitPatch = false,
+                        userName = "jimbo",
+                    ),
+                ),
+            ),
+            result,
         )
     }
 }
