@@ -9,8 +9,7 @@ repositories {
 
 plugins {
     base
-    alias(libs.plugins.org.jetbrains.kotlin.multiplatform) apply false
-    alias(libs.plugins.org.jmailen.kotlinter)
+    id("org.jetbrains.kotlin.multiplatform") version embeddedKotlinVersion apply false
     alias(libs.plugins.com.github.ben.manes.versions)
     alias(libs.plugins.nl.littlerobots.version.catalog.update)
 }
