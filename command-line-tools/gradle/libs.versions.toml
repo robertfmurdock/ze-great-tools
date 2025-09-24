@@ -3,6 +3,6 @@ com-github-ajalt-clikt-clikt = "com.github.ajalt.clikt:clikt:5.0.3"
 org-jetbrains-kotlinx-kotlinx-serialization-bom = "org.jetbrains.kotlinx:kotlinx-serialization-bom:1.9.0"
 
 [plugins]
-com-github-ben-manes-versions = "com.github.ben-manes.versions:0.52.0"
+com-github-ben-manes-versions = "com.github.ben-manes.versions:0.53.0"
 nl-littlerobots-version-catalog-update = "nl.littlerobots.version-catalog-update:1.0.0"
 org-jmailen-kotlinter = "org.jmailen.kotlinter:5.2.0"
