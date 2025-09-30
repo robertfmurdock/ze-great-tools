@@ -2,7 +2,7 @@
 org-jetbrains-kotlinx-kotlinx-coroutines-bom = "org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.10.2"
 org-jetbrains-kotlinx-kotlinx-datetime = "org.jetbrains.kotlinx:kotlinx-datetime:0.7.1"
 org-jetbrains-kotlinx-kotlinx-serialization-bom = "org.jetbrains.kotlinx:kotlinx-serialization-bom:1.9.0"
-org-junit-junit-bom = "org.junit:junit-bom:5.13.4"
+org-junit-junit-bom = "org.junit:junit-bom:6.0.0"
 
 [plugins]
 com-gradle-plugin-publish = "com.gradle.plugin-publish:2.0.0"
