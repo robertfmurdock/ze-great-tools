@@ -5,4 +5,4 @@ org-jetbrains-kotlinx-kotlinx-serialization-bom = "org.jetbrains.kotlinx:kotlinx
 [plugins]
 com-github-ben-manes-versions = "com.github.ben-manes.versions:0.53.0"
 nl-littlerobots-version-catalog-update = "nl.littlerobots.version-catalog-update:1.0.1"
-org-jmailen-kotlinter = "org.jmailen.kotlinter:5.2.0"
+org-jmailen-kotlinter = "org.jmailen.kotlinter:5.3.0"
