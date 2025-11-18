@@ -34,6 +34,7 @@ class Tag : CliktCommand() {
             .let {
                 when (it) {
                     TagResult.Success -> echo("Success!")
+
                     is TagResult.Error -> if (warningsAsErrors) {
                         throw CliktError(it.message)
                     } else {
