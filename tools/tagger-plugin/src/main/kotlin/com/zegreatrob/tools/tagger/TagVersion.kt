@@ -28,6 +28,7 @@ open class TagVersion :
     fun execute() = taggerExtension.run {
         when (val result = core.tag(this@TagVersion.version, releaseBranch, userName, userEmail)) {
             TagResult.Success -> {}
+
             is TagResult.Error -> if (warningsAsErrors.get()) {
                 throw GradleException(result.message)
             } else {
