@@ -41,7 +41,9 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
           node-version: 22
       - name: Validate NPM Token
-        run: npm whoami
+        run: |
+          npm --version
+          npm whoami
       - uses: testspace-com/setup-testspace@v1
         if: ${{ github.ref == 'refs/heads/master' }}
         with:
