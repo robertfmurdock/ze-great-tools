@@ -42,6 +42,7 @@ jobs:
           node-version: 22
       - name: Validate NPM Token
         run: |
+          npm install -g npm@latest
           npm --version
           npm whoami
       - uses: testspace-com/setup-testspace@v1
