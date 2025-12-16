@@ -18,7 +18,7 @@ jobs:
           cache-read-only: true
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
       - name: Update Deps
-        run: ./gradlew versionCatalogUpdate --scan
+        run: ./gradlew versionCatalogUpdate --no-configuration-cache --scan
       - name: Create Pull Request
         id: cpr
         uses: peter-evans/create-pull-request@v6
