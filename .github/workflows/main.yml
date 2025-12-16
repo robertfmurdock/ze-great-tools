@@ -44,7 +44,6 @@ jobs:
         run: |
           npm install -g npm@latest
           npm --version
-          npm whoami
       - uses: testspace-com/setup-testspace@v1
         if: ${{ github.ref == 'refs/heads/master' }}
         with:
