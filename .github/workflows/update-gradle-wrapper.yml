@@ -13,9 +13,10 @@ jobs:
           ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
           fetch-depth: '25'
       - name: Setup Current Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v5
         with:
           gradle-version: current
+          cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
       - run: gradle wrapper --distribution-type all
       - name: Create Pull Request
         id: cpr

@@ -13,9 +13,10 @@ jobs:
           ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
           fetch-depth: '25'
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v5
         with:
           cache-read-only: true
+          cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
       - name: Update Deps
         run: ./gradlew versionCatalogUpdate --no-configuration-cache --scan
       - name: Create Pull Request
