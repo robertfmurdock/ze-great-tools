@@ -1,3 +1,5 @@
+import nl.littlerobots.vcu.plugin.versionSelector
+
 repositories {
     maven { url = uri("https://plugins.gradle.org/m2/") }
     mavenCentral()
@@ -44,3 +46,10 @@ nexusPublishing {
 }
 
 fun Project.isSnapshot() = version.toString().contains("SNAPSHOT")
+
+versionCatalogUpdate {
+    val rejectRegex = "^[0-9.]+[0-9](-RC|-M[0-9]*|-RC[0-9]*.*|-beta.*|-Beta.*|-alpha.*|-dev.*|.*-compat.*)$".toRegex()
+    versionSelector { versionCandidate ->
+        !rejectRegex.matches(versionCandidate.candidate.version)
+    }
+}
