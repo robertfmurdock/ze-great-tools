@@ -4,6 +4,7 @@ import com.github.ajalt.clikt.testing.test
 import com.zegreatrob.tools.cli.readFromFile
 import com.zegreatrob.tools.digger.AllContributionTestSpec
 import kotlin.test.BeforeTest
+import kotlin.test.assertEquals
 
 class AllContributionDataTest : AllContributionTestSpec {
 
@@ -49,7 +50,7 @@ class AllContributionDataTest : AllContributionTestSpec {
         AllContributionData()
             .test(arguments)
             .output
-            .let { kotlin.test.assertEquals("Data written to ${outputFile}\n", it) }
+            .let { assertEquals("Data written to ${outputFile}\n", it) }
         return readFromFile(outputFile) ?: ""
     }
 }
