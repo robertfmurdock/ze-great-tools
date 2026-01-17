@@ -58,7 +58,9 @@ dependencies {
     commonMainImplementation(libs.com.github.ajalt.clikt.clikt)
 
     commonTestImplementation("com.zegreatrob.tools:digger-test")
-    "jvmTestImplementation"(kotlin("test-junit5"))
+    commonTestImplementation(libs.org.jetbrains.kotlin.kotlin.stdlib)
+    commonTestImplementation(libs.org.jetbrains.kotlin.kotlin.test)
+    "jvmTestImplementation"(libs.org.jetbrains.kotlin.kotlin.test.junit5)
     "jvmTestImplementation"("org.junit.jupiter:junit-jupiter-api")
     "jvmTestImplementation"("org.junit.jupiter:junit-jupiter-engine")
 }
