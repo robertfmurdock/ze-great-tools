@@ -7,6 +7,11 @@
         <compositeConfiguration>
           <compositeBuild compositeDefinitionSource="SCRIPT">
             <builds>
+              <build path="$PROJECT_DIR$/build-logic" name="build-logic">
+                <projects>
+                  <project path="$PROJECT_DIR$/build-logic" />
+                </projects>
+              </build>
               <build path="$PROJECT_DIR$/command-line-tools" name="command-line-tools">
                 <projects>
                   <project path="$PROJECT_DIR$/command-line-tools" />
@@ -47,6 +52,7 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/build-logic" />
             <option value="$PROJECT_DIR$/command-line-tools" />
             <option value="$PROJECT_DIR$/command-line-tools/digger-cli" />
             <option value="$PROJECT_DIR$/command-line-tools/tagger-cli" />

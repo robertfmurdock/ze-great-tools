@@ -3,6 +3,8 @@ pluginManagement {
         gradlePluginPortal()
         mavenCentral()
     }
+
+    includeBuild("../build-logic")
 }
 
 rootProject.name = "command-line-tools"

@@ -3,6 +3,7 @@ pluginManagement {
         gradlePluginPortal()
         mavenCentral()
     }
+    includeBuild("build-logic")
 }
 
 plugins {
@@ -13,6 +14,7 @@ rootProject.name = "ze-great-tools"
 includeBuild("tools-plugins")
 includeBuild("tools")
 includeBuild("command-line-tools")
+
 
 develocity {
     buildScan {

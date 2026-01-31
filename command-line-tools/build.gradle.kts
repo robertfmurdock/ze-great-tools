@@ -11,6 +11,7 @@ plugins {
     base
     alias(libs.plugins.org.jetbrains.kotlin.multiplatform) apply false
     alias(libs.plugins.nl.littlerobots.version.catalog.update)
+    id("fingerprint")
 }
 
 group = "com.zegreatrob.tools"

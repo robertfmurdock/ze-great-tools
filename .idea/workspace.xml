@@ -1,0 +1,863 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="db94fc10-b377-4baa-a961-aa371128c1bb" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/ze-great-tools.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build-logic/build.gradle.kts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build-logic/settings.gradle.kts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build-logic/src/main/kotlin/AggregateReleaseFingerprint.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build-logic/src/main/kotlin/ReleaseModuleExtension.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build-logic/src/main/kotlin/WriteReleaseFingerprint.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/artifacts/cli_tools_js.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/artifacts/cli_tools_js.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/artifacts/cli_tools_jvm.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/artifacts/cli_tools_jvm.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/artifacts/digger_cli_js.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/artifacts/digger_cli_js.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/artifacts/digger_cli_jvm.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/artifacts/digger_cli_jvm.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/artifacts/digger_core_js.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/artifacts/digger_core_js.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/artifacts/digger_core_jvm.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/artifacts/digger_core_jvm.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/artifacts/digger_json_js.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/artifacts/digger_json_js.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/artifacts/digger_json_jvm.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/artifacts/digger_json_jvm.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/artifacts/digger_model_js.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/artifacts/digger_model_js.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/artifacts/digger_model_jvm.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/artifacts/digger_model_jvm.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/artifacts/digger_test_js.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/artifacts/digger_test_js.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/artifacts/digger_test_jvm.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/artifacts/digger_test_jvm.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/artifacts/git_adapter_js.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/artifacts/git_adapter_js.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/artifacts/git_adapter_jvm.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/artifacts/git_adapter_jvm.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/artifacts/git_test_js.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/artifacts/git_test_js.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/artifacts/git_test_jvm.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/artifacts/git_test_jvm.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/artifacts/tagger_cli_js.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/artifacts/tagger_cli_js.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/artifacts/tagger_cli_jvm.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/artifacts/tagger_cli_jvm.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/artifacts/tagger_core_js.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/artifacts/tagger_core_js.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/artifacts/tagger_core_jvm.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/artifacts/tagger_core_jvm.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/artifacts/tagger_json_js.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/artifacts/tagger_json_js.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/artifacts/tagger_json_jvm.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/artifacts/tagger_json_jvm.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/artifacts/tagger_test_js.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/artifacts/tagger_test_js.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/artifacts/tagger_test_jvm.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/artifacts/tagger_test_jvm.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/gradle.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/gradle.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle.kts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/command-line-tools/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/command-line-tools/build.gradle.kts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/command-line-tools/settings.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/command-line-tools/settings.gradle.kts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/settings.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/settings.gradle.kts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/tools/build.gradle.kts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/settings.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/tools/settings.gradle.kts" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ExternalProjectsData">
+    <projectState path="$PROJECT_DIR$">
+      <ProjectState />
+    </projectState>
+  </component>
+  <component name="ExternalProjectsManager">
+    <system id="GRADLE">
+      <state>
+        <task path="$PROJECT_DIR$">
+          <activation />
+        </task>
+        <task path="$PROJECT_DIR$/tools/git-adapter">
+          <activation />
+        </task>
+        <task path="$PROJECT_DIR$/command-line-tools/digger-cli">
+          <activation />
+        </task>
+        <task path="$PROJECT_DIR$/command-line-tools/tagger-cli">
+          <activation />
+        </task>
+        <task path="$PROJECT_DIR$/command-line-tools">
+          <activation />
+        </task>
+        <projects_view>
+          <tree_state>
+            <expand>
+              <path>
+                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
+                <item name="ze-great-tools" type="f1a62948:ProjectNode" />
+              </path>
+            </expand>
+            <select />
+          </tree_state>
+        </projects_view>
+      </state>
+    </system>
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="JUnit5 Test Class" />
+        <option value="Kotlin Class" />
+        <option value="Kotlin File" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GradleScriptDefinitionsStorage" workingDir="$PROJECT_DIR$" gradleHome="$USER_HOME$/.gradle/wrapper/dists/gradle-9.3.1-all/9ot9r568e8zfvvd4mn8rbu1j0/gradle-9.3.1" javaHome="$USER_HOME$/.sdkman/candidates/java/17.0.7-amzn" gradleVersion="9.3.1" />
+  <component name="JsbtTreeLayoutManager">
+    <layout place="tools.popupGrunt">
+      <scroll-view-position x="0" y="0" />
+    </layout>
+  </component>
+  <component name="KotlinCodeInsightWorkspaceSettings">
+    <option name="optimizeImportsOnTheFly" value="true" />
+  </component>
+  <component name="KotlinMultiplatform" KONAN_HOME="$USER_HOME$/.konan/kotlin-native-prebuilt-macos-aarch64-2.3.0" />
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 7
+}</component>
+  <component name="ProjectId" id="2Y51iLz563Uoy5WjshFvdIXftMg" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Gradle.AllContributionDataTest.executor": "Run",
+    "Gradle.AllContributionFunctionalTest.executor": "Run",
+    "Gradle.AllPathsTest.branchMergeBranchMergeFindsAllPaths.executor": "Run",
+    "Gradle.AllPathsTest.executor": "Run",
+    "Gradle.AsSemverComponentsTest.executor": "Run",
+    "Gradle.Build command-line-tools.executor": "Run",
+    "Gradle.Build tools.executor": "Run",
+    "Gradle.Build ze-great-tools.executor": "Run",
+    "Gradle.CalculateVersionCommandTest (1).executor": "Run",
+    "Gradle.CalculateVersionCommandTest.executor": "Run",
+    "Gradle.CalculateVersionFunctionalTest.executor": "Run",
+    "Gradle.CertifierPluginFunctionalTest.executor": "Run",
+    "Gradle.ContributionParserTest.executor": "Run",
+    "Gradle.CurrentContributionDataTest (1).executor": "Run",
+    "Gradle.CurrentContributionDataTest js.executor": "Run",
+    "Gradle.CurrentContributionDataTest.executor": "Run",
+    "Gradle.CurrentContributionFunctionalTest.executor": "Run",
+    "Gradle.DiggerGitWrapperTest.executor": "Run",
+    "Gradle.DiggerPluginFunctionalTest.allContributionData will include all tag segments.executor": "Run",
+    "Gradle.DiggerPluginFunctionalTest.executor": "Run",
+    "Gradle.DiggerTest.executor": "Run",
+    "Gradle.GenerateSettingsFileCommandTest (1).executor": "Run",
+    "Gradle.GenerateSettingsFileCommandTest.executor": "Run",
+    "Gradle.GitAdapterTest.executor": "Run",
+    "Gradle.MessageDigTest.canGetAllGroupsFromRegex.executor": "Run",
+    "Gradle.RThingTest.executor": "Run",
+    "Gradle.TagCommandTest.executor": "Run",
+    "Gradle.TagFunctionalTest.executor": "Run",
+    "Gradle.TaggerPluginCalculateVersionFunctionalTest.executor": "Run",
+    "Gradle.TaggerPluginCalculateVersionFunctionalTest.tagWillTagAndPushSuccessfully.executor": "Run",
+    "Gradle.TaggerPluginCalculateVersionFunctionalTest.unifiedGroupRegexCanReplaceMajorRegex.executor": "Run",
+    "Gradle.TaggerPluginFunctionalTest.calculating version when current commit already has tag will use tag.executor": "Run",
+    "Gradle.TaggerPluginFunctionalTest.executor": "Run",
+    "Gradle.TaggerPluginFunctionalTest.unifiedGroupCanReplaceNoneRegex.executor": "Run",
+    "Gradle.TaggerPluginFunctionalTest.unifiedGroupRegexCanReplaceMajorRegex.executor": "Run",
+    "Gradle.TaggerTest.bloop.executor": "Run",
+    "Gradle.TaggerTest.executor": "Run",
+    "Gradle.Tests in 'tools.digger-plugin'.executor": "Run",
+    "Gradle.Tests in 'tools.digger-plugin.functionalTest'.executor": "Run",
+    "Gradle.Tests in 'tools.tagger-plugin'.executor": "Run",
+    "Gradle.WelcomeTest.executor": "Run",
+    "Gradle.ze-great-tools [:command-line-tools:digger-cli:jsTest].executor": "Run",
+    "Gradle.ze-great-tools [:command-line-tools:digger-cli:jvmTest].executor": "Run",
+    "Gradle.ze-great-tools [:command-line-tools:tagger-cli:cleanJvmTest :command-line-tools:tagger-cli:jvmTest].executor": "Run",
+    "Gradle.ze-great-tools [:tagger-cli:cleanJvmTest :tagger-cli:jvmTest].executor": "Run",
+    "Gradle.ze-great-tools [:tools:digger-cli:allTests].executor": "Run",
+    "Gradle.ze-great-tools [:tools:digger-cli:jvmTest].executor": "Run",
+    "Gradle.ze-great-tools [:tools:digger-core:allTests].executor": "Run",
+    "Gradle.ze-great-tools [:tools:digger-core:check].executor": "Run",
+    "Gradle.ze-great-tools [:tools:digger-model:assemble].executor": "Run",
+    "Gradle.ze-great-tools [:tools:digger-model:compileJvmMainJava].executor": "Run",
+    "Gradle.ze-great-tools [:tools:digger-model:dependencies].executor": "Run",
+    "Gradle.ze-great-tools [:tools:tagger-cli:confirmTaggerCanRun].executor": "Run",
+    "Gradle.ze-great-tools [:tools:tagger-cli:jvmTest].executor": "Run",
+    "Gradle.ze-great-tools [assemble].executor": "Run",
+    "Gradle.ze-great-tools [check].executor": "Run",
+    "Gradle.ze-great-tools [clean].executor": "Run",
+    "Gradle.ze-great-tools [confirmTaggerCanRun].executor": "Run",
+    "Gradle.ze-great-tools [formatKotlin check].executor": "Run",
+    "Gradle.ze-great-tools [formatKotlin].executor": "Run",
+    "JUnit.All in command-line-tools.digger-cli (1).executor": "Run",
+    "JUnit.All in command-line-tools.digger-cli.executor": "Run",
+    "JUnit.AllContributionDataTest.executor": "Run",
+    "JUnit.AllContributionDataTest.will handle merge commits on merged branches correctly.executor": "Run",
+    "JUnit.AllContributionFunctionalTest.executor": "Run",
+    "JUnit.AllContributionFunctionalTest.when merging multiple times from same branch, commits are only counted once.executor": "Run",
+    "JUnit.AllContributionFunctionalTest.will handle normal merge-into-branch-then-ff-back case.executor": "Run",
+    "JUnit.CalculateVersionFunctionalTest.unifiedGroupRegexCanReplaceMajorRegex (1).executor": "Run",
+    "JUnit.CalculateVersionFunctionalTest.unifiedGroupRegexCanReplaceMajorRegex.executor": "Run",
+    "JUnit.CurrentContributionDataTest.canReplaceEaseRegex.executor": "Run",
+    "JUnit.CurrentContributionFunctionalTest.executor": "Run",
+    "JUnit.GenerateSettingsFileCommandTest.executor": "Run",
+    "JUnit.TagCommandTest.executor": "Run",
+    "JUnit.TagFunctionalTest.tagWillFailWhenUserEmailAndNameAreNotConfigured.executor": "Run",
+    "JUnit.TaggerPluginCalculateVersionFunctionalTest.unifiedGroupRegexCanReplaceMajorRegex.executor": "Run",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.cidr.known.project.marker": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.readMode.enableVisualFormatting": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "cidr.known.project.marker": "true",
+    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultAutoModeForALLUsers.v1": "true",
+    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
+    "com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrary": "JUnit5",
+    "com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrarySuperClass.JUnit5": "",
+    "git-widget-placeholder": "main",
+    "junie.onboarding.icon.badge.shown": "true",
+    "kotlin-language-version-configured": "true",
+    "last_directory_selection": "/Users/robertfmurdock/git/ze-great-tools/tools/tagger-json/src/commonMain/kotlin/com/zegreatrob/tools/tagger",
+    "last_opened_file_path": "/Users/robertfmurdock/git/ze-great-tools/build-logic",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "project.structure.last.edited": "Modules",
+    "project.structure.proportion": "0.0",
+    "project.structure.side.proportion": "0.0",
+    "ruby.rails.projectView.checked": "true",
+    "settings.editor.selected.configurable": "reference.settingsdialog.project.gradle",
+    "to.speed.mode.migration.done": "true",
+    "vue.rearranger.settings.migration": "true"
+  },
+  "keyToStringList": {
+    "com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File": [
+      "TEXT",
+      "kotlin",
+      "JSON"
+    ]
+  }
+}]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/build-logic" />
+      <recent name="$PROJECT_DIR$" />
+      <recent name="$PROJECT_DIR$/command-line-tools/digger-cli" />
+      <recent name="$PROJECT_DIR$/tools" />
+      <recent name="$PROJECT_DIR$/command-line-tools/digger-cli/src/commonMain" />
+    </key>
+    <key name="CreateTestDialog.Recents.Supers">
+      <recent name="" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/tools/git-test/src/jvmMain/kotlin/com/zegreatrob/tools/test/git" />
+      <recent name="$PROJECT_DIR$/tools/git-test/src/jsMain/kotlin/com/zegreatrob/tools/test/git" />
+      <recent name="$PROJECT_DIR$/tools/git-test/src/commonMain/kotlin/com/zegreatrob/tools/test/git" />
+      <recent name="$PROJECT_DIR$/tools/digger-test/src/commonMain/kotlin/com/zegreatrob/tools/digger" />
+      <recent name="$PROJECT_DIR$/tools/cli-tools/src/jvmMain/kotlin/com/zegreatrob/tools/cli" />
+    </key>
+    <key name="CreateKotlinClassDialog.RecentsKey">
+      <recent name="com.zegreatrob.tools.tagger.cli" />
+      <recent name="com.zegreatrob.tools.tagger" />
+      <recent name="tagger" />
+    </key>
+    <key name="MoveKotlinTopLevelDeclarationsDialog.RECENTS_KEY">
+      <recent name="com.zegreatrob.tools.tagger" />
+      <recent name="com.zegreatrob.tools.tagger.cli" />
+      <recent name="com.zegreatrob.tools.cli" />
+      <recent name="com.zegreatrob.tools.test.git" />
+      <recent name="com.zegreatrob.tools.digger" />
+    </key>
+    <key name="CreateTestDialog.RecentsKey">
+      <recent name="com.zegreatrob.tools.tagger.cli" />
+      <recent name="com.zegreatrob.tools.digger.core" />
+      <recent name="com.zegreatrob.tools.digger.cli" />
+      <recent name="com.zegreatrob.tools.tagger" />
+    </key>
+    <key name="KotlinExtractInterfaceDialog.RECENT_KEYS">
+      <recent name="com.zegreatrob.tools.digger" />
+    </key>
+    <key name="CopyKotlinDeclarationDialog.RECENTS_KEY">
+      <recent name="com.zegreatrob.tools.tagger.cli" />
+      <recent name="com.zegreatrob.tools.digger" />
+      <recent name="com.zegreatrob.tools.digger.cli" />
+    </key>
+    <key name="K2MoveDeclarationsDialog.RECENT_PACKAGE_KEY">
+      <recent name="com.zegreatrob.tools.build" />
+      <recent name="com.zegreatrob.tools.tagger.json" />
+      <recent name="com.zegreatrob.tools.tagger.j" />
+      <recent name="com.zegreatrob.tools.tagger.cli" />
+      <recent name="com.zegreatrob.tools.tagger.core" />
+    </key>
+  </component>
+  <component name="RubyModuleManagerSettings">
+    <option name="blackListedRootsPaths">
+      <list>
+        <option value="$PROJECT_DIR$/tools/digger-plugin" />
+        <option value="$PROJECT_DIR$/tools/digger-plugin/src/functionalTest" />
+        <option value="$PROJECT_DIR$/tools/tagger-plugin/src/functionalTest" />
+        <option value="$PROJECT_DIR$/command-line-tools/digger-cli/src/commonMain" />
+        <option value="$PROJECT_DIR$/tools/certifier-plugin/src/main" />
+        <option value="$PROJECT_DIR$/tools/tagger-json" />
+        <option value="$PROJECT_DIR$/tools/tagger-test" />
+        <option value="$PROJECT_DIR$/tools/certifier-plugin" />
+        <option value="$PROJECT_DIR$/tools/tagger-core" />
+        <option value="$PROJECT_DIR$/tools/tagger-plugin/src/test" />
+        <option value="$PROJECT_DIR$/tools/git-adapter/src/jsMain" />
+        <option value="$PROJECT_DIR$/tools/git-adapter/src/jvmTest" />
+        <option value="$PROJECT_DIR$/tools/digger-plugin/src/main" />
+        <option value="$PROJECT_DIR$/tools/cli-tools" />
+        <option value="$PROJECT_DIR$/tools/digger-core" />
+        <option value="$PROJECT_DIR$/tools/cli-tools/src/jvmMain" />
+        <option value="$PROJECT_DIR$/tools/digger-core/src/commonTest" />
+        <option value="$PROJECT_DIR$/tools/digger-core/src/jvmTest" />
+        <option value="$PROJECT_DIR$/tools-plugins/src/main" />
+        <option value="$PROJECT_DIR$/command-line-tools/digger-cli/src/jsMain" />
+        <option value="$PROJECT_DIR$/tools/certifier-plugin/src/functionalTest" />
+        <option value="$PROJECT_DIR$/tools/git-adapter/src/commonMain" />
+        <option value="$PROJECT_DIR$/tools/digger-model" />
+        <option value="$PROJECT_DIR$/tools/tagger-plugin/src/main" />
+        <option value="$PROJECT_DIR$/tools/tools-bom" />
+        <option value="$PROJECT_DIR$/tools/git-adapter/src/jvmMain" />
+        <option value="$PROJECT_DIR$/tools/digger-plugin/src/test" />
+        <option value="$PROJECT_DIR$/tools/git-test" />
+        <option value="$PROJECT_DIR$/command-line-tools/tagger-cli/src/commonMain" />
+        <option value="$PROJECT_DIR$/tools/dependency-bom" />
+        <option value="$PROJECT_DIR$/tools/tagger-plugin" />
+        <option value="$PROJECT_DIR$/tools/git-test/src/jvmMain" />
+        <option value="$PROJECT_DIR$/tools/digger-core/src/commonMain" />
+        <option value="$PROJECT_DIR$/build-logic" />
+        <option value="$PROJECT_DIR$/command-line-tools/digger-cli" />
+        <option value="$PROJECT_DIR$/tools/digger-test" />
+        <option value="$PROJECT_DIR$/command-line-tools/tagger-cli/src/jsMain" />
+        <option value="$PROJECT_DIR$/command-line-tools/tagger-cli" />
+        <option value="$PROJECT_DIR$/build-logic/src/main" />
+        <option value="$PROJECT_DIR$/tools-plugins" />
+        <option value="$PROJECT_DIR$/tools/digger-json" />
+        <option value="$PROJECT_DIR$/tools" />
+        <option value="$PROJECT_DIR$/tools/git-adapter" />
+        <option value="$PROJECT_DIR$/command-line-tools" />
+      </list>
+    </option>
+  </component>
+  <component name="RunAnythingCache">
+    <option name="myCommands">
+      <command value="./gradlew check --rerun-tasks" />
+      <command value="./gradlew assemble" />
+      <command value="./gradlew :tools:digger-core:allTests" />
+      <command value="./gradlew :tools:digger-core:allTests --rerun-tasks" />
+      <command value="./gradlew :tools:digger-core:check --rerun-tasks" />
+      <command value="./gradlew :tools:digger-core:allTests --continue --rerun-tasks" />
+      <command value="./gradlew :tools:digger-cli:allTests --rerun-tasks" />
+      <command value="./gradlew :tools:digger-cli:jvmTest --rerun-tasks" />
+      <command value="./gradlew :tools:digger-cli:jvmTest" />
+      <command value="./gradlew clean" />
+      <command value="./gradlew formatKotlin" />
+      <command value="./gradlew :tools:tagger-cli:jvmTest" />
+      <command value="./gradlew formatKotlin check --rerun-tasks" />
+      <command value="./gradlew confirmTaggerCanRun" />
+      <command value="./gradlew :tools:tagger-cli:confirmTaggerCanRun" />
+      <command value="./gradlew :command-line-tools:digger-cli:jsTest" />
+      <command value="./gradlew :command-line-tools:digger-cli:jvmTest" />
+      <command value="./gradlew check" />
+      <command value="./gradlew formatKotlin check --no-configuration-cache" />
+      <command value="./gradlew :tagger-cli:cleanJvmTest :tagger-cli:jvmTest" />
+      <command value="./gradlew -p command-line-tools :tagger-cli:cleanJvmTest :tagger-cli:jvmTest" />
+      <command value="./gradlew formatKotlin check" />
+      <command value="./gradlew :command-line-tools:tagger-cli:cleanJvmTest :command-line-tools:tagger-cli:jvmTest" />
+      <command value="./gradlew :tools:digger-model:dependencies" />
+      <command value="./gradlew :tools:digger-model:assemble" />
+      <command value="./gradlew :tools:digger-model:compileJvmMainJava" />
+    </option>
+  </component>
+  <component name="RunManager" selected="Gradle.ze-great-tools [:tools:digger-model:compileJvmMainJava]">
+    <configuration default="true" type="AppleRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" IS_LOCATION_SIMULATION_SUPPORTED="false" IS_LOCATION_SIMULATION_ALLOWED="true" APPLICATION_LANGUAGE="IDELaunchSchemeLanguageUseSystemLanguage" APPLICATION_REGION="" DEVELOPMENT_TEAM="${TEAM_ID}" MAKE_ACTIVE="TRUE" SHOULD_DEBUG_EXTENSIONS="false">
+      <embedded_app_extension_list />
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="CurrentContributionDataTest js" type="GradleRunConfiguration" factoryName="Gradle">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$/command-line-tools/digger-cli" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" value="" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list>
+            <option value=":digger-cli:jsNodeTest" />
+            <option value="--tests" />
+            <option value="&quot;com.zegreatrob.tools.digger.cli.CurrentContributionDataTest.willCorrectlyUnderstandLongerRunningBranch&quot;" />
+          </list>
+        </option>
+        <option name="vmOptions" />
+      </ExternalSystemSettings>
+      <ExternalSystemDebugServerProcess>false</ExternalSystemDebugServerProcess>
+      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+      <ExternalSystemDebugDisabled>false</ExternalSystemDebugDisabled>
+      <DebugAllEnabled>false</DebugAllEnabled>
+      <RunAsTest>true</RunAsTest>
+      <GradleProfilingDisabled>false</GradleProfilingDisabled>
+      <GradleCoverageDisabled>false</GradleCoverageDisabled>
+      <method v="2" />
+    </configuration>
+    <configuration name="CurrentContributionDataTest" type="GradleRunConfiguration" factoryName="Gradle">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$/command-line-tools/digger-cli" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" value="" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list>
+            <option value=":digger-cli:cleanJvmTest" />
+            <option value=":digger-cli:jvmTest" />
+            <option value="--tests" />
+            <option value="&quot;com.zegreatrob.tools.digger.cli.CurrentContributionDataTest.willCorrectlyUnderstandLongerRunningBranch&quot;" />
+          </list>
+        </option>
+        <option name="vmOptions" />
+      </ExternalSystemSettings>
+      <ExternalSystemDebugServerProcess>false</ExternalSystemDebugServerProcess>
+      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+      <ExternalSystemDebugDisabled>false</ExternalSystemDebugDisabled>
+      <DebugAllEnabled>false</DebugAllEnabled>
+      <RunAsTest>true</RunAsTest>
+      <GradleProfilingDisabled>false</GradleProfilingDisabled>
+      <GradleCoverageDisabled>false</GradleCoverageDisabled>
+      <method v="2" />
+    </configuration>
+    <configuration name="Tests in 'tools.digger-plugin.functionalTest'" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" value="" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list>
+            <option value=":tools:digger-plugin:functionalTest" />
+          </list>
+        </option>
+        <option name="vmOptions" />
+      </ExternalSystemSettings>
+      <ExternalSystemDebugServerProcess>false</ExternalSystemDebugServerProcess>
+      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+      <ExternalSystemDebugDisabled>false</ExternalSystemDebugDisabled>
+      <DebugAllEnabled>false</DebugAllEnabled>
+      <RunAsTest>true</RunAsTest>
+      <GradleProfilingDisabled>false</GradleProfilingDisabled>
+      <GradleCoverageDisabled>false</GradleCoverageDisabled>
+      <method v="2" />
+    </configuration>
+    <configuration name="ze-great-tools [:command-line-tools:tagger-cli:cleanJvmTest :command-line-tools:tagger-cli:jvmTest]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" value="" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list>
+            <option value=":command-line-tools:tagger-cli:cleanJvmTest" />
+            <option value=":command-line-tools:tagger-cli:jvmTest" />
+          </list>
+        </option>
+        <option name="vmOptions" />
+      </ExternalSystemSettings>
+      <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
+      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+      <ExternalSystemDebugDisabled>false</ExternalSystemDebugDisabled>
+      <DebugAllEnabled>false</DebugAllEnabled>
+      <RunAsTest>false</RunAsTest>
+      <GradleProfilingDisabled>false</GradleProfilingDisabled>
+      <GradleCoverageDisabled>false</GradleCoverageDisabled>
+      <method v="2" />
+    </configuration>
+    <configuration name="ze-great-tools [:tools:digger-model:assemble]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" value="" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list>
+            <option value=":tools:digger-model:assemble" />
+          </list>
+        </option>
+        <option name="vmOptions" />
+      </ExternalSystemSettings>
+      <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
+      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+      <ExternalSystemDebugDisabled>false</ExternalSystemDebugDisabled>
+      <DebugAllEnabled>false</DebugAllEnabled>
+      <RunAsTest>false</RunAsTest>
+      <GradleProfilingDisabled>false</GradleProfilingDisabled>
+      <GradleCoverageDisabled>false</GradleCoverageDisabled>
+      <method v="2" />
+    </configuration>
+    <configuration name="ze-great-tools [:tools:digger-model:compileJvmMainJava]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" value="" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list>
+            <option value=":tools:digger-model:compileJvmMainJava" />
+          </list>
+        </option>
+        <option name="vmOptions" />
+      </ExternalSystemSettings>
+      <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
+      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+      <ExternalSystemDebugDisabled>false</ExternalSystemDebugDisabled>
+      <DebugAllEnabled>false</DebugAllEnabled>
+      <RunAsTest>false</RunAsTest>
+      <GradleProfilingDisabled>false</GradleProfilingDisabled>
+      <GradleCoverageDisabled>false</GradleCoverageDisabled>
+      <method v="2" />
+    </configuration>
+    <configuration name="ze-great-tools [:tools:digger-model:dependencies]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" value="" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list>
+            <option value=":tools:digger-model:dependencies" />
+          </list>
+        </option>
+        <option name="vmOptions" />
+      </ExternalSystemSettings>
+      <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
+      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+      <ExternalSystemDebugDisabled>false</ExternalSystemDebugDisabled>
+      <DebugAllEnabled>false</DebugAllEnabled>
+      <RunAsTest>false</RunAsTest>
+      <GradleProfilingDisabled>false</GradleProfilingDisabled>
+      <GradleCoverageDisabled>false</GradleCoverageDisabled>
+      <method v="2" />
+    </configuration>
+    <list>
+      <item itemvalue="Gradle.CurrentContributionDataTest" />
+      <item itemvalue="Gradle.CurrentContributionDataTest js" />
+      <item itemvalue="Gradle.ze-great-tools [:tools:digger-model:assemble]" />
+      <item itemvalue="Gradle.ze-great-tools [:tools:digger-model:compileJvmMainJava]" />
+      <item itemvalue="Gradle.ze-great-tools [:tools:digger-model:dependencies]" />
+      <item itemvalue="Gradle.ze-great-tools [:command-line-tools:tagger-cli:cleanJvmTest :command-line-tools:tagger-cli:jvmTest]" />
+      <item itemvalue="Gradle.Tests in 'tools.digger-plugin.functionalTest'" />
+    </list>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Gradle.ze-great-tools [:tools:digger-model:dependencies]" />
+        <item itemvalue="Gradle.ze-great-tools [:tools:digger-model:assemble]" />
+        <item itemvalue="Gradle.ze-great-tools [:tools:digger-model:compileJvmMainJava]" />
+        <item itemvalue="Gradle.ze-great-tools [:command-line-tools:tagger-cli:cleanJvmTest :command-line-tools:tagger-cli:jvmTest]" />
+        <item itemvalue="Gradle.Tests in 'tools.digger-plugin.functionalTest'" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-jdk-30f59d01ecdd-2fc7cc6b9a17-intellij.indexing.shared.core-IU-253.30387.90" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="db94fc10-b377-4baa-a961-aa371128c1bb" name="Changes" comment="" />
+      <created>1699800752557</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1699800752557</updated>
+      <workItem from="1699800753750" duration="844000" />
+      <workItem from="1700088528404" duration="1885000" />
+      <workItem from="1701197898229" duration="2338000" />
+      <workItem from="1701439806355" duration="2411000" />
+      <workItem from="1706137781449" duration="666000" />
+      <workItem from="1708385538766" duration="612000" />
+      <workItem from="1712065151539" duration="4129000" />
+      <workItem from="1714603172438" duration="761000" />
+      <workItem from="1714837470967" duration="16000" />
+      <workItem from="1717192583506" duration="1827000" />
+      <workItem from="1717205013150" duration="3500000" />
+      <workItem from="1717211231649" duration="1290000" />
+      <workItem from="1717343963270" duration="1704000" />
+      <workItem from="1717375991278" duration="1391000" />
+      <workItem from="1717621117333" duration="2178000" />
+      <workItem from="1717852707493" duration="1802000" />
+      <workItem from="1718461426423" duration="903000" />
+      <workItem from="1719273895343" duration="622000" />
+      <workItem from="1720445671998" duration="1431000" />
+      <workItem from="1720530574468" duration="1099000" />
+      <workItem from="1720622166178" duration="829000" />
+      <workItem from="1721414884146" duration="3960000" />
+      <workItem from="1721485425460" duration="2270000" />
+      <workItem from="1721499560524" duration="3399000" />
+      <workItem from="1721531431007" duration="1650000" />
+      <workItem from="1721616292020" duration="1384000" />
+      <workItem from="1722282636332" duration="7593000" />
+      <workItem from="1722307129720" duration="10128000" />
+      <workItem from="1722353950607" duration="1384000" />
+      <workItem from="1722375884548" duration="6682000" />
+      <workItem from="1722481025366" duration="12191000" />
+      <workItem from="1722603768303" duration="4994000" />
+      <workItem from="1722652018402" duration="36043000" />
+      <workItem from="1722818136401" duration="6421000" />
+      <workItem from="1722881339315" duration="10290000" />
+      <workItem from="1722948771051" duration="7491000" />
+      <workItem from="1722992414705" duration="46486000" />
+      <workItem from="1723225635769" duration="29661000" />
+      <workItem from="1723315739036" duration="403000" />
+      <workItem from="1723316152245" duration="4537000" />
+      <workItem from="1723467495437" duration="4870000" />
+      <workItem from="1723484478133" duration="1271000" />
+      <workItem from="1723640799237" duration="4958000" />
+      <workItem from="1723729697938" duration="2731000" />
+      <workItem from="1724274602659" duration="2321000" />
+      <workItem from="1724278883488" duration="33547000" />
+      <workItem from="1724379486569" duration="8442000" />
+      <workItem from="1724421758767" duration="8075000" />
+      <workItem from="1724468685326" duration="3018000" />
+      <workItem from="1724634680294" duration="5783000" />
+      <workItem from="1724850554406" duration="3962000" />
+      <workItem from="1725554431746" duration="1490000" />
+      <workItem from="1725915283731" duration="2655000" />
+      <workItem from="1725939162816" duration="9927000" />
+      <workItem from="1726083191272" duration="2361000" />
+      <workItem from="1726107704056" duration="8706000" />
+      <workItem from="1726591249464" duration="8415000" />
+      <workItem from="1726630105154" duration="1230000" />
+      <workItem from="1726696936890" duration="20219000" />
+      <workItem from="1726883832999" duration="18783000" />
+      <workItem from="1726964911644" duration="95000" />
+      <workItem from="1727268732532" duration="1601000" />
+      <workItem from="1727322772786" duration="9315000" />
+      <workItem from="1727403636583" duration="1572000" />
+      <workItem from="1727806916177" duration="1309000" />
+      <workItem from="1727833024478" duration="14340000" />
+      <workItem from="1727906892388" duration="7999000" />
+      <workItem from="1727922972156" duration="3251000" />
+      <workItem from="1727926613028" duration="2921000" />
+      <workItem from="1727961725503" duration="5869000" />
+      <workItem from="1728097573242" duration="5093000" />
+      <workItem from="1728149018678" duration="64000" />
+      <workItem from="1728661447897" duration="4441000" />
+      <workItem from="1732589377027" duration="2180000" />
+      <workItem from="1732767450822" duration="1526000" />
+      <workItem from="1733591861349" duration="866000" />
+      <workItem from="1734143831092" duration="2085000" />
+      <workItem from="1734806859598" duration="2667000" />
+      <workItem from="1734836477718" duration="2179000" />
+      <workItem from="1736569665196" duration="1898000" />
+      <workItem from="1737944584408" duration="9172000" />
+      <workItem from="1738989790537" duration="283000" />
+      <workItem from="1739131563672" duration="629000" />
+      <workItem from="1739135937640" duration="2150000" />
+      <workItem from="1739738390002" duration="1852000" />
+      <workItem from="1739746887580" duration="2130000" />
+      <workItem from="1740008406960" duration="11636000" />
+      <workItem from="1740095052065" duration="3149000" />
+      <workItem from="1740111621062" duration="611000" />
+      <workItem from="1740621044351" duration="1723000" />
+      <workItem from="1740750280133" duration="1397000" />
+      <workItem from="1743174595180" duration="728000" />
+      <workItem from="1743265013927" duration="1121000" />
+      <workItem from="1746015589127" duration="2434000" />
+      <workItem from="1748303667436" duration="1812000" />
+      <workItem from="1748471936089" duration="2769000" />
+      <workItem from="1749483503481" duration="16869000" />
+      <workItem from="1750688934886" duration="1541000" />
+      <workItem from="1750860385374" duration="1425000" />
+      <workItem from="1751206196586" duration="1416000" />
+      <workItem from="1751491914726" duration="1802000" />
+      <workItem from="1751978916929" duration="15000" />
+      <workItem from="1753707410789" duration="1895000" />
+      <workItem from="1753879318812" duration="1848000" />
+      <workItem from="1754158529441" duration="3553000" />
+      <workItem from="1754570371709" duration="1489000" />
+      <workItem from="1756385027465" duration="2913000" />
+      <workItem from="1756511891816" duration="4146000" />
+      <workItem from="1758067450269" duration="4288000" />
+      <workItem from="1759928045318" duration="2433000" />
+      <workItem from="1760225531499" duration="574000" />
+      <workItem from="1763424478007" duration="1493000" />
+      <workItem from="1765907181171" duration="3791000" />
+      <workItem from="1768359594232" duration="5616000" />
+      <workItem from="1768626518903" duration="14487000" />
+      <workItem from="1769478712895" duration="539000" />
+      <workItem from="1769793791725" duration="8252000" />
+      <workItem from="1769880105343" duration="1212000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.History.Properties">
+    <option name="COLUMN_ID_ORDER">
+      <list>
+        <option value="Default.Root" />
+        <option value="Default.Author" />
+        <option value="Default.Date" />
+        <option value="Default.Subject" />
+        <option value="GitHub.CommitStatus" />
+      </list>
+    </option>
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="OPEN_GENERIC_TABS">
+      <map>
+        <entry key="54bb825c-f0b5-4168-9d2b-df22954738e8" value="TOOL_WINDOW" />
+        <entry key="fae3d1e5-980d-4032-8f06-25d4f8258393" value="TOOL_WINDOW" />
+        <entry key="3de123ee-7cb0-4a98-9a2a-4686ac37347f" value="TOOL_WINDOW" />
+        <entry key="0fdbb20b-ccae-4b77-b34c-9b8ecd7ea909" value="TOOL_WINDOW" />
+      </map>
+    </option>
+    <option name="TAB_STATES">
+      <map>
+        <entry key="0fdbb20b-ccae-4b77-b34c-9b8ecd7ea909">
+          <value>
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="HEAD" />
+                      </list>
+                    </value>
+                  </entry>
+                  <entry key="roots">
+                    <value>
+                      <list>
+                        <option value="$PROJECT_DIR$" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+              <option name="SHOW_ONLY_AFFECTED_CHANGES" value="true" />
+            </State>
+          </value>
+        </entry>
+        <entry key="3de123ee-7cb0-4a98-9a2a-4686ac37347f">
+          <value>
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="HEAD" />
+                      </list>
+                    </value>
+                  </entry>
+                  <entry key="roots">
+                    <value>
+                      <list>
+                        <option value="$PROJECT_DIR$" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+              <option name="SHOW_ONLY_AFFECTED_CHANGES" value="true" />
+            </State>
+          </value>
+        </entry>
+        <entry key="54bb825c-f0b5-4168-9d2b-df22954738e8">
+          <value>
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="HEAD" />
+                      </list>
+                    </value>
+                  </entry>
+                  <entry key="roots">
+                    <value>
+                      <list>
+                        <option value="$PROJECT_DIR$" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+              <option name="SHOW_ONLY_AFFECTED_CHANGES" value="true" />
+            </State>
+          </value>
+        </entry>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+        <entry key="fae3d1e5-980d-4032-8f06-25d4f8258393">
+          <value>
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="HEAD" />
+                      </list>
+                    </value>
+                  </entry>
+                  <entry key="roots">
+                    <value>
+                      <list>
+                        <option value="$PROJECT_DIR$" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+              <option name="SHOW_ONLY_AFFECTED_CHANGES" value="true" />
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <breakpoint enabled="true" type="java-exception">
+          <properties class="java.lang.Error" package="java.lang">
+            <option name="NOTIFY_UNCAUGHT" value="false" />
+          </properties>
+          <option name="timeStamp" value="1" />
+        </breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
+  <component name="com.apollographql.ijplugin.settings.ProjectSettingsState">
+    <option name="lspPassPathToSuperGraphYaml" value="false" />
+    <option name="telemetryInstanceId" value="a6c6ce47-e6b2-4722-acb3-19638f4d9148" />
+  </component>
+</project>

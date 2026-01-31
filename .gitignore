@@ -1,5 +1,4 @@
 .gradle
-.kotlin
 build
 .cache-proxy
-.idea/workspace.xml
+.kotlin

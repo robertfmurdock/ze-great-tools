@@ -8,6 +8,7 @@ plugins {
     id("com.zegreatrob.tools.tagger")
     id("com.zegreatrob.tools.digger")
     id("com.zegreatrob.tools.plugins.lint")
+    id("fingerprint")
     base
 }
 
@@ -49,4 +50,28 @@ tasks {
         from(testBuilds.map { it.projectDir.resolve("build/test-output") })
         into(rootProject.layout.buildDirectory.file("test-output/${project.path}".replace(":", "/")))
     }
+
+}
+
+fun includedBuild(name: String): IncludedBuild =
+    gradle.includedBuilds.find { it.name == name }
+        ?: error("Included build '$name' was not found")
+
+val releaseBuilds = listOf(
+    includedBuild("tools"),
+    includedBuild("command-line-tools")
+)
+
+tasks.register<AggregateReleaseFingerprint>("aggregateReleaseFingerprint") {
+    dependsOn(releaseBuilds.map { it.task(":writeReleaseFingerprint") })
+    outputFile.set(
+        layout.buildDirectory.file("aggregate-release-fingerprint.txt")
+    )
+    fingerprints.from(
+        releaseBuilds.map {
+            it
+                .projectDir
+                .resolve("build/release-fingerprint.txt")
+        }
+    )
 }
