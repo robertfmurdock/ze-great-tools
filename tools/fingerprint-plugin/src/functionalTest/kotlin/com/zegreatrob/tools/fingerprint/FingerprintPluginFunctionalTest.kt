@@ -2,6 +2,7 @@ package com.zegreatrob.tools.fingerprint
 
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
+import org.junit.jupiter.api.Assertions.assertNotEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 import java.io.File
@@ -355,5 +356,50 @@ class FingerprintPluginFunctionalTest {
             .buildAndFail() // We expect a crash
 
         assertTrue(result.output.contains("Could not resolve"), result.output)
+    }
+
+    @Test
+    fun `aggregateFingerprints combines hashes from included builds`(@TempDir testProjectDir: File) {
+        val includedDir = testProjectDir.resolve("my-included-lib").apply { mkdirs() }
+        includedDir.resolve("settings.gradle.kts").writeText("rootProject.name = \"my-included-lib\"")
+        includedDir.resolve("build.gradle.kts").writeText(
+            """
+        plugins { id("com.zegreatrob.tools.fingerprint") }
+        // Hardcode a dependency string so we know the hash will be specific
+        tasks.named<com.zegreatrob.tools.fingerprint.FingerprintTask>("generateFingerprint") {
+            dependencies.set("v=1.0|deps=lib-content")
+        }
+            """.trimIndent(),
+        )
+
+        val mainDir = testProjectDir.resolve("main-app").apply { mkdirs() }
+        mainDir.resolve("settings.gradle.kts").writeText(
+            """
+        rootProject.name = "main-app"
+        includeBuild("../my-included-lib")
+            """.trimIndent(),
+        )
+
+        mainDir.resolve("build.gradle.kts").writeText(
+            """
+        plugins { id("com.zegreatrob.tools.fingerprint") }
+        tasks.named<com.zegreatrob.tools.fingerprint.FingerprintTask>("generateFingerprint") {
+            dependencies.set("v=1.0|deps=app-content")
+        }
+            """.trimIndent(),
+        )
+
+        GradleRunner.create()
+            .withProjectDir(mainDir)
+            .withArguments(":my-included-lib:generateFingerprint", "aggregateFingerprints")
+            .withPluginClasspath()
+            .build()
+
+        val localHash = mainDir.resolve("build/fingerprint.txt").readText()
+        val includedHash = includedDir.resolve("build/fingerprint.txt").readText()
+        val aggregateHash = mainDir.resolve("build/aggregate-fingerprint.txt").readText()
+
+        assert(aggregateHash != localHash) { "Aggregate should not match local hash" }
+        assert(aggregateHash != includedHash) { "Aggregate should not match included hash" }
     }
 }

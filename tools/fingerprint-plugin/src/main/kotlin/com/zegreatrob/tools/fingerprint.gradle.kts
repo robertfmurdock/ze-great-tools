@@ -1,5 +1,6 @@
 package com.zegreatrob.tools
 
+import com.zegreatrob.tools.fingerprint.AggregateFingerprintsTask
 import com.zegreatrob.tools.fingerprint.FingerprintExtension
 import com.zegreatrob.tools.fingerprint.FingerprintTask
 
@@ -46,4 +47,21 @@ project.tasks.register("generateFingerprint", FingerprintTask::class.java) {
     )
 
     outputFile.set(project.layout.buildDirectory.file("fingerprint.txt"))
+}
+
+if (project == project.rootProject) {
+    project.tasks.register("aggregateFingerprints", AggregateFingerprintsTask::class.java) {
+        val localTask = project.tasks.named("generateFingerprint", FingerprintTask::class.java)
+        localFingerprint.set(localTask.flatMap { it.outputFile })
+
+        includedFingerprints.from(
+            project.gradle.includedBuilds.map { included ->
+                included.projectDir.resolve("build/fingerprint.txt")
+            },
+        )
+
+        dependsOn(localTask)
+
+        outputFile.set(project.layout.buildDirectory.file("aggregate-fingerprint.txt"))
+    }
 }

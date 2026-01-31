@@ -8,6 +8,7 @@ plugins {
     id("com.zegreatrob.tools.tagger")
     id("com.zegreatrob.tools.digger")
     id("com.zegreatrob.tools.plugins.lint")
+    id("com.zegreatrob.tools.fingerprint")
     base
 }
 
