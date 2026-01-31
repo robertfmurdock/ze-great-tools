@@ -27,6 +27,7 @@ testing {
 configurations["functionalTestImplementation"].extendsFrom(configurations["testImplementation"])
 
 dependencies {
+    compileOnly(gradleApi())
     testImplementation(kotlin("test-junit5", embeddedKotlinVersion))
     "functionalTestImplementation"(gradleTestKit())
     "functionalTestImplementation"(platform(libs.org.junit.junit.bom))

@@ -1,32 +1,47 @@
 package com.zegreatrob.tools
 
+import com.zegreatrob.tools.fingerprint.FingerprintExtension
 import com.zegreatrob.tools.fingerprint.FingerprintTask
 
 val version = System.getProperty("test.plugin.version")
     ?: this.javaClass.`package`.implementationVersion
     ?: "development"
+val isRoot = project == project.rootProject
+
+val extension = project.extensions.create("fingerprintConfig", FingerprintExtension::class.java)!!
+
+extension.includedProjects.convention(emptySet<String>())
 
 project.tasks.register("generateFingerprint", FingerprintTask::class.java) {
     pluginVersion.set(version)
+
     dependencies.set(
         project.provider {
-            val resolvableConfigs = project.configurations.filter {
-                it.isCanBeResolved &&
-                    (it.name.contains("CompileClasspath") || it.name.contains("CompilationClasspath")) &&
-                    !it.name.contains("Test", ignoreCase = true)
+            val includedNames = extension.includedProjects.get()
+            val targets = if (isRoot) project.allprojects else listOf(project)
+
+            val filteredTargets = targets.filter {
+                includedNames.isEmpty() || it.name in includedNames || it == project.rootProject
             }
 
-            val depsString = if (resolvableConfigs.isNotEmpty() && project.repositories.isNotEmpty()) {
-                resolvableConfigs.flatMap { config ->
-                    config.resolvedConfiguration.resolvedArtifacts.map {
-                        "${it.moduleVersion.id.group}:${it.moduleVersion.id.name}:${it.moduleVersion.id.version}"
+            val depsString = filteredTargets.flatMap { sub ->
+                sub.configurations.filter {
+                    it.isCanBeResolved && (it.name.contains("CompileClasspath") || it.name.contains("CompilationClasspath")) && !it.name.contains(
+                        "Test",
+                    )
+                }.flatMap { config ->
+                    val resolvedConfig = config.resolvedConfiguration
+
+                    if (resolvedConfig.hasError()) {
+                        resolvedConfig.rethrowFailure()
                     }
-                }.distinct().sorted().joinToString(",")
-            } else {
-                "no-deps"
-            }
 
-            "v=$version|deps=$depsString"
+                    resolvedConfig.resolvedArtifacts.map {
+                        "${sub.name}:${it.moduleVersion.id.group}:${it.moduleVersion.id.name}:${it.moduleVersion.id.version}"
+                    }
+                }
+            }.distinct().sorted().joinToString(",")
+            "v=$version|deps=${depsString.ifEmpty { "none" }}"
         },
     )
 

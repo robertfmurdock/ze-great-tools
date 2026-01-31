@@ -23,10 +23,10 @@ class FingerprintPluginFunctionalTest {
         buildFile.writeText(
             """
             plugins {
-                kotlin("multiplatform") version "1.9.20"
+                kotlin("multiplatform") version "2.3.0"
                 id("com.zegreatrob.tools.fingerprint")
             }
-
+            repositories { mavenCentral() }
             kotlin {
                 jvm()
             }
@@ -50,7 +50,7 @@ class FingerprintPluginFunctionalTest {
 
         val initialBuildScript = """
         plugins {
-            kotlin("multiplatform") version "1.9.20"
+            kotlin("multiplatform") version "2.3.0"
             id("com.zegreatrob.tools.fingerprint")
         }
         kotlin { jvm() }
@@ -103,7 +103,7 @@ class FingerprintPluginFunctionalTest {
 
         val jsBuildScript = """
         plugins {
-            kotlin("multiplatform") version "1.9.20"
+            kotlin("multiplatform") version "2.3.0"
             id("com.zegreatrob.tools.fingerprint")
         }
         kotlin {
@@ -153,7 +153,7 @@ class FingerprintPluginFunctionalTest {
 
         val baseBuildScript = """
         plugins {
-            kotlin("multiplatform") version "1.9.20"
+            kotlin("multiplatform") version "2.3.0"
             id("com.zegreatrob.tools.fingerprint")
         }
         kotlin { jvm() }
@@ -201,7 +201,7 @@ class FingerprintPluginFunctionalTest {
 
         val baseBuildScript = """
         plugins {
-            kotlin("multiplatform") version "1.9.20"
+            kotlin("multiplatform") version "2.3.0"
             id("com.zegreatrob.tools.fingerprint")
         }
         kotlin { jvm() }
@@ -229,7 +229,7 @@ class FingerprintPluginFunctionalTest {
     fun `task is retrieved from build cache on second run`() {
         val buildScript = """
         plugins {
-            kotlin("multiplatform") version "1.9.20"
+            kotlin("multiplatform") version "2.3.0"
             id("com.zegreatrob.tools.fingerprint")
         }
         kotlin { jvm() }
@@ -252,5 +252,108 @@ class FingerprintPluginFunctionalTest {
             .build()
 
         assertEquals(result.task(":generateFingerprint")?.outcome, TaskOutcome.FROM_CACHE)
+    }
+
+    @Test
+    fun `root fingerprint reflects changes in subprojects`() {
+        settingsFile.writeText(
+            """
+        rootProject.name = "multi-project-root"
+        include(":app")
+            """.trimIndent(),
+        )
+
+        buildFile.writeText(
+            """
+        plugins { id("com.zegreatrob.tools.fingerprint") }
+            """.trimIndent(),
+        )
+
+        val appBuildFile = testProjectDir.resolve("app/build.gradle.kts").apply {
+            parentFile.mkdirs()
+            writeText(
+                """
+            plugins { kotlin("multiplatform") version "2.3.0" }
+            kotlin { jvm() }
+            repositories { mavenCentral() }
+            
+                """.trimIndent(),
+            )
+        }
+
+        val firstHash = runFingerprint()
+
+        appBuildFile.appendText(
+            """
+        dependencies { "commonMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3") }
+            """.trimIndent(),
+        )
+
+        val secondHash = runFingerprint()
+
+        assert(firstHash != secondHash) { "Root fingerprint must change when subproject dependencies change!" }
+    }
+
+    @Test
+    fun `fingerprint ignores unconfigured subprojects`() {
+        settingsFile.writeText(
+            """
+        rootProject.name = "filter-test"
+        include(":app", ":ignored-lib")
+            """.trimIndent(),
+        )
+
+        buildFile.writeText(
+            """
+        plugins { id("com.zegreatrob.tools.fingerprint") }
+        repositories { mavenCentral() }
+        fingerprintConfig {
+            includedProjects.add("app")
+        }
+            """.trimIndent(),
+        )
+
+        val appBuild = testProjectDir.resolve("app/build.gradle.kts").apply { parentFile.mkdirs() }
+        val ignoredBuild = testProjectDir.resolve("ignored-lib/build.gradle.kts").apply { parentFile.mkdirs() }
+
+        appBuild.writeText("plugins { kotlin(\"jvm\") version \"2.3.0\" } repositories { mavenCentral() }")
+        ignoredBuild.writeText("plugins { kotlin(\"jvm\") version \"2.3.0\" } repositories { mavenCentral() }")
+
+        val firstHash = runFingerprint()
+
+        ignoredBuild.appendText("\ndependencies { implementation(\"org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3\") }")
+        val secondHash = runFingerprint()
+
+        assert(firstHash == secondHash) { "Hash should remain stable when unconfigured subprojects change!" }
+
+        appBuild.appendText("\ndependencies { implementation(\"org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3\") }")
+        val thirdHash = runFingerprint()
+
+        assert(firstHash != thirdHash) { "Hash should change when configured subprojects change!" }
+    }
+
+    @Test
+    fun `fingerprint fails if dependencies cannot be resolved`() {
+        settingsFile.writeText("rootProject.name = \"resolution-failure-test\"")
+        buildFile.writeText(
+            """
+        plugins {
+            kotlin("jvm") version "2.3.0"
+            id("com.zegreatrob.tools.fingerprint") 
+        }
+        // NO repositories defined
+        dependencies {
+            implementation("com.example:fake-lib:1.0.0")
+        }
+            """.trimIndent(),
+        )
+
+        val result = GradleRunner.create()
+            .withProjectDir(testProjectDir)
+            .withArguments("generateFingerprint")
+            .withPluginClasspath()
+            .buildAndFail() // We expect a crash
+
+        assertTrue(result.output.contains("Could not resolve"), result.output)
     }
 }
