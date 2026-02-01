@@ -25,6 +25,7 @@ fingerprintConfig {
 
 tasks {
     assemble {
+        dependsOn(aggregateFingerprints)
         dependsOn(provider { gradle.includedBuilds.map { it.task(":assemble") }.toList() })
     }
     release {
