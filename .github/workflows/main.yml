@@ -49,6 +49,12 @@ jobs:
         if: ${{ github.ref == 'refs/heads/master' }}
         with:
           domain: robertfmurdock
+      - name: Check Fingerprint 🔨
+        run: |
+          ./gradlew aggregateFingerprints -Pversion=$(./gradlew previousVersion -q)
+          cat command-line-tools/build/fingerprint.txt
+          cat tools/build/fingerprint.txt
+          cat build/aggregate-fingerprint.txt
       - name: Version
         run: ./gradlew calculateVersion -PexportToGithub=true --scan
       - name: Build 🔨
