@@ -51,10 +51,10 @@ jobs:
           domain: robertfmurdock
       - name: Check Fingerprint 🔨
         run: |
-          ./gradlew aggregateFingerprints -Pversion=$(./gradlew previousVersion -q)
-          cat command-line-tools/build/fingerprint.txt
-          cat tools/build/fingerprint.txt
-          cat build/aggregate-fingerprint.txt
+          export PREVIOUS_VERSION=$(./gradlew previousVersion -q)
+          ./gradlew aggregateFingerprints -Pversion=$PREVIOUS_VERSION
+          gh release download "$PREVIOUS_VERSION" -p "aggregate-fingerprint.txt" -D .
+          diff -u aggregate-fingerprint.txt build/aggregate-fingerprint.txt || true
       - name: Version
         run: ./gradlew calculateVersion -PexportToGithub=true --scan
       - name: Build 🔨
