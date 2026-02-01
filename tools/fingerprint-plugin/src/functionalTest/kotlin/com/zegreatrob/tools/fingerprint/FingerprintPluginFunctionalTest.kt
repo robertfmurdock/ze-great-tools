@@ -726,4 +726,41 @@ class FingerprintPluginFunctionalTest {
             "Fingerprint should NOT change when KMP jsTest resources (custom dir) change!",
         )
     }
+
+    @Test
+    fun `fingerprint handles classpath entries that are directories and changes when directory contents change`() {
+        writeSettings("classpath-directory-entry-test")
+
+        val classpathDir = fileUnderProject("build/classes/kotlin/js/main").apply { mkdirs() }
+        val marker = classpathDir.resolve("marker.txt").apply { writeText("v1") }
+
+        writeBuild(
+            """
+            plugins {
+                id("com.zegreatrob.tools.fingerprint")
+            }
+
+            tasks.named<com.zegreatrob.tools.fingerprint.FingerprintTask>("generateFingerprint") {
+                pluginVersion.set("1.0")
+                classpath.setFrom(files("${classpathDir.invariantSeparatorsPath}"))
+            }
+            """.trimIndent(),
+        )
+
+        val firstHash = runFingerprint()
+        val firstManifest = fingerprintManifestFile().readText()
+        assertManifestContainsDependencyIngredients(firstManifest, context = "baseline (directory classpath entry)")
+
+        marker.writeText("v2")
+
+        val secondHash = runFingerprint()
+        val secondManifest = fingerprintManifestFile().readText()
+        assertManifestContainsDependencyIngredients(secondManifest, context = "after directory content change")
+
+        assertFingerprintChanged(firstHash, secondHash, "Fingerprint should change when a directory classpath entry contents change!")
+        assertTrue(
+            firstManifest != secondManifest,
+            "Manifest should change when a directory classpath entry contents change.\n--- first ---\n$firstManifest\n--- second ---\n$secondManifest",
+        )
+    }
 }

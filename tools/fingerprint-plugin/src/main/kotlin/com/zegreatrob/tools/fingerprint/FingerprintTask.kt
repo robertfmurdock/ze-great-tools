@@ -80,6 +80,31 @@ abstract class FingerprintTask : DefaultTask() {
             digest.update(value.toByte())
         }
 
+        fun classpathEntryContentSha256Hex(entry: java.io.File): String {
+            val md = MessageDigest.getInstance("SHA-256")
+
+            if (entry.isFile) {
+                md.update(entry.readBytes())
+                return md.digest().toHex()
+            }
+
+            if (entry.isDirectory) {
+                entry.walkTopDown()
+                    .filter { it.isFile }
+                    .sortedBy { it.relativeTo(entry).invariantSeparatorsPath }
+                    .forEach { f ->
+                        val rel = f.relativeTo(entry).invariantSeparatorsPath
+                        md.update(rel.toByteArray(Charsets.UTF_8))
+                        md.update(0)
+                        md.update(f.readBytes())
+                        md.update(0)
+                    }
+                return md.digest().toHex()
+            }
+
+            return md.digest().toHex()
+        }
+
         manifest.append("pluginVersion|").append(pluginVersion.get()).append("|\n")
 
         updateBytes("pluginVersion(prefix)", "pluginVersion=".toByteArray())
@@ -88,13 +113,18 @@ abstract class FingerprintTask : DefaultTask() {
         classpath.files
             .sortedBy { it.name }
             .forEach { file ->
-                manifest.append("classpath|").append(file.name).append("|").append(file.length()).append("\n")
+                val classpathSha256 = classpathEntryContentSha256Hex(file)
+                manifest.append("classpath|").append(file.name).append("|").append(file.length()).append("|")
+                    .append(classpathSha256).append("\n")
 
                 val fileContext = "classpath[fileName=${file.name} fileLength=${file.length()}]"
                 updateByte("$fileContext sep(0)", 0)
                 updateBytes("$fileContext file.name", file.name.toByteArray())
                 updateByte("$fileContext sep(0)", 0)
                 updateBytes("$fileContext file.length", file.length().toString().toByteArray())
+
+                updateByte("$fileContext sep(0)", 0)
+                updateBytes("$fileContext content.sha256", classpathSha256.toByteArray())
             }
 
         val baseDirFile = baseDir.get().asFile
@@ -108,7 +138,8 @@ abstract class FingerprintTask : DefaultTask() {
 
                 val bytes = file.readBytes()
                 val sha256 = MessageDigest.getInstance("SHA-256").digest(bytes).toHex()
-                manifest.append("source|").append(relPath).append("|").append(file.length()).append("|").append(sha256).append("\n")
+                manifest.append("source|").append(relPath).append("|").append(file.length()).append("|").append(sha256)
+                    .append("\n")
 
                 updateByte("$fileContext sep(0)", 0)
                 updateBytes("$fileContext file.path", relPath.toByteArray())
