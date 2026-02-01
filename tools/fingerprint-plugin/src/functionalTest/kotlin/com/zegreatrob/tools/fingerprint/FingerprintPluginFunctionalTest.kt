@@ -25,11 +25,9 @@ class FingerprintPluginFunctionalTest {
         buildFile.writeText(script.trimIndent())
     }
 
-    private fun fileUnderProject(relativePath: String): File =
-        testProjectDir.resolve(relativePath).also { it.parentFile?.mkdirs() }
+    private fun fileUnderProject(relativePath: String): File = testProjectDir.resolve(relativePath).also { it.parentFile?.mkdirs() }
 
-    private fun writeProjectFile(relativePath: String, content: String): File =
-        fileUnderProject(relativePath).also { it.writeText(content.trimIndent()) }
+    private fun writeProjectFile(relativePath: String, content: String): File = fileUnderProject(relativePath).also { it.writeText(content.trimIndent()) }
 
     private fun gradle(
         projectDir: File = testProjectDir,
