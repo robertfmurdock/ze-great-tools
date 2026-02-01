@@ -25,12 +25,29 @@ tasks {
     register("formatKotlin") {
         dependsOn(provider { (getTasksByName("formatKotlin", true) - this).toList() })
     }
+
+    val allChecks = register("allChecks") {
+        group = "verification"
+        description = "Runs check in this build and all included builds (composite)."
+
+        dependsOn(check)
+
+        gradle.includedBuilds.forEach { included ->
+            dependsOn(gradle.includedBuild(included.name).task(":check"))
+        }
+    }
+
     register("release") {
-        mustRunAfter(check)
+        dependsOn(allChecks)
+
         finalizedBy(provider { (getTasksByName("publish", true)).toList() })
         if (!isSnapshot()) {
             dependsOn(provider { (getTasksByName("publishPlugins", true) - this).toList() })
         }
+    }
+
+    matching { it.name == "publish" || it.name == "publishPlugins" }.configureEach {
+        dependsOn(allChecks)
     }
 }
 
