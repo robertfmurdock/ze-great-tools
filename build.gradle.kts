@@ -19,6 +19,10 @@ tagger {
     userEmail = "6215634+robertfmurdock@users.noreply.github.com"
 }
 
+fingerprintConfig {
+    includedBuilds = listOf("command-line-tools")
+}
+
 tasks {
     assemble {
         dependsOn(provider { gradle.includedBuilds.map { it.task(":assemble") }.toList() })

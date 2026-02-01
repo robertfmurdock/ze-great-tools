@@ -54,14 +54,21 @@ if (project == project.rootProject) {
         val localTask = project.tasks.named("generateFingerprint", FingerprintTask::class.java)
         localFingerprint.set(localTask.flatMap { it.outputFile })
 
-        includedFingerprints.from(
-            project.gradle.includedBuilds.map { included ->
-                included.projectDir.resolve("build/fingerprint.txt")
+        dependsOn(localTask)
+        dependsOn(
+            project.provider {
+                extension.includedBuilds.get().mapNotNull { buildName ->
+                    project.gradle.includedBuild(buildName).task(":generateFingerprint")
+                }
             },
         )
-
-        dependsOn(localTask)
-
+        includedFingerprints.from(
+            project.provider {
+                extension.includedBuilds.get().mapNotNull { buildName ->
+                    project.gradle.includedBuild(buildName).projectDir.resolve("build/fingerprint.txt")
+                }
+            },
+        )
         outputFile.set(project.layout.buildDirectory.file("aggregate-fingerprint.txt"))
     }
 }
