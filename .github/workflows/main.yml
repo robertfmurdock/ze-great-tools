@@ -70,9 +70,10 @@ jobs:
         continue-on-error: true
         run: |
           cp command-line-tools/build/fingerprint.txt build/cli.txt
-          cp command-line-tools/build/fingerprint-dump.txt build/fingerprint-dump.txt
+          cp command-line-tools/build/fingerprint-manifest.log build/cli.log
           cp tools/build/fingerprint.txt build/tools.txt
-          gh release upload ${{ env.TAGGER_VERSION }} build/aggregate-fingerprint.txt build/cli.txt build/tools.txt build/fingerprint-dump.txt --clobber
+          cp tools/build/fingerprint-manifest.log build/tools.log
+          gh release upload ${{ env.TAGGER_VERSION }} build/aggregate-fingerprint.txt build/cli.txt build/cli.log build/tools.txt build/tools.log --clobber
       - name: Update Contributions
         uses: robertfmurdock/coupling-contribution-action@v3
         with:
