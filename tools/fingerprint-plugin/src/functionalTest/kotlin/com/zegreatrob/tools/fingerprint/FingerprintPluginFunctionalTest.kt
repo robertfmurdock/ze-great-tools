@@ -42,9 +42,61 @@ class FingerprintPluginFunctionalTest {
         .let { runner -> if (expectFailure) runner.buildAndFail() else runner.build() }
 
     private fun fingerprintFile(dir: File = testProjectDir) = dir.resolve("build/fingerprint.txt")
+    private fun fingerprintManifestFile(dir: File = testProjectDir) = dir.resolve("build/fingerprint-manifest.log")
+
+    private fun assertFingerprintManifestGeneratedCorrectly(
+        dir: File = testProjectDir,
+        expectedPluginVersion: String? = null,
+        vararg expectedSourcePaths: String,
+    ) {
+        val manifestFile = fingerprintManifestFile(dir)
+        assertTrue(
+            manifestFile.exists(),
+            "Fingerprint manifest file should be generated at ${manifestFile.path}",
+        )
+
+        val manifest = manifestFile.readText()
+
+        val pluginVersionLine = manifest.lineSequence().firstOrNull { it.startsWith("pluginVersion|") }
+        assertTrue(
+            pluginVersionLine != null,
+            "Manifest must contain a pluginVersion line. Content:\n$manifest",
+        )
+
+        val actualVersion = pluginVersionLine
+            .substringAfter("pluginVersion|")
+            .substringBefore('|')
+        assertTrue(
+            actualVersion.isNotBlank(),
+            "Manifest pluginVersion value must not be blank. Line: $pluginVersionLine",
+        )
+
+        if (expectedPluginVersion != null) {
+            assertEquals(
+                actualVersion,
+                expectedPluginVersion,
+                "Manifest pluginVersion must match expected. Expected=$expectedPluginVersion Actual=$actualVersion",
+            )
+        }
+
+        expectedSourcePaths.forEach { path ->
+            assertTrue(
+                manifest.contains("source|$path|"),
+                "Manifest should include source entry for '$path'. Content:\n$manifest",
+            )
+        }
+    }
+
+    private fun assertManifestContainsDependencyIngredients(manifest: String, context: String) {
+        assertTrue(
+            manifest.lineSequence().any { it.startsWith("classpath|") },
+            "Manifest should include dependency/classpath ingredients ($context). Content:\n$manifest",
+        )
+    }
 
     private fun runFingerprint(dir: File = testProjectDir, vararg extraArgs: String): String {
         gradle(dir, "generateFingerprint", "--configuration-cache", *extraArgs)
+        assertFingerprintManifestGeneratedCorrectly(dir)
         return fingerprintFile(dir).readText()
     }
 
@@ -85,6 +137,7 @@ class FingerprintPluginFunctionalTest {
 
         val fingerprintFile = fingerprintFile()
         assertTrue(fingerprintFile.exists(), "Fingerprint file should be generated at ${fingerprintFile.path}")
+        assertFingerprintManifestGeneratedCorrectly()
     }
 
     @Test
@@ -137,6 +190,7 @@ class FingerprintPluginFunctionalTest {
         )
 
         val firstHash = runFingerprint()
+        assertFingerprintManifestGeneratedCorrectly(expectedSourcePaths = arrayOf("src/commonMain/kotlin/Example.kt"))
 
         sourceFile.writeText(
             """
@@ -149,6 +203,7 @@ class FingerprintPluginFunctionalTest {
         )
 
         val secondHash = runFingerprint()
+        assertFingerprintManifestGeneratedCorrectly(expectedSourcePaths = arrayOf("src/commonMain/kotlin/Example.kt"))
 
         assertFingerprintChanged(firstHash, secondHash, "Fingerprint should change when module source changes!")
     }
@@ -161,6 +216,8 @@ class FingerprintPluginFunctionalTest {
         writeBuild(base)
 
         val firstFingerprint = runFingerprint()
+        val firstManifest = fingerprintManifestFile().readText()
+        assertManifestContainsDependencyIngredients(firstManifest, context = "baseline")
 
         writeBuild(
             """
@@ -179,8 +236,14 @@ class FingerprintPluginFunctionalTest {
         )
 
         val secondFingerprint = runFingerprint()
+        val secondManifest = fingerprintManifestFile().readText()
+        assertManifestContainsDependencyIngredients(secondManifest, context = "after dependency change")
 
         assertFingerprintChanged(firstFingerprint, secondFingerprint, "Fingerprint should have changed!")
+        assertTrue(
+            firstManifest != secondManifest,
+            "Manifest should change when non-test dependencies change.\n--- first ---\n$firstManifest\n--- second ---\n$secondManifest",
+        )
     }
 
     @Test
@@ -197,6 +260,8 @@ class FingerprintPluginFunctionalTest {
         writeBuild(base)
 
         val firstHash = runFingerprint()
+        val firstManifest = fingerprintManifestFile().readText()
+        assertManifestContainsDependencyIngredients(firstManifest, context = "baseline")
 
         writeBuild(
             """
@@ -214,8 +279,14 @@ class FingerprintPluginFunctionalTest {
         )
 
         val secondHash = runFingerprint()
+        val secondManifest = fingerprintManifestFile().readText()
+        assertManifestContainsDependencyIngredients(secondManifest, context = "after dependency change")
 
         assertFingerprintChanged(firstHash, secondHash, "JS fingerprint should have changed!")
+        assertTrue(
+            firstManifest != secondManifest,
+            "Manifest should change when JS main dependencies change.\n--- first ---\n$firstManifest\n--- second ---\n$secondManifest",
+        )
     }
 
     @Test
@@ -226,6 +297,8 @@ class FingerprintPluginFunctionalTest {
         writeBuild(base)
 
         val firstHash = runFingerprint()
+        val firstManifest = fingerprintManifestFile().readText()
+        assertManifestContainsDependencyIngredients(firstManifest, context = "baseline")
 
         writeBuild(
             """
@@ -243,8 +316,14 @@ class FingerprintPluginFunctionalTest {
         )
 
         val secondHash = runFingerprint()
+        val secondManifest = fingerprintManifestFile().readText()
+        assertManifestContainsDependencyIngredients(secondManifest, context = "after test dependency change")
 
         assertFingerprintUnchanged(firstHash, secondHash, "Fingerprint should NOT change for test dependencies!")
+        assertTrue(
+            firstManifest == secondManifest,
+            "Manifest should NOT change for test-only dependency changes.\n--- first ---\n$firstManifest\n--- second ---\n$secondManifest",
+        )
     }
 
     @Test
@@ -263,6 +342,7 @@ class FingerprintPluginFunctionalTest {
 
     private fun runWithVersion(dir: File, version: String): String {
         gradle(dir, "generateFingerprint", "-Dtest.plugin.version=$version")
+        assertFingerprintManifestGeneratedCorrectly(dir, expectedPluginVersion = version)
         return fingerprintFile(dir).readText()
     }
 
@@ -271,10 +351,12 @@ class FingerprintPluginFunctionalTest {
         writeBuild(kmpBuild())
 
         gradle(arguments = arrayOf("generateFingerprint", "--build-cache"))
+        assertFingerprintManifestGeneratedCorrectly()
 
         testProjectDir.resolve("build").deleteRecursively()
 
         val result = gradle(arguments = arrayOf("generateFingerprint", "--build-cache"))
+        assertFingerprintManifestGeneratedCorrectly()
 
         assertEquals(result.task(":generateFingerprint")?.outcome, TaskOutcome.FROM_CACHE)
     }

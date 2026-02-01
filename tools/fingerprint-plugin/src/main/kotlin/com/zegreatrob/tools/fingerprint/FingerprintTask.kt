@@ -36,6 +36,9 @@ abstract class FingerprintTask : DefaultTask() {
     @get:OutputFile
     abstract val outputFile: RegularFileProperty
 
+    @get:OutputFile
+    abstract val manifestFile: RegularFileProperty
+
     @get:Optional
     @get:OutputFile
     abstract val digestInputDumpFile: RegularFileProperty
@@ -47,6 +50,8 @@ abstract class FingerprintTask : DefaultTask() {
         val dumpFile = digestInputDumpFile.orNull?.asFile
         val dump = if (dumpFile != null) StringBuilder() else null
         var step = 0
+
+        val manifest = StringBuilder()
 
         fun ByteArray.toHex(): String = joinToString("") { "%02x".format(it) }
 
@@ -75,12 +80,16 @@ abstract class FingerprintTask : DefaultTask() {
             digest.update(value.toByte())
         }
 
+        manifest.append("pluginVersion|").append(pluginVersion.get()).append("|\n")
+
         updateBytes("pluginVersion(prefix)", "pluginVersion=".toByteArray())
         updateBytes("pluginVersion(value)", pluginVersion.get().toByteArray())
 
         classpath.files
             .sortedBy { it.name }
             .forEach { file ->
+                manifest.append("classpath|").append(file.name).append("|").append(file.length()).append("\n")
+
                 val fileContext = "classpath[fileName=${file.name} fileLength=${file.length()}]"
                 updateByte("$fileContext sep(0)", 0)
                 updateBytes("$fileContext file.name", file.name.toByteArray())
@@ -97,14 +106,22 @@ abstract class FingerprintTask : DefaultTask() {
                 val relPath = file.relativeTo(baseDirFile).invariantSeparatorsPath
                 val fileContext = "sources[path=$relPath length=${file.length()}]"
 
+                val bytes = file.readBytes()
+                val sha256 = MessageDigest.getInstance("SHA-256").digest(bytes).toHex()
+                manifest.append("source|").append(relPath).append("|").append(file.length()).append("|").append(sha256).append("\n")
+
                 updateByte("$fileContext sep(0)", 0)
                 updateBytes("$fileContext file.path", relPath.toByteArray())
                 updateByte("$fileContext sep(0)", 0)
-                updateBytes("$fileContext file.bytes", file.readBytes())
+                updateBytes("$fileContext file.bytes", bytes)
             }
 
         val hash = digest.digest().joinToString("") { "%02x".format(it) }
         outputFile.get().asFile.writeText(hash)
+
+        val mf = manifestFile.get().asFile
+        mf.parentFile?.mkdirs()
+        mf.writeText(manifest.toString())
 
         if (dump != null && dumpFile != null) {
             dumpFile.parentFile?.mkdirs()

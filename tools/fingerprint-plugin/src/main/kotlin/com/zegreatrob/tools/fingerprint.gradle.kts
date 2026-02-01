@@ -71,6 +71,7 @@ fun FingerprintTask.addKmpMainSources(from: Project) {
 project.tasks.register("generateFingerprint", FingerprintTask::class.java) {
     pluginVersion.set(version)
     outputFile.set(project.layout.buildDirectory.file("fingerprint.txt"))
+    manifestFile.set(project.layout.buildDirectory.file("fingerprint-manifest.log"))
     baseDir.set(project.layout.projectDirectory)
 
     val includedNames = extension.includedProjects.get()
