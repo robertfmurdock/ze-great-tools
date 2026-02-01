@@ -50,12 +50,12 @@ class FingerprintPluginFunctionalTest {
         kotlinBlock: String = "kotlin { jvm() }",
         repositoriesBlock: String = "repositories { mavenCentral() }",
     ) = """
-        plugins {
-            kotlin("multiplatform") version "2.3.0"
-            id("com.zegreatrob.tools.fingerprint")
-        }
-        $repositoriesBlock
-        $kotlinBlock
+            plugins {
+                kotlin("multiplatform") version "2.3.0"
+                id("com.zegreatrob.tools.fingerprint")
+            }
+            $repositoriesBlock
+            $kotlinBlock
     """.trimIndent()
 
     @Test
@@ -65,9 +65,9 @@ class FingerprintPluginFunctionalTest {
         writeBuild(
             kmpBuild(
                 kotlinBlock = """
-                    kotlin {
-                        jvm()
-                    }
+                        kotlin {
+                            jvm()
+                        }
                 """.trimIndent(),
             ),
         )
@@ -76,6 +76,84 @@ class FingerprintPluginFunctionalTest {
 
         val fingerprintFile = fingerprintFile()
         assertTrue(fingerprintFile.exists(), "Fingerprint file should be generated at ${fingerprintFile.path}")
+    }
+
+    @Test
+    fun `fingerprint does not change when test source code is modified`() {
+        writeSettings("test-source-change-test")
+        writeBuild(kmpBuild())
+
+        val testSourceFile = testProjectDir
+            .resolve("src/commonTest/kotlin")
+            .apply { mkdirs() }
+            .resolve("ExampleTest.kt")
+
+        testSourceFile.writeText(
+            """
+            package example
+
+            class ExampleTest {
+                fun value(): Int = 1
+            }
+            """.trimIndent(),
+        )
+
+        val firstHash = runFingerprint()
+
+        testSourceFile.writeText(
+            """
+            package example
+
+            class ExampleTest {
+                fun value(): Int = 2
+            }
+            """.trimIndent(),
+        )
+
+        val secondHash = runFingerprint()
+
+        assert(firstHash == secondHash) {
+            "Fingerprint should NOT change when test sources change! Old: $firstHash, New: $secondHash"
+        }
+    }
+
+    @Test
+    fun `fingerprint changes when module source code is modified`() {
+        writeSettings("source-change-test")
+        writeBuild(kmpBuild())
+
+        val sourceFile = testProjectDir
+            .resolve("src/commonMain/kotlin")
+            .apply { mkdirs() }
+            .resolve("Example.kt")
+
+        sourceFile.writeText(
+            """
+            package example
+
+            class Example {
+                fun value(): Int = 1
+            }
+            """.trimIndent(),
+        )
+
+        val firstHash = runFingerprint()
+
+        sourceFile.writeText(
+            """
+            package example
+
+            class Example {
+                fun value(): Int = 2
+            }
+            """.trimIndent(),
+        )
+
+        val secondHash = runFingerprint()
+
+        assert(firstHash != secondHash) {
+            "Fingerprint should change when module source changes! Old: $firstHash, New: $secondHash"
+        }
     }
 
     @Test
@@ -415,5 +493,175 @@ class FingerprintPluginFunctionalTest {
         assertTrue(result.output.contains("SUCCESS"), "Build should succeed even with non-plugin included builds")
         val aggregateFile = mainDir.resolve("build/aggregate-fingerprint.txt")
         assertTrue(aggregateFile.exists(), "Aggregate file should still be generated")
+    }
+
+    @Test
+    fun `fingerprint changes when main resources include a custom directory and its contents change`() {
+        writeSettings("java-custom-main-resources")
+
+        writeBuild(
+            """
+            plugins {
+                java
+                id("com.zegreatrob.tools.fingerprint")
+            }
+
+            repositories { mavenCentral() }
+
+            // Proves we use Gradle's built-in SourceSet knowledge rather than hard-coded directories.
+            sourceSets {
+                named("main") {
+                    resources.srcDir("graphql")
+                }
+            }
+            """.trimIndent(),
+        )
+
+        val schema = testProjectDir
+            .resolve("graphql")
+            .apply { mkdirs() }
+            .resolve("schema.graphql")
+
+        schema.writeText(
+            """
+            type Query { hello: String }
+            """.trimIndent(),
+        )
+
+        val firstHash = runFingerprint()
+
+        schema.writeText(
+            """
+            type Query { hello: String, goodbye: String }
+            """.trimIndent(),
+        )
+
+        val secondHash = runFingerprint()
+
+        assert(firstHash != secondHash) {
+            "Fingerprint should change when a main SourceSet resource (custom dir) changes! Old: $firstHash, New: $secondHash"
+        }
+    }
+
+    @Test
+    fun `fingerprint does not change when test resources include a custom directory and its contents change`() {
+        writeSettings("java-custom-test-resources")
+
+        writeBuild(
+            """
+            plugins {
+                java
+                id("com.zegreatrob.tools.fingerprint")
+            }
+
+            repositories { mavenCentral() }
+
+            // Test resources should NOT affect the fingerprint.
+            sourceSets {
+                named("test") {
+                    resources.srcDir("test-fixtures")
+                }
+            }
+            """.trimIndent(),
+        )
+
+        val fixture = testProjectDir
+            .resolve("test-fixtures")
+            .apply { mkdirs() }
+            .resolve("fixture.txt")
+
+        fixture.writeText("v1")
+
+        val firstHash = runFingerprint()
+
+        fixture.writeText("v2")
+
+        val secondHash = runFingerprint()
+
+        assert(firstHash == secondHash) {
+            "Fingerprint should NOT change when a test SourceSet resource (custom dir) changes! Old: $firstHash, New: $secondHash"
+        }
+    }
+
+    @Test
+    fun `fingerprint changes when KMP JS main resources include a custom directory and its contents change`() {
+        writeSettings("kmp-js-custom-main-resources")
+
+        writeBuild(
+            kmpBuild(
+                kotlinBlock = """
+                    kotlin {
+                        js(IR) { browser() }
+                        sourceSets {
+                            val jsMain by getting {
+                                resources.srcDir("graphql")
+                            }
+                        }
+                    }
+                """.trimIndent(),
+            ),
+        )
+
+        val schema = testProjectDir
+            .resolve("graphql")
+            .apply { mkdirs() }
+            .resolve("schema.graphql")
+
+        schema.writeText(
+            """
+            type Query { hello: String }
+            """.trimIndent(),
+        )
+
+        val firstHash = runFingerprint()
+
+        schema.writeText(
+            """
+            type Query { hello: String, goodbye: String }
+            """.trimIndent(),
+        )
+
+        val secondHash = runFingerprint()
+
+        assert(firstHash != secondHash) {
+            "Fingerprint should change when KMP jsMain resources (custom dir) change! Old: $firstHash, New: $secondHash"
+        }
+    }
+
+    @Test
+    fun `fingerprint does not change when KMP JS test resources include a custom directory and its contents change`() {
+        writeSettings("kmp-js-custom-test-resources")
+
+        writeBuild(
+            kmpBuild(
+                kotlinBlock = """
+                    kotlin {
+                        js(IR) { browser() }
+                        sourceSets {
+                            val jsTest by getting {
+                                resources.srcDir("test-fixtures")
+                            }
+                        }
+                    }
+                """.trimIndent(),
+            ),
+        )
+
+        val fixture = testProjectDir
+            .resolve("test-fixtures")
+            .apply { mkdirs() }
+            .resolve("fixture.txt")
+
+        fixture.writeText("v1")
+
+        val firstHash = runFingerprint()
+
+        fixture.writeText("v2")
+
+        val secondHash = runFingerprint()
+
+        assert(firstHash == secondHash) {
+            "Fingerprint should NOT change when KMP jsTest resources (custom dir) change! Old: $firstHash, New: $secondHash"
+        }
     }
 }

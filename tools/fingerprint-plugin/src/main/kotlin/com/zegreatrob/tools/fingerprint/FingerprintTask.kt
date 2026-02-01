@@ -2,13 +2,18 @@ package com.zegreatrob.tools.fingerprint
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.ConfigurableFileCollection
+import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Classpath
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.InputFiles
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputFile
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 import java.security.MessageDigest
 
@@ -20,6 +25,13 @@ abstract class FingerprintTask : DefaultTask() {
 
     @get:Classpath
     abstract val classpath: ConfigurableFileCollection
+
+    @get:InputFiles
+    @get:PathSensitive(PathSensitivity.RELATIVE)
+    abstract val sources: ConfigurableFileCollection
+
+    @get:Internal
+    abstract val baseDir: DirectoryProperty
 
     @get:OutputFile
     abstract val outputFile: RegularFileProperty
@@ -74,6 +86,21 @@ abstract class FingerprintTask : DefaultTask() {
                 updateBytes("$fileContext file.name", file.name.toByteArray())
                 updateByte("$fileContext sep(0)", 0)
                 updateBytes("$fileContext file.length", file.length().toString().toByteArray())
+            }
+
+        val baseDirFile = baseDir.get().asFile
+
+        sources.files
+            .filter { it.isFile }
+            .sortedBy { it.relativeTo(baseDirFile).invariantSeparatorsPath }
+            .forEach { file ->
+                val relPath = file.relativeTo(baseDirFile).invariantSeparatorsPath
+                val fileContext = "sources[path=$relPath length=${file.length()}]"
+
+                updateByte("$fileContext sep(0)", 0)
+                updateBytes("$fileContext file.path", relPath.toByteArray())
+                updateByte("$fileContext sep(0)", 0)
+                updateBytes("$fileContext file.bytes", file.readBytes())
             }
 
         val hash = digest.digest().joinToString("") { "%02x".format(it) }
