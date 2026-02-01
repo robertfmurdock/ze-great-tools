@@ -18,14 +18,18 @@ class FingerprintPluginFunctionalTest {
     private val settingsFile by lazy { testProjectDir.resolve("settings.gradle.kts") }
 
     private fun writeSettings(name: String? = null) {
-        settingsFile.writeText(
-            name?.let { """rootProject.name = "$it"""" } ?: "",
-        )
+        settingsFile.writeText(name?.let { """rootProject.name = "$it"""" } ?: "")
     }
 
     private fun writeBuild(script: String) {
         buildFile.writeText(script.trimIndent())
     }
+
+    private fun fileUnderProject(relativePath: String): File =
+        testProjectDir.resolve(relativePath).also { it.parentFile?.mkdirs() }
+
+    private fun writeProjectFile(relativePath: String, content: String): File =
+        fileUnderProject(relativePath).also { it.writeText(content.trimIndent()) }
 
     private fun gradle(
         projectDir: File = testProjectDir,
@@ -46,28 +50,35 @@ class FingerprintPluginFunctionalTest {
         return fingerprintFile(dir).readText()
     }
 
+    private fun assertFingerprintChanged(before: String, after: String, message: String) {
+        assert(before != after) { "$message Old: $before, New: $after" }
+    }
+
+    private fun assertFingerprintUnchanged(before: String, after: String, message: String) {
+        assert(before == after) { "$message Old: $before, New: $after" }
+    }
+
     private fun kmpBuild(
         kotlinBlock: String = "kotlin { jvm() }",
         repositoriesBlock: String = "repositories { mavenCentral() }",
     ) = """
-            plugins {
-                kotlin("multiplatform") version "2.3.0"
-                id("com.zegreatrob.tools.fingerprint")
-            }
-            $repositoriesBlock
-            $kotlinBlock
+        plugins {
+            kotlin("multiplatform") version "2.3.0"
+            id("com.zegreatrob.tools.fingerprint")
+        }
+        $repositoriesBlock
+        $kotlinBlock
     """.trimIndent()
 
     @Test
     fun `plugin generates fingerprint file in KMP project`() {
         writeSettings("kmp-test-project")
-
         writeBuild(
             kmpBuild(
                 kotlinBlock = """
-                        kotlin {
-                            jvm()
-                        }
+                    kotlin {
+                        jvm()
+                    }
                 """.trimIndent(),
             ),
         )
@@ -83,19 +94,15 @@ class FingerprintPluginFunctionalTest {
         writeSettings("test-source-change-test")
         writeBuild(kmpBuild())
 
-        val testSourceFile = testProjectDir
-            .resolve("src/commonTest/kotlin")
-            .apply { mkdirs() }
-            .resolve("ExampleTest.kt")
-
-        testSourceFile.writeText(
+        val testSourceFile = writeProjectFile(
+            "src/commonTest/kotlin/ExampleTest.kt",
             """
             package example
 
             class ExampleTest {
                 fun value(): Int = 1
             }
-            """.trimIndent(),
+            """,
         )
 
         val firstHash = runFingerprint()
@@ -112,9 +119,7 @@ class FingerprintPluginFunctionalTest {
 
         val secondHash = runFingerprint()
 
-        assert(firstHash == secondHash) {
-            "Fingerprint should NOT change when test sources change! Old: $firstHash, New: $secondHash"
-        }
+        assertFingerprintUnchanged(firstHash, secondHash, "Fingerprint should NOT change when test sources change!")
     }
 
     @Test
@@ -122,19 +127,15 @@ class FingerprintPluginFunctionalTest {
         writeSettings("source-change-test")
         writeBuild(kmpBuild())
 
-        val sourceFile = testProjectDir
-            .resolve("src/commonMain/kotlin")
-            .apply { mkdirs() }
-            .resolve("Example.kt")
-
-        sourceFile.writeText(
+        val sourceFile = writeProjectFile(
+            "src/commonMain/kotlin/Example.kt",
             """
             package example
 
             class Example {
                 fun value(): Int = 1
             }
-            """.trimIndent(),
+            """,
         )
 
         val firstHash = runFingerprint()
@@ -151,9 +152,7 @@ class FingerprintPluginFunctionalTest {
 
         val secondHash = runFingerprint()
 
-        assert(firstHash != secondHash) {
-            "Fingerprint should change when module source changes! Old: $firstHash, New: $secondHash"
-        }
+        assertFingerprintChanged(firstHash, secondHash, "Fingerprint should change when module source changes!")
     }
 
     @Test
@@ -183,9 +182,7 @@ class FingerprintPluginFunctionalTest {
 
         val secondFingerprint = runFingerprint()
 
-        assert(firstFingerprint != secondFingerprint) {
-            "Fingerprint should have changed! Old: $firstFingerprint, New: $secondFingerprint"
-        }
+        assertFingerprintChanged(firstFingerprint, secondFingerprint, "Fingerprint should have changed!")
     }
 
     @Test
@@ -220,7 +217,7 @@ class FingerprintPluginFunctionalTest {
 
         val secondHash = runFingerprint()
 
-        assert(firstHash != secondHash) { "JS fingerprint should have changed!" }
+        assertFingerprintChanged(firstHash, secondHash, "JS fingerprint should have changed!")
     }
 
     @Test
@@ -249,9 +246,7 @@ class FingerprintPluginFunctionalTest {
 
         val secondHash = runFingerprint()
 
-        assert(firstHash == secondHash) {
-            "Fingerprint should NOT change for test dependencies! Old: $firstHash, New: $secondHash"
-        }
+        assertFingerprintUnchanged(firstHash, secondHash, "Fingerprint should NOT change for test dependencies!")
     }
 
     @Test
@@ -290,14 +285,14 @@ class FingerprintPluginFunctionalTest {
     fun `root fingerprint reflects changes in subprojects`() {
         settingsFile.writeText(
             """
-        rootProject.name = "multi-project-root"
-        include(":app")
+            rootProject.name = "multi-project-root"
+            include(":app")
             """.trimIndent(),
         )
 
         buildFile.writeText(
             """
-        plugins { id("com.zegreatrob.tools.fingerprint"); kotlin("multiplatform") version "2.3.0" apply false }
+            plugins { id("com.zegreatrob.tools.fingerprint"); kotlin("multiplatform") version "2.3.0" apply false }
             """.trimIndent(),
         )
 
@@ -305,10 +300,10 @@ class FingerprintPluginFunctionalTest {
             parentFile.mkdirs()
             writeText(
                 """
-            plugins { kotlin("multiplatform") version "2.3.0" }
-            kotlin { jvm() }
-            repositories { mavenCentral() }
-            
+                plugins { kotlin("multiplatform") version "2.3.0" }
+                kotlin { jvm() }
+                repositories { mavenCentral() }
+                
                 """.trimIndent(),
             )
         }
@@ -317,7 +312,7 @@ class FingerprintPluginFunctionalTest {
 
         appBuildFile.appendText(
             """
-        dependencies { "commonMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3") }
+            dependencies { "commonMainImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3") }
             """.trimIndent(),
         )
 
@@ -330,38 +325,38 @@ class FingerprintPluginFunctionalTest {
     fun `fingerprint ignores unconfigured subprojects`() {
         settingsFile.writeText(
             """
-        rootProject.name = "filter-test"
-        include(":app", ":ignored-lib")
+            rootProject.name = "filter-test"
+            include(":app", ":ignored-lib")
             """.trimIndent(),
         )
 
         writeBuild(
             """
-        plugins { id("com.zegreatrob.tools.fingerprint"); kotlin("jvm") version "2.3.0" apply false }
-        repositories { mavenCentral() }
-        fingerprintConfig {
-            includedProjects.add("app")
-        }
+            plugins { id("com.zegreatrob.tools.fingerprint"); kotlin("jvm") version "2.3.0" apply false }
+            repositories { mavenCentral() }
+            fingerprintConfig {
+                includedProjects.add("app")
+            }
             """.trimIndent(),
         )
 
         val appBuild = testProjectDir.resolve("app/build.gradle.kts").apply { parentFile.mkdirs() }
         val ignoredBuild = testProjectDir.resolve("ignored-lib/build.gradle.kts").apply { parentFile.mkdirs() }
 
-        appBuild.writeText("plugins { kotlin(\"jvm\") version \"2.3.0\" } repositories { mavenCentral() }")
-        ignoredBuild.writeText("plugins { kotlin(\"jvm\") version \"2.3.0\" } repositories { mavenCentral() }")
+        appBuild.writeText("""plugins { kotlin("jvm") version "2.3.0" } repositories { mavenCentral() }""")
+        ignoredBuild.writeText("""plugins { kotlin("jvm") version "2.3.0" } repositories { mavenCentral() }""")
 
         val firstHash = runFingerprint()
 
         ignoredBuild.appendText("\ndependencies { implementation(\"org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3\") }")
         val secondHash = runFingerprint()
 
-        assert(firstHash == secondHash) { "Hash should remain stable when unconfigured subprojects change!" }
+        assertFingerprintUnchanged(firstHash, secondHash, "Hash should remain stable when unconfigured subprojects change!")
 
         appBuild.appendText("\ndependencies { implementation(\"org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3\") }")
         val thirdHash = runFingerprint()
 
-        assert(firstHash != thirdHash) { "Hash should change when configured subprojects change!" }
+        assertFingerprintChanged(firstHash, thirdHash, "Hash should change when configured subprojects change!")
     }
 
     @Test
@@ -369,14 +364,14 @@ class FingerprintPluginFunctionalTest {
         writeSettings("resolution-failure-test")
         writeBuild(
             """
-        plugins {
-            kotlin("jvm") version "2.3.0"
-            id("com.zegreatrob.tools.fingerprint")
-        }
-        // NO repositories defined
-        dependencies {
-            implementation("com.example:fake-lib:1.0.0")
-        }
+            plugins {
+                kotlin("jvm") version "2.3.0"
+                id("com.zegreatrob.tools.fingerprint")
+            }
+            // NO repositories defined
+            dependencies {
+                implementation("com.example:fake-lib:1.0.0")
+            }
             """.trimIndent(),
         )
 
@@ -388,38 +383,39 @@ class FingerprintPluginFunctionalTest {
     @Test
     fun `aggregateFingerprints combines hashes from included builds`(@TempDir testProjectDir: File) {
         val includedDir = testProjectDir.resolve("my-included-lib").apply { mkdirs() }
-        includedDir.resolve("settings.gradle.kts").writeText("rootProject.name = \"my-included-lib\"")
+        includedDir.resolve("settings.gradle.kts").writeText("""rootProject.name = "my-included-lib"""")
+
         includedDir.resolve("build.gradle.kts").writeText(
             """
-        plugins { id("com.zegreatrob.tools.fingerprint") }
+            plugins { id("com.zegreatrob.tools.fingerprint") }
 
-        val includedMarker = file("included-marker.txt").apply { writeText("lib-content") }
+            val includedMarker = file("included-marker.txt").apply { writeText("lib-content") }
 
-        tasks.named<com.zegreatrob.tools.fingerprint.FingerprintTask>("generateFingerprint") {
-            pluginVersion.set("1.0")
-            classpath.setFrom(files(includedMarker))
-        }
+            tasks.named<com.zegreatrob.tools.fingerprint.FingerprintTask>("generateFingerprint") {
+                pluginVersion.set("1.0")
+                classpath.setFrom(files(includedMarker))
+            }
             """.trimIndent(),
         )
 
         val mainDir = testProjectDir.resolve("main-app").apply { mkdirs() }
         mainDir.resolve("settings.gradle.kts").writeText(
             """
-        rootProject.name = "main-app"
-        includeBuild("../my-included-lib")
+            rootProject.name = "main-app"
+            includeBuild("../my-included-lib")
             """.trimIndent(),
         )
 
         mainDir.resolve("build.gradle.kts").writeText(
             """
-        plugins { id("com.zegreatrob.tools.fingerprint"); kotlin("multiplatform") version "2.3.0" apply false }
+            plugins { id("com.zegreatrob.tools.fingerprint"); kotlin("multiplatform") version "2.3.0" apply false }
 
-        val mainMarker = file("main-marker.txt").apply { writeText("app-content") }
+            val mainMarker = file("main-marker.txt").apply { writeText("app-content") }
 
-        tasks.named<com.zegreatrob.tools.fingerprint.FingerprintTask>("generateFingerprint") {
-            pluginVersion.set("1.0")
-            classpath.setFrom(files(mainMarker))
-        }
+            tasks.named<com.zegreatrob.tools.fingerprint.FingerprintTask>("generateFingerprint") {
+                pluginVersion.set("1.0")
+                classpath.setFrom(files(mainMarker))
+            }
             """.trimIndent(),
         )
 
@@ -436,26 +432,26 @@ class FingerprintPluginFunctionalTest {
     @Test
     fun `aggregateFingerprints triggers generateFingerprint in included builds`(@TempDir testProjectDir: File) {
         val includedDir = testProjectDir.resolve("my-lib").apply { mkdirs() }
-        includedDir.resolve("settings.gradle.kts").writeText("rootProject.name = \"my-lib\"")
+        includedDir.resolve("settings.gradle.kts").writeText("""rootProject.name = "my-lib"""")
         includedDir.resolve("build.gradle.kts").writeText(
             """
-        plugins { id("com.zegreatrob.tools.fingerprint") }
+            plugins { id("com.zegreatrob.tools.fingerprint") }
             """.trimIndent(),
         )
 
         val mainDir = testProjectDir.resolve("my-app").apply { mkdirs() }
         mainDir.resolve("settings.gradle.kts").writeText(
             """
-        rootProject.name = "my-app"
-        includeBuild("../my-lib")
+            rootProject.name = "my-app"
+            includeBuild("../my-lib")
             """.trimIndent(),
         )
         mainDir.resolve("build.gradle.kts").writeText(
             """
-        plugins { id("com.zegreatrob.tools.fingerprint") }
-        fingerprintConfig {
-            includedBuilds.add("my-lib") 
-        }
+            plugins { id("com.zegreatrob.tools.fingerprint") }
+            fingerprintConfig {
+                includedBuilds.add("my-lib")
+            }
             """.trimIndent(),
         )
 
@@ -472,19 +468,19 @@ class FingerprintPluginFunctionalTest {
     @Test
     fun `aggregateFingerprints skips included builds that do not have the plugin`(@TempDir testProjectDir: File) {
         val nakedDir = testProjectDir.resolve("naked-lib").apply { mkdirs() }
-        nakedDir.resolve("settings.gradle.kts").writeText("rootProject.name = \"naked-lib\"")
+        nakedDir.resolve("settings.gradle.kts").writeText("""rootProject.name = "naked-lib"""")
         nakedDir.resolve("build.gradle.kts").writeText("// Empty - no plugin here")
 
         val mainDir = testProjectDir.resolve("main-app").apply { mkdirs() }
         mainDir.resolve("settings.gradle.kts").writeText(
             """
-        rootProject.name = "main-app"
-        includeBuild("../naked-lib")
+            rootProject.name = "main-app"
+            includeBuild("../naked-lib")
             """.trimIndent(),
         )
         mainDir.resolve("build.gradle.kts").writeText(
             """
-        plugins { id("com.zegreatrob.tools.fingerprint") }
+            plugins { id("com.zegreatrob.tools.fingerprint") }
             """.trimIndent(),
         )
 
@@ -517,15 +513,11 @@ class FingerprintPluginFunctionalTest {
             """.trimIndent(),
         )
 
-        val schema = testProjectDir
-            .resolve("graphql")
-            .apply { mkdirs() }
-            .resolve("schema.graphql")
-
-        schema.writeText(
+        val schema = writeProjectFile(
+            "graphql/schema.graphql",
             """
             type Query { hello: String }
-            """.trimIndent(),
+            """,
         )
 
         val firstHash = runFingerprint()
@@ -538,9 +530,11 @@ class FingerprintPluginFunctionalTest {
 
         val secondHash = runFingerprint()
 
-        assert(firstHash != secondHash) {
-            "Fingerprint should change when a main SourceSet resource (custom dir) changes! Old: $firstHash, New: $secondHash"
-        }
+        assertFingerprintChanged(
+            firstHash,
+            secondHash,
+            "Fingerprint should change when a main SourceSet resource (custom dir) changes!",
+        )
     }
 
     @Test
@@ -565,12 +559,7 @@ class FingerprintPluginFunctionalTest {
             """.trimIndent(),
         )
 
-        val fixture = testProjectDir
-            .resolve("test-fixtures")
-            .apply { mkdirs() }
-            .resolve("fixture.txt")
-
-        fixture.writeText("v1")
+        val fixture = writeProjectFile("test-fixtures/fixture.txt", "v1")
 
         val firstHash = runFingerprint()
 
@@ -578,9 +567,11 @@ class FingerprintPluginFunctionalTest {
 
         val secondHash = runFingerprint()
 
-        assert(firstHash == secondHash) {
-            "Fingerprint should NOT change when a test SourceSet resource (custom dir) changes! Old: $firstHash, New: $secondHash"
-        }
+        assertFingerprintUnchanged(
+            firstHash,
+            secondHash,
+            "Fingerprint should NOT change when a test SourceSet resource (custom dir) changes!",
+        )
     }
 
     @Test
@@ -602,15 +593,11 @@ class FingerprintPluginFunctionalTest {
             ),
         )
 
-        val schema = testProjectDir
-            .resolve("graphql")
-            .apply { mkdirs() }
-            .resolve("schema.graphql")
-
-        schema.writeText(
+        val schema = writeProjectFile(
+            "graphql/schema.graphql",
             """
             type Query { hello: String }
-            """.trimIndent(),
+            """,
         )
 
         val firstHash = runFingerprint()
@@ -623,9 +610,7 @@ class FingerprintPluginFunctionalTest {
 
         val secondHash = runFingerprint()
 
-        assert(firstHash != secondHash) {
-            "Fingerprint should change when KMP jsMain resources (custom dir) change! Old: $firstHash, New: $secondHash"
-        }
+        assertFingerprintChanged(firstHash, secondHash, "Fingerprint should change when KMP jsMain resources (custom dir) change!")
     }
 
     @Test
@@ -647,12 +632,7 @@ class FingerprintPluginFunctionalTest {
             ),
         )
 
-        val fixture = testProjectDir
-            .resolve("test-fixtures")
-            .apply { mkdirs() }
-            .resolve("fixture.txt")
-
-        fixture.writeText("v1")
+        val fixture = writeProjectFile("test-fixtures/fixture.txt", "v1")
 
         val firstHash = runFingerprint()
 
@@ -660,8 +640,10 @@ class FingerprintPluginFunctionalTest {
 
         val secondHash = runFingerprint()
 
-        assert(firstHash == secondHash) {
-            "Fingerprint should NOT change when KMP jsTest resources (custom dir) change! Old: $firstHash, New: $secondHash"
-        }
+        assertFingerprintUnchanged(
+            firstHash,
+            secondHash,
+            "Fingerprint should NOT change when KMP jsTest resources (custom dir) change!",
+        )
     }
 }
