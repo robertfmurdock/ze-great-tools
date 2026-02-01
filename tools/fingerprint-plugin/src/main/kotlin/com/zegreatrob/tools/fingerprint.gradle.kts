@@ -18,8 +18,55 @@ val version: Provider<String> = project.providers.systemProperty("test.plugin.ve
 val isRoot = project == project.rootProject
 
 val extension = project.extensions.create("fingerprintConfig", FingerprintExtension::class.java)!!
-
 extension.includedProjects.convention(emptySet<String>())
+
+fun Project.isIncludedByConfig(includedNames: Set<String>, root: Project): Boolean = includedNames.isEmpty() || name in includedNames || this == root
+
+private fun Any.invokeNoArg(methodName: String): Any? = javaClass.methods.firstOrNull { it.name == methodName && it.parameterCount == 0 }?.invoke(this)
+
+private fun Any.asIterableOrEmpty(): Iterable<Any> {
+    val iterator = (invokeNoArg("iterator") as? Iterator<*>) ?: return emptyList()
+    return Iterable { iterator }.filterNotNull()
+}
+
+private fun Project.kotlinExtensionOrNull(): Any? = extensions.findByName("kotlin")
+
+private fun Project.kmpSourceSets(): Sequence<Any> {
+    val kotlinExt = kotlinExtensionOrNull() ?: return emptySequence()
+    val sourceSets = kotlinExt.invokeNoArg("getSourceSets") ?: return emptySequence()
+    return sourceSets.asIterableOrEmpty().asSequence()
+}
+
+private fun Any.kmpNameOrNull(): String? = invokeNoArg("getName") as? String
+
+private fun Any.kmpKotlinOrNull(): SourceDirectorySet? = invokeNoArg("getKotlin") as? SourceDirectorySet
+
+private fun Any.kmpResourcesOrNull(): SourceDirectorySet? = invokeNoArg("getResources") as? SourceDirectorySet
+
+private fun Project.kmpMainSourceSets(): Sequence<Any> = kmpSourceSets().filter { it.kmpNameOrNull()?.endsWith("Main") == true }
+
+fun FingerprintTask.addNonTestCompileClasspaths(from: Project) {
+    from.configurations
+        .matching {
+            it.isCanBeResolved &&
+                (it.name.contains("CompileClasspath") || it.name.contains("CompilationClasspath")) &&
+                !it.name.contains("Test")
+        }
+        .forEach { cfg -> classpath.from(cfg) }
+}
+
+fun FingerprintTask.addJavaMainSources(from: Project) {
+    val sourceSets = from.extensions.getByType<SourceSetContainer>()
+    val main = sourceSets.named("main").get()
+    sources.from(main.allSource)
+}
+
+fun FingerprintTask.addKmpMainSources(from: Project) {
+    from.kmpMainSourceSets().forEach { ss ->
+        ss.kmpKotlinOrNull()?.let { sources.from(it) }
+        ss.kmpResourcesOrNull()?.let { sources.from(it) }
+    }
+}
 
 project.tasks.register("generateFingerprint", FingerprintTask::class.java) {
     pluginVersion.set(version)
@@ -29,81 +76,15 @@ project.tasks.register("generateFingerprint", FingerprintTask::class.java) {
     val includedNames = extension.includedProjects.get()
     val targets = if (isRoot) project.allprojects else listOf(project)
 
-    val filteredTargets = targets.filter {
-        includedNames.isEmpty() || it.name in includedNames || it == project.rootProject
-    }
+    targets
+        .filter { it.isIncludedByConfig(includedNames, project.rootProject) }
+        .forEach { sub ->
+            addNonTestCompileClasspaths(sub)
 
-    fun FingerprintTask.wireClasspathInputsFrom(sub: Project) {
-        sub.configurations
-            .matching {
-                it.isCanBeResolved &&
-                    (it.name.contains("CompileClasspath") || it.name.contains("CompilationClasspath")) &&
-                    !it.name.contains("Test")
-            }
-            .forEach { cfg -> classpath.from(cfg) }
-    }
-
-    fun FingerprintTask.wireMainSourcesFromJavaSourceSets(sub: Project) {
-        val sourceSets = sub.extensions.getByType<SourceSetContainer>()
-        val main = sourceSets.named("main").get()
-        sources.from(main.allSource)
-    }
-
-    fun FingerprintTask.wireMainSourcesFromKotlinMultiplatform(sub: Project) {
-        val kotlinExt = sub.extensions.findByName("kotlin") ?: return
-
-        val getSourceSets = kotlinExt.javaClass.methods
-            .firstOrNull { it.name == "getSourceSets" && it.parameterCount == 0 }
-            ?: return
-
-        val asIterable = when (val sourceSetsContainer = getSourceSets.invoke(kotlinExt)) {
-            is Iterable<*> -> sourceSetsContainer
-            else -> {
-                val iteratorMethod = sourceSetsContainer.javaClass.methods
-                    .firstOrNull { it.name == "iterator" && it.parameterCount == 0 }
-                    ?: return
-                val iterator = iteratorMethod.invoke(sourceSetsContainer) as? Iterator<*> ?: return
-                Iterable { iterator }
-            }
+            sub.pluginManager.withPlugin("java") { addJavaMainSources(sub) }
+            sub.pluginManager.withPlugin("org.jetbrains.kotlin.jvm") { addJavaMainSources(sub) }
+            sub.pluginManager.withPlugin("org.jetbrains.kotlin.multiplatform") { addKmpMainSources(sub) }
         }
-
-        fun invokeSourceDirSet(sourceSet: Any, getterName: String): SourceDirectorySet? =
-            sourceSet.javaClass.methods
-                .firstOrNull { it.name == getterName && it.parameterCount == 0 }
-                ?.invoke(sourceSet) as? SourceDirectorySet
-
-        fun sourceSetName(sourceSet: Any): String? =
-            sourceSet.javaClass.methods
-                .firstOrNull { it.name == "getName" && it.parameterCount == 0 }
-                ?.invoke(sourceSet) as? String
-
-        asIterable
-            .filterNotNull()
-            .forEach { ss ->
-                val name = sourceSetName(ss) ?: return@forEach
-                if (!name.endsWith("Main")) return@forEach
-
-                invokeSourceDirSet(ss, "getKotlin")?.let { sources.from(it) }
-                invokeSourceDirSet(ss, "getResources")?.let { sources.from(it) }
-            }
-    }
-
-    filteredTargets.forEach { sub ->
-        wireClasspathInputsFrom(sub)
-
-        sub.pluginManager.withPlugin("java") { wireMainSourcesFromJavaSourceSets(sub) }
-        sub.pluginManager.withPlugin("org.jetbrains.kotlin.jvm") { wireMainSourcesFromJavaSourceSets(sub) }
-        sub.pluginManager.withPlugin("org.jetbrains.kotlin.multiplatform") { wireMainSourcesFromKotlinMultiplatform(sub) }
-
-        sources.from(
-            sub.fileTree("src") {
-                include("main/**")
-                include("**/*Main/**")
-                exclude("**/build/**")
-                exclude("**/.gradle/**")
-            },
-        )
-    }
 }
 
 if (project == project.rootProject) {
@@ -113,8 +94,7 @@ if (project == project.rootProject) {
 
         dependsOn(localTask)
 
-        val includedBuildNames = extension.includedBuilds.get()
-        includedBuildNames.forEach { buildName ->
+        extension.includedBuilds.get().forEach { buildName ->
             dependsOn(project.gradle.includedBuild(buildName).task(":generateFingerprint"))
             includedFingerprints.from(
                 project.gradle.includedBuild(buildName).projectDir.resolve("build/fingerprint.txt"),
