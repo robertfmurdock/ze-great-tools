@@ -42,7 +42,7 @@ class FingerprintPluginFunctionalTest {
     private fun fingerprintFile(dir: File = testProjectDir) = dir.resolve("build/fingerprint.txt")
 
     private fun runFingerprint(dir: File = testProjectDir, vararg extraArgs: String): String {
-        gradle(dir, "generateFingerprint", *extraArgs)
+        gradle(dir, "generateFingerprint", "--configuration-cache", *extraArgs)
         return fingerprintFile(dir).readText()
     }
 
@@ -219,7 +219,7 @@ class FingerprintPluginFunctionalTest {
 
         buildFile.writeText(
             """
-        plugins { id("com.zegreatrob.tools.fingerprint") }
+        plugins { id("com.zegreatrob.tools.fingerprint"); kotlin("multiplatform") version "2.3.0" apply false }
             """.trimIndent(),
         )
 
@@ -259,7 +259,7 @@ class FingerprintPluginFunctionalTest {
 
         writeBuild(
             """
-        plugins { id("com.zegreatrob.tools.fingerprint") }
+        plugins { id("com.zegreatrob.tools.fingerprint"); kotlin("jvm") version "2.3.0" apply false }
         repositories { mavenCentral() }
         fingerprintConfig {
             includedProjects.add("app")
@@ -314,9 +314,12 @@ class FingerprintPluginFunctionalTest {
         includedDir.resolve("build.gradle.kts").writeText(
             """
         plugins { id("com.zegreatrob.tools.fingerprint") }
-        // Hardcode a dependency string so we know the hash will be specific
+
+        val includedMarker = file("included-marker.txt").apply { writeText("lib-content") }
+
         tasks.named<com.zegreatrob.tools.fingerprint.FingerprintTask>("generateFingerprint") {
-            dependencies.set("v=1.0|deps=lib-content")
+            pluginVersion.set("1.0")
+            classpath.setFrom(files(includedMarker))
         }
             """.trimIndent(),
         )
@@ -331,9 +334,13 @@ class FingerprintPluginFunctionalTest {
 
         mainDir.resolve("build.gradle.kts").writeText(
             """
-        plugins { id("com.zegreatrob.tools.fingerprint") }
+        plugins { id("com.zegreatrob.tools.fingerprint"); kotlin("multiplatform") version "2.3.0" apply false }
+
+        val mainMarker = file("main-marker.txt").apply { writeText("app-content") }
+
         tasks.named<com.zegreatrob.tools.fingerprint.FingerprintTask>("generateFingerprint") {
-            dependencies.set("v=1.0|deps=app-content")
+            pluginVersion.set("1.0")
+            classpath.setFrom(files(mainMarker))
         }
             """.trimIndent(),
         )
