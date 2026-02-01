@@ -9,6 +9,7 @@ repositories {
 plugins {
     id("com.zegreatrob.tools.plugins.lint")
     id("com.zegreatrob.tools.plugins.versioning")
+    id("com.zegreatrob.tools.fingerprint") version "+"
     alias(libs.plugins.nl.littlerobots.version.catalog.update)
     alias(libs.plugins.io.github.gradle.nexus.publish.plugin)
     base

@@ -20,7 +20,7 @@ tagger {
 }
 
 fingerprintConfig {
-    includedBuilds = listOf("command-line-tools")
+    includedBuilds = listOf("command-line-tools", "tools")
 }
 
 tasks {
