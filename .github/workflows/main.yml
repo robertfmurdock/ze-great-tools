@@ -54,7 +54,11 @@ jobs:
           export PREVIOUS_VERSION=$(./gradlew previousVersion -q)
           ./gradlew aggregateFingerprints -Pversion=$PREVIOUS_VERSION
           gh release download "$PREVIOUS_VERSION" -p "aggregate-fingerprint.txt" -D .
-          diff -u aggregate-fingerprint.txt build/aggregate-fingerprint.txt || true
+          if diff -u aggregate-fingerprint.txt build/aggregate-fingerprint.txt; then
+            echo "OK: aggregate fingerprint matches release $PREVIOUS_VERSION"
+          else
+            echo "WARNING: aggregate fingerprint differs from release $PREVIOUS_VERSION (see diff above)"
+          fi
       - name: Version
         run: ./gradlew calculateVersion -PexportToGithub=true --scan
       - name: Build 🔨
