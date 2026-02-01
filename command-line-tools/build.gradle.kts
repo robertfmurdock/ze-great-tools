@@ -33,6 +33,9 @@ tasks {
             dependsOn(provider { (getTasksByName("publishPlugins", true) - this).toList() })
         }
     }
+    generateFingerprint {
+        digestInputDumpFile.set(layout.buildDirectory.file("fingerprint-dump.txt"))
+    }
 }
 
 fun Project.isSnapshot() = version.toString().contains("SNAPSHOT")
