@@ -763,4 +763,80 @@ class FingerprintPluginFunctionalTest {
             "Manifest should change when a directory classpath entry contents change.\n--- first ---\n$firstManifest\n--- second ---\n$secondManifest",
         )
     }
+
+    @Test
+    fun `aggregateFingerprints merges included + local manifest logs into one aggregate manifest log file`(@TempDir testProjectDir: File) {
+        val includedDir = testProjectDir.resolve("my-included-lib").apply { mkdirs() }
+        includedDir.resolve("settings.gradle.kts").writeText("""rootProject.name = "my-included-lib"""")
+        includedDir.resolve("build.gradle.kts").writeText(
+            """
+            plugins { id("com.zegreatrob.tools.fingerprint") }
+
+            val includedMarker = file("included-marker.txt").apply { writeText("included-content") }
+
+            tasks.named<com.zegreatrob.tools.fingerprint.FingerprintTask>("generateFingerprint") {
+                pluginVersion.set("included-1.0")
+                classpath.setFrom(files(includedMarker))
+            }
+            """.trimIndent(),
+        )
+
+        val mainDir = testProjectDir.resolve("main-app").apply { mkdirs() }
+        mainDir.resolve("settings.gradle.kts").writeText(
+            """
+            rootProject.name = "main-app"
+            includeBuild("../my-included-lib")
+            """.trimIndent(),
+        )
+        mainDir.resolve("build.gradle.kts").writeText(
+            """
+            plugins { id("com.zegreatrob.tools.fingerprint") }
+
+            fingerprintConfig {
+                includedBuilds.add("my-included-lib")
+            }
+
+            val mainMarker = file("main-marker.txt").apply { writeText("main-content") }
+
+            tasks.named<com.zegreatrob.tools.fingerprint.FingerprintTask>("generateFingerprint") {
+                pluginVersion.set("main-1.0")
+                classpath.setFrom(files(mainMarker))
+            }
+            """.trimIndent(),
+        )
+
+        gradle(mainDir, "aggregateFingerprints", "--no-configuration-cache")
+
+        assertTrue(
+            aggregateFingerprintFile(mainDir).exists(),
+            "Aggregate fingerprint file should be generated at ${aggregateFingerprintFile(mainDir).path}",
+        )
+
+        val aggregateManifest = aggregateFingerprintManifestFile(mainDir)
+        assertTrue(
+            aggregateManifest.exists(),
+            "Aggregate manifest log should be generated at ${aggregateManifest.path}",
+        )
+
+        val text = aggregateManifest.readText()
+
+        assertTrue(
+            text.contains("included-marker.txt"),
+            "Aggregate manifest should include evidence from the included build manifest.\n--- aggregate ---\n$text",
+        )
+        assertTrue(
+            text.contains("main-marker.txt"),
+            "Aggregate manifest should include evidence from the local/main manifest.\n--- aggregate ---\n$text",
+        )
+
+        val pluginVersionLines = text.lineSequence().filter { it.startsWith("pluginVersion|") }.toList()
+        assertTrue(
+            pluginVersionLines.size >= 2,
+            "Aggregate manifest should contain pluginVersion lines from multiple manifests. Found=${pluginVersionLines.size}\n--- aggregate ---\n$text",
+        )
+    }
+
+    private fun aggregateFingerprintFile(dir: File) = dir.resolve("build/aggregate-fingerprint.txt")
+
+    private fun aggregateFingerprintManifestFile(dir: File) = dir.resolve("build/aggregate-fingerprint-manifest.log")
 }
