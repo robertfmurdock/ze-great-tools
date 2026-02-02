@@ -53,7 +53,7 @@ jobs:
         continue-on-error: true
         run: |
           export PREVIOUS_VERSION=$(./gradlew previousVersion -q)
-          ./gradlew aggregateFingerprints -Pversion=$PREVIOUS_VERSION
+          ./gradlew aggregateFingerprints -Pversion=$PREVIOUS_VERSION --refresh-dependencies
           gh release download "$PREVIOUS_VERSION" -p "aggregate-fingerprint.txt" -D build/prev-aggregate-fingerprint.txt || true
           if diff -u build/prev-aggregate-fingerprint.txt build/aggregate-fingerprint.txt; then
             echo "OK: aggregate fingerprint matches release $PREVIOUS_VERSION"
