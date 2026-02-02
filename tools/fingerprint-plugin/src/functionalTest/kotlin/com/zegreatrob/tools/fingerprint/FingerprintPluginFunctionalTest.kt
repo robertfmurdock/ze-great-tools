@@ -174,6 +174,48 @@ class FingerprintPluginFunctionalTest {
     }
 
     @Test
+    fun `fingerprint does not include junit when junit is test-only dependency`() {
+        writeSettings("junit-test-only-dependency-should-not-leak")
+
+        writeBuild(
+            """
+            plugins {
+                kotlin("jvm") version "2.3.0"
+                id("com.zegreatrob.tools.fingerprint")
+            }
+
+            repositories {
+                mavenCentral()
+            }
+
+            dependencies {
+                testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.2")
+            }
+            """,
+        )
+
+        runFingerprint()
+
+        val manifest = fingerprintManifestFile().readText()
+        assertManifestContainsDependencyIngredients(manifest, "sanity check: we should have at least one classpath entry")
+
+        val classpathLines = manifest.lineSequence().filter { it.startsWith("classpath|") }.toList()
+        val junitClasspathLines = classpathLines.filter { it.contains("junit", ignoreCase = true) }
+
+        assertTrue(
+            junitClasspathLines.isEmpty(),
+            """
+            JUnit must not be treated as a production dependency ingredient when it's only declared in testImplementation.
+            Found classpath lines containing 'junit':
+            ${junitClasspathLines.joinToString("\n")}
+            
+            Full manifest:
+            $manifest
+            """.trimIndent(),
+        )
+    }
+
+    @Test
     fun `fingerprint changes when module source code is modified`() {
         writeSettings("source-change-test")
         writeBuild(kmpBuild())

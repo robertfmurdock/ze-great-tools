@@ -48,9 +48,10 @@ private fun Project.kmpMainSourceSets(): Sequence<Any> = kmpSourceSets().filter 
 fun FingerprintTask.addNonTestCompileClasspaths(from: Project) {
     from.configurations
         .matching {
+            val name = it.name.lowercase()
             it.isCanBeResolved &&
-                (it.name.contains("CompileClasspath") || it.name.contains("CompilationClasspath")) &&
-                !it.name.contains("Test")
+                (name.contains("compileclasspath") || name.contains("compilationclasspath")) &&
+                !name.contains("test")
         }
         .forEach { cfg -> classpath.from(cfg) }
 }

@@ -15,6 +15,16 @@ plugins {
     base
 }
 
+fingerprintConfig {
+    includedProjects = setOf(
+        "digger-core",
+        "digger-json",
+        "digger-model",
+        "digger-plugin",
+        "tagger-plugin",
+    )
+}
+
 tasks {
     assemble { dependsOn(provider { (getTasksByName("assemble", true) - this).toList() }) }
     check { dependsOn(provider { (getTasksByName("check", true) - this).toList() }) }
