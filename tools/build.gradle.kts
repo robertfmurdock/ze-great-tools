@@ -17,10 +17,12 @@ plugins {
 
 fingerprintConfig {
     includedProjects = setOf(
+        "certifier-plugin",
         "digger-core",
         "digger-json",
         "digger-model",
         "digger-plugin",
+        "fingerprint-plugin",
         "tagger-plugin",
     )
 }
