@@ -60,6 +60,12 @@ jobs:
           else
             echo "WARNING: aggregate fingerprint differs from release $PREVIOUS_VERSION (see diff above)"
           fi
+          gh release download "$PREVIOUS_VERSION" -p "aggregate-fingerprint-manifest.log" -D build/prev-aggregate-fingerprint-manifest.log || true
+          if diff -u build/prev-aggregate-fingerprint-manifest.log aggregate-fingerprint-manifest.log; then
+            echo "OK: aggregate log matches release $PREVIOUS_VERSION"
+          else
+            echo "WARNING: aggregate log differs from release $PREVIOUS_VERSION (see diff above)"
+          fi
       - name: Version
         run: ./gradlew calculateVersion -PexportToGithub=true --scan
       - name: Build 🔨
