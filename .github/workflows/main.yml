@@ -73,7 +73,14 @@ jobs:
           cp command-line-tools/build/fingerprint-manifest.log build/cli.log
           cp tools/build/fingerprint.txt build/tools.txt
           cp tools/build/fingerprint-manifest.log build/tools.log
-          gh release upload ${{ env.TAGGER_VERSION }} build/aggregate-fingerprint.txt build/cli.txt build/cli.log build/tools.txt build/tools.log --clobber
+          gh release upload ${{ env.TAGGER_VERSION }} \
+            build/aggregate-fingerprint.txt \
+            build/cli.txt \
+            build/cli.log \
+            build/tools.txt \
+            build/tools.log \
+            build/aggregate-fingerprint-manifest.log \
+            --clobber
       - name: Update Contributions
         uses: robertfmurdock/coupling-contribution-action@v3
         with:
