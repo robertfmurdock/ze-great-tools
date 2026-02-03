@@ -889,6 +889,7 @@ class FingerprintPluginFunctionalTest : FingerprintFunctionalTestBase() {
             "Fingerprint should change when a KMP published artifact (jvmJar) bytes change, even if sources/deps are unchanged.",
         )
     }
+
     @Test
     fun `fingerprint changes when build logic changes via buildSrc plugin implementation change`() {
         writeSettings("build-logic-change-test")
@@ -975,7 +976,6 @@ class FingerprintPluginFunctionalTest : FingerprintFunctionalTestBase() {
             "Fingerprint should change when build logic (buildSrc plugin code) changes AND that change affects produced artifact bytes.",
         )
     }
-
 
     @Test
     fun `fingerprint changes when build logic changes via buildSrc convention plugin for KMP`() {
