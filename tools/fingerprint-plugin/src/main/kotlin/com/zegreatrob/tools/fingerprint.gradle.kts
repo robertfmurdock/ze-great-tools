@@ -3,11 +3,7 @@ package com.zegreatrob.tools
 import com.zegreatrob.tools.fingerprint.AggregateFingerprintsTask
 import com.zegreatrob.tools.fingerprint.FingerprintExtension
 import com.zegreatrob.tools.fingerprint.FingerprintTask
-import org.gradle.api.Project
-import org.gradle.api.file.SourceDirectorySet
-import org.gradle.api.tasks.SourceSetContainer
 import org.gradle.jvm.tasks.Jar
-import org.gradle.kotlin.dsl.getByType
 
 val version: Provider<String> = project.providers.systemProperty("test.plugin.version")
     .orElse(
@@ -77,6 +73,19 @@ fun FingerprintTask.addKmpMainSources(from: Project) {
     }
 }
 
+fun FingerprintTask.addKmpPublishedArtifacts(from: Project) {
+    from.configurations
+        .matching {
+            val n = it.name.lowercase()
+            it.isCanBeConsumed &&
+                (n.endsWith("apielements") || n.endsWith("runtimeelements")) &&
+                !n.contains("test")
+        }
+        .forEach { cfg ->
+            publishedArtifacts.from(cfg.outgoing.artifacts.files)
+        }
+}
+
 project.tasks.register("generateFingerprint", FingerprintTask::class.java) {
     pluginVersion.set(version)
     outputFile.set(project.layout.buildDirectory.file("fingerprint.txt"))
@@ -99,7 +108,10 @@ project.tasks.register("generateFingerprint", FingerprintTask::class.java) {
                 addJavaMainSources(sub)
                 addJavaJarArtifact(sub)
             }
-            sub.pluginManager.withPlugin("org.jetbrains.kotlin.multiplatform") { addKmpMainSources(sub) }
+            sub.pluginManager.withPlugin("org.jetbrains.kotlin.multiplatform") {
+                addKmpMainSources(sub)
+                addKmpPublishedArtifacts(sub)
+            }
         }
 }
 

@@ -1,5 +1,6 @@
 package com.zegreatrob.tools.fingerprint
 
+import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
 import org.junit.jupiter.api.io.TempDir
 import java.io.File
@@ -22,18 +23,16 @@ abstract class FingerprintFunctionalTestBase {
         buildFile.writeText(script.trimIndent())
     }
 
-    protected fun fileUnderProject(relativePath: String): File =
-        testProjectDir.resolve(relativePath).also { it.parentFile?.mkdirs() }
+    protected fun fileUnderProject(relativePath: String): File = testProjectDir.resolve(relativePath).also { it.parentFile?.mkdirs() }
 
-    protected fun writeProjectFile(relativePath: String, content: String): File =
-        fileUnderProject(relativePath).also { it.writeText(content.trimIndent()) }
+    protected fun writeProjectFile(relativePath: String, content: String): File = fileUnderProject(relativePath).also { it.writeText(content.trimIndent()) }
 
     protected fun gradle(
         projectDir: File = testProjectDir,
         vararg arguments: String,
         forwardOutput: Boolean = false,
         expectFailure: Boolean = false,
-    ) = GradleRunner.create()
+    ): BuildResult = GradleRunner.create()
         .withProjectDir(projectDir)
         .withArguments(*arguments)
         .withPluginClasspath()

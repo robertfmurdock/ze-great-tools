@@ -5,118 +5,10 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 import java.io.File
 import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
 class FingerprintPluginFunctionalTest : FingerprintFunctionalTestBase() {
-
-    @TempDir
-    lateinit var testProjectDir: File
-
-    private val buildFile by lazy { testProjectDir.resolve("build.gradle.kts") }
-    private val settingsFile by lazy { testProjectDir.resolve("settings.gradle.kts") }
-
-    private fun writeSettings(name: String? = null) {
-        settingsFile.writeText(name?.let { """rootProject.name = "$it"""" } ?: "")
-    }
-
-    private fun writeBuild(script: String) {
-        buildFile.writeText(script.trimIndent())
-    }
-
-    private fun fileUnderProject(relativePath: String): File = testProjectDir.resolve(relativePath).also { it.parentFile?.mkdirs() }
-
-    private fun writeProjectFile(relativePath: String, content: String): File = fileUnderProject(relativePath).also { it.writeText(content.trimIndent()) }
-
-    private fun gradle(
-        projectDir: File = testProjectDir,
-        vararg arguments: String,
-        forwardOutput: Boolean = false,
-        expectFailure: Boolean = false,
-    ) = GradleRunner.create()
-        .withProjectDir(projectDir)
-        .withArguments(*arguments)
-        .withPluginClasspath()
-        .apply { if (forwardOutput) forwardOutput() }
-        .let { runner -> if (expectFailure) runner.buildAndFail() else runner.build() }
-
-    private fun fingerprintFile(dir: File = testProjectDir) = dir.resolve("build/fingerprint.txt")
-    private fun fingerprintManifestFile(dir: File = testProjectDir) = dir.resolve("build/fingerprint-manifest.log")
-
-    private fun assertFingerprintManifestGeneratedCorrectly(
-        dir: File = testProjectDir,
-        expectedPluginVersion: String? = null,
-        vararg expectedSourcePaths: String,
-    ) {
-        val manifestFile = fingerprintManifestFile(dir)
-        assertTrue(
-            manifestFile.exists(),
-            "Fingerprint manifest file should be generated at ${manifestFile.path}",
-        )
-
-        val manifest = manifestFile.readText()
-
-        val pluginVersionLine = manifest.lineSequence().firstOrNull { it.startsWith("pluginVersion|") }
-        assertTrue(
-            pluginVersionLine != null,
-            "Manifest must contain a pluginVersion line. Content:\n$manifest",
-        )
-
-        val actualVersion = pluginVersionLine
-            .substringAfter("pluginVersion|")
-            .substringBefore('|')
-        assertTrue(
-            actualVersion.isNotBlank(),
-            "Manifest pluginVersion value must not be blank. Line: $pluginVersionLine",
-        )
-
-        if (expectedPluginVersion != null) {
-            assertEquals(
-                actualVersion,
-                expectedPluginVersion,
-                "Manifest pluginVersion must match expected. Expected=$expectedPluginVersion Actual=$actualVersion",
-            )
-        }
-
-        expectedSourcePaths.forEach { path ->
-            assertTrue(
-                manifest.contains("source|$path|"),
-                "Manifest should include source entry for '$path'. Content:\n$manifest",
-            )
-        }
-    }
-
-    private fun assertManifestContainsDependencyIngredients(manifest: String, context: String) {
-        assertTrue(
-            manifest.lineSequence().any { it.startsWith("classpath|") },
-            "Manifest should include dependency/classpath ingredients ($context). Content:\n$manifest",
-        )
-    }
-
-    private fun runFingerprint(dir: File = testProjectDir, vararg extraArgs: String): String {
-        gradle(dir, "generateFingerprint", "--configuration-cache", *extraArgs)
-        assertFingerprintManifestGeneratedCorrectly(dir)
-        return fingerprintFile(dir).readText()
-    }
-
-    private fun assertFingerprintChanged(before: String, after: String, message: String) {
-        assert(before != after) { "$message Old: $before, New: $after" }
-    }
-
-    private fun assertFingerprintUnchanged(before: String, after: String, message: String) {
-        assert(before == after) { "$message Old: $before, New: $after" }
-    }
-
-    private fun kmpBuild(
-        kotlinBlock: String = "kotlin { jvm() }",
-        repositoriesBlock: String = "repositories { mavenCentral() }",
-    ) = """
-        plugins {
-            kotlin("multiplatform") version "2.3.0"
-            id("com.zegreatrob.tools.fingerprint")
-        }
-        $repositoriesBlock
-        $kotlinBlock
-    """.trimIndent()
 
     @Test
     fun `plugin generates fingerprint file in KMP project`() {
@@ -360,8 +252,9 @@ class FingerprintPluginFunctionalTest : FingerprintFunctionalTestBase() {
         assertManifestContainsDependencyIngredients(secondManifest, context = "after test dependency change")
 
         assertFingerprintUnchanged(firstHash, secondHash, "Fingerprint should NOT change for test dependencies!")
-        assertTrue(
-            firstManifest == secondManifest,
+        assertEquals(
+            firstManifest,
+            secondManifest,
             "Manifest should NOT change for test-only dependency changes.\n--- first ---\n$firstManifest\n--- second ---\n$secondManifest",
         )
     }
@@ -950,7 +843,50 @@ class FingerprintPluginFunctionalTest : FingerprintFunctionalTestBase() {
         )
     }
 
-    private fun aggregateFingerprintFile(dir: File) = dir.resolve("build/aggregate-fingerprint.txt")
+    @Test
+    fun `fingerprint changes when KMP published artifact bytes change even if sources and dependencies do not`() {
+        writeSettings("kmp-published-artifact-change-test")
 
-    private fun aggregateFingerprintManifestFile(dir: File) = dir.resolve("build/aggregate-fingerprint-manifest.log")
+        writeProjectFile(
+            "src/commonMain/kotlin/example/Hello.kt",
+            """
+            package example
+
+            class Hello {
+                fun value(): String = "hello"
+            }
+            """,
+        )
+
+        fun buildWithJvmJarManifest(implementationVersion: String) = """
+            plugins {
+                kotlin("multiplatform") version "2.3.0"
+                id("com.zegreatrob.tools.fingerprint")
+            }
+
+            repositories { mavenCentral() }
+
+            kotlin { jvm() }
+
+            tasks.named<org.gradle.jvm.tasks.Jar>("jvmJar") {
+                manifest {
+                    attributes["Implementation-Version"] = "$implementationVersion"
+                }
+            }
+        """.trimIndent()
+
+        writeBuild(buildWithJvmJarManifest("1"))
+        val hash1 = runFingerprint()
+
+        testProjectDir.resolve("build").deleteRecursively()
+
+        writeBuild(buildWithJvmJarManifest("2"))
+        val hash2 = runFingerprint()
+
+        assertFingerprintChanged(
+            hash1,
+            hash2,
+            "Fingerprint should change when a KMP published artifact (jvmJar) bytes change, even if sources/deps are unchanged.",
+        )
+    }
 }
