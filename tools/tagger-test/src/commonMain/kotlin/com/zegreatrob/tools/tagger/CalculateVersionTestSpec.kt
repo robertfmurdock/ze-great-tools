@@ -95,7 +95,7 @@ interface CalculateVersionTestSpec {
             directory = projectDir,
             remoteUrl = null,
             addFileNames = addFileNames,
-            commits = listOf<String>("init", "commit (no) 1"),
+            commits = listOf("init", "commit (no) 1"),
         )
         when (val result = execute()) {
             is TestResult.Failure -> assertContains(
@@ -114,7 +114,7 @@ interface CalculateVersionTestSpec {
             directory = projectDir,
             remoteUrl = null,
             addFileNames = addFileNames,
-            commits = listOf<String>("init", "commit (no) 1"),
+            commits = listOf("init", "commit (no) 1"),
             initialTag = "1.2.3",
         )
         val version = runCalculateVersionSuccessfully()
