@@ -30,6 +30,9 @@ abstract class FingerprintTask : DefaultTask() {
     @get:PathSensitive(PathSensitivity.RELATIVE)
     abstract val sources: ConfigurableFileCollection
 
+    @get:Classpath
+    abstract val publishedArtifacts: ConfigurableFileCollection
+
     @get:Internal
     abstract val baseDir: DirectoryProperty
 
@@ -125,6 +128,22 @@ abstract class FingerprintTask : DefaultTask() {
 
                 updateByte("$fileContext sep(0)", 0)
                 updateBytes("$fileContext content.sha256", classpathSha256.toByteArray())
+            }
+
+        publishedArtifacts.files
+            .sortedBy { it.name }
+            .forEach { file ->
+                val sha256 = classpathEntryContentSha256Hex(file)
+                manifest.append("artifact|").append(file.name).append("|").append(file.length()).append("|")
+                    .append(sha256).append("\n")
+
+                val fileContext = "artifact[fileName=${file.name} fileLength=${file.length()}]"
+                updateByte("$fileContext sep(0)", 0)
+                updateBytes("$fileContext file.name", file.name.toByteArray())
+                updateByte("$fileContext sep(0)", 0)
+                updateBytes("$fileContext file.length", file.length().toString().toByteArray())
+                updateByte("$fileContext sep(0)", 0)
+                updateBytes("$fileContext content.sha256", sha256.toByteArray())
             }
 
         val baseDirFile = baseDir.get().asFile

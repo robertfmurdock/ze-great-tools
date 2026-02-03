@@ -6,6 +6,7 @@ import com.zegreatrob.tools.fingerprint.FingerprintTask
 import org.gradle.api.Project
 import org.gradle.api.file.SourceDirectorySet
 import org.gradle.api.tasks.SourceSetContainer
+import org.gradle.jvm.tasks.Jar
 import org.gradle.kotlin.dsl.getByType
 
 val version: Provider<String> = project.providers.systemProperty("test.plugin.version")
@@ -19,6 +20,7 @@ val isRoot = project == project.rootProject
 
 val extension = project.extensions.create("fingerprintConfig", FingerprintExtension::class.java)!!
 extension.includedProjects.convention(emptySet<String>())
+extension.includedBuilds.convention(emptySet())
 
 fun Project.isIncludedByConfig(includedNames: Set<String>, root: Project): Boolean = includedNames.isEmpty() || name in includedNames || this == root
 
@@ -62,6 +64,12 @@ fun FingerprintTask.addJavaMainSources(from: Project) {
     sources.from(main.allSource)
 }
 
+fun FingerprintTask.addJavaJarArtifact(from: Project) {
+    val jarTask = from.tasks.named("jar", Jar::class.java)
+    dependsOn(jarTask)
+    publishedArtifacts.from(jarTask.flatMap { it.archiveFile })
+}
+
 fun FingerprintTask.addKmpMainSources(from: Project) {
     from.kmpMainSourceSets().forEach { ss ->
         ss.kmpKotlinOrNull()?.let { sources.from(it) }
@@ -83,8 +91,14 @@ project.tasks.register("generateFingerprint", FingerprintTask::class.java) {
         .forEach { sub ->
             addNonTestCompileClasspaths(sub)
 
-            sub.pluginManager.withPlugin("java") { addJavaMainSources(sub) }
-            sub.pluginManager.withPlugin("org.jetbrains.kotlin.jvm") { addJavaMainSources(sub) }
+            sub.pluginManager.withPlugin("java") {
+                addJavaMainSources(sub)
+                addJavaJarArtifact(sub)
+            }
+            sub.pluginManager.withPlugin("org.jetbrains.kotlin.jvm") {
+                addJavaMainSources(sub)
+                addJavaJarArtifact(sub)
+            }
             sub.pluginManager.withPlugin("org.jetbrains.kotlin.multiplatform") { addKmpMainSources(sub) }
         }
 }
@@ -97,7 +111,7 @@ if (project == project.rootProject) {
 
         dependsOn(localTask)
 
-        extension.includedBuilds.get().forEach { buildName ->
+        extension.includedBuilds.orElse(emptySet()).get().forEach { buildName ->
             dependsOn(project.gradle.includedBuild(buildName).task(":generateFingerprint"))
 
             includedFingerprints.from(

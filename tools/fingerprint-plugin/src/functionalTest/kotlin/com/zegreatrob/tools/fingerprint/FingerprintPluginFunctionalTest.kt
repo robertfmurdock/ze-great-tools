@@ -878,6 +878,80 @@ class FingerprintPluginFunctionalTest {
         )
     }
 
+    @Test
+    fun `aggregateFingerprints works when includedBuilds is not configured`() {
+        writeSettings("aggregate-defaults-test")
+
+        writeBuild(
+            """
+            plugins { id("com.zegreatrob.tools.fingerprint") }
+            """,
+        )
+
+        val result = gradle(arguments = arrayOf("aggregateFingerprints", "--no-configuration-cache"))
+
+        assertEquals(TaskOutcome.SUCCESS, result.task(":aggregateFingerprints")?.outcome)
+
+        assertTrue(fingerprintFile().exists(), "Local fingerprint should be generated at ${fingerprintFile().path}")
+        assertFingerprintManifestGeneratedCorrectly()
+
+        assertTrue(
+            aggregateFingerprintFile(testProjectDir).exists(),
+            "Aggregate fingerprint file should be generated at ${aggregateFingerprintFile(testProjectDir).path}",
+        )
+        assertTrue(
+            aggregateFingerprintManifestFile(testProjectDir).exists(),
+            "Aggregate manifest log should be generated at ${aggregateFingerprintManifestFile(testProjectDir).path}",
+        )
+    }
+
+    @Test
+    fun `fingerprint changes when published artifact bytes change even if sources and dependencies do not`() {
+        writeSettings("published-artifact-change-test")
+
+        // Stable main source (unchanged between runs)
+        writeProjectFile(
+            "src/main/java/example/Hello.java",
+            """
+            package example;
+
+            public class Hello {
+                public static String value() { return "hello"; }
+            }
+            """,
+        )
+
+        fun buildWithManifest(implementationVersion: String) = """
+            plugins {
+                java
+                id("com.zegreatrob.tools.fingerprint")
+            }
+
+            repositories { mavenCentral() }
+
+            tasks.jar {
+                manifest {
+                    attributes["Implementation-Version"] = "$implementationVersion"
+                }
+            }
+        """.trimIndent()
+
+        writeBuild(buildWithManifest("1"))
+        val hash1 = runFingerprint()
+
+        testProjectDir.resolve("build").deleteRecursively()
+
+        writeBuild(buildWithManifest("2"))
+        val hash2 = runFingerprint()
+
+        assertFingerprintChanged(
+            hash1,
+            hash2,
+            "Fingerprint should change when the produced JAR bytes change (e.g., manifest attribute change), " +
+                "even if sources and dependencies are unchanged.",
+        )
+    }
+
     private fun aggregateFingerprintFile(dir: File) = dir.resolve("build/aggregate-fingerprint.txt")
 
     private fun aggregateFingerprintManifestFile(dir: File) = dir.resolve("build/aggregate-fingerprint-manifest.log")
