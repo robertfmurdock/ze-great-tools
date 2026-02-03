@@ -1,15 +1,13 @@
 package com.zegreatrob.tools.fingerprint
 
-import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertNotNull
 import org.junit.jupiter.api.io.TempDir
 import java.io.File
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-class FingerprintPluginFunctionalTest {
+class FingerprintPluginFunctionalTest : FingerprintFunctionalTestBase() {
 
     @TempDir
     lateinit var testProjectDir: File
