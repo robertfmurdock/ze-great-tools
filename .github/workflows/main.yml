@@ -57,6 +57,7 @@ jobs:
           gh release download "$PREVIOUS_VERSION" -p "aggregate-fingerprint.txt" -D build/prev-aggregate-fingerprint.txt || true
           if diff -u build/prev-aggregate-fingerprint.txt build/aggregate-fingerprint.txt; then
             echo "OK: aggregate fingerprint matches release $PREVIOUS_VERSION"
+            echo "FINGERPRINT_SNAPSHOT=-SNAPSHOT" >> "$GITHUB_ENV"
           else
             echo "WARNING: aggregate fingerprint differs from release $PREVIOUS_VERSION (see diff above)"
           fi
@@ -68,6 +69,8 @@ jobs:
           fi
       - name: Version
         run: ./gradlew calculateVersion -PexportToGithub=true --scan
+      - name: Consider Fingerprint
+        run: echo "TAGGER_VERSION=$TAGGER_VERSION$FINGERPRINT_SNAPSHOT" >> "$GITHUB_ENV"
       - name: Build 🔨
         run: ./gradlew check -Pversion=${{ env.TAGGER_VERSION }} --no-configuration-cache --scan
       - name: Release 🔨
