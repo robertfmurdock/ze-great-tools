@@ -18,7 +18,8 @@ val extension = project.extensions.create("fingerprintConfig", FingerprintExtens
 extension.includedProjects.convention(emptySet<String>())
 extension.includedBuilds.convention(emptySet())
 
-fun Project.isIncludedByConfig(includedNames: Set<String>, root: Project): Boolean = includedNames.isEmpty() || name in includedNames || this == root
+fun Project.isIncludedByConfig(includedNames: Set<String>, root: Project): Boolean =
+    includedNames.isEmpty() || name in includedNames || this == root
 
 private fun Any.invokeNoArg(methodName: String): Any? = javaClass.methods.firstOrNull { it.name == methodName && it.parameterCount == 0 }?.invoke(this)
 
@@ -91,7 +92,7 @@ project.tasks.register("generateFingerprint", FingerprintTask::class.java) {
     outputFile.set(project.layout.buildDirectory.file("fingerprint.txt"))
     manifestFile.set(project.layout.buildDirectory.file("fingerprint-manifest.log"))
     baseDir.set(project.layout.projectDirectory)
-
+    
     val includedNames = extension.includedProjects.get()
     val targets = if (isRoot) project.allprojects else listOf(project)
 

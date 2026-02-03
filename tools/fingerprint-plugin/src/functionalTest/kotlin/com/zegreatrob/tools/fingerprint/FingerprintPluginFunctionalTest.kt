@@ -889,4 +889,188 @@ class FingerprintPluginFunctionalTest : FingerprintFunctionalTestBase() {
             "Fingerprint should change when a KMP published artifact (jvmJar) bytes change, even if sources/deps are unchanged.",
         )
     }
+    @Test
+    fun `fingerprint changes when build logic changes via buildSrc plugin implementation change`() {
+        writeSettings("build-logic-change-test")
+
+        writeProjectFile(
+            "src/main/java/example/Hello.java",
+            """
+            package example;
+
+            public class Hello {
+                public static String value() { return "hello"; }
+            }
+            """,
+        )
+
+        writeProjectFile(
+            "buildSrc/build.gradle.kts",
+            """
+            plugins {
+                `kotlin-dsl`
+            }
+
+            repositories {
+                gradlePluginPortal()
+                mavenCentral()
+            }
+            """,
+        )
+
+        writeProjectFile(
+            "buildSrc/src/main/resources/META-INF/gradle-plugins/test.noop.properties",
+            """
+            implementation-class=example.NoOpPlugin
+            """,
+        )
+
+        fun writeNoOpPluginSource(marker: String) {
+            writeProjectFile(
+                "buildSrc/src/main/kotlin/example/NoOpPlugin.kt",
+                """
+                package example
+
+                import org.gradle.api.Plugin
+                import org.gradle.api.Project
+                import org.gradle.api.tasks.bundling.Jar
+
+                class NoOpPlugin : Plugin<Project> {
+                    override fun apply(target: Project) {
+                        // Receiver lambda form (Kotlin DSL): no parameters here.
+                        target.tasks.withType(Jar::class.java).configureEach {
+                            manifest.attributes(mapOf("Implementation-Version" to "$marker"))
+                        }
+                    }
+                }
+                """,
+            )
+        }
+
+        writeNoOpPluginSource(marker = "A")
+
+        writeBuild(
+            """
+            plugins {
+                java
+                id("test.noop")
+                id("com.zegreatrob.tools.fingerprint")
+            }
+
+            repositories { mavenCentral() }
+            """,
+        )
+
+        val hash1 = runFingerprint()
+
+        writeNoOpPluginSource(marker = "B")
+
+        testProjectDir.resolve("build").deleteRecursively()
+
+        val hash2 = runFingerprint()
+
+        assertFingerprintChanged(
+            hash1,
+            hash2,
+            "Fingerprint should change when build logic (buildSrc plugin code) changes AND that change affects produced artifact bytes.",
+        )
+    }
+
+
+    @Test
+    fun `fingerprint changes when build logic changes via buildSrc convention plugin for KMP`() {
+        writeSettings("build-logic-kmp-change-test")
+
+        writeProjectFile(
+            "src/commonMain/kotlin/example/Hello.kt",
+            """
+            package example
+
+            class Hello {
+                fun value(): String = "hello"
+            }
+            """,
+        )
+
+        writeProjectFile(
+            "buildSrc/build.gradle.kts",
+            """
+            plugins { `kotlin-dsl` }
+
+            repositories {
+                gradlePluginPortal()
+                mavenCentral()
+            }
+            """,
+        )
+
+        writeProjectFile(
+            "buildSrc/src/main/resources/META-INF/gradle-plugins/test.kmpconvention.properties",
+            """
+            implementation-class=example.KmpConventionPlugin
+            """,
+        )
+
+        fun writeConventionPluginSource(marker: String) {
+            writeProjectFile(
+                "buildSrc/src/main/kotlin/example/KmpConventionPlugin.kt",
+                """
+                package example
+
+                import org.gradle.api.Plugin
+                import org.gradle.api.Project
+                import org.gradle.api.tasks.bundling.Jar
+
+                class KmpConventionPlugin : Plugin<Project> {
+                    override fun apply(target: Project) {
+                        target.tasks.withType(Jar::class.java)
+                            .matching { it.name == "jvmJar" }
+                            .configureEach {
+                                manifest.attributes(mapOf("Implementation-Version" to "$marker"))
+                            }
+                    }
+                }
+                """,
+            )
+        }
+
+        fun assertManifestShowsJvmJarWasFingerprinted(context: String) {
+            val manifest = fingerprintManifestFile().readText()
+            assertTrue(
+                manifest.lineSequence().any { it.startsWith("artifact|") && it.contains("jvm", ignoreCase = true) && it.contains("jar", ignoreCase = true) },
+                "Manifest must include an artifact line for the KMP JVM jar ($context). Manifest:\n$manifest",
+            )
+        }
+
+        writeConventionPluginSource(marker = "A")
+
+        writeBuild(
+            """
+            plugins {
+                kotlin("multiplatform") version "2.3.0"
+                id("test.kmpconvention")
+                id("com.zegreatrob.tools.fingerprint")
+            }
+
+            repositories { mavenCentral() }
+
+            kotlin { jvm() }
+            """,
+        )
+
+        val hash1 = runFingerprint()
+        assertManifestShowsJvmJarWasFingerprinted("first run")
+
+        writeConventionPluginSource(marker = "B")
+        testProjectDir.resolve("build").deleteRecursively()
+
+        val hash2 = runFingerprint()
+        assertManifestShowsJvmJarWasFingerprinted("second run")
+
+        assertFingerprintChanged(
+            hash1,
+            hash2,
+            "Fingerprint should change when KMP convention build logic changes AND that change affects published artifact bytes (jvmJar).",
+        )
+    }
 }
