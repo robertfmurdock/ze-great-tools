@@ -71,7 +71,7 @@ jobs:
         run: ./gradlew calculateVersion -PexportToGithub=true --scan
       - name: Consider Fingerprint
         run: |
-          if [[ $s == *"-SNAPSHOT" ]]; then
+          if [[ $TAGGER_VERSION == *"-SNAPSHOT" ]]; then
             echo "Already a snapshot."
           else
             echo "TAGGER_VERSION=$TAGGER_VERSION$FINGERPRINT_SNAPSHOT" >> "$GITHUB_ENV"
