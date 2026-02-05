@@ -1,5 +1,5 @@
 [versions]
-kotlin = "2.3.0"
+kotlin = "2.3.10"
 
 [libraries]
 com-github-ajalt-clikt-clikt = "com.github.ajalt.clikt:clikt:5.1.0"
@@ -11,5 +11,5 @@ org-jetbrains-kotlinx-kotlinx-serialization-bom = "org.jetbrains.kotlinx:kotlinx
 
 [plugins]
 nl-littlerobots-version-catalog-update = "nl.littlerobots.version-catalog-update:1.0.1"
-org-jetbrains-kotlin-multiplatform = "org.jetbrains.kotlin.multiplatform:2.3.0"
+org-jetbrains-kotlin-multiplatform = "org.jetbrains.kotlin.multiplatform:2.3.10"
 org-jmailen-kotlinter = "org.jmailen.kotlinter:5.4.0"
