@@ -53,14 +53,15 @@ jobs:
         continue-on-error: true
         run: |
           export PREVIOUS_VERSION=$(./gradlew previousVersion -q)
-          ./gradlew aggregateFingerprints -Pversion=$PREVIOUS_VERSION
           gh release download "$PREVIOUS_VERSION" -p "aggregate-fingerprint.txt" -D build/prev-aggregate-fingerprint.txt || true
-          if diff -u build/prev-aggregate-fingerprint.txt build/aggregate-fingerprint.txt; then
+
+          if ./gradlew compareAggregateFingerprints -Pversion=$PREVIOUS_VERSION; then
             echo "OK: aggregate fingerprint matches release $PREVIOUS_VERSION"
             echo "FINGERPRINT_SNAPSHOT=-SNAPSHOT" >> "$GITHUB_ENV"
           else
-            echo "WARNING: aggregate fingerprint differs from release $PREVIOUS_VERSION (see diff above)"
+            echo "WARNING: aggregate fingerprint differs from release $PREVIOUS_VERSION"
           fi
+
           gh release download "$PREVIOUS_VERSION" -p "aggregate-fingerprint-manifest.log" -D build/prev-aggregate-fingerprint-manifest.log || true
           if diff -u build/prev-aggregate-fingerprint-manifest.log build/aggregate-fingerprint-manifest.log; then
             echo "OK: aggregate log matches release $PREVIOUS_VERSION"

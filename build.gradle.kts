@@ -21,6 +21,7 @@ tagger {
 
 fingerprintConfig {
     includedBuilds = listOf("command-line-tools", "tools")
+    compareToFingerprintFile = layout.buildDirectory.file("prev-aggregate-fingerprint.txt")
 }
 
 tasks {
