@@ -1,6 +1,7 @@
 package com.zegreatrob.tools
 
 import com.zegreatrob.tools.fingerprint.AggregateFingerprintsTask
+import com.zegreatrob.tools.fingerprint.CompareAggregateFingerprintsTask
 import com.zegreatrob.tools.fingerprint.FingerprintExtension
 import com.zegreatrob.tools.fingerprint.FingerprintTask
 import org.gradle.jvm.tasks.Jar
@@ -136,5 +137,13 @@ if (project == project.rootProject) {
 
         outputFile.set(project.layout.buildDirectory.file("aggregate-fingerprint.txt"))
         outputManifestFile.set(project.layout.buildDirectory.file("aggregate-fingerprint-manifest.log"))
+    }
+
+    project.tasks.register("compareAggregateFingerprints", CompareAggregateFingerprintsTask::class.java) {
+        val aggregateTask = project.tasks.named("aggregateFingerprints", AggregateFingerprintsTask::class.java)
+        dependsOn(aggregateTask)
+
+        currentFingerprint.set(aggregateTask.flatMap { it.outputFile })
+        expectedFingerprint.set(extension.compareToFingerprintFile)
     }
 }
