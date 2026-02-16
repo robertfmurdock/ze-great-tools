@@ -54,6 +54,8 @@ jobs:
         run: |
           export PREVIOUS_VERSION=$(./gradlew previousVersion -q)
           gh release download "$PREVIOUS_VERSION" -p "aggregate-fingerprint.txt" -D build/prev-aggregate-fingerprint.txt || true
+          
+          ls build/prev-aggregate-fingerprint.txt
 
           if ./gradlew compareAggregateFingerprints -Pversion=$PREVIOUS_VERSION; then
             echo "OK: aggregate fingerprint matches release $PREVIOUS_VERSION"
