@@ -19,6 +19,12 @@ val extension = project.extensions.create("fingerprintConfig", FingerprintExtens
 extension.includedProjects.convention(emptySet<String>())
 extension.includedBuilds.convention(emptySet())
 
+project.providers.gradleProperty("compareToFingerprintFile")
+    .map { project.file(it) }
+    .let { fileProvider ->
+        extension.compareToFingerprintFile.convention(project.layout.file(fileProvider))
+    }
+
 fun Project.isIncludedByConfig(includedNames: Set<String>, root: Project): Boolean = includedNames.isEmpty() || name in includedNames || this == root
 
 private fun Any.invokeNoArg(methodName: String): Any? = javaClass.methods.firstOrNull { it.name == methodName && it.parameterCount == 0 }?.invoke(this)

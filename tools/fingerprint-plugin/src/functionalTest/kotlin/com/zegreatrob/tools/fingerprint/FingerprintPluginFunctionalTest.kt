@@ -1142,4 +1142,36 @@ class FingerprintPluginFunctionalTest : FingerprintFunctionalTestBase() {
             "Expected a bash-friendly mismatch indicator line `FINGERPRINT_MATCH=false` in output.\n--- output ---\n${compareResult.output}",
         )
     }
+
+    @Test
+    fun `compareAggregateFingerprints can be configured via -P compareToFingerprintFile`() {
+        writeSettings("compare-aggregate-fingerprints-property-config")
+
+        writeBuild(
+            """
+            plugins { id("com.zegreatrob.tools.fingerprint") }
+            """,
+        )
+
+        val expectedFile = fileUnderProject("expected/aggregate-fingerprint.txt")
+
+        val aggregateResult = gradle(arguments = arrayOf("aggregateFingerprints", "--no-configuration-cache"))
+        assertEquals(TaskOutcome.SUCCESS, aggregateResult.task(":aggregateFingerprints")?.outcome)
+
+        expectedFile.writeText(aggregateFingerprintFile(testProjectDir).readText())
+
+        val compareResult = gradle(
+            arguments = arrayOf(
+                "compareAggregateFingerprints",
+                "--no-configuration-cache",
+                "-PcompareToFingerprintFile=expected/aggregate-fingerprint.txt",
+            ),
+        )
+
+        assertEquals(TaskOutcome.SUCCESS, compareResult.task(":compareAggregateFingerprints")?.outcome)
+        assertTrue(
+            compareResult.output.lineSequence().any { it.trim() == "FINGERPRINT_MATCH=true" },
+            "Expected `FINGERPRINT_MATCH=true` in output.\n--- output ---\n${compareResult.output}",
+        )
+    }
 }
