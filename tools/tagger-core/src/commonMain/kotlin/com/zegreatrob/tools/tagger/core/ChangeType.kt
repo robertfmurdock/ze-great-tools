@@ -11,6 +11,7 @@ fun TaggerCore.calculateNextVersion(
     implicitPatch: Boolean,
     disableDetached: Boolean,
     versionRegex: VersionRegex,
+    forceSnapshot: Boolean,
     releaseBranch: String,
 ): VersionResult {
     val gitStatus = this.adapter.status()
@@ -31,8 +32,11 @@ fun TaggerCore.calculateNextVersion(
         previousVersionNumber,
         gitStatus,
     )
+
+    val shouldSnapshot = forceSnapshot || reasonsToUseSnapshot.isNotEmpty()
+
     return VersionResult.Success(
-        if (reasonsToUseSnapshot.isEmpty()) currentVersionNumber else "$currentVersionNumber-SNAPSHOT",
+        if (!shouldSnapshot) currentVersionNumber else "$currentVersionNumber-SNAPSHOT",
         reasonsToUseSnapshot,
     )
 }

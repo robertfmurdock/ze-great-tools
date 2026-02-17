@@ -28,6 +28,7 @@ interface CalculateVersionTestSpec {
     }
 
     fun configureWithDefaults()
+
     fun configureWithOverrides(
         implicitPatch: Boolean? = null,
         disableDetached: Boolean? = null,
@@ -36,6 +37,7 @@ interface CalculateVersionTestSpec {
         patchRegex: String? = null,
         versionRegex: String? = null,
         noneRegex: String? = null,
+        forceSnapshot: Boolean? = null,
     )
 
     fun initializeGitRepo(
@@ -369,5 +371,18 @@ interface CalculateVersionTestSpec {
 
             is TestResult.Success -> fail("Should not have succeeded.")
         }
+    }
+
+    @Test
+    fun forceSnapshotMakesReleaseVersionsBecomeSnapshots() {
+        configureWithOverrides(forceSnapshot = true)
+
+        initializeGitRepo(
+            commits = listOf("init", "[patch] commit 1"),
+            initialTag = "1.2.3",
+        )
+
+        val version = runCalculateVersionSuccessfully()
+        assertEquals("1.2.4-SNAPSHOT", version)
     }
 }

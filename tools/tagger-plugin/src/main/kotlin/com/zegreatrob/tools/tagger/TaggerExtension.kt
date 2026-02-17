@@ -38,6 +38,9 @@ open class TaggerExtension(
     var disableDetached = objectFactory.property<Boolean>().convention(true)
 
     @Input
+    var forceSnapshot = objectFactory.property<Boolean>().convention(false)
+
+    @Input
     var githubReleaseEnabled = objectFactory.property<Boolean>().convention(false)
 
     @Input
@@ -63,6 +66,7 @@ open class TaggerExtension(
         implicitPatch = implicitPatch.get(),
         versionRegex = versionRegex(),
         disableDetached = disableDetached.get(),
+        forceSnapshot = forceSnapshot.get(),
         releaseBranch = releaseBranch ?: throw GradleException("Please configure the tagger release branch."),
     )
 

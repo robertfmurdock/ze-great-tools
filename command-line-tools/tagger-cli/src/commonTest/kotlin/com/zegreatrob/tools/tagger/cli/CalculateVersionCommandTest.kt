@@ -30,6 +30,7 @@ class CalculateVersionCommandTest : CalculateVersionTestSpec {
         patchRegex: String?,
         versionRegex: String?,
         noneRegex: String?,
+        forceSnapshot: Boolean?,
     ) {
         implicitPatch?.let { arguments += "--implicit-patch=$implicitPatch" }
         disableDetached?.let { arguments += "--disable-detached=$disableDetached" }
@@ -38,6 +39,7 @@ class CalculateVersionCommandTest : CalculateVersionTestSpec {
         minorRegex?.let { arguments += "--minor-regex=$minorRegex" }
         patchRegex?.let { arguments += "--patch-regex=$patchRegex" }
         noneRegex?.let { arguments += "--none-regex=$noneRegex" }
+        forceSnapshot?.let { arguments += "--force-snapshot=$forceSnapshot" }
         arguments += "--release-branch=master"
         arguments += projectDir
     }
