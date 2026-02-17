@@ -19,10 +19,10 @@ val extension = project.extensions.create("fingerprintConfig", FingerprintExtens
 extension.includedProjects.convention(emptySet<String>())
 extension.includedBuilds.convention(emptySet())
 
-project.providers.gradleProperty("compareToFingerprintFile")
+project.providers.gradleProperty("fingerprintCompareToFile")
     .map { project.file(it) }
     .let { fileProvider ->
-        extension.compareToFingerprintFile.convention(project.layout.file(fileProvider))
+        extension.compareToFile.convention(project.layout.file(fileProvider))
     }
 
 fun Project.isIncludedByConfig(includedNames: Set<String>, root: Project): Boolean = includedNames.isEmpty() || name in includedNames || this == root
@@ -150,6 +150,6 @@ if (project == project.rootProject) {
         dependsOn(aggregateTask)
 
         currentFingerprint.set(aggregateTask.flatMap { it.outputFile })
-        expectedFingerprint.set(extension.compareToFingerprintFile)
+        expectedFingerprint.set(extension.compareToFile)
     }
 }

@@ -6,5 +6,5 @@ import org.gradle.api.provider.SetProperty
 interface FingerprintExtension {
     val includedProjects: SetProperty<String>
     val includedBuilds: SetProperty<String>
-    val compareToFingerprintFile: RegularFileProperty
+    val compareToFile: RegularFileProperty
 }

@@ -1083,7 +1083,7 @@ class FingerprintPluginFunctionalTest : FingerprintFunctionalTestBase() {
             plugins { id("com.zegreatrob.tools.fingerprint") }
 
             fingerprintConfig {
-                compareToFingerprintFile.set(layout.projectDirectory.file("expected/aggregate-fingerprint.txt"))
+                compareToFile.set(layout.projectDirectory.file("expected/aggregate-fingerprint.txt"))
             }
             """,
         )
@@ -1118,7 +1118,7 @@ class FingerprintPluginFunctionalTest : FingerprintFunctionalTestBase() {
             plugins { id("com.zegreatrob.tools.fingerprint") }
 
             fingerprintConfig {
-                compareToFingerprintFile.set(layout.projectDirectory.file("expected/aggregate-fingerprint.txt"))
+                compareToFile.set(layout.projectDirectory.file("expected/aggregate-fingerprint.txt"))
             }
             """,
         )
@@ -1144,7 +1144,7 @@ class FingerprintPluginFunctionalTest : FingerprintFunctionalTestBase() {
     }
 
     @Test
-    fun `compareAggregateFingerprints can be configured via -P compareToFingerprintFile`() {
+    fun `compareAggregateFingerprints can be configured via -PfingerprintCompareToFile`() {
         writeSettings("compare-aggregate-fingerprints-property-config")
 
         writeBuild(
@@ -1164,7 +1164,7 @@ class FingerprintPluginFunctionalTest : FingerprintFunctionalTestBase() {
             arguments = arrayOf(
                 "compareAggregateFingerprints",
                 "--no-configuration-cache",
-                "-PcompareToFingerprintFile=expected/aggregate-fingerprint.txt",
+                "-PfingerprintCompareToFile=expected/aggregate-fingerprint.txt",
             ),
         )
 
