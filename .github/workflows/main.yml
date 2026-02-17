@@ -55,7 +55,9 @@ jobs:
           export PREVIOUS_VERSION=$(./gradlew previousVersion -q)
           gh release download "$PREVIOUS_VERSION" -p "aggregate-fingerprint.txt" -O build/prev-aggregate-fingerprint.txt || true
 
-          ./gradlew -q compareAggregateFingerprints -Pversion=$PREVIOUS_VERSION \
+          ./gradlew -q compareAggregateFingerprints \
+            -Pversion=$PREVIOUS_VERSION \
+            -PfingerprintCompareToFile=build/prev-aggregate-fingerprint.txt \
             && echo "FINGERPRINT_MATCHES_PREVIOUS=true" >> "$GITHUB_ENV" \
             || echo "FINGERPRINT_MATCHES_PREVIOUS=false" >> "$GITHUB_ENV"
 
