@@ -15,6 +15,11 @@ val tagger = project.extensions.create("tagger", TaggerExtension::class, project
 
 tagger.workingDirectory.convention(project.rootDir)
 
+project.findProperty("taggerForceSnapshot")
+    ?.toString()
+    ?.toBooleanStrictOrNull()
+    ?.let { tagger.forceSnapshot.set(it) }
+
 tasks {
     val exportToGithub = project.findProperty("exportToGithub")
     register<PreviousVersion>("previousVersion") {
