@@ -55,18 +55,9 @@ jobs:
           export PREVIOUS_VERSION=$(./gradlew previousVersion -q)
           gh release download "$PREVIOUS_VERSION" -p "aggregate-fingerprint.txt" -O build/prev-aggregate-fingerprint.txt || true
 
-          set +e
-          ./gradlew compareAggregateFingerprints -Pversion=$PREVIOUS_VERSION
-          COMPARE_EXIT=$?
-          set -e
-
-          if [ "$COMPARE_EXIT" -eq 0 ]; then
-            echo "FINGERPRINT_MATCHES_PREVIOUS=true" >> "$GITHUB_ENV"
-            echo "OK: aggregate fingerprint matches release $PREVIOUS_VERSION"
-          else
-            echo "FINGERPRINT_MATCHES_PREVIOUS=false" >> "$GITHUB_ENV"
-            echo "WARNING: aggregate fingerprint differs from release $PREVIOUS_VERSION"
-          fi
+          ./gradlew -q compareAggregateFingerprints -Pversion=$PREVIOUS_VERSION \
+            && echo "FINGERPRINT_MATCHES_PREVIOUS=true" >> "$GITHUB_ENV" \
+            || echo "FINGERPRINT_MATCHES_PREVIOUS=false" >> "$GITHUB_ENV"
 
           gh release download "$PREVIOUS_VERSION" -p "aggregate-fingerprint-manifest.log" -D build/prev-aggregate-fingerprint-manifest.log || true
           if diff -u build/prev-aggregate-fingerprint-manifest.log build/aggregate-fingerprint-manifest.log; then
