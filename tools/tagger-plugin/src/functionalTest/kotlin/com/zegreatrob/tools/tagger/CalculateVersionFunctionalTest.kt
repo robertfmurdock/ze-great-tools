@@ -81,7 +81,16 @@ class CalculateVersionFunctionalTest : CalculateVersionTestSpec {
         runner.withProjectDir(File(projectDir))
         return try {
             val result = runner.build()
-            result.output.trim().let(TestResult::Success)
+            val lines = result.output
+                .lineSequence()
+                .map { it.trim() }
+                .filter { it.isNotBlank() }
+                .toList()
+
+            val version = lines.firstOrNull().orEmpty()
+            val details = lines.drop(1).joinToString("\n")
+
+            TestResult.Success(version, details)
         } catch (e: Exception) {
             TestResult.Failure(e.message!!)
         }

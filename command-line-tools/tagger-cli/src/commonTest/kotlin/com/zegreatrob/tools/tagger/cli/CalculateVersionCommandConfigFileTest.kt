@@ -6,7 +6,6 @@ import com.zegreatrob.tools.tagger.CalculateVersionTestSpec
 import com.zegreatrob.tools.tagger.TestResult
 import com.zegreatrob.tools.tagger.json.TaggerConfig
 import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlin.test.BeforeTest
 
@@ -58,10 +57,10 @@ class CalculateVersionCommandConfigFileTest : CalculateVersionTestSpec {
         val test = cli()
             .test(arguments, envvars = mapOf("PWD" to projectDir))
         return if (test.statusCode == 0) {
-            test
-                .stdout
-                .trim()
-                .let { TestResult.Success(it) }
+            TestResult.Success(
+                message = test.stdout.trim(),
+                details = test.stderr.trim(),
+            )
         } else {
             TestResult.Failure(test.output.trim())
         }

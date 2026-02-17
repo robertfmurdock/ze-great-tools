@@ -8,6 +8,7 @@ import com.zegreatrob.tools.test.git.initializeGitRepo
 import com.zegreatrob.tools.test.git.removeDirectory
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
+import kotlin.test.DefaultAsserter.assertTrue
 import kotlin.test.Test
 import kotlin.test.assertContains
 import kotlin.test.assertEquals
@@ -384,5 +385,27 @@ interface CalculateVersionTestSpec {
 
         val version = runCalculateVersionSuccessfully()
         assertEquals("1.2.4-SNAPSHOT", version)
+    }
+
+    @Test
+    fun forceSnapshotReportsForcedReason() {
+        configureWithOverrides(forceSnapshot = true)
+
+        initializeGitRepo(
+            commits = listOf("init", "[patch] commit 1"),
+            initialTag = "1.2.3",
+        )
+
+        when (val result = execute()) {
+            is TestResult.Success -> {
+                assertEquals("1.2.4-SNAPSHOT", result.message)
+                assertTrue(
+                    actual = result.details.contains("FORCED"),
+                    message = "Expected snapshot reason output to include FORCED. Details:\n${result.details}",
+                )
+            }
+
+            is TestResult.Failure -> fail("Expected success but got ${result.reason}")
+        }
     }
 }

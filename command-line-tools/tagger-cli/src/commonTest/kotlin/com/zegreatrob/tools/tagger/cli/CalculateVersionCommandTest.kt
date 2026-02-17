@@ -48,10 +48,10 @@ class CalculateVersionCommandTest : CalculateVersionTestSpec {
         val test = cli()
             .test(arguments)
         return if (test.statusCode == 0) {
-            test
-                .stdout
-                .trim()
-                .let { TestResult.Success(it) }
+            TestResult.Success(
+                message = test.stdout.trim(),
+                details = test.stderr.trim(),
+            )
         } else {
             TestResult.Failure(test.output.trim())
         }

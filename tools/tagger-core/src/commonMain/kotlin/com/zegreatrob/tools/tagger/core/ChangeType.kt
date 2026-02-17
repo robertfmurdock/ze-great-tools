@@ -31,9 +31,10 @@ fun TaggerCore.calculateNextVersion(
         currentVersionNumber,
         previousVersionNumber,
         gitStatus,
+        forceSnapshot,
     )
 
-    val shouldSnapshot = forceSnapshot || reasonsToUseSnapshot.isNotEmpty()
+    val shouldSnapshot = reasonsToUseSnapshot.isNotEmpty()
 
     return VersionResult.Success(
         if (!shouldSnapshot) currentVersionNumber else "$currentVersionNumber-SNAPSHOT",
@@ -46,11 +47,13 @@ private fun snapshotReasons(
     currentVersionNumber: String,
     previousVersionNumber: String,
     gitStatus: GitStatus,
+    forceSnapshot: Boolean,
 ) = StatusCheck(
     gitStatus = gitStatus,
     releaseBranch = releaseBranch,
     currentVersionNumber = currentVersionNumber,
     previousVersionNumber = previousVersionNumber,
+    forceSnapshot = forceSnapshot,
 ).let { statusCheck -> SnapshotReason.entries.filter { reason -> reason.reasonIsValid(statusCheck) } }
 
 private fun findAppropriateIncrement(
@@ -108,9 +111,13 @@ data class StatusCheck(
     val releaseBranch: String,
     val currentVersionNumber: String,
     val previousVersionNumber: String,
+    val forceSnapshot: Boolean,
 )
 
 enum class SnapshotReason {
+    FORCED {
+        override fun StatusCheck.exists() = forceSnapshot
+    },
     DIRTY {
         override fun StatusCheck.exists() = !gitStatus.isClean
     },

@@ -24,6 +24,9 @@ open class CalculateVersion :
 
     private fun VersionResult.Success.outputSuccess() {
         logger.quiet(version)
+        if (snapshotReasons.isNotEmpty()) {
+            System.err.println(snapshotReasons.joinToString(","))
+        }
         val githubEnvFile = System.getenv("GITHUB_ENV")
         if (exportToGithubEnv && githubEnvFile != null) {
             FileOutputStream(githubEnvFile, true).write("TAGGER_VERSION=$version".toByteArray())
