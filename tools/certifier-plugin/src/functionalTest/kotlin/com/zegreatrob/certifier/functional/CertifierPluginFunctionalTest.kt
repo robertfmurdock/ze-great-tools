@@ -1,9 +1,9 @@
 package com.zegreatrob.certifier.functional
 
+import com.zegreatrob.testmints.setup
 import org.gradle.testkit.runner.GradleRunner
 import org.junit.jupiter.api.io.TempDir
 import java.io.File
-import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertContains
 
@@ -15,16 +15,17 @@ class CertifierPluginFunctionalTest {
     private val settingsFile by lazy { projectDir.resolve("settings.gradle") }
     private val ignoreFile by lazy { projectDir.resolve(".gitignore") }
 
-    @BeforeTest
-    fun setup() {
+    @Test
+    fun canRunInstallCertTask() = setup(object {
+        val certificatePath = this@CertifierPluginFunctionalTest.javaClass.getResource("/localhost.crt")?.toURI()?.path
+        val runner = GradleRunner.create()
+            .forwardOutput()
+            .withPluginClasspath()
+            .withArguments("installCert")
+            .withProjectDir(projectDir)
+    }) {
         settingsFile.writeText("")
         ignoreFile.writeText(".gradle")
-    }
-
-    @Test
-    fun `can run install cert task`() {
-        val certificatePath = this.javaClass.getResource("/localhost.crt")?.toURI()?.path
-
         buildFile.writeText(
             """
             plugins {
@@ -40,19 +41,22 @@ class CertifierPluginFunctionalTest {
 
             """.trimIndent(),
         )
-
-        val runner = GradleRunner.create()
-        runner.forwardOutput()
-        runner.withPluginClasspath()
-        runner.withArguments("installCert")
-        runner.withProjectDir(projectDir)
+    } exercise {
         runner.build()
+    } verify {
     }
 
     @Test
-    fun `will emit error when no jdk selected`() {
-        val certificatePath = this.javaClass.getResource("/localhost.crt")?.toURI()?.path
-
+    fun willEmitErrorWhenNoJdkSelected() = setup(object {
+        val certificatePath = this@CertifierPluginFunctionalTest.javaClass.getResource("/localhost.crt")?.toURI()?.path
+        val runner = GradleRunner.create()
+            .forwardOutput()
+            .withPluginClasspath()
+            .withArguments("installCert")
+            .withProjectDir(projectDir)
+    }) {
+        settingsFile.writeText("")
+        ignoreFile.writeText(".gradle")
         buildFile.writeText(
             """
             plugins {
@@ -67,18 +71,22 @@ class CertifierPluginFunctionalTest {
 
             """.trimIndent(),
         )
-
-        val runner = GradleRunner.create()
-        runner.forwardOutput()
-        runner.withPluginClasspath()
-        runner.withArguments("installCert")
-        runner.withProjectDir(projectDir)
-        val result = runner.buildAndFail()
+    } exercise {
+        runner.buildAndFail()
+    } verify { result ->
         assertContains(result.output, "property 'jdkSelector' doesn't have a configured value")
     }
 
     @Test
-    fun `will emit error when no certificate selected`() {
+    fun willEmitErrorWhenNoCertificateSelected() = setup(object {
+        val runner = GradleRunner.create()
+            .forwardOutput()
+            .withPluginClasspath()
+            .withArguments("installCert")
+            .withProjectDir(projectDir)
+    }) {
+        settingsFile.writeText("")
+        ignoreFile.writeText(".gradle")
         buildFile.writeText(
             """
             plugins {
@@ -92,13 +100,9 @@ class CertifierPluginFunctionalTest {
             }
             """.trimIndent(),
         )
-
-        val runner = GradleRunner.create()
-        runner.forwardOutput()
-        runner.withPluginClasspath()
-        runner.withArguments("installCert")
-        runner.withProjectDir(projectDir)
-        val result = runner.buildAndFail()
+    } exercise {
+        runner.buildAndFail()
+    } verify { result ->
         assertContains(result.output, "property 'certificatePath' doesn't have a configured value")
     }
 }
