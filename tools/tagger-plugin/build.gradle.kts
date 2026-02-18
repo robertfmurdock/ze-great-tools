@@ -30,6 +30,7 @@ dependencies {
     implementation(project(":git-adapter"))
     implementation(project(":tagger-core"))
     testImplementation(kotlin("test-junit5", embeddedKotlinVersion))
+    testImplementation(libs.com.zegreatrob.testmints.standard)
     "functionalTestImplementation"(platform(libs.org.junit.junit.bom))
     "functionalTestImplementation"(project(":tagger-test"))
 }

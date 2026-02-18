@@ -1,5 +1,6 @@
 package com.zegreatrob.tools.tagger
 
+import com.zegreatrob.testmints.setup
 import org.gradle.testfixtures.ProjectBuilder
 import kotlin.test.Test
 import kotlin.test.assertNotNull
@@ -7,27 +8,29 @@ import kotlin.test.assertTrue
 
 class TaggerPluginTest {
     @Test
-    fun `plugin registers task`() {
+    fun `plugin registers task`() = setup(object {
         val project = ProjectBuilder.builder().build()
+    }) exercise {
         project.plugins.apply("com.zegreatrob.tools.tagger")
+    } verify {
         assertNotNull(project.tasks.findByName("calculateVersion"))
     }
 
     @Test
-    fun tagMustRunAfterAllChecksInMultiProject() {
-        val rootProject =
-            ProjectBuilder.builder()
-                .build()
-        val innerProject1 =
-            ProjectBuilder.builder()
-                .withParent(rootProject)
-                .withName("p1")
-                .build()
+    fun tagMustRunAfterAllChecksInMultiProject() = setup(object {
+        val rootProject = ProjectBuilder.builder().build()
+        val innerProject1 = ProjectBuilder.builder()
+            .withParent(rootProject)
+            .withName("p1")
+            .build()
+    }) {
         ProjectBuilder.builder()
             .withParent(rootProject)
             .withName("p2")
             .build()
+    } exercise {
         rootProject.plugins.apply("com.zegreatrob.tools.tagger")
+    } verify {
         val rootCheck = rootProject.tasks.named("check").get()
         val innerProject1Check = innerProject1.tasks.register("check")
 
