@@ -34,7 +34,7 @@ class CertifierPluginFunctionalTest {
 
             tasks {
                 installCert {
-                    jdkSelector = "20"
+                    jdkSelector = "21"
                     certificatePath = "$certificatePath"
                 }
             }
@@ -95,7 +95,7 @@ class CertifierPluginFunctionalTest {
 
             tasks {
                 installCert {
-                    jdkSelector = "20"
+                    jdkSelector = "21"
                 }
             }
             """.trimIndent(),
