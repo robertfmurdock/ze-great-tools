@@ -4,6 +4,7 @@ org-jetbrains-kotlinx-kotlinx-datetime = "org.jetbrains.kotlinx:kotlinx-datetime
 # @pin
 org-jetbrains-kotlinx-kotlinx-serialization-bom = "org.jetbrains.kotlinx:kotlinx-serialization-bom:1.9.0"
 org-junit-junit-bom = "org.junit:junit-bom:6.0.3"
+com-zegreatrob-testmints-standard = "com.zegreatrob.testmints:standard:12.5.43"
 
 [plugins]
 com-gradle-plugin-publish = "com.gradle.plugin-publish:2.0.0"
