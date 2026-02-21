@@ -3,7 +3,7 @@ kotlin = "2.3.10"
 
 [libraries]
 com-github-ajalt-clikt-clikt = "com.github.ajalt.clikt:clikt:5.1.0"
-com-zegreatrob-testmints-standard = "com.zegreatrob.testmints:standard:12.5.44"
+com-zegreatrob-testmints-standard = "com.zegreatrob.testmints:standard:12.5.45"
 org-jetbrains-kotlin-kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin" }
 org-jetbrains-kotlin-kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 org-jetbrains-kotlin-kotlin-test-junit5 = { module = "org.jetbrains.kotlin:kotlin-test-junit5", version.ref = "kotlin" }
@@ -11,6 +11,6 @@ org-jetbrains-kotlin-kotlin-test-junit5 = { module = "org.jetbrains.kotlin:kotli
 org-jetbrains-kotlinx-kotlinx-serialization-bom = "org.jetbrains.kotlinx:kotlinx-serialization-bom:1.9.0"
 
 [plugins]
-nl-littlerobots-version-catalog-update = "nl.littlerobots.version-catalog-update:1.0.1"
+nl-littlerobots-version-catalog-update = "nl.littlerobots.version-catalog-update:1.1.0"
 org-jetbrains-kotlin-multiplatform = "org.jetbrains.kotlin.multiplatform:2.3.10"
 org-jmailen-kotlinter = "org.jmailen.kotlinter:5.4.2"
