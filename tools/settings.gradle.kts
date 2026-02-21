@@ -10,6 +10,7 @@ rootProject.name = "tools"
 include("certifier-plugin")
 include("cli-tools")
 include("dependency-bom")
+include("plugin-dependency-bom")
 include("digger-core")
 include("digger-gradle")
 include("digger-json")

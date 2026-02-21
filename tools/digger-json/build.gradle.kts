@@ -22,7 +22,7 @@ kotlin {
 }
 
 dependencies {
-    commonMainImplementation(platform(project(":dependency-bom")))
+    commonMainImplementation(platform(project(":plugin-dependency-bom")))
     commonMainApi(project(":digger-model"))
     commonMainImplementation("org.jetbrains.kotlinx:kotlinx-serialization-json")
     commonTestImplementation(kotlin("test"))

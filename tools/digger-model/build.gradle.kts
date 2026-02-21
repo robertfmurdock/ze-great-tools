@@ -20,7 +20,7 @@ kotlin {
 }
 
 dependencies {
-    commonMainApi(platform(project(":dependency-bom")))
+    commonMainApi(platform(project(":plugin-dependency-bom")))
     commonMainApi("org.jetbrains.kotlinx:kotlinx-datetime")
     "jvmTestImplementation"(kotlin("test-junit5", embeddedKotlinVersion))
 }

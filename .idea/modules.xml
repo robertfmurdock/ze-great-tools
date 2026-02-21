@@ -2,6 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/tools/cli-tools/tools.cli-tools.jvmMain.iml" filepath="$PROJECT_DIR$/.idea/modules/tools/cli-tools/tools.cli-tools.jvmMain.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/tools/digger-core/tools.digger-core.jvmTest.iml" filepath="$PROJECT_DIR$/.idea/modules/tools/digger-core/tools.digger-core.jvmTest.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/tools/fingerprint-plugin/tools.fingerprint-plugin.functionalTest.iml" filepath="$PROJECT_DIR$/.idea/modules/tools/fingerprint-plugin/tools.fingerprint-plugin.functionalTest.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/tools/fingerprint-plugin/tools.fingerprint-plugin.main.iml" filepath="$PROJECT_DIR$/.idea/modules/tools/fingerprint-plugin/tools.fingerprint-plugin.main.iml" />
     </modules>
