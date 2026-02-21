@@ -26,8 +26,7 @@ testing {
 configurations["functionalTestImplementation"].extendsFrom(configurations["testImplementation"])
 
 dependencies {
-    implementation(project(":digger-core"))
-    implementation(project(":digger-json"))
+    implementation(project(":digger-gradle"))
     testImplementation(kotlin("test-junit5", embeddedKotlinVersion))
     testImplementation(libs.com.zegreatrob.testmints.standard)
     "functionalTestImplementation"(platform(libs.org.junit.junit.bom))
