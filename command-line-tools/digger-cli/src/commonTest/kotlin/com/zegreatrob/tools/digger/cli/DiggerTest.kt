@@ -12,10 +12,11 @@ class DiggerTest {
     @Test
     fun versionWillReturnAppropriateVersion() = setup(object {
         val expectedVersion = getEnvironmentVariable("EXPECTED_VERSION")
+        val command = cli()
     }) {
         assertNotNull(expectedVersion, "Test not setup correctly - include build version")
     } exercise {
-        cli().test("--version")
+        command.test("--version")
     } verify { result ->
         assertEquals("digger version $expectedVersion", result.output.trim())
     }

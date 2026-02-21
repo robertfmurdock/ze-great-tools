@@ -59,6 +59,7 @@ dependencies {
     commonMainImplementation("org.jetbrains.kotlinx:kotlinx-serialization-json")
     commonTestImplementation("com.zegreatrob.tools:tagger-test")
     commonTestImplementation(kotlin("test"))
+    commonTestImplementation(libs.com.zegreatrob.testmints.standard)
 }
 
 tasks {

@@ -1,6 +1,7 @@
 package com.zegreatrob.tools.tagger.cli
 
 import com.github.ajalt.clikt.testing.test
+import com.zegreatrob.testmints.setup
 import com.zegreatrob.tools.test.git.getEnvironmentVariable
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -8,35 +9,32 @@ import kotlin.test.assertNotNull
 
 class TaggerTest {
     @Test
-    fun quietWillSuppressWelcome() {
-        Tagger()
-            .test("--quiet")
-            .output
-            .let {
-                assertEquals("", it)
-            }
+    fun quietWillSuppressWelcome() = setup(object {
+        val tagger = Tagger()
+    }) exercise {
+        tagger.test("--quiet")
+    } verify { result ->
+        assertEquals("", result.output)
     }
 
     @Test
-    fun quietHasShorthand() {
-        Tagger()
-            .test("-q")
-            .output
-            .let {
-                assertEquals("", it)
-            }
+    fun quietHasShorthand() = setup(object {
+        val tagger = Tagger()
+    }) exercise {
+        tagger.test("-q")
+    } verify { result ->
+        assertEquals("", result.output)
     }
 
     @Test
-    fun versionWillReturnAppropriateVersion() {
+    fun versionWillReturnAppropriateVersion() = setup(object {
         val expectedVersion = getEnvironmentVariable("EXPECTED_VERSION")
+        val command = cli()
+    }) {
         assertNotNull(expectedVersion, "Test not setup correctly - include build version")
-        cli()
-            .test("-q --version")
-            .output
-            .trim()
-            .let {
-                assertEquals("tagger version $expectedVersion", it)
-            }
+    } exercise {
+        command.test("-q --version")
+    } verify { result ->
+        assertEquals("tagger version $expectedVersion", result.output.trim())
     }
 }
