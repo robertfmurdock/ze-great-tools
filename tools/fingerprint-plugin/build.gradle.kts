@@ -8,7 +8,6 @@ import java.util.*
 plugins {
     id("com.zegreatrob.tools.plugins.jvm")
     `java-gradle-plugin`
-    `kotlin-dsl`
     alias(libs.plugins.com.gradle.plugin.publish)
 }
 
@@ -37,7 +36,9 @@ gradlePlugin {
     website.set("https://github.com/robertfmurdock/ze-great-tools")
     vcsUrl.set("https://github.com/robertfmurdock/ze-great-tools")
     plugins {
-        named("com.zegreatrob.tools.fingerprint") {
+        create("fingerprint") {
+            id = "com.zegreatrob.tools.fingerprint"
+            implementationClass = "com.zegreatrob.tools.FingerprintPlugin"
             displayName = "Fingerprint Plugin"
             description = "This plugin will generate a fingerprint based on all the production code in a project. This is in early development, buyer beware."
             tags.addAll("git", "changes", "dependencies", "fingerprint")

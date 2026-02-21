@@ -7,7 +7,6 @@ import java.util.*
 
 plugins {
     `java-gradle-plugin`
-    `kotlin-dsl`
     alias(libs.plugins.com.gradle.plugin.publish)
     id("com.zegreatrob.tools.plugins.jvm")
 }
@@ -39,7 +38,9 @@ gradlePlugin {
     website.set("https://github.com/robertfmurdock/ze-great-tools")
     vcsUrl.set("https://github.com/robertfmurdock/ze-great-tools")
     plugins {
-        named("com.zegreatrob.tools.tagger") {
+        create("tagger") {
+            id = "com.zegreatrob.tools.tagger"
+            implementationClass = "com.zegreatrob.tools.TaggerPlugin"
             displayName = "Tagger Plugin"
             description =
                 "This plugin automates generation of version numbers based on commit messages and git tags."

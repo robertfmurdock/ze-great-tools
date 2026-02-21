@@ -7,7 +7,6 @@ import java.util.*
 
 plugins {
     `java-gradle-plugin`
-    `kotlin-dsl`
     alias(libs.plugins.com.gradle.plugin.publish)
     id("com.zegreatrob.tools.plugins.jvm")
 }
@@ -36,7 +35,9 @@ gradlePlugin {
     website.set("https://github.com/robertfmurdock/ze-great-tools")
     vcsUrl.set("https://github.com/robertfmurdock/ze-great-tools")
     plugins {
-        named("com.zegreatrob.tools.certifier") {
+        create("certifier") {
+            id = "com.zegreatrob.tools.certifier"
+            implementationClass = "com.zegreatrob.tools.CertifierPlugin"
             displayName = "Certifier Plugin"
             description =
                 "This plugin assists in the installation of certificates into JDKs with Java Keytool."

@@ -39,13 +39,21 @@ fun initializeGitRepo(
             gitAdapter.newAnnotatedTag(initialTag, "HEAD", "Funky Testerson", "funk@test.io")
         }
     }
+    val currentBranch = gitAdapter.status().head
+    val defaultBranch = if (currentBranch.isBlank()) "master" else currentBranch
+    if (defaultBranch != "master") {
+        gitAdapter.checkout("master", newBranch = true)
+    }
     if (remoteUrl != null) {
+        val branchName = gitAdapter.status().head.ifBlank { "master" }
         gitAdapter.addRemote(name = "origin", url = remoteUrl)
         gitAdapter.fetch()
-        if (remoteUrl != directory) {
-            gitAdapter.push(true, upstream = "origin", branch = "master")
-        } else {
-            gitAdapter.setBranchUpstream("origin/master", "master")
+        if (branchName.isNotBlank()) {
+            if (remoteUrl != directory) {
+                gitAdapter.push(true, upstream = "origin", branch = branchName)
+            } else {
+                gitAdapter.setBranchUpstream("origin/$branchName", branchName)
+            }
         }
     }
     return gitAdapter

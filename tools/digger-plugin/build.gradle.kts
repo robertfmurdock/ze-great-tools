@@ -8,7 +8,6 @@ import java.util.*
 plugins {
     id("com.zegreatrob.tools.plugins.jvm")
     `java-gradle-plugin`
-    `kotlin-dsl`
     alias(libs.plugins.com.gradle.plugin.publish)
 }
 
@@ -39,7 +38,9 @@ gradlePlugin {
     website.set("https://github.com/robertfmurdock/ze-great-tools")
     vcsUrl.set("https://github.com/robertfmurdock/ze-great-tools")
     plugins {
-        named("com.zegreatrob.tools.digger") {
+        create("digger") {
+            id = "com.zegreatrob.tools.digger"
+            implementationClass = "com.zegreatrob.tools.DiggerPlugin"
             displayName = "Digger Plugin"
             description =
                 "This plugin finds and extracts information from git commits, including co-author data."

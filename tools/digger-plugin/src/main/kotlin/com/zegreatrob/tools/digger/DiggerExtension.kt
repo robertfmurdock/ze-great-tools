@@ -6,36 +6,35 @@ import com.zegreatrob.tools.digger.core.MessageDigger
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
-import org.gradle.kotlin.dsl.property
 import java.io.File
 
 open class DiggerExtension(objectFactory: ObjectFactory) {
     @Input
-    var label = objectFactory.property<String>()
+    var label: Property<String> = objectFactory.property(String::class.java)
 
     @Input
-    var workingDirectory = objectFactory.property<File>()
+    var workingDirectory: Property<File> = objectFactory.property(File::class.java)
 
     @Input
-    var majorRegex: Property<Regex> = objectFactory.property<Regex>().convention(MessageDigger.Defaults.majorRegex)
+    var majorRegex: Property<Regex> = objectFactory.property(Regex::class.java).convention(MessageDigger.Defaults.majorRegex)
 
     @Input
-    var minorRegex: Property<Regex> = objectFactory.property<Regex>().convention(MessageDigger.Defaults.minorRegex)
+    var minorRegex: Property<Regex> = objectFactory.property(Regex::class.java).convention(MessageDigger.Defaults.minorRegex)
 
     @Input
-    var patchRegex: Property<Regex> = objectFactory.property<Regex>().convention(MessageDigger.Defaults.patchRegex)
+    var patchRegex: Property<Regex> = objectFactory.property(Regex::class.java).convention(MessageDigger.Defaults.patchRegex)
 
     @Input
-    var noneRegex: Property<Regex> = objectFactory.property<Regex>().convention(MessageDigger.Defaults.noneRegex)
+    var noneRegex: Property<Regex> = objectFactory.property(Regex::class.java).convention(MessageDigger.Defaults.noneRegex)
 
     @Input
-    var storyIdRegex: Property<Regex> = objectFactory.property<Regex>().convention(MessageDigger.Defaults.storyIdRegex)
+    var storyIdRegex: Property<Regex> = objectFactory.property(Regex::class.java).convention(MessageDigger.Defaults.storyIdRegex)
 
     @Input
-    var easeRegex: Property<Regex> = objectFactory.property<Regex>().convention(MessageDigger.Defaults.easeRegex)
+    var easeRegex: Property<Regex> = objectFactory.property(Regex::class.java).convention(MessageDigger.Defaults.easeRegex)
 
     @Input
-    var tagRegex: Property<Regex> = objectFactory.property<Regex>().convention(DiggerCore.Defaults.tagRegex)
+    var tagRegex: Property<Regex> = objectFactory.property(Regex::class.java).convention(DiggerCore.Defaults.tagRegex)
 
     private val gitWrapper get() = GitAdapter(workingDirectory.get().absolutePath)
     private val core

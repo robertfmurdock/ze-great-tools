@@ -9,7 +9,6 @@ import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.tasks.Input
-import org.gradle.kotlin.dsl.property
 import java.io.File
 
 open class TaggerExtension(
@@ -26,37 +25,37 @@ open class TaggerExtension(
     var userEmail: String? = null
 
     @Input
-    var warningsAsErrors = objectFactory.property<Boolean>().convention(false)
+    var warningsAsErrors = objectFactory.property(Boolean::class.java).convention(false)
 
     @Input
-    var workingDirectory = objectFactory.property<File>()
+    var workingDirectory = objectFactory.property(File::class.java)
 
     @Input
-    var implicitPatch = objectFactory.property<Boolean>().convention(true)
+    var implicitPatch = objectFactory.property(Boolean::class.java).convention(true)
 
     @Input
-    var disableDetached = objectFactory.property<Boolean>().convention(true)
+    var disableDetached = objectFactory.property(Boolean::class.java).convention(true)
 
     @Input
-    var forceSnapshot = objectFactory.property<Boolean>().convention(false)
+    var forceSnapshot = objectFactory.property(Boolean::class.java).convention(false)
 
     @Input
-    var githubReleaseEnabled = objectFactory.property<Boolean>().convention(false)
+    var githubReleaseEnabled = objectFactory.property(Boolean::class.java).convention(false)
 
     @Input
-    var versionRegex = objectFactory.property<Regex>().convention(null)
+    var versionRegex = objectFactory.property(Regex::class.java).convention(null)
 
     @Input
-    var noneRegex = objectFactory.property<Regex>().convention(VersionRegex.Defaults.none)
+    var noneRegex = objectFactory.property(Regex::class.java).convention(VersionRegex.Defaults.none)
 
     @Input
-    var patchRegex = objectFactory.property<Regex>().convention(VersionRegex.Defaults.patch)
+    var patchRegex = objectFactory.property(Regex::class.java).convention(VersionRegex.Defaults.patch)
 
     @Input
-    var minorRegex = objectFactory.property<Regex>().convention(VersionRegex.Defaults.minor)
+    var minorRegex = objectFactory.property(Regex::class.java).convention(VersionRegex.Defaults.minor)
 
     @Input
-    var majorRegex = objectFactory.property<Regex>().convention(VersionRegex.Defaults.major)
+    var majorRegex = objectFactory.property(Regex::class.java).convention(VersionRegex.Defaults.major)
 
     val core get() = TaggerCore(GitAdapter(workingDirectory.get().absolutePath))
 

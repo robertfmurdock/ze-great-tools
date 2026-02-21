@@ -6,7 +6,6 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskAction
 import org.gradle.jvm.toolchain.JavaLanguageVersion
 import org.gradle.jvm.toolchain.JavaToolchainService
-import org.gradle.kotlin.dsl.property
 import org.gradle.process.ExecResult
 import org.gradle.process.ProcessExecutionException
 import org.gradle.process.internal.DefaultExecSpec
@@ -24,18 +23,18 @@ constructor(
     private val javaToolchainService: JavaToolchainService,
 ) : DefaultTask() {
     @Input
-    val jdkSelector = objectFactory.property<String>()
+    val jdkSelector = objectFactory.property(String::class.java)
 
     @Input
-    val certificatePath = objectFactory.property<String>()
+    val certificatePath = objectFactory.property(String::class.java)
 
     @TaskAction
     fun installCertificate() {
         var execSpec: DefaultExecSpec = objectFactory.newInstance(DefaultExecSpec::class.java)
         val cert = certificatePath.get()
         val javaLauncher =
-            javaToolchainService.launcherFor {
-                languageVersion.set(JavaLanguageVersion.of(jdkSelector.get()))
+            javaToolchainService.launcherFor { spec ->
+                spec.getLanguageVersion().set(JavaLanguageVersion.of(jdkSelector.get()))
             }
         val javaHome = javaLauncher.get().metadata.installationPath
         execSpec.commandLine(

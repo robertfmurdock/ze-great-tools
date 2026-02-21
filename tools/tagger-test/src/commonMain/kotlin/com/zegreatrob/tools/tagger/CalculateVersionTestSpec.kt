@@ -141,7 +141,12 @@ interface CalculateVersionTestSpec {
         gitAdapter.add(".")
         gitAdapter.addCommitWithMessage("test commit")
         gitAdapter.newAnnotatedTag("1.0.23", "HEAD", "test", "test")
-        gitAdapter.checkout("main", newBranch = true)
+        val currentBranch = gitAdapter.status().head
+        if (currentBranch == "main") {
+            gitAdapter.checkout("main")
+        } else {
+            gitAdapter.checkout("main", newBranch = true)
+        }
         gitAdapter.addRemote(name = "origin", url = projectDir)
         gitAdapter.fetch()
         gitAdapter.setBranchUpstream("origin/main", "main")
