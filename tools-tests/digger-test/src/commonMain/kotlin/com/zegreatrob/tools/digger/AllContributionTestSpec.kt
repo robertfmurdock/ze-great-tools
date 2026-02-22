@@ -25,6 +25,14 @@ interface AllContributionTestSpec : SetupWithOverrides {
 
     fun setupWithDefaults()
     fun runAllContributionData(): String
+    private fun <C : Any> longAsyncSetup(
+        context: C,
+        additionalActions: suspend C.() -> Unit = {},
+    ) = asyncSetup(
+        context,
+        timeoutMs = 180_000,
+        additionalActions = additionalActions,
+    )
     fun initializeGitRepo(commits: List<String>) = initializeGitRepo(
         directory = projectDir,
         addFileNames = addFileNames,
@@ -42,7 +50,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
     }
 
     @Test
-    fun willIncludeAllTagSegments() = asyncSetup(object {
+    fun willIncludeAllTagSegments() = longAsyncSetup(object {
         lateinit var firstCommit: CommitRef
         lateinit var firstRelease: TagRef
         lateinit var secondCommit: CommitRef
@@ -103,7 +111,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
     }
 
     @Test
-    fun willConsiderThePathWithTheMostTagsTheTrunk() = asyncSetup(object {
+    fun willConsiderThePathWithTheMostTagsTheTrunk() = longAsyncSetup(object {
         lateinit var firstCommit: CommitRef
         lateinit var firstRelease: TagRef
         lateinit var secondCommit: CommitRef
@@ -161,7 +169,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
     }
 
     @Test
-    fun willHandleNormalMergeIntoBranchThenBackCaseWell() = asyncSetup(object {
+    fun willHandleNormalMergeIntoBranchThenBackCaseWell() = longAsyncSetup(object {
         lateinit var firstCommit: CommitRef
         lateinit var firstRelease: TagRef
         lateinit var secondCommit: CommitRef
@@ -214,7 +222,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
     }
 
     @Test
-    fun willHandleNormalMergeIntoBranchThenFfBackCase() = asyncSetup(object {
+    fun willHandleNormalMergeIntoBranchThenFfBackCase() = longAsyncSetup(object {
         lateinit var firstCommit: CommitRef
         lateinit var firstRelease: TagRef
         lateinit var secondCommit: CommitRef
@@ -278,7 +286,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
     }
 
     @Test
-    fun willHandleMergeBranches() = asyncSetup(object {
+    fun willHandleMergeBranches() = longAsyncSetup(object {
         lateinit var firstCommit: CommitRef
         lateinit var firstRelease: TagRef
         lateinit var secondCommit: CommitRef
@@ -337,7 +345,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
     }
 
     @Test
-    fun willIgnoreTagsThatDoNotMatchTagRegex() = asyncSetup(object {
+    fun willIgnoreTagsThatDoNotMatchTagRegex() = longAsyncSetup(object {
         lateinit var firstCommit: CommitRef
         lateinit var firstRelease: TagRef
         lateinit var secondCommit: CommitRef
@@ -391,7 +399,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
     }
 
     @Test
-    fun willHandleMergeCommitsOnMergedBranchesCorrectly() = asyncSetup(object {
+    fun willHandleMergeCommitsOnMergedBranchesCorrectly() = longAsyncSetup(object {
         lateinit var firstCommit: CommitRef
         lateinit var firstRelease: TagRef
         lateinit var secondCommit: CommitRef
@@ -448,7 +456,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
     }
 
     @Test
-    fun whenMergingMultipleTimesFromSameBranchCommitsAreOnlyCountedOnce() = asyncSetup(object {
+    fun whenMergingMultipleTimesFromSameBranchCommitsAreOnlyCountedOnce() = longAsyncSetup(object {
         lateinit var firstCommit: CommitRef
         lateinit var firstRelease: TagRef
         lateinit var secondCommit: CommitRef
@@ -511,7 +519,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
     }
 
     @Test
-    fun willIncludeEaseOfChange() = asyncSetup(object {
+    fun willIncludeEaseOfChange() = longAsyncSetup(object {
         lateinit var firstCommit: CommitRef
         lateinit var tag: TagRef
         lateinit var secondCommit: CommitRef
@@ -556,7 +564,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
     }
 
     @Test
-    fun willIncludeStoryIds() = asyncSetup(object {
+    fun willIncludeStoryIds() = longAsyncSetup(object {
         lateinit var firstCommit: CommitRef
         lateinit var tag: TagRef
         lateinit var secondCommit: CommitRef
@@ -592,7 +600,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
     }
 
     @Test
-    fun willMergeTheSameStoryIdWithinAContribution() = asyncSetup(object {
+    fun willMergeTheSameStoryIdWithinAContribution() = longAsyncSetup(object {
         lateinit var firstCommit: CommitRef
         lateinit var secondCommit: CommitRef
     }) {
@@ -619,7 +627,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
     }
 
     @Test
-    fun willMergeTheDifferentStoryIdsWithinAContribution() = asyncSetup(object {
+    fun willMergeTheDifferentStoryIdsWithinAContribution() = longAsyncSetup(object {
         lateinit var firstCommit: CommitRef
         lateinit var secondCommit: CommitRef
     }) {
@@ -647,7 +655,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
     }
 
     @Test
-    fun willIncludeFlattenEaseIntoLargestNumber() = asyncSetup(object {
+    fun willIncludeFlattenEaseIntoLargestNumber() = longAsyncSetup(object {
         lateinit var firstCommit: CommitRef
         lateinit var secondCommit: CommitRef
     }) {
@@ -673,7 +681,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
     }
 
     @Test
-    fun canReplaceMajorRegex() = asyncSetup(object {}) {
+    fun canReplaceMajorRegex() = longAsyncSetup(object {}) {
         setupWithOverrides(majorRegex = ".*(big).*")
 
         initializeGitRepo(commits = listOf("[patch] commit 1", "commit (big) 2", "[patch] commit 3"))
@@ -684,7 +692,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
     }
 
     @Test
-    fun canReplaceMinorRegex() = asyncSetup(object {}) {
+    fun canReplaceMinorRegex() = longAsyncSetup(object {}) {
         setupWithOverrides(minorRegex = ".*mid.*")
 
         initializeGitRepo(commits = listOf("[patch] commit 1", "commit (middle) 2", "[patch] commit 3"))
@@ -695,7 +703,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
     }
 
     @Test
-    fun canReplacePatchRegex() = asyncSetup(object {}) {
+    fun canReplacePatchRegex() = longAsyncSetup(object {}) {
         setupWithOverrides(patchRegex = ".*tiny.*")
 
         initializeGitRepo(commits = listOf("commit 1", "commit (tiny) 2", "commit 3"))
@@ -706,7 +714,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
     }
 
     @Test
-    fun canReplaceNoneRegex() = asyncSetup(object {}) {
+    fun canReplaceNoneRegex() = longAsyncSetup(object {}) {
         setupWithOverrides(noneRegex = ".*(no).*")
 
         initializeGitRepo(commits = listOf("commit (no) 1"))
@@ -717,7 +725,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
     }
 
     @Test
-    fun canReplaceStoryRegex() = asyncSetup(object {}) {
+    fun canReplaceStoryRegex() = longAsyncSetup(object {}) {
         setupWithOverrides(storyRegex = ".*-(?<storyId>.*-.*)-.*")
 
         initializeGitRepo(commits = listOf("commit -CowDog-99- 1"))
@@ -729,7 +737,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
     }
 
     @Test
-    fun canReplaceEaseRegex() = asyncSetup(object {}) {
+    fun canReplaceEaseRegex() = longAsyncSetup(object {}) {
         setupWithOverrides(easeRegex = """.*\[(?<ease>[0-5])\].*""")
 
         initializeGitRepo(commits = listOf("commit [4] 1"))

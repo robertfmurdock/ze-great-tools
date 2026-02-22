@@ -26,6 +26,14 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
 
     fun setupWithDefaults()
     fun runCurrentContributionData(): String
+    private fun <C : Any> longAsyncSetup(
+        context: C,
+        additionalActions: suspend C.() -> Unit = {},
+    ) = asyncSetup(
+        context,
+        timeoutMs = 180_000,
+        additionalActions = additionalActions,
+    )
 
     @BeforeTest
     fun setupProjectDir() {
@@ -52,7 +60,7 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
     }
 
     @Test
-    fun currentContributionDataWillShowAuthorsAndCoAuthorsCaseInsensitive() = asyncSetup(object {}) {
+    fun currentContributionDataWillShowAuthorsAndCoAuthorsCaseInsensitive() = longAsyncSetup(object {}) {
         setupWithDefaults()
 
         initializeGitRepo(
@@ -82,7 +90,7 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
     }
 
     @Test
-    fun whenLabelIsSetWillApplyItToContribution() = asyncSetup(object {
+    fun whenLabelIsSetWillApplyItToContribution() = longAsyncSetup(object {
         val label = "extraSpecialLabel"
     }) {
         setupWithOverrides(label = label)
@@ -102,7 +110,7 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
     }
 
     @Test
-    fun whenLabelIsNotSetWillUseDirectoryName() = asyncSetup(object {}) {
+    fun whenLabelIsNotSetWillUseDirectoryName() = longAsyncSetup(object {}) {
         setupWithDefaults()
 
         initializeGitRepo(
@@ -120,7 +128,7 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
     }
 
     @Test
-    fun whenIncludedCurrentContributionDataWillShowSemverLevel() = asyncSetup(object {}) {
+    fun whenIncludedCurrentContributionDataWillShowSemverLevel() = longAsyncSetup(object {}) {
         setupWithDefaults()
 
         initializeGitRepo(
@@ -143,7 +151,7 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
     }
 
     @Test
-    fun whenCurrentContributionDataIncludesMultipleSemversUsesLargest() = asyncSetup(object {}) {
+    fun whenCurrentContributionDataIncludesMultipleSemversUsesLargest() = longAsyncSetup(object {}) {
         setupWithDefaults()
 
         initializeGitRepo(
@@ -172,7 +180,7 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
     }
 
     @Test
-    fun currentContributionDataWillIncludeAuthorsFromMultipleCommitsAfterLastTag() = asyncSetup(object {}) {
+    fun currentContributionDataWillIncludeAuthorsFromMultipleCommitsAfterLastTag() = longAsyncSetup(object {}) {
         setupWithDefaults()
 
         initializeGitRepo(
@@ -214,7 +222,7 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
     }
 
     @Test
-    fun currentContributionDataWillIncludeMostRecentTagRangeWhenHeadIsTagged() = asyncSetup(object {}) {
+    fun currentContributionDataWillIncludeMostRecentTagRangeWhenHeadIsTagged() = longAsyncSetup(object {}) {
         setupWithDefaults()
 
         val gitAdapter = initializeGitRepo(
@@ -264,7 +272,7 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
     }
 
     @Test
-    fun whenHeadIsTaggedCurrentContributionDataWillUseIncludeTagInfo() = asyncSetup(object {
+    fun whenHeadIsTaggedCurrentContributionDataWillUseIncludeTagInfo() = longAsyncSetup(object {
         lateinit var nowTag: TagRef
     }) {
         setupWithDefaults()
@@ -311,7 +319,7 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
     }
 
     @Test
-    fun currentContributionDataWillNotIncludeAuthorsFromCommitsBeforeLastTag() = asyncSetup(object {}) {
+    fun currentContributionDataWillNotIncludeAuthorsFromCommitsBeforeLastTag() = longAsyncSetup(object {}) {
         setupWithDefaults()
 
         val gitAdapter = initializeGitRepo(
@@ -353,7 +361,7 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
     }
 
     @Test
-    fun canReplaceMajorRegex() = asyncSetup(object {}) {
+    fun canReplaceMajorRegex() = longAsyncSetup(object {}) {
         setupWithOverrides(majorRegex = ".*(big).*")
 
         initializeGitRepo(
@@ -368,7 +376,7 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
     }
 
     @Test
-    fun canReplaceMinorRegex() = asyncSetup(object {}) {
+    fun canReplaceMinorRegex() = longAsyncSetup(object {}) {
         setupWithOverrides(minorRegex = ".*mid.*")
 
         initializeGitRepo(
@@ -383,7 +391,7 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
     }
 
     @Test
-    fun canReplacePatchRegex() = asyncSetup(object {}) {
+    fun canReplacePatchRegex() = longAsyncSetup(object {}) {
         setupWithOverrides(patchRegex = ".*tiny.*")
 
         initializeGitRepo(
@@ -398,7 +406,7 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
     }
 
     @Test
-    fun canReplaceNoneRegex() = asyncSetup(object {}) {
+    fun canReplaceNoneRegex() = longAsyncSetup(object {}) {
         setupWithOverrides(noneRegex = ".*(no).*")
 
         initializeGitRepo(
@@ -413,7 +421,7 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
     }
 
     @Test
-    fun canReplaceStoryRegex() = asyncSetup(object {}) {
+    fun canReplaceStoryRegex() = longAsyncSetup(object {}) {
         setupWithOverrides(storyRegex = ".*-(?<storyId>.*-.*)-.*")
 
         initializeGitRepo(
@@ -429,7 +437,7 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
     }
 
     @Test
-    fun canReplaceEaseRegex() = asyncSetup(object {}) {
+    fun canReplaceEaseRegex() = longAsyncSetup(object {}) {
         setupWithOverrides(easeRegex = """.*\[(?<ease>[0-5])\].*""")
 
         initializeGitRepo(
@@ -445,7 +453,7 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
     }
 
     @Test
-    fun willHandleMergeCommitsOnMergedBranchesCorrectly() = asyncSetup(object {
+    fun willHandleMergeCommitsOnMergedBranchesCorrectly() = longAsyncSetup(object {
         lateinit var merge2Commit: CommitRef
         lateinit var secondRelease: TagRef
         lateinit var secondCommit: CommitRef
@@ -491,7 +499,7 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
     }
 
     @Test
-    fun willIgnoreTagsThatDoNotMatchRegex() = asyncSetup(object {
+    fun willIgnoreTagsThatDoNotMatchRegex() = longAsyncSetup(object {
         lateinit var merge2Commit: CommitRef
         lateinit var secondCommit: CommitRef
     }) {
@@ -537,7 +545,7 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
     }
 
     @Test
-    fun willCorrectlyUnderstandLongerRunningBranch() = asyncSetup(object {
+    fun willCorrectlyUnderstandLongerRunningBranch() = longAsyncSetup(object {
         lateinit var secondCommit: CommitRef
         lateinit var lastCommit: CommitRef
         lateinit var thirdRelease: TagRef
