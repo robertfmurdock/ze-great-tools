@@ -1,10 +1,11 @@
 [versions]
+com-zegreatrob-testmints = "12.6.1"
 kotlin = "2.3.10"
 kotlinx-coroutines = "1.10.2"
 
 [libraries]
-com-zegreatrob-testmints-async = "com.zegreatrob.testmints:async:12.6.1"
-com-zegreatrob-testmints-standard = "com.zegreatrob.testmints:standard:12.6.1"
+com-zegreatrob-testmints-async = { module = "com.zegreatrob.testmints:async", version.ref = "com-zegreatrob-testmints" }
+com-zegreatrob-testmints-standard = { module = "com.zegreatrob.testmints:standard", version.ref = "com-zegreatrob-testmints" }
 org-jetbrains-kotlin-kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin" }
 org-jetbrains-kotlin-kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 org-jetbrains-kotlin-kotlin-test-junit5 = { module = "org.jetbrains.kotlin:kotlin-test-junit5", version.ref = "kotlin" }
