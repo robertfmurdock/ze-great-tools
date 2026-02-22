@@ -1,5 +1,6 @@
 package com.zegreatrob.tools.digger
 
+import com.zegreatrob.testmints.setup
 import com.zegreatrob.tools.adapter.git.CommitRef
 import com.zegreatrob.tools.adapter.git.TagRef
 import com.zegreatrob.tools.digger.json.ContributionParser.parseContribution
@@ -8,14 +9,12 @@ import com.zegreatrob.tools.test.git.addCommitWithMessage
 import com.zegreatrob.tools.test.git.addTag
 import com.zegreatrob.tools.test.git.createTempDirectory
 import com.zegreatrob.tools.test.git.defaultAuthors
-import com.zegreatrob.tools.test.git.delayLongEnoughToAffectGitDate
 import com.zegreatrob.tools.test.git.getEnvironmentVariable
 import com.zegreatrob.tools.test.git.initializeGitRepo
 import com.zegreatrob.tools.test.git.mergeInBranch
 import com.zegreatrob.tools.test.git.removeDirectory
 import com.zegreatrob.tools.test.git.sleep
 import com.zegreatrob.tools.test.git.switchToNewBranch
-import kotlinx.coroutines.test.runTest
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -53,7 +52,7 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
     }
 
     @Test
-    fun currentContributionDataWillShowAuthorsAndCoAuthorsCaseInsensitive() {
+    fun currentContributionDataWillShowAuthorsAndCoAuthorsCaseInsensitive() = setup(object {}) {
         setupWithDefaults()
 
         initializeGitRepo(
@@ -68,7 +67,9 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
                 """.trimMargin(),
             ),
         )
-        val output = runCurrentContributionData()
+    } exercise {
+        runCurrentContributionData()
+    } verify { output ->
         assertEquals(
             listOf(
                 "first@guy.edu",
@@ -81,8 +82,9 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
     }
 
     @Test
-    fun whenLabelIsSetWillApplyItToContribution() {
+    fun whenLabelIsSetWillApplyItToContribution() = setup(object {
         val label = "extraSpecialLabel"
+    }) {
         setupWithOverrides(label = label)
 
         initializeGitRepo(
@@ -90,7 +92,9 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
             addFileNames = addFileNames,
             commits = listOf("here's a message"),
         )
-        val output = runCurrentContributionData()
+    } exercise {
+        runCurrentContributionData()
+    } verify { output ->
         assertEquals(
             label,
             parseContribution(output)?.label,
@@ -98,7 +102,7 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
     }
 
     @Test
-    fun whenLabelIsNotSetWillUseDirectoryName() {
+    fun whenLabelIsNotSetWillUseDirectoryName() = setup(object {}) {
         setupWithDefaults()
 
         initializeGitRepo(
@@ -106,7 +110,9 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
             addFileNames = addFileNames,
             commits = listOf("here's a message"),
         )
-        val output = runCurrentContributionData()
+    } exercise {
+        runCurrentContributionData()
+    } verify { output ->
         assertEquals(
             projectDir.split("/").last(),
             parseContribution(output)?.label,
@@ -114,7 +120,7 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
     }
 
     @Test
-    fun whenIncludedCurrentContributionDataWillShowSemverLevel() {
+    fun whenIncludedCurrentContributionDataWillShowSemverLevel() = setup(object {}) {
         setupWithDefaults()
 
         initializeGitRepo(
@@ -129,14 +135,15 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
                 """.trimMargin(),
             ),
         )
-
-        val output = runCurrentContributionData()
+    } exercise {
+        runCurrentContributionData()
+    } verify { output ->
         assertEquals("Patch", parseSemver(output))
         assertEquals(null, parseStoryId(output))
     }
 
     @Test
-    fun whenCurrentContributionDataIncludesMultipleSemversUsesLargest() {
+    fun whenCurrentContributionDataIncludesMultipleSemversUsesLargest() = setup(object {}) {
         setupWithDefaults()
 
         initializeGitRepo(
@@ -157,13 +164,15 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
                 """.trimMargin(),
             ),
         )
-        val output = runCurrentContributionData()
+    } exercise {
+        runCurrentContributionData()
+    } verify { output ->
         assertEquals("Major", parseSemver(output))
         assertEquals(null, parseStoryId(output))
     }
 
     @Test
-    fun currentContributionDataWillIncludeAuthorsFromMultipleCommitsAfterLastTag() {
+    fun currentContributionDataWillIncludeAuthorsFromMultipleCommitsAfterLastTag() = setup(object {}) {
         setupWithDefaults()
 
         initializeGitRepo(
@@ -188,8 +197,9 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
                 """.trimMargin(),
             ),
         )
-        val output = runCurrentContributionData()
-
+    } exercise {
+        runCurrentContributionData()
+    } verify { output ->
         assertEquals(
             listOf(
                 "first@guy.edu",
@@ -204,7 +214,7 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
     }
 
     @Test
-    fun currentContributionDataWillIncludeMostRecentTagRangeWhenHeadIsTagged() {
+    fun currentContributionDataWillIncludeMostRecentTagRangeWhenHeadIsTagged() = setup(object {}) {
         setupWithDefaults()
 
         val gitAdapter = initializeGitRepo(
@@ -239,9 +249,9 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
             """.trimMargin(),
         )
         gitAdapter.addTag("now")
-
-        val output = runCurrentContributionData()
-
+    } exercise {
+        runCurrentContributionData()
+    } verify { output ->
         assertEquals(
             listOf(
                 "fourth@guy.edu",
@@ -254,7 +264,9 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
     }
 
     @Test
-    fun whenHeadIsTaggedCurrentContributionDataWillUseIncludeTagInfo() {
+    fun whenHeadIsTaggedCurrentContributionDataWillUseIncludeTagInfo() = setup(object {
+        lateinit var nowTag: TagRef
+    }) {
         setupWithDefaults()
 
         val gitAdapter = initializeGitRepo(
@@ -289,17 +301,17 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
             """.trimMargin(),
         )
         sleep(1000)
-        val nowTag = gitAdapter.addTag("now")
-
-        val output = runCurrentContributionData()
-
+        nowTag = gitAdapter.addTag("now")
+    } exercise {
+        runCurrentContributionData()
+    } verify { output ->
         val contribution = parseContribution(output)
         assertEquals(nowTag.name, contribution?.tagName)
         assertEquals(nowTag.dateTime, contribution?.tagDateTime)
     }
 
     @Test
-    fun currentContributionDataWillNotIncludeAuthorsFromCommitsBeforeLastTag() {
+    fun currentContributionDataWillNotIncludeAuthorsFromCommitsBeforeLastTag() = setup(object {}) {
         setupWithDefaults()
 
         val gitAdapter = initializeGitRepo(
@@ -326,9 +338,9 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
                 |Co-authored-by: 4th Gui <fourth@gui.io>
             """.trimMargin(),
         )
-
-        val output = runCurrentContributionData()
-
+    } exercise {
+        runCurrentContributionData()
+    } verify { output ->
         assertEquals(
             listOf(
                 "fourth@gui.io",
@@ -341,7 +353,7 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
     }
 
     @Test
-    fun canReplaceMajorRegex() {
+    fun canReplaceMajorRegex() = setup(object {}) {
         setupWithOverrides(majorRegex = ".*(big).*")
 
         initializeGitRepo(
@@ -349,14 +361,14 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
             addFileNames = addFileNames,
             commits = listOf("[patch] commit 1", "commit (big) 2", "[patch] commit 3"),
         )
-
-        val output = runCurrentContributionData()
-
+    } exercise {
+        runCurrentContributionData()
+    } verify { output ->
         assertEquals("Major", parseContribution(output)?.semver)
     }
 
     @Test
-    fun canReplaceMinorRegex() {
+    fun canReplaceMinorRegex() = setup(object {}) {
         setupWithOverrides(minorRegex = ".*mid.*")
 
         initializeGitRepo(
@@ -364,14 +376,14 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
             addFileNames = addFileNames,
             commits = listOf("[patch] commit 1", "commit (middle) 2", "[patch] commit 3"),
         )
-
-        val output = runCurrentContributionData()
-
+    } exercise {
+        runCurrentContributionData()
+    } verify { output ->
         assertEquals("Minor", parseContribution(output)?.semver)
     }
 
     @Test
-    fun canReplacePatchRegex() {
+    fun canReplacePatchRegex() = setup(object {}) {
         setupWithOverrides(patchRegex = ".*tiny.*")
 
         initializeGitRepo(
@@ -379,13 +391,14 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
             addFileNames = addFileNames,
             commits = listOf("commit 1", "commit (tiny) 2", "commit 3"),
         )
-        val output = runCurrentContributionData()
-
+    } exercise {
+        runCurrentContributionData()
+    } verify { output ->
         assertEquals("Patch", parseContribution(output)?.semver)
     }
 
     @Test
-    fun canReplaceNoneRegex() {
+    fun canReplaceNoneRegex() = setup(object {}) {
         setupWithOverrides(noneRegex = ".*(no).*")
 
         initializeGitRepo(
@@ -393,13 +406,14 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
             addFileNames = addFileNames,
             commits = listOf("commit (no) 1"),
         )
-        val output = runCurrentContributionData()
-
+    } exercise {
+        runCurrentContributionData()
+    } verify { output ->
         assertEquals("None", parseContribution(output)?.semver)
     }
 
     @Test
-    fun canReplaceStoryRegex() {
+    fun canReplaceStoryRegex() = setup(object {}) {
         setupWithOverrides(storyRegex = ".*-(?<storyId>.*-.*)-.*")
 
         initializeGitRepo(
@@ -407,14 +421,15 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
             addFileNames = addFileNames,
             commits = listOf("commit -CowDog-99- 1"),
         )
-        val output = runCurrentContributionData()
-
+    } exercise {
+        runCurrentContributionData()
+    } verify { output ->
         val contribution = parseContribution(output)
         assertEquals("CowDog-99", contribution?.storyId)
     }
 
     @Test
-    fun canReplaceEaseRegex() {
+    fun canReplaceEaseRegex() = setup(object {}) {
         setupWithOverrides(easeRegex = """.*\[(?<ease>[0-5])\].*""")
 
         initializeGitRepo(
@@ -422,14 +437,19 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
             addFileNames = addFileNames,
             commits = listOf("commit [4] 1"),
         )
-        val output = runCurrentContributionData()
-
+    } exercise {
+        runCurrentContributionData()
+    } verify { output ->
         val contribution = parseContribution(output)
         assertEquals(4, contribution?.ease)
     }
 
     @Test
-    fun willHandleMergeCommitsOnMergedBranchesCorrectly() = runTest {
+    fun willHandleMergeCommitsOnMergedBranchesCorrectly() = setup(object {
+        lateinit var merge2Commit: CommitRef
+        lateinit var secondRelease: TagRef
+        lateinit var secondCommit: CommitRef
+    }) {
         setupWithDefaults()
         val gitAdapter = initializeGitRepo(listOf("first"))
         gitAdapter.config("user.name", "Test")
@@ -437,7 +457,7 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
 
         gitAdapter.addTag("release")
         gitAdapter.switchToNewBranch("branch2")
-        val secondCommit = gitAdapter.addCommitWithMessage("second")
+        secondCommit = gitAdapter.addCommitWithMessage("second")
 
         gitAdapter.switchToNewBranch("branch1")
         gitAdapter.addCommitWithMessage("third")
@@ -452,11 +472,12 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
         gitAdapter.checkout("master")
         gitAdapter.addCommitWithMessage("sixth")
 
-        val merge2Commit = gitAdapter.mergeInBranch("branch1", "merge2")
-        delayLongEnoughToAffectGitDate()
-        val secondRelease = gitAdapter.addTag("release2")
-
-        val allOutput = runCurrentContributionData()
+        merge2Commit = gitAdapter.mergeInBranch("branch1", "merge2")
+        sleep(1100)
+        secondRelease = gitAdapter.addTag("release2")
+    } exercise {
+        runCurrentContributionData()
+    } verify { allOutput ->
         assertEquals(
             toContribution(
                 lastCommit = merge2Commit,
@@ -470,7 +491,10 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
     }
 
     @Test
-    fun willIgnoreTagsThatDoNotMatchRegex() = runTest {
+    fun willIgnoreTagsThatDoNotMatchRegex() = setup(object {
+        lateinit var merge2Commit: CommitRef
+        lateinit var secondCommit: CommitRef
+    }) {
         setupWithOverrides(
             tagRegex = "v(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?",
         )
@@ -480,7 +504,7 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
 
         gitAdapter.addTag("v1.0.0")
         gitAdapter.switchToNewBranch("branch2")
-        val secondCommit = gitAdapter.addCommitWithMessage("second")
+        secondCommit = gitAdapter.addCommitWithMessage("second")
 
         gitAdapter.switchToNewBranch("branch1")
         gitAdapter.addCommitWithMessage("third")
@@ -495,11 +519,12 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
         gitAdapter.checkout("master")
         gitAdapter.addCommitWithMessage("sixth")
 
-        val merge2Commit = gitAdapter.mergeInBranch("branch1", "merge2")
-        delayLongEnoughToAffectGitDate()
+        merge2Commit = gitAdapter.mergeInBranch("branch1", "merge2")
+        sleep(1100)
         gitAdapter.addTag("ignore-me")
-
-        val allOutput = runCurrentContributionData()
+    } exercise {
+        runCurrentContributionData()
+    } verify { allOutput ->
         assertEquals(
             toContribution(
                 lastCommit = merge2Commit,
@@ -512,7 +537,11 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
     }
 
     @Test
-    fun willCorrectlyUnderstandLongerRunningBranch() = runTest {
+    fun willCorrectlyUnderstandLongerRunningBranch() = setup(object {
+        lateinit var secondCommit: CommitRef
+        lateinit var lastCommit: CommitRef
+        lateinit var thirdRelease: TagRef
+    }) {
         setupWithDefaults()
         val gitAdapter = initializeGitRepo(listOf("first"))
         gitAdapter.config("user.name", "Test")
@@ -520,21 +549,22 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
 
         gitAdapter.addTag("release")
         gitAdapter.switchToNewBranch("branch")
-        val secondCommit = gitAdapter.addCommitWithMessage("second")
+        secondCommit = gitAdapter.addCommitWithMessage("second")
         gitAdapter.checkout("master")
         gitAdapter.addCommitWithMessage("third")
-        delayLongEnoughToAffectGitDate()
+        sleep(1100)
         gitAdapter.addTag("release2")
         gitAdapter.checkout("branch")
         gitAdapter.addCommitWithMessage("fourth")
         gitAdapter.addCommitWithMessage("fifth")
         gitAdapter.checkout("master")
         gitAdapter.mergeInBranch("branch", "merge")
-        val lastCommit = gitAdapter.addCommitWithMessage("sixth")
-        delayLongEnoughToAffectGitDate()
-        val thirdRelease = gitAdapter.addTag("release3")
-
-        val allOutput = runCurrentContributionData()
+        lastCommit = gitAdapter.addCommitWithMessage("sixth")
+        sleep(1100)
+        thirdRelease = gitAdapter.addTag("release3")
+    } exercise {
+        runCurrentContributionData()
+    } verify { allOutput ->
         assertEquals(
             toContribution(
                 lastCommit = lastCommit,
@@ -571,7 +601,6 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
         commitCount = expectedCommitCount,
         semver = expectedSemver,
     )
-
     fun initializeGitRepo(commits: List<String>) = initializeGitRepo(
         directory = projectDir,
         addFileNames = addFileNames,

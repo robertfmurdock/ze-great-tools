@@ -15,22 +15,8 @@ repositories {
     mavenCentral()
 }
 
-testing {
-    suites {
-        register<JvmTestSuite>("functionalTest") {
-            gradlePlugin.testSourceSets(sources)
-        }
-    }
-}
-
-configurations["functionalTestImplementation"].extendsFrom(configurations["testImplementation"])
-
 dependencies {
     implementation(project(":digger-gradle"))
-    testImplementation(kotlin("test-junit5", embeddedKotlinVersion))
-    testImplementation(libs.com.zegreatrob.testmints.standard)
-    "functionalTestImplementation"(platform(libs.org.junit.junit.bom))
-    "functionalTestImplementation"(project(":digger-test"))
 }
 
 gradlePlugin {
@@ -49,12 +35,6 @@ gradlePlugin {
 }
 
 tasks {
-    "compileFunctionalTestKotlin" {
-        dependsOn("compileKotlin")
-    }
-    check {
-        dependsOn(testing.suites.named("functionalTest"))
-    }
     publish { finalizedBy("::closeAndReleaseSonatypeStagingRepository") }
     withType(Test::class) {
         useJUnitPlatform()

@@ -1,5 +1,6 @@
 package com.zegreatrob.tools.digger
 
+import com.zegreatrob.testmints.setup
 import com.zegreatrob.tools.adapter.git.CommitRef
 import com.zegreatrob.tools.adapter.git.TagRef
 import com.zegreatrob.tools.digger.model.Contribution
@@ -7,18 +8,16 @@ import com.zegreatrob.tools.test.git.addCommitWithMessage
 import com.zegreatrob.tools.test.git.addTag
 import com.zegreatrob.tools.test.git.createTempDirectory
 import com.zegreatrob.tools.test.git.defaultAuthors
-import com.zegreatrob.tools.test.git.delayLongEnoughToAffectGitDate
 import com.zegreatrob.tools.test.git.ffOnlyInBranch
 import com.zegreatrob.tools.test.git.initializeGitRepo
 import com.zegreatrob.tools.test.git.mergeInBranch
 import com.zegreatrob.tools.test.git.removeDirectory
+import com.zegreatrob.tools.test.git.sleep
 import com.zegreatrob.tools.test.git.switchToNewBranch
-import kotlinx.coroutines.test.runTest
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.time.Duration.Companion.minutes
 
 interface AllContributionTestSpec : SetupWithOverrides {
     var projectDir: String
@@ -43,7 +42,11 @@ interface AllContributionTestSpec : SetupWithOverrides {
     }
 
     @Test
-    fun willIncludeAllTagSegments() {
+    fun willIncludeAllTagSegments() = setup(object {
+        lateinit var firstCommit: CommitRef
+        lateinit var firstRelease: TagRef
+        lateinit var secondCommit: CommitRef
+    }) {
         setupWithDefaults()
         val gitAdapter = initializeGitRepo(
             listOf(
@@ -58,10 +61,10 @@ interface AllContributionTestSpec : SetupWithOverrides {
         gitAdapter.config("user.name", "Test")
         gitAdapter.config("user.email", "Test")
 
-        val firstCommit = gitAdapter.show("HEAD")!!
+        firstCommit = gitAdapter.show("HEAD")!!
 
-        val firstRelease = gitAdapter.addTag("release")
-        val secondCommit =
+        firstRelease = gitAdapter.addTag("release")
+        secondCommit =
             gitAdapter.addCommitWithMessage(
                 """here's a message
                 |
@@ -70,7 +73,9 @@ interface AllContributionTestSpec : SetupWithOverrides {
                 |Co-authored-by: 4th Gui <fourth@gui.io>
                 """.trimMargin(),
             )
-        val allOutput = runAllContributionData()
+    } exercise {
+        runAllContributionData()
+    } verify { allOutput ->
         assertEquals(
             listOf(
                 toContribution(
@@ -98,28 +103,37 @@ interface AllContributionTestSpec : SetupWithOverrides {
     }
 
     @Test
-    fun willConsiderThePathWithTheMostTagsTheTrunk() = runTest {
+    fun willConsiderThePathWithTheMostTagsTheTrunk() = setup(object {
+        lateinit var firstCommit: CommitRef
+        lateinit var firstRelease: TagRef
+        lateinit var secondCommit: CommitRef
+        lateinit var midRelease: TagRef
+        lateinit var thirdCommit: CommitRef
+        lateinit var mergeCommit: CommitRef
+        lateinit var release2: TagRef
+    }) {
         setupWithDefaults()
         val gitAdapter = initializeGitRepo(listOf("here's a message"))
         gitAdapter.config("user.name", "Test")
         gitAdapter.config("user.email", "Test")
 
-        val firstCommit = gitAdapter.show("HEAD")!!
-        val firstRelease = gitAdapter.addTag("release1")
-        delayLongEnoughToAffectGitDate()
+        firstCommit = gitAdapter.show("HEAD")!!
+        firstRelease = gitAdapter.addTag("release1")
+        sleep(1100)
         gitAdapter.switchToNewBranch("branch")
 
-        val secondCommit = gitAdapter.addCommitWithMessage("second")
-        val midRelease = gitAdapter.addTag("release1-5")
-        delayLongEnoughToAffectGitDate()
+        secondCommit = gitAdapter.addCommitWithMessage("second")
+        midRelease = gitAdapter.addTag("release1-5")
+        sleep(1100)
         gitAdapter.checkout("master")
 
-        val thirdCommit = gitAdapter.addCommitWithMessage("third")
+        thirdCommit = gitAdapter.addCommitWithMessage("third")
 
-        val mergeCommit = gitAdapter.mergeInBranch("branch", "merge")
-        val release2 = gitAdapter.addTag("release-2")
-
-        val allOutput = runAllContributionData()
+        mergeCommit = gitAdapter.mergeInBranch("branch", "merge")
+        release2 = gitAdapter.addTag("release-2")
+    } exercise {
+        runAllContributionData()
+    } verify { allOutput ->
         assertEquals(
             listOf(
                 toContribution(
@@ -147,17 +161,23 @@ interface AllContributionTestSpec : SetupWithOverrides {
     }
 
     @Test
-    fun willHandleNormalMergeIntoBranchThenBackCaseWell() = runTest {
+    fun willHandleNormalMergeIntoBranchThenBackCaseWell() = setup(object {
+        lateinit var firstCommit: CommitRef
+        lateinit var firstRelease: TagRef
+        lateinit var secondCommit: CommitRef
+        lateinit var mergeToMainCommit: CommitRef
+        lateinit var release2: TagRef
+    }) {
         setupWithDefaults()
         val gitAdapter = initializeGitRepo(listOf("here's a message"))
         gitAdapter.config("user.name", "Test")
         gitAdapter.config("user.email", "Test")
 
-        val firstCommit = gitAdapter.show("HEAD")!!
-        val firstRelease = gitAdapter.addTag("release")
+        firstCommit = gitAdapter.show("HEAD")!!
+        firstRelease = gitAdapter.addTag("release")
 
         gitAdapter.switchToNewBranch("branch")
-        val secondCommit = gitAdapter.addCommitWithMessage("second")
+        secondCommit = gitAdapter.addCommitWithMessage("second")
 
         gitAdapter.checkout("master")
         gitAdapter.addCommitWithMessage("third")
@@ -168,11 +188,12 @@ interface AllContributionTestSpec : SetupWithOverrides {
 
         gitAdapter.checkout("master")
 
-        val mergeToMainCommit = gitAdapter.mergeInBranch("branch", "merge-to-main")
-        delayLongEnoughToAffectGitDate()
-        val release2 = gitAdapter.addTag("release-2")
-
-        val allOutput = runAllContributionData()
+        mergeToMainCommit = gitAdapter.mergeInBranch("branch", "merge-to-main")
+        sleep(1100)
+        release2 = gitAdapter.addTag("release-2")
+    } exercise {
+        runAllContributionData()
+    } verify { allOutput ->
         assertEquals(
             listOf(
                 toContribution(
@@ -193,34 +214,43 @@ interface AllContributionTestSpec : SetupWithOverrides {
     }
 
     @Test
-    fun willHandleNormalMergeIntoBranchThenFfBackCase() = runTest {
+    fun willHandleNormalMergeIntoBranchThenFfBackCase() = setup(object {
+        lateinit var firstCommit: CommitRef
+        lateinit var firstRelease: TagRef
+        lateinit var secondCommit: CommitRef
+        lateinit var thirdCommit: CommitRef
+        lateinit var secondRelease: TagRef
+        lateinit var mergeInBranchCommit: CommitRef
+        lateinit var thirdRelease: TagRef
+    }) {
         setupWithDefaults()
         val gitAdapter = initializeGitRepo(listOf("here's a message"))
         gitAdapter.config("user.name", "Test")
         gitAdapter.config("user.email", "Test")
 
-        val firstCommit = gitAdapter.show("HEAD")!!
-        val firstRelease = gitAdapter.addTag("release-1")
+        firstCommit = gitAdapter.show("HEAD")!!
+        firstRelease = gitAdapter.addTag("release-1")
 
         gitAdapter.switchToNewBranch("branch")
-        val secondCommit = gitAdapter.addCommitWithMessage("second")
+        secondCommit = gitAdapter.addCommitWithMessage("second")
 
         gitAdapter.checkout("master")
-        val thirdCommit = gitAdapter.addCommitWithMessage("third")
-        delayLongEnoughToAffectGitDate()
-        val secondRelease = gitAdapter.addTag("release-2")
+        thirdCommit = gitAdapter.addCommitWithMessage("third")
+        sleep(1100)
+        secondRelease = gitAdapter.addTag("release-2")
 
         gitAdapter.checkout("branch")
         gitAdapter.addCommitWithMessage("fourth")
-        val mergeInBranchCommit = gitAdapter.mergeInBranch("master", "merge-to-branch")
+        mergeInBranchCommit = gitAdapter.mergeInBranch("master", "merge-to-branch")
 
         gitAdapter.checkout("master")
 
         gitAdapter.ffOnlyInBranch("branch")
-        delayLongEnoughToAffectGitDate()
-        val thirdRelease = gitAdapter.addTag("release-3")
-
-        val allOutput = runAllContributionData()
+        sleep(1100)
+        thirdRelease = gitAdapter.addTag("release-3")
+    } exercise {
+        runAllContributionData()
+    } verify { allOutput ->
         assertEquals(
             listOf(
                 toContribution(
@@ -248,31 +278,40 @@ interface AllContributionTestSpec : SetupWithOverrides {
     }
 
     @Test
-    fun willHandleMergeBranches() = runTest {
+    fun willHandleMergeBranches() = setup(object {
+        lateinit var firstCommit: CommitRef
+        lateinit var firstRelease: TagRef
+        lateinit var secondCommit: CommitRef
+        lateinit var thirdCommit: CommitRef
+        lateinit var secondRelease: TagRef
+        lateinit var mergeCommit: CommitRef
+        lateinit var thirdRelease: TagRef
+    }) {
         setupWithDefaults()
         val gitAdapter = initializeGitRepo(listOf("first"))
         gitAdapter.config("user.name", "Test")
         gitAdapter.config("user.email", "Test")
 
-        val firstCommit = gitAdapter.show("HEAD")!!
+        firstCommit = gitAdapter.show("HEAD")!!
 
-        val firstRelease = gitAdapter.addTag("release")
+        firstRelease = gitAdapter.addTag("release")
         gitAdapter.switchToNewBranch("branch1")
-        val secondCommit = gitAdapter.addCommitWithMessage("second")
+        secondCommit = gitAdapter.addCommitWithMessage("second")
 
         gitAdapter.checkout("master")
-        val thirdCommit = gitAdapter.addCommitWithMessage("third")
+        thirdCommit = gitAdapter.addCommitWithMessage("third")
 
-        delayLongEnoughToAffectGitDate()
-        val secondRelease = gitAdapter.addTag("release2")
+        sleep(1100)
+        secondRelease = gitAdapter.addTag("release2")
         gitAdapter.checkout("branch1")
         gitAdapter.addCommitWithMessage("fourth")
         gitAdapter.checkout("master")
-        val mergeCommit = gitAdapter.mergeInBranch("branch1", "merge")
-        delayLongEnoughToAffectGitDate()
-        val thirdRelease = gitAdapter.addTag("release3")
-
-        val allOutput = runAllContributionData()
+        mergeCommit = gitAdapter.mergeInBranch("branch1", "merge")
+        sleep(1100)
+        thirdRelease = gitAdapter.addTag("release3")
+    } exercise {
+        runAllContributionData()
+    } verify { allOutput ->
         assertEquals(
             listOf(
                 toContribution(
@@ -298,7 +337,13 @@ interface AllContributionTestSpec : SetupWithOverrides {
     }
 
     @Test
-    fun willIgnoreTagsThatDoNotMatchTagRegex() = runTest {
+    fun willIgnoreTagsThatDoNotMatchTagRegex() = setup(object {
+        lateinit var firstCommit: CommitRef
+        lateinit var firstRelease: TagRef
+        lateinit var secondCommit: CommitRef
+        lateinit var mergeCommit: CommitRef
+        lateinit var thirdRelease: TagRef
+    }) {
         setupWithOverrides(
             tagRegex = "v(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?",
         )
@@ -306,25 +351,26 @@ interface AllContributionTestSpec : SetupWithOverrides {
         gitAdapter.config("user.name", "Test")
         gitAdapter.config("user.email", "Test")
 
-        val firstCommit = gitAdapter.show("HEAD")!!
+        firstCommit = gitAdapter.show("HEAD")!!
 
-        val firstRelease = gitAdapter.addTag("v1.2.8")
+        firstRelease = gitAdapter.addTag("v1.2.8")
         gitAdapter.switchToNewBranch("branch1")
-        val secondCommit = gitAdapter.addCommitWithMessage("second")
+        secondCommit = gitAdapter.addCommitWithMessage("second")
 
         gitAdapter.checkout("master")
         gitAdapter.addCommitWithMessage("third")
 
-        delayLongEnoughToAffectGitDate()
+        sleep(1100)
         gitAdapter.addTag("unrelated-tag")
         gitAdapter.checkout("branch1")
         gitAdapter.addCommitWithMessage("fourth")
         gitAdapter.checkout("master")
-        val mergeCommit = gitAdapter.mergeInBranch("branch1", "merge")
-        delayLongEnoughToAffectGitDate()
-        val thirdRelease = gitAdapter.addTag("v20.176.37")
-
-        val allOutput = runAllContributionData()
+        mergeCommit = gitAdapter.mergeInBranch("branch1", "merge")
+        sleep(1100)
+        thirdRelease = gitAdapter.addTag("v20.176.37")
+    } exercise {
+        runAllContributionData()
+    } verify { allOutput ->
         assertEquals(
             listOf(
                 toContribution(
@@ -345,17 +391,23 @@ interface AllContributionTestSpec : SetupWithOverrides {
     }
 
     @Test
-    fun willHandleMergeCommitsOnMergedBranchesCorrectly() = runTest(timeout = 5.minutes) {
+    fun willHandleMergeCommitsOnMergedBranchesCorrectly() = setup(object {
+        lateinit var firstCommit: CommitRef
+        lateinit var firstRelease: TagRef
+        lateinit var secondCommit: CommitRef
+        lateinit var merge2Commit: CommitRef
+        lateinit var thirdRelease: TagRef
+    }) {
         setupWithDefaults()
         val gitAdapter = initializeGitRepo(listOf("first"))
         gitAdapter.config("user.name", "Test")
         gitAdapter.config("user.email", "Test")
 
-        val firstCommit = gitAdapter.show("HEAD")!!
+        firstCommit = gitAdapter.show("HEAD")!!
 
-        val firstRelease = gitAdapter.addTag("release")
+        firstRelease = gitAdapter.addTag("release")
         gitAdapter.switchToNewBranch("branch2")
-        val secondCommit = gitAdapter.addCommitWithMessage("second")
+        secondCommit = gitAdapter.addCommitWithMessage("second")
 
         gitAdapter.switchToNewBranch("branch1")
         gitAdapter.addCommitWithMessage("third")
@@ -370,11 +422,12 @@ interface AllContributionTestSpec : SetupWithOverrides {
         gitAdapter.checkout("master")
         gitAdapter.addCommitWithMessage("sixth")
 
-        val merge2Commit = gitAdapter.mergeInBranch("branch1", "merge2")
-        delayLongEnoughToAffectGitDate()
-        val thirdRelease = gitAdapter.addTag("release3")
-
-        val allOutput = runAllContributionData()
+        merge2Commit = gitAdapter.mergeInBranch("branch1", "merge2")
+        sleep(1100)
+        thirdRelease = gitAdapter.addTag("release3")
+    } exercise {
+        runAllContributionData()
+    } verify { allOutput ->
         assertEquals(
             listOf(
                 toContribution(
@@ -395,32 +448,42 @@ interface AllContributionTestSpec : SetupWithOverrides {
     }
 
     @Test
-    fun whenMergingMultipleTimesFromSameBranchCommitsAreOnlyCountedOnce() = runTest {
+    fun whenMergingMultipleTimesFromSameBranchCommitsAreOnlyCountedOnce() = setup(object {
+        lateinit var firstCommit: CommitRef
+        lateinit var firstRelease: TagRef
+        lateinit var secondCommit: CommitRef
+        lateinit var merge1Commit: CommitRef
+        lateinit var secondRelease: TagRef
+        lateinit var fourthCommit: CommitRef
+        lateinit var merge2Commit: CommitRef
+        lateinit var thirdRelease: TagRef
+    }) {
         setupWithDefaults()
         val gitAdapter = initializeGitRepo(listOf("first"))
         gitAdapter.config("user.name", "Test")
         gitAdapter.config("user.email", "Test")
 
-        val firstCommit = gitAdapter.show("HEAD")!!
-        val firstRelease = gitAdapter.addTag("release")
+        firstCommit = gitAdapter.show("HEAD")!!
+        firstRelease = gitAdapter.addTag("release")
 
         gitAdapter.switchToNewBranch("branch1")
-        val secondCommit = gitAdapter.addCommitWithMessage("second")
+        secondCommit = gitAdapter.addCommitWithMessage("second")
 
         gitAdapter.checkout("master")
         gitAdapter.addCommitWithMessage("third")
-        val merge1Commit = gitAdapter.mergeInBranch("branch1", "merge1")
-        delayLongEnoughToAffectGitDate()
-        val secondRelease = gitAdapter.addTag("release2")
+        merge1Commit = gitAdapter.mergeInBranch("branch1", "merge1")
+        sleep(1100)
+        secondRelease = gitAdapter.addTag("release2")
 
         gitAdapter.checkout("branch1")
-        val fourthCommit = gitAdapter.addCommitWithMessage("fourth")
+        fourthCommit = gitAdapter.addCommitWithMessage("fourth")
         gitAdapter.checkout("master")
-        val merge2Commit = gitAdapter.mergeInBranch("branch1", "merge2")
-        delayLongEnoughToAffectGitDate()
-        val thirdRelease = gitAdapter.addTag("release3")
-
-        val allOutput = runAllContributionData()
+        merge2Commit = gitAdapter.mergeInBranch("branch1", "merge2")
+        sleep(1100)
+        thirdRelease = gitAdapter.addTag("release3")
+    } exercise {
+        runAllContributionData()
+    } verify { allOutput ->
         assertEquals(
             listOf(
                 toContribution(
@@ -447,6 +510,236 @@ interface AllContributionTestSpec : SetupWithOverrides {
         )
     }
 
+    @Test
+    fun willIncludeEaseOfChange() = setup(object {
+        lateinit var firstCommit: CommitRef
+        lateinit var tag: TagRef
+        lateinit var secondCommit: CommitRef
+    }) {
+        setupWithDefaults()
+        val gitAdapter = initializeGitRepo(
+            directory = projectDir,
+            addFileNames = addFileNames,
+            commits = listOf(
+                "here's a message -4- more stuff",
+            ),
+        )
+        gitAdapter.config("user.name", "Test")
+        gitAdapter.config("user.email", "Test")
+
+        firstCommit = gitAdapter.show("HEAD")!!
+
+        tag = gitAdapter.addTag("release")
+        secondCommit =
+            gitAdapter.addCommitWithMessage(
+                "-3- here's a message",
+            )
+    } exercise {
+        runAllContributionData()
+    } verify { allOutput ->
+        assertEquals(
+            listOf(
+                toContribution(
+                    lastCommit = secondCommit,
+                    expectedAuthors = defaultAuthors,
+                    expectedEase = 3,
+                ),
+                toContribution(
+                    lastCommit = firstCommit,
+                    tag = tag,
+                    expectedAuthors = defaultAuthors,
+                    expectedEase = 4,
+                ),
+            ),
+            parseAll(allOutput),
+        )
+    }
+
+    @Test
+    fun willIncludeStoryIds() = setup(object {
+        lateinit var firstCommit: CommitRef
+        lateinit var tag: TagRef
+        lateinit var secondCommit: CommitRef
+    }) {
+        setupWithDefaults()
+        val gitAdapter = initializeGitRepo(commits = listOf("[DOGCOW-17] here's a message"))
+        gitAdapter.config("user.name", "Test")
+        gitAdapter.config("user.email", "Test")
+
+        firstCommit = gitAdapter.show("HEAD")!!
+        tag = gitAdapter.addTag("release")
+        secondCommit = gitAdapter.addCommitWithMessage("[DOGCOW-18] -3- here's a message")
+    } exercise {
+        runAllContributionData()
+    } verify { allOutput ->
+        assertEquals(
+            listOf(
+                toContribution(
+                    lastCommit = secondCommit,
+                    expectedAuthors = defaultAuthors,
+                    expectedEase = 3,
+                    expectedStoryId = "DOGCOW-18",
+                ),
+                toContribution(
+                    lastCommit = firstCommit,
+                    tag = tag,
+                    expectedAuthors = defaultAuthors,
+                    expectedStoryId = "DOGCOW-17",
+                ),
+            ),
+            parseAll(allOutput),
+        )
+    }
+
+    @Test
+    fun willMergeTheSameStoryIdWithinAContribution() = setup(object {
+        lateinit var firstCommit: CommitRef
+        lateinit var secondCommit: CommitRef
+    }) {
+        setupWithDefaults()
+        val gitAdapter = initializeGitRepo(listOf("[DOGCOW-17] here's a message"))
+        firstCommit = gitAdapter.show("HEAD")!!
+        secondCommit = gitAdapter.addCommitWithMessage("[DOGCOW-17] -3- here's a message")
+    } exercise {
+        runAllContributionData()
+    } verify { allOutput ->
+        assertEquals(
+            listOf(
+                toContribution(
+                    lastCommit = secondCommit,
+                    firstCommit = firstCommit,
+                    expectedAuthors = defaultAuthors,
+                    expectedCommitCount = 2,
+                    expectedEase = 3,
+                    expectedStoryId = "DOGCOW-17",
+                ),
+            ),
+            parseAll(allOutput),
+        )
+    }
+
+    @Test
+    fun willMergeTheDifferentStoryIdsWithinAContribution() = setup(object {
+        lateinit var firstCommit: CommitRef
+        lateinit var secondCommit: CommitRef
+    }) {
+        setupWithOverrides(label = "AwesomeProject")
+        val gitAdapter = initializeGitRepo(commits = listOf("[DOGCOW-17] here's a message"))
+        firstCommit = gitAdapter.show("HEAD")!!
+        secondCommit = gitAdapter.addCommitWithMessage("[DOGCOW-18] -3- here's a message")
+    } exercise {
+        runAllContributionData()
+    } verify { allOutput ->
+        assertEquals(
+            listOf(
+                toContribution(
+                    lastCommit = secondCommit,
+                    firstCommit = firstCommit,
+                    expectedAuthors = defaultAuthors,
+                    expectedCommitCount = 2,
+                    expectedEase = 3,
+                    expectedStoryId = "DOGCOW-17, DOGCOW-18",
+                    expectedLabel = "AwesomeProject",
+                ),
+            ),
+            parseAll(allOutput),
+        )
+    }
+
+    @Test
+    fun willIncludeFlattenEaseIntoLargestNumber() = setup(object {
+        lateinit var firstCommit: CommitRef
+        lateinit var secondCommit: CommitRef
+    }) {
+        setupWithDefaults()
+        val gitAdapter = initializeGitRepo(listOf("here's a message -4- more stuff"))
+        firstCommit = gitAdapter.show("HEAD")!!
+        secondCommit = gitAdapter.addCommitWithMessage("-3- here's a message")
+    } exercise {
+        runAllContributionData()
+    } verify { allOutput ->
+        assertEquals(
+            listOf(
+                toContribution(
+                    lastCommit = secondCommit,
+                    firstCommit = firstCommit,
+                    expectedAuthors = defaultAuthors,
+                    expectedCommitCount = 2,
+                    expectedEase = 4,
+                ),
+            ),
+            parseAll(allOutput),
+        )
+    }
+
+    @Test
+    fun canReplaceMajorRegex() = setup(object {}) {
+        setupWithOverrides(majorRegex = ".*(big).*")
+
+        initializeGitRepo(commits = listOf("[patch] commit 1", "commit (big) 2", "[patch] commit 3"))
+    } exercise {
+        runAllContributionData()
+    } verify { allOutput ->
+        assertEquals(listOf("Major"), parseAll(allOutput).map { it.semver })
+    }
+
+    @Test
+    fun canReplaceMinorRegex() = setup(object {}) {
+        setupWithOverrides(minorRegex = ".*mid.*")
+
+        initializeGitRepo(commits = listOf("[patch] commit 1", "commit (middle) 2", "[patch] commit 3"))
+    } exercise {
+        runAllContributionData()
+    } verify { allOutput ->
+        assertEquals(listOf("Minor"), parseAll(allOutput).map { it.semver })
+    }
+
+    @Test
+    fun canReplacePatchRegex() = setup(object {}) {
+        setupWithOverrides(patchRegex = ".*tiny.*")
+
+        initializeGitRepo(commits = listOf("commit 1", "commit (tiny) 2", "commit 3"))
+    } exercise {
+        runAllContributionData()
+    } verify { allOutput ->
+        assertEquals(listOf("Patch"), parseAll(allOutput).map { it.semver })
+    }
+
+    @Test
+    fun canReplaceNoneRegex() = setup(object {}) {
+        setupWithOverrides(noneRegex = ".*(no).*")
+
+        initializeGitRepo(commits = listOf("commit (no) 1"))
+    } exercise {
+        runAllContributionData()
+    } verify { allOutput ->
+        assertEquals(listOf("None"), parseAll(allOutput).map { it.semver })
+    }
+
+    @Test
+    fun canReplaceStoryRegex() = setup(object {}) {
+        setupWithOverrides(storyRegex = ".*-(?<storyId>.*-.*)-.*")
+
+        initializeGitRepo(commits = listOf("commit -CowDog-99- 1"))
+    } exercise {
+        runAllContributionData()
+    } verify { allOutput ->
+        val contributions = parseAll(allOutput)
+        assertEquals(listOf("CowDog-99"), contributions.map { it.storyId })
+    }
+
+    @Test
+    fun canReplaceEaseRegex() = setup(object {}) {
+        setupWithOverrides(easeRegex = """.*\[(?<ease>[0-5])\].*""")
+
+        initializeGitRepo(commits = listOf("commit [4] 1"))
+    } exercise {
+        runAllContributionData()
+    } verify { allOutput ->
+        val contributions = parseAll(allOutput)
+        assertEquals(listOf(4), contributions.map { it.ease })
+    }
+
     private fun toContribution(
         lastCommit: CommitRef,
         tag: TagRef? = null,
@@ -471,206 +764,4 @@ interface AllContributionTestSpec : SetupWithOverrides {
         commitCount = expectedCommitCount,
         semver = expectedSemver,
     )
-
-    @Test
-    fun willIncludeEaseOfChange() {
-        setupWithDefaults()
-        val gitAdapter = initializeGitRepo(
-            directory = projectDir,
-            addFileNames = addFileNames,
-            commits = listOf(
-                "here's a message -4- more stuff",
-            ),
-        )
-        gitAdapter.config("user.name", "Test")
-        gitAdapter.config("user.email", "Test")
-
-        val firstCommit = gitAdapter.show("HEAD")!!
-
-        val tag = gitAdapter.addTag("release")
-        val secondCommit =
-            gitAdapter.addCommitWithMessage(
-                "-3- here's a message",
-            )
-        val allOutput = runAllContributionData()
-        assertEquals(
-            listOf(
-                toContribution(
-                    lastCommit = secondCommit,
-                    expectedAuthors = defaultAuthors,
-                    expectedEase = 3,
-                ),
-                toContribution(
-                    lastCommit = firstCommit,
-                    tag = tag,
-                    expectedAuthors = defaultAuthors,
-                    expectedEase = 4,
-                ),
-            ),
-            parseAll(allOutput),
-        )
-    }
-
-    @Test
-    fun willIncludeStoryIds() {
-        setupWithDefaults()
-        val gitAdapter = initializeGitRepo(commits = listOf("[DOGCOW-17] here's a message"))
-        gitAdapter.config("user.name", "Test")
-        gitAdapter.config("user.email", "Test")
-
-        val firstCommit = gitAdapter.show("HEAD")!!
-        val tag = gitAdapter.addTag("release")
-        val secondCommit = gitAdapter.addCommitWithMessage("[DOGCOW-18] -3- here's a message")
-        val allOutput = runAllContributionData()
-        assertEquals(
-            listOf(
-                toContribution(
-                    lastCommit = secondCommit,
-                    expectedAuthors = defaultAuthors,
-                    expectedEase = 3,
-                    expectedStoryId = "DOGCOW-18",
-                ),
-                toContribution(
-                    lastCommit = firstCommit,
-                    tag = tag,
-                    expectedAuthors = defaultAuthors,
-                    expectedStoryId = "DOGCOW-17",
-                ),
-            ),
-            parseAll(allOutput),
-        )
-    }
-
-    @Test
-    fun willMergeTheSameStoryIdWithinAContribution() {
-        setupWithDefaults()
-        val gitAdapter = initializeGitRepo(listOf("[DOGCOW-17] here's a message"))
-        val firstCommit = gitAdapter.show("HEAD")!!
-        val secondCommit = gitAdapter.addCommitWithMessage("[DOGCOW-17] -3- here's a message")
-        val allOutput = runAllContributionData()
-        assertEquals(
-            listOf(
-                toContribution(
-                    lastCommit = secondCommit,
-                    firstCommit = firstCommit,
-                    expectedAuthors = defaultAuthors,
-                    expectedCommitCount = 2,
-                    expectedEase = 3,
-                    expectedStoryId = "DOGCOW-17",
-                ),
-            ),
-            parseAll(allOutput),
-        )
-    }
-
-    @Test
-    fun willMergeTheDifferentStoryIdsWithinAContribution() {
-        setupWithOverrides(label = "AwesomeProject")
-        val gitAdapter = initializeGitRepo(commits = listOf("[DOGCOW-17] here's a message"))
-        val firstCommit = gitAdapter.show("HEAD")!!
-        val secondCommit = gitAdapter.addCommitWithMessage("[DOGCOW-18] -3- here's a message")
-
-        val allOutput = runAllContributionData()
-
-        assertEquals(
-            listOf(
-                toContribution(
-                    lastCommit = secondCommit,
-                    firstCommit = firstCommit,
-                    expectedAuthors = defaultAuthors,
-                    expectedCommitCount = 2,
-                    expectedEase = 3,
-                    expectedStoryId = "DOGCOW-17, DOGCOW-18",
-                    expectedLabel = "AwesomeProject",
-                ),
-            ),
-            parseAll(allOutput),
-        )
-    }
-
-    @Test
-    fun willIncludeFlattenEaseIntoLargestNumber() {
-        setupWithDefaults()
-        val gitAdapter = initializeGitRepo(listOf("here's a message -4- more stuff"))
-        val firstCommit = gitAdapter.show("HEAD")!!
-        val secondCommit = gitAdapter.addCommitWithMessage("-3- here's a message")
-        val allOutput = runAllContributionData()
-
-        assertEquals(
-            listOf(
-                toContribution(
-                    lastCommit = secondCommit,
-                    firstCommit = firstCommit,
-                    expectedAuthors = defaultAuthors,
-                    expectedCommitCount = 2,
-                    expectedEase = 4,
-                ),
-            ),
-            parseAll(allOutput),
-        )
-    }
-
-    @Test
-    fun canReplaceMajorRegex() {
-        setupWithOverrides(majorRegex = ".*(big).*")
-
-        initializeGitRepo(commits = listOf("[patch] commit 1", "commit (big) 2", "[patch] commit 3"))
-
-        val output = runAllContributionData()
-
-        assertEquals(listOf("Major"), parseAll(output).map { it.semver })
-    }
-
-    @Test
-    fun canReplaceMinorRegex() {
-        setupWithOverrides(minorRegex = ".*mid.*")
-
-        initializeGitRepo(commits = listOf("[patch] commit 1", "commit (middle) 2", "[patch] commit 3"))
-
-        val output = runAllContributionData()
-
-        assertEquals(listOf("Minor"), parseAll(output).map { it.semver })
-    }
-
-    @Test
-    fun canReplacePatchRegex() {
-        setupWithOverrides(patchRegex = ".*tiny.*")
-
-        initializeGitRepo(commits = listOf("commit 1", "commit (tiny) 2", "commit 3"))
-        val output = runAllContributionData()
-
-        assertEquals(listOf("Patch"), parseAll(output).map { it.semver })
-    }
-
-    @Test
-    fun canReplaceNoneRegex() {
-        setupWithOverrides(noneRegex = ".*(no).*")
-
-        initializeGitRepo(commits = listOf("commit (no) 1"))
-        val output = runAllContributionData()
-
-        assertEquals(listOf("None"), parseAll(output).map { it.semver })
-    }
-
-    @Test
-    fun canReplaceStoryRegex() {
-        setupWithOverrides(storyRegex = ".*-(?<storyId>.*-.*)-.*")
-
-        initializeGitRepo(commits = listOf("commit -CowDog-99- 1"))
-        val output = runAllContributionData()
-
-        val contributions = parseAll(output)
-        assertEquals(listOf("CowDog-99"), contributions.map { it.storyId })
-    }
-
-    @Test
-    fun canReplaceEaseRegex() {
-        setupWithOverrides(easeRegex = """.*\[(?<ease>[0-5])\].*""")
-
-        initializeGitRepo(commits = listOf("commit [4] 1"))
-        val output = runAllContributionData()
-
-        val contributions = parseAll(output)
-        assertEquals(listOf(4), contributions.map { it.ease })
-    }
 }

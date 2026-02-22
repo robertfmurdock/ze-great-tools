@@ -30,7 +30,6 @@
       <module name="tagger-tests.tagger-test" target="22" />
       <module name="tagger-tests.tagger-test.jvmMain" target="22" />
       <module name="tagger-tests.tagger-test.jvmTest" target="22" />
-      <module name="tools-tests.digger-plugin-test" target="22" />
       <module name="tools-tests.digger-plugin-test.jvmMain" target="22" />
       <module name="tools-tests.digger-plugin-test.jvmTest" target="22" />
       <module name="tools.digger" target="17" />
@@ -40,6 +39,10 @@
       <module name="tools.digger-core.test" target="11" />
       <module name="tools.digger-json.main" target="11" />
       <module name="tools.digger-json.test" target="11" />
+      <module name="tools.digger-plugin.functionalTest" target="21" />
+      <module name="tools.digger-test" target="21" />
+      <module name="tools.digger-test.jvmMain" target="21" />
+      <module name="tools.digger-test.jvmTest" target="21" />
       <module name="tools.digger-test.main" target="11" />
       <module name="tools.digger-test.test" target="11" />
       <module name="tools.digger.main" target="17" />

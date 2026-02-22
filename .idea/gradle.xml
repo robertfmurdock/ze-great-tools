@@ -25,7 +25,6 @@
                   <project path="$PROJECT_DIR$/tools/digger-json" />
                   <project path="$PROJECT_DIR$/tools/digger-model" />
                   <project path="$PROJECT_DIR$/tools/digger-plugin" />
-                  <project path="$PROJECT_DIR$/tools/digger-test" />
                   <project path="$PROJECT_DIR$/tools/fingerprint-plugin" />
                   <project path="$PROJECT_DIR$/tools/git-adapter" />
                   <project path="$PROJECT_DIR$/tools/git-test" />
@@ -47,6 +46,8 @@
                   <project path="$PROJECT_DIR$/tools-tests" />
                   <project path="$PROJECT_DIR$/tools-tests/digger-core-test" />
                   <project path="$PROJECT_DIR$/tools-tests/digger-json-test" />
+                  <project path="$PROJECT_DIR$/tools-tests/digger-plugin-test" />
+                  <project path="$PROJECT_DIR$/tools-tests/digger-test" />
                   <project path="$PROJECT_DIR$/tools-tests/tagger-core-test" />
                   <project path="$PROJECT_DIR$/tools-tests/tagger-plugin-test" />
                   <project path="$PROJECT_DIR$/tools-tests/tagger-test" />
@@ -69,6 +70,8 @@
             <option value="$PROJECT_DIR$/tools-tests" />
             <option value="$PROJECT_DIR$/tools-tests/digger-core-test" />
             <option value="$PROJECT_DIR$/tools-tests/digger-json-test" />
+            <option value="$PROJECT_DIR$/tools-tests/digger-plugin-test" />
+            <option value="$PROJECT_DIR$/tools-tests/digger-test" />
             <option value="$PROJECT_DIR$/tools-tests/tagger-core-test" />
             <option value="$PROJECT_DIR$/tools-tests/tagger-plugin-test" />
             <option value="$PROJECT_DIR$/tools-tests/tagger-test" />
@@ -80,7 +83,6 @@
             <option value="$PROJECT_DIR$/tools/digger-json" />
             <option value="$PROJECT_DIR$/tools/digger-model" />
             <option value="$PROJECT_DIR$/tools/digger-plugin" />
-            <option value="$PROJECT_DIR$/tools/digger-test" />
             <option value="$PROJECT_DIR$/tools/fingerprint-plugin" />
             <option value="$PROJECT_DIR$/tools/git-adapter" />
             <option value="$PROJECT_DIR$/tools/git-test" />

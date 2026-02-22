@@ -3,10 +3,11 @@ package com.zegreatrob.tools.digger
 import org.gradle.testkit.runner.GradleRunner
 import java.io.File
 
-class CurrentContributionFunctionalTest : CurrentContributionTestSpec {
+class AllContributionFunctionalTest : AllContributionTestSpec {
     override lateinit var projectDir: String
 
     private val buildFile by lazy { "$projectDir/build.gradle.kts" }
+    private val allOutput by lazy { "$projectDir/build/digger/all.json" }
     private val settingsFile by lazy { "$projectDir/settings.gradle" }
     private val ignoreFile by lazy { "$projectDir/.gitignore" }
 
@@ -18,9 +19,13 @@ class CurrentContributionFunctionalTest : CurrentContributionTestSpec {
         )
     }
 
-    override fun setupWithDefaults() {
-        File(settingsFile).writeText("")
+    private fun setup() {
+        File(settingsFile).writeText("includeBuild(\"\${System.getProperty(\"user.dir\")}/../../tools\")")
         File(ignoreFile).writeText(".gradle")
+    }
+
+    override fun setupWithDefaults() {
+        setup()
         File(buildFile).writeText(
             """
             plugins {
@@ -40,8 +45,7 @@ class CurrentContributionFunctionalTest : CurrentContributionTestSpec {
         easeRegex: String?,
         tagRegex: String?,
     ) {
-        File(settingsFile).writeText("")
-        File(ignoreFile).writeText(".gradle")
+        setup()
         File(buildFile).writeText(
             """
             plugins {
@@ -54,21 +58,19 @@ class CurrentContributionFunctionalTest : CurrentContributionTestSpec {
                 ${if (patchRegex != null) "patchRegex.set(Regex(\"${patchRegex.replace("\\", "\\\\")}\"))" else ""}
                 ${if (noneRegex != null) "noneRegex.set(Regex(\"${noneRegex.replace("\\", "\\\\")}\"))" else ""}
                 ${if (storyRegex != null) "storyIdRegex.set(Regex(\"${storyRegex.replace("\\", "\\\\")}\"))" else ""}
-                ${if (easeRegex != null) """easeRegex.set(Regex("${easeRegex.replace("\\", "\\\\")}"))""" else ""}
-                ${if (tagRegex != null) """tagRegex.set(Regex("${tagRegex.replace("\\", "\\\\")}"))""" else ""}
+                ${if (easeRegex != null) "easeRegex.set(Regex(\"${easeRegex.replace("\\", "\\\\")}\"))" else ""}
+                ${if (tagRegex != null) "tagRegex.set(Regex(\"${tagRegex.replace("\\", "\\\\")}\"))" else ""}
             }
             """.trimIndent(),
         )
     }
 
-    override fun runCurrentContributionData(): String {
-        val currentOutput by lazy { "$projectDir/build/digger/current.json" }
+    override fun runAllContributionData(): String {
         GradleRunner.create()
             .forwardOutput()
-            .withPluginClasspath()
-            .withArguments("currentContributionData", "-q")
+            .withArguments("allContributionData", "-q")
             .withProjectDir(File(projectDir))
             .build()
-        return File(currentOutput).readText()
+        return File(allOutput).readText()
     }
 }
