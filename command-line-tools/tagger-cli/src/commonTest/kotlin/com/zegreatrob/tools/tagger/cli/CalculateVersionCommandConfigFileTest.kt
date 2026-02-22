@@ -7,8 +7,6 @@ import com.zegreatrob.tools.tagger.TestResult
 import com.zegreatrob.tools.tagger.json.TaggerConfig
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
-import kotlin.test.BeforeTest
-
 @ExperimentalSerializationApi
 class CalculateVersionCommandConfigFileTest : CalculateVersionTestSpec {
 
@@ -16,12 +14,7 @@ class CalculateVersionCommandConfigFileTest : CalculateVersionTestSpec {
 
     private val taggerFile get() = "$projectDir/.tagger"
     override val addFileNames: Set<String> get() = setOf(taggerFile.split("/").last())
-    private lateinit var arguments: List<String>
-
-    @BeforeTest
-    fun setup() {
-        arguments = listOf("-q", "calculate-version")
-    }
+    private val baseArguments: List<String> = listOf("-q", "calculate-version")
 
     override fun configureWithDefaults() {
         val config = TaggerConfig(releaseBranch = "master")
@@ -55,7 +48,7 @@ class CalculateVersionCommandConfigFileTest : CalculateVersionTestSpec {
 
     override fun execute(): TestResult {
         val test = cli()
-            .test(arguments, envvars = mapOf("PWD" to projectDir))
+            .test(baseArguments, envvars = mapOf("PWD" to projectDir))
         return if (test.statusCode == 0) {
             TestResult.Success(
                 message = test.stdout.trim(),

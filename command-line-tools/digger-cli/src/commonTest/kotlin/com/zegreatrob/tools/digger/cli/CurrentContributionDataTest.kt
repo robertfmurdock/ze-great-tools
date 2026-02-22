@@ -3,7 +3,6 @@ package com.zegreatrob.tools.digger.cli
 import com.github.ajalt.clikt.testing.test
 import com.zegreatrob.tools.cli.readFromFile
 import com.zegreatrob.tools.digger.CurrentContributionTestSpec
-import kotlin.test.BeforeTest
 import kotlin.test.assertEquals
 
 class CurrentContributionDataTest : CurrentContributionTestSpec {
@@ -13,14 +12,11 @@ class CurrentContributionDataTest : CurrentContributionTestSpec {
     override val addFileNames: Set<String> = emptySet()
     private lateinit var arguments: List<String>
 
-    @BeforeTest
-    fun setup() {
-        arguments = emptyList()
-    }
-
     override fun setupWithDefaults() {
-        arguments += "--output-file=$outputFile"
-        arguments += projectDir
+        arguments = listOf(
+            "--output-file=$outputFile",
+            projectDir,
+        )
     }
 
     override fun setupWithOverrides(
@@ -33,15 +29,19 @@ class CurrentContributionDataTest : CurrentContributionTestSpec {
         easeRegex: String?,
         tagRegex: String?,
     ) {
-        setupWithDefaults()
-        label?.let { arguments += "--label=$label" }
-        majorRegex?.let { arguments += """--major-regex=$majorRegex""" }
-        minorRegex?.let { arguments += """--minor-regex=$minorRegex""" }
-        patchRegex?.let { arguments += """--patch-regex=$patchRegex""" }
-        noneRegex?.let { arguments += """--none-regex=$noneRegex""" }
-        storyRegex?.let { arguments += """--story-id-regex=$storyRegex""" }
-        easeRegex?.let { arguments += """--ease-regex=$easeRegex""" }
-        tagRegex?.let { arguments += """--tag-regex=$tagRegex""" }
+        arguments = listOf(
+            "--output-file=$outputFile",
+            projectDir,
+        ) + listOfNotNull(
+            label?.let { "--label=$it" },
+            majorRegex?.let { "--major-regex=$it" },
+            minorRegex?.let { "--minor-regex=$it" },
+            patchRegex?.let { "--patch-regex=$it" },
+            noneRegex?.let { "--none-regex=$it" },
+            storyRegex?.let { "--story-id-regex=$it" },
+            easeRegex?.let { "--ease-regex=$it" },
+            tagRegex?.let { "--tag-regex=$it" },
+        )
     }
 
     override fun runCurrentContributionData(): String {

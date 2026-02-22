@@ -3,23 +3,23 @@ package com.zegreatrob.tools.tagger.cli
 import com.github.ajalt.clikt.testing.test
 import com.zegreatrob.tools.tagger.GenerateSettingsFileTestSpec
 import com.zegreatrob.tools.tagger.TestResult
-import kotlin.test.BeforeTest
-
 class GenerateSettingsFileCommandTest : GenerateSettingsFileTestSpec {
 
     override lateinit var projectDir: String
-    private lateinit var arguments: List<String>
-
-    @BeforeTest
-    fun setup() {
-        arguments = listOf("-q", "generate-settings-file")
-    }
+    private val baseArguments: List<String> = listOf("-q", "generate-settings-file")
+    private var mergeFlag: Boolean? = null
 
     override fun execute(file: String?, merge: Boolean?): TestResult {
-        file?.let { arguments += "--file=$file" }
-        merge?.let { arguments += "--merge=$merge" }
+        if (merge != null) {
+            mergeFlag = merge
+        }
+        val args = baseArguments +
+            listOfNotNull(
+                file?.let { "--file=$it" },
+                mergeFlag?.let { "--merge=$it" },
+            )
         val test = cli()
-            .test(arguments, envvars = mapOf("PWD" to projectDir))
+            .test(args, envvars = mapOf("PWD" to projectDir))
         return if (test.statusCode == 0) {
             test
                 .output

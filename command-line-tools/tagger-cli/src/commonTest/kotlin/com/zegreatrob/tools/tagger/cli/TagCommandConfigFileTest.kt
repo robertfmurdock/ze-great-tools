@@ -7,20 +7,13 @@ import com.zegreatrob.tools.tagger.TestResult
 import com.zegreatrob.tools.tagger.json.TaggerConfig
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import kotlin.test.BeforeTest
-
 class TagCommandConfigFileTest : TagTestSpec {
 
     override lateinit var projectDir: String
 
     private val taggerFile get() = "$projectDir/.tagger"
     override val addFileNames: Set<String> = emptySet()
-    private lateinit var arguments: List<String>
-
-    @BeforeTest
-    fun setup() {
-        arguments = listOf("-q", "tag")
-    }
+    private val baseArguments: List<String> = listOf("-q", "tag")
 
     override fun configureWithDefaults() {
         val config = TaggerConfig(releaseBranch = "master")
@@ -44,9 +37,8 @@ class TagCommandConfigFileTest : TagTestSpec {
     }
 
     override fun execute(version: String): TestResult {
-        arguments += "--version=$version"
         val test = cli()
-            .test(arguments, envvars = mapOf("PWD" to projectDir))
+            .test(baseArguments + "--version=$version", envvars = mapOf("PWD" to projectDir))
         return if (test.statusCode == 0) {
             test
                 .output
