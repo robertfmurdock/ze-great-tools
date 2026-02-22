@@ -1,6 +1,6 @@
 package com.zegreatrob.tools.digger
 
-import com.zegreatrob.testmints.setup
+import com.zegreatrob.testmints.async.asyncSetup
 import com.zegreatrob.tools.adapter.git.CommitRef
 import com.zegreatrob.tools.adapter.git.TagRef
 import com.zegreatrob.tools.digger.json.ContributionParser.parseContribution
@@ -13,8 +13,8 @@ import com.zegreatrob.tools.test.git.getEnvironmentVariable
 import com.zegreatrob.tools.test.git.initializeGitRepo
 import com.zegreatrob.tools.test.git.mergeInBranch
 import com.zegreatrob.tools.test.git.removeDirectory
-import com.zegreatrob.tools.test.git.sleep
 import com.zegreatrob.tools.test.git.switchToNewBranch
+import kotlinx.coroutines.delay
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -52,7 +52,7 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
     }
 
     @Test
-    fun currentContributionDataWillShowAuthorsAndCoAuthorsCaseInsensitive() = setup(object {}) {
+    fun currentContributionDataWillShowAuthorsAndCoAuthorsCaseInsensitive() = asyncSetup(object {}) {
         setupWithDefaults()
 
         initializeGitRepo(
@@ -82,7 +82,7 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
     }
 
     @Test
-    fun whenLabelIsSetWillApplyItToContribution() = setup(object {
+    fun whenLabelIsSetWillApplyItToContribution() = asyncSetup(object {
         val label = "extraSpecialLabel"
     }) {
         setupWithOverrides(label = label)
@@ -102,7 +102,7 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
     }
 
     @Test
-    fun whenLabelIsNotSetWillUseDirectoryName() = setup(object {}) {
+    fun whenLabelIsNotSetWillUseDirectoryName() = asyncSetup(object {}) {
         setupWithDefaults()
 
         initializeGitRepo(
@@ -120,7 +120,7 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
     }
 
     @Test
-    fun whenIncludedCurrentContributionDataWillShowSemverLevel() = setup(object {}) {
+    fun whenIncludedCurrentContributionDataWillShowSemverLevel() = asyncSetup(object {}) {
         setupWithDefaults()
 
         initializeGitRepo(
@@ -143,7 +143,7 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
     }
 
     @Test
-    fun whenCurrentContributionDataIncludesMultipleSemversUsesLargest() = setup(object {}) {
+    fun whenCurrentContributionDataIncludesMultipleSemversUsesLargest() = asyncSetup(object {}) {
         setupWithDefaults()
 
         initializeGitRepo(
@@ -172,7 +172,7 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
     }
 
     @Test
-    fun currentContributionDataWillIncludeAuthorsFromMultipleCommitsAfterLastTag() = setup(object {}) {
+    fun currentContributionDataWillIncludeAuthorsFromMultipleCommitsAfterLastTag() = asyncSetup(object {}) {
         setupWithDefaults()
 
         initializeGitRepo(
@@ -214,7 +214,7 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
     }
 
     @Test
-    fun currentContributionDataWillIncludeMostRecentTagRangeWhenHeadIsTagged() = setup(object {}) {
+    fun currentContributionDataWillIncludeMostRecentTagRangeWhenHeadIsTagged() = asyncSetup(object {}) {
         setupWithDefaults()
 
         val gitAdapter = initializeGitRepo(
@@ -264,7 +264,7 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
     }
 
     @Test
-    fun whenHeadIsTaggedCurrentContributionDataWillUseIncludeTagInfo() = setup(object {
+    fun whenHeadIsTaggedCurrentContributionDataWillUseIncludeTagInfo() = asyncSetup(object {
         lateinit var nowTag: TagRef
     }) {
         setupWithDefaults()
@@ -300,7 +300,7 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
                 |Co-authored-by: 4th Guy <fourth@guy.edu>
             """.trimMargin(),
         )
-        sleep(1000)
+        delay(1000)
         nowTag = gitAdapter.addTag("now")
     } exercise {
         runCurrentContributionData()
@@ -311,7 +311,7 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
     }
 
     @Test
-    fun currentContributionDataWillNotIncludeAuthorsFromCommitsBeforeLastTag() = setup(object {}) {
+    fun currentContributionDataWillNotIncludeAuthorsFromCommitsBeforeLastTag() = asyncSetup(object {}) {
         setupWithDefaults()
 
         val gitAdapter = initializeGitRepo(
@@ -353,7 +353,7 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
     }
 
     @Test
-    fun canReplaceMajorRegex() = setup(object {}) {
+    fun canReplaceMajorRegex() = asyncSetup(object {}) {
         setupWithOverrides(majorRegex = ".*(big).*")
 
         initializeGitRepo(
@@ -368,7 +368,7 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
     }
 
     @Test
-    fun canReplaceMinorRegex() = setup(object {}) {
+    fun canReplaceMinorRegex() = asyncSetup(object {}) {
         setupWithOverrides(minorRegex = ".*mid.*")
 
         initializeGitRepo(
@@ -383,7 +383,7 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
     }
 
     @Test
-    fun canReplacePatchRegex() = setup(object {}) {
+    fun canReplacePatchRegex() = asyncSetup(object {}) {
         setupWithOverrides(patchRegex = ".*tiny.*")
 
         initializeGitRepo(
@@ -398,7 +398,7 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
     }
 
     @Test
-    fun canReplaceNoneRegex() = setup(object {}) {
+    fun canReplaceNoneRegex() = asyncSetup(object {}) {
         setupWithOverrides(noneRegex = ".*(no).*")
 
         initializeGitRepo(
@@ -413,7 +413,7 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
     }
 
     @Test
-    fun canReplaceStoryRegex() = setup(object {}) {
+    fun canReplaceStoryRegex() = asyncSetup(object {}) {
         setupWithOverrides(storyRegex = ".*-(?<storyId>.*-.*)-.*")
 
         initializeGitRepo(
@@ -429,7 +429,7 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
     }
 
     @Test
-    fun canReplaceEaseRegex() = setup(object {}) {
+    fun canReplaceEaseRegex() = asyncSetup(object {}) {
         setupWithOverrides(easeRegex = """.*\[(?<ease>[0-5])\].*""")
 
         initializeGitRepo(
@@ -445,7 +445,7 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
     }
 
     @Test
-    fun willHandleMergeCommitsOnMergedBranchesCorrectly() = setup(object {
+    fun willHandleMergeCommitsOnMergedBranchesCorrectly() = asyncSetup(object {
         lateinit var merge2Commit: CommitRef
         lateinit var secondRelease: TagRef
         lateinit var secondCommit: CommitRef
@@ -473,7 +473,7 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
         gitAdapter.addCommitWithMessage("sixth")
 
         merge2Commit = gitAdapter.mergeInBranch("branch1", "merge2")
-        sleep(1100)
+        delay(1100)
         secondRelease = gitAdapter.addTag("release2")
     } exercise {
         runCurrentContributionData()
@@ -491,7 +491,7 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
     }
 
     @Test
-    fun willIgnoreTagsThatDoNotMatchRegex() = setup(object {
+    fun willIgnoreTagsThatDoNotMatchRegex() = asyncSetup(object {
         lateinit var merge2Commit: CommitRef
         lateinit var secondCommit: CommitRef
     }) {
@@ -520,7 +520,7 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
         gitAdapter.addCommitWithMessage("sixth")
 
         merge2Commit = gitAdapter.mergeInBranch("branch1", "merge2")
-        sleep(1100)
+        delay(1100)
         gitAdapter.addTag("ignore-me")
     } exercise {
         runCurrentContributionData()
@@ -537,7 +537,7 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
     }
 
     @Test
-    fun willCorrectlyUnderstandLongerRunningBranch() = setup(object {
+    fun willCorrectlyUnderstandLongerRunningBranch() = asyncSetup(object {
         lateinit var secondCommit: CommitRef
         lateinit var lastCommit: CommitRef
         lateinit var thirdRelease: TagRef
@@ -552,7 +552,7 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
         secondCommit = gitAdapter.addCommitWithMessage("second")
         gitAdapter.checkout("master")
         gitAdapter.addCommitWithMessage("third")
-        sleep(1100)
+        delay(1100)
         gitAdapter.addTag("release2")
         gitAdapter.checkout("branch")
         gitAdapter.addCommitWithMessage("fourth")
@@ -560,7 +560,7 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
         gitAdapter.checkout("master")
         gitAdapter.mergeInBranch("branch", "merge")
         lastCommit = gitAdapter.addCommitWithMessage("sixth")
-        sleep(1100)
+        delay(1100)
         thirdRelease = gitAdapter.addTag("release3")
     } exercise {
         runCurrentContributionData()

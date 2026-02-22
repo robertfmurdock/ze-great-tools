@@ -1,6 +1,6 @@
 package com.zegreatrob.tools.digger
 
-import com.zegreatrob.testmints.setup
+import com.zegreatrob.testmints.async.asyncSetup
 import com.zegreatrob.tools.adapter.git.CommitRef
 import com.zegreatrob.tools.adapter.git.TagRef
 import com.zegreatrob.tools.digger.model.Contribution
@@ -12,8 +12,8 @@ import com.zegreatrob.tools.test.git.ffOnlyInBranch
 import com.zegreatrob.tools.test.git.initializeGitRepo
 import com.zegreatrob.tools.test.git.mergeInBranch
 import com.zegreatrob.tools.test.git.removeDirectory
-import com.zegreatrob.tools.test.git.sleep
 import com.zegreatrob.tools.test.git.switchToNewBranch
+import kotlinx.coroutines.delay
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -42,7 +42,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
     }
 
     @Test
-    fun willIncludeAllTagSegments() = setup(object {
+    fun willIncludeAllTagSegments() = asyncSetup(object {
         lateinit var firstCommit: CommitRef
         lateinit var firstRelease: TagRef
         lateinit var secondCommit: CommitRef
@@ -103,7 +103,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
     }
 
     @Test
-    fun willConsiderThePathWithTheMostTagsTheTrunk() = setup(object {
+    fun willConsiderThePathWithTheMostTagsTheTrunk() = asyncSetup(object {
         lateinit var firstCommit: CommitRef
         lateinit var firstRelease: TagRef
         lateinit var secondCommit: CommitRef
@@ -119,12 +119,12 @@ interface AllContributionTestSpec : SetupWithOverrides {
 
         firstCommit = gitAdapter.show("HEAD")!!
         firstRelease = gitAdapter.addTag("release1")
-        sleep(1100)
+        delay(1100)
         gitAdapter.switchToNewBranch("branch")
 
         secondCommit = gitAdapter.addCommitWithMessage("second")
         midRelease = gitAdapter.addTag("release1-5")
-        sleep(1100)
+        delay(1100)
         gitAdapter.checkout("master")
 
         thirdCommit = gitAdapter.addCommitWithMessage("third")
@@ -161,7 +161,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
     }
 
     @Test
-    fun willHandleNormalMergeIntoBranchThenBackCaseWell() = setup(object {
+    fun willHandleNormalMergeIntoBranchThenBackCaseWell() = asyncSetup(object {
         lateinit var firstCommit: CommitRef
         lateinit var firstRelease: TagRef
         lateinit var secondCommit: CommitRef
@@ -189,7 +189,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
         gitAdapter.checkout("master")
 
         mergeToMainCommit = gitAdapter.mergeInBranch("branch", "merge-to-main")
-        sleep(1100)
+        delay(1100)
         release2 = gitAdapter.addTag("release-2")
     } exercise {
         runAllContributionData()
@@ -214,7 +214,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
     }
 
     @Test
-    fun willHandleNormalMergeIntoBranchThenFfBackCase() = setup(object {
+    fun willHandleNormalMergeIntoBranchThenFfBackCase() = asyncSetup(object {
         lateinit var firstCommit: CommitRef
         lateinit var firstRelease: TagRef
         lateinit var secondCommit: CommitRef
@@ -236,7 +236,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
 
         gitAdapter.checkout("master")
         thirdCommit = gitAdapter.addCommitWithMessage("third")
-        sleep(1100)
+        delay(1100)
         secondRelease = gitAdapter.addTag("release-2")
 
         gitAdapter.checkout("branch")
@@ -246,7 +246,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
         gitAdapter.checkout("master")
 
         gitAdapter.ffOnlyInBranch("branch")
-        sleep(1100)
+        delay(1100)
         thirdRelease = gitAdapter.addTag("release-3")
     } exercise {
         runAllContributionData()
@@ -278,7 +278,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
     }
 
     @Test
-    fun willHandleMergeBranches() = setup(object {
+    fun willHandleMergeBranches() = asyncSetup(object {
         lateinit var firstCommit: CommitRef
         lateinit var firstRelease: TagRef
         lateinit var secondCommit: CommitRef
@@ -301,13 +301,13 @@ interface AllContributionTestSpec : SetupWithOverrides {
         gitAdapter.checkout("master")
         thirdCommit = gitAdapter.addCommitWithMessage("third")
 
-        sleep(1100)
+        delay(1100)
         secondRelease = gitAdapter.addTag("release2")
         gitAdapter.checkout("branch1")
         gitAdapter.addCommitWithMessage("fourth")
         gitAdapter.checkout("master")
         mergeCommit = gitAdapter.mergeInBranch("branch1", "merge")
-        sleep(1100)
+        delay(1100)
         thirdRelease = gitAdapter.addTag("release3")
     } exercise {
         runAllContributionData()
@@ -337,7 +337,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
     }
 
     @Test
-    fun willIgnoreTagsThatDoNotMatchTagRegex() = setup(object {
+    fun willIgnoreTagsThatDoNotMatchTagRegex() = asyncSetup(object {
         lateinit var firstCommit: CommitRef
         lateinit var firstRelease: TagRef
         lateinit var secondCommit: CommitRef
@@ -360,13 +360,13 @@ interface AllContributionTestSpec : SetupWithOverrides {
         gitAdapter.checkout("master")
         gitAdapter.addCommitWithMessage("third")
 
-        sleep(1100)
+        delay(1100)
         gitAdapter.addTag("unrelated-tag")
         gitAdapter.checkout("branch1")
         gitAdapter.addCommitWithMessage("fourth")
         gitAdapter.checkout("master")
         mergeCommit = gitAdapter.mergeInBranch("branch1", "merge")
-        sleep(1100)
+        delay(1100)
         thirdRelease = gitAdapter.addTag("v20.176.37")
     } exercise {
         runAllContributionData()
@@ -391,7 +391,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
     }
 
     @Test
-    fun willHandleMergeCommitsOnMergedBranchesCorrectly() = setup(object {
+    fun willHandleMergeCommitsOnMergedBranchesCorrectly() = asyncSetup(object {
         lateinit var firstCommit: CommitRef
         lateinit var firstRelease: TagRef
         lateinit var secondCommit: CommitRef
@@ -423,7 +423,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
         gitAdapter.addCommitWithMessage("sixth")
 
         merge2Commit = gitAdapter.mergeInBranch("branch1", "merge2")
-        sleep(1100)
+        delay(1100)
         thirdRelease = gitAdapter.addTag("release3")
     } exercise {
         runAllContributionData()
@@ -448,7 +448,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
     }
 
     @Test
-    fun whenMergingMultipleTimesFromSameBranchCommitsAreOnlyCountedOnce() = setup(object {
+    fun whenMergingMultipleTimesFromSameBranchCommitsAreOnlyCountedOnce() = asyncSetup(object {
         lateinit var firstCommit: CommitRef
         lateinit var firstRelease: TagRef
         lateinit var secondCommit: CommitRef
@@ -472,14 +472,14 @@ interface AllContributionTestSpec : SetupWithOverrides {
         gitAdapter.checkout("master")
         gitAdapter.addCommitWithMessage("third")
         merge1Commit = gitAdapter.mergeInBranch("branch1", "merge1")
-        sleep(1100)
+        delay(1100)
         secondRelease = gitAdapter.addTag("release2")
 
         gitAdapter.checkout("branch1")
         fourthCommit = gitAdapter.addCommitWithMessage("fourth")
         gitAdapter.checkout("master")
         merge2Commit = gitAdapter.mergeInBranch("branch1", "merge2")
-        sleep(1100)
+        delay(1100)
         thirdRelease = gitAdapter.addTag("release3")
     } exercise {
         runAllContributionData()
@@ -511,7 +511,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
     }
 
     @Test
-    fun willIncludeEaseOfChange() = setup(object {
+    fun willIncludeEaseOfChange() = asyncSetup(object {
         lateinit var firstCommit: CommitRef
         lateinit var tag: TagRef
         lateinit var secondCommit: CommitRef
@@ -556,7 +556,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
     }
 
     @Test
-    fun willIncludeStoryIds() = setup(object {
+    fun willIncludeStoryIds() = asyncSetup(object {
         lateinit var firstCommit: CommitRef
         lateinit var tag: TagRef
         lateinit var secondCommit: CommitRef
@@ -592,7 +592,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
     }
 
     @Test
-    fun willMergeTheSameStoryIdWithinAContribution() = setup(object {
+    fun willMergeTheSameStoryIdWithinAContribution() = asyncSetup(object {
         lateinit var firstCommit: CommitRef
         lateinit var secondCommit: CommitRef
     }) {
@@ -619,7 +619,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
     }
 
     @Test
-    fun willMergeTheDifferentStoryIdsWithinAContribution() = setup(object {
+    fun willMergeTheDifferentStoryIdsWithinAContribution() = asyncSetup(object {
         lateinit var firstCommit: CommitRef
         lateinit var secondCommit: CommitRef
     }) {
@@ -647,7 +647,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
     }
 
     @Test
-    fun willIncludeFlattenEaseIntoLargestNumber() = setup(object {
+    fun willIncludeFlattenEaseIntoLargestNumber() = asyncSetup(object {
         lateinit var firstCommit: CommitRef
         lateinit var secondCommit: CommitRef
     }) {
@@ -673,7 +673,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
     }
 
     @Test
-    fun canReplaceMajorRegex() = setup(object {}) {
+    fun canReplaceMajorRegex() = asyncSetup(object {}) {
         setupWithOverrides(majorRegex = ".*(big).*")
 
         initializeGitRepo(commits = listOf("[patch] commit 1", "commit (big) 2", "[patch] commit 3"))
@@ -684,7 +684,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
     }
 
     @Test
-    fun canReplaceMinorRegex() = setup(object {}) {
+    fun canReplaceMinorRegex() = asyncSetup(object {}) {
         setupWithOverrides(minorRegex = ".*mid.*")
 
         initializeGitRepo(commits = listOf("[patch] commit 1", "commit (middle) 2", "[patch] commit 3"))
@@ -695,7 +695,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
     }
 
     @Test
-    fun canReplacePatchRegex() = setup(object {}) {
+    fun canReplacePatchRegex() = asyncSetup(object {}) {
         setupWithOverrides(patchRegex = ".*tiny.*")
 
         initializeGitRepo(commits = listOf("commit 1", "commit (tiny) 2", "commit 3"))
@@ -706,7 +706,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
     }
 
     @Test
-    fun canReplaceNoneRegex() = setup(object {}) {
+    fun canReplaceNoneRegex() = asyncSetup(object {}) {
         setupWithOverrides(noneRegex = ".*(no).*")
 
         initializeGitRepo(commits = listOf("commit (no) 1"))
@@ -717,7 +717,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
     }
 
     @Test
-    fun canReplaceStoryRegex() = setup(object {}) {
+    fun canReplaceStoryRegex() = asyncSetup(object {}) {
         setupWithOverrides(storyRegex = ".*-(?<storyId>.*-.*)-.*")
 
         initializeGitRepo(commits = listOf("commit -CowDog-99- 1"))
@@ -729,7 +729,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
     }
 
     @Test
-    fun canReplaceEaseRegex() = setup(object {}) {
+    fun canReplaceEaseRegex() = asyncSetup(object {}) {
         setupWithOverrides(easeRegex = """.*\[(?<ease>[0-5])\].*""")
 
         initializeGitRepo(commits = listOf("commit [4] 1"))

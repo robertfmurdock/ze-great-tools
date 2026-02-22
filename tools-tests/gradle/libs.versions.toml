@@ -3,6 +3,7 @@ kotlin = "2.3.10"
 kotlinx-coroutines = "1.10.2"
 
 [libraries]
+com-zegreatrob-testmints-async = "com.zegreatrob.testmints:async:12.6.1"
 com-zegreatrob-testmints-standard = "com.zegreatrob.testmints:standard:12.6.1"
 org-jetbrains-kotlin-kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin" }
 org-jetbrains-kotlin-kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
