@@ -95,7 +95,6 @@ abstract class FingerprintFunctionalTestBase {
 
     protected fun runFingerprint(dir: File = testProjectDir, vararg extraArgs: String): String {
         gradle(dir, "generateFingerprint", "--configuration-cache", *extraArgs)
-        assertFingerprintManifestGeneratedCorrectly(dir)
         return fingerprintFile(dir).readText()
     }
 

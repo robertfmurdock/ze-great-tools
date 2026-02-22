@@ -1,20 +1,22 @@
 package com.zegreatrob.tools.fingerprint
 
+import com.zegreatrob.testmints.setup
 import org.gradle.testkit.runner.TaskOutcome
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertNotNull
-import org.junit.jupiter.api.io.TempDir
 import java.io.File
 import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
 class FingerprintPluginAggregateFunctionalTest : FingerprintFunctionalTestBase() {
 
     @Test
-    fun `aggregateFingerprints combines hashes from included builds`(@TempDir testProjectDir: File) {
-        val includedDir = testProjectDir.resolve("my-included-lib").apply { mkdirs() }
+    fun `aggregateFingerprints combines hashes from included builds`() = setup(object {
+        lateinit var includedDir: File
+        lateinit var mainDir: File
+    }) {
+        includedDir = testProjectDir.resolve("my-included-lib").apply { mkdirs() }
         includedDir.resolve("settings.gradle.kts").writeText("""rootProject.name = "my-included-lib"""")
-
         includedDir.resolve("build.gradle.kts").writeText(
             """
             plugins { id("com.zegreatrob.tools.fingerprint") }
@@ -28,7 +30,7 @@ class FingerprintPluginAggregateFunctionalTest : FingerprintFunctionalTestBase()
             """.trimIndent(),
         )
 
-        val mainDir = testProjectDir.resolve("main-app").apply { mkdirs() }
+        mainDir = testProjectDir.resolve("main-app").apply { mkdirs() }
         mainDir.resolve("settings.gradle.kts").writeText(
             """
             rootProject.name = "main-app"
@@ -48,9 +50,9 @@ class FingerprintPluginAggregateFunctionalTest : FingerprintFunctionalTestBase()
             }
             """.trimIndent(),
         )
-
+    } exercise {
         gradle(mainDir, ":my-included-lib:generateFingerprint", "aggregateFingerprints")
-
+    } verify {
         val localHash = fingerprintFile(mainDir).readText()
         val includedHash = fingerprintFile(includedDir).readText()
         val aggregateHash = aggregateFingerprintFile(mainDir).readText()
@@ -60,12 +62,14 @@ class FingerprintPluginAggregateFunctionalTest : FingerprintFunctionalTestBase()
     }
 
     @Test
-    fun `aggregateFingerprints triggers generateFingerprint in included builds`(@TempDir testProjectDir: File) {
+    fun `aggregateFingerprints triggers generateFingerprint in included builds`() = setup(object {
+        lateinit var mainDir: File
+    }) {
         val includedDir = testProjectDir.resolve("my-lib").apply { mkdirs() }
         includedDir.resolve("settings.gradle.kts").writeText("""rootProject.name = "my-lib"""")
         includedDir.resolve("build.gradle.kts").writeText("""plugins { id("com.zegreatrob.tools.fingerprint") }""")
 
-        val mainDir = testProjectDir.resolve("my-app").apply { mkdirs() }
+        mainDir = testProjectDir.resolve("my-app").apply { mkdirs() }
         mainDir.resolve("settings.gradle.kts").writeText(
             """
             rootProject.name = "my-app"
@@ -80,9 +84,9 @@ class FingerprintPluginAggregateFunctionalTest : FingerprintFunctionalTestBase()
             }
             """.trimIndent(),
         )
-
-        val result = gradle(mainDir, "aggregateFingerprints")
-
+    } exercise {
+        gradle(mainDir, "aggregateFingerprints")
+    } verify { result ->
         val includedTaskResult = result.task(":my-lib:generateFingerprint")
         assertNotNull(includedTaskResult, "Task in included build should have been triggered")
         assertTrue(
@@ -92,12 +96,14 @@ class FingerprintPluginAggregateFunctionalTest : FingerprintFunctionalTestBase()
     }
 
     @Test
-    fun `aggregateFingerprints skips included builds that do not have the plugin`(@TempDir testProjectDir: File) {
+    fun `aggregateFingerprints skips included builds that do not have the plugin`() = setup(object {
+        lateinit var mainDir: File
+    }) {
         val nakedDir = testProjectDir.resolve("naked-lib").apply { mkdirs() }
         nakedDir.resolve("settings.gradle.kts").writeText("""rootProject.name = "naked-lib"""")
         nakedDir.resolve("build.gradle.kts").writeText("// Empty - no plugin here")
 
-        val mainDir = testProjectDir.resolve("main-app").apply { mkdirs() }
+        mainDir = testProjectDir.resolve("main-app").apply { mkdirs() }
         mainDir.resolve("settings.gradle.kts").writeText(
             """
             rootProject.name = "main-app"
@@ -105,20 +111,20 @@ class FingerprintPluginAggregateFunctionalTest : FingerprintFunctionalTestBase()
             """.trimIndent(),
         )
         mainDir.resolve("build.gradle.kts").writeText("""plugins { id("com.zegreatrob.tools.fingerprint") }""")
-
-        val result = gradle(mainDir, "aggregateFingerprints", "--stacktrace", "--no-configuration-cache")
-
+    } exercise {
+        gradle(mainDir, "aggregateFingerprints", "--stacktrace", "--no-configuration-cache")
+    } verify { result ->
         assertTrue(result.output.contains("SUCCESS"), "Build should succeed even with non-plugin included builds")
         assertTrue(aggregateFingerprintFile(mainDir).exists(), "Aggregate file should still be generated")
     }
 
     @Test
-    fun `aggregateFingerprints works when includedBuilds is not configured`() {
+    fun `aggregateFingerprints works when includedBuilds is not configured`() = setup(object {}) {
         writeSettings("aggregate-defaults-test")
         writeBuild("""plugins { id("com.zegreatrob.tools.fingerprint") }""")
-
-        val result = gradle(arguments = arrayOf("aggregateFingerprints", "--no-configuration-cache"))
-
+    } exercise {
+        gradle(arguments = arrayOf("aggregateFingerprints", "--no-configuration-cache"))
+    } verify { result ->
         assertEquals(TaskOutcome.SUCCESS, result.task(":aggregateFingerprints")?.outcome)
         assertTrue(fingerprintFile().exists(), "Local fingerprint should be generated at ${fingerprintFile().path}")
         assertFingerprintManifestGeneratedCorrectly()

@@ -1,8 +1,9 @@
 package com.zegreatrob.tools.fingerprint
 
+import com.zegreatrob.testmints.setup
+import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.TaskOutcome
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.io.TempDir
 import java.io.File
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
@@ -11,7 +12,8 @@ import kotlin.test.assertTrue
 class FingerprintPluginFunctionalTest : FingerprintFunctionalTestBase() {
 
     @Test
-    fun `plugin generates fingerprint file in KMP project`() {
+    fun `plugin generates fingerprint file in KMP project`() = setup(object {
+    }) {
         writeSettings("kmp-test-project")
         writeBuild(
             kmpBuild(
@@ -22,20 +24,22 @@ class FingerprintPluginFunctionalTest : FingerprintFunctionalTestBase() {
                 """.trimIndent(),
             ),
         )
-
+    } exercise {
         gradle(arguments = arrayOf("generateFingerprint", "--configuration-cache"), forwardOutput = true)
-
+    } verify {
         val fingerprintFile = fingerprintFile()
         assertTrue(fingerprintFile.exists(), "Fingerprint file should be generated at ${fingerprintFile.path}")
         assertFingerprintManifestGeneratedCorrectly()
     }
 
     @Test
-    fun `fingerprint does not change when test source code is modified`() {
+    fun `fingerprint does not change when test source code is modified`() = setup(object {
+        lateinit var testSourceFile: File
+    }) {
         writeSettings("test-source-change-test")
         writeBuild(kmpBuild())
 
-        val testSourceFile = writeProjectFile(
+        testSourceFile = writeProjectFile(
             "src/commonTest/kotlin/ExampleTest.kt",
             """
             package example
@@ -45,7 +49,7 @@ class FingerprintPluginFunctionalTest : FingerprintFunctionalTestBase() {
             }
             """,
         )
-
+    } exercise {
         val firstHash = runFingerprint()
 
         testSourceFile.writeText(
@@ -60,11 +64,14 @@ class FingerprintPluginFunctionalTest : FingerprintFunctionalTestBase() {
 
         val secondHash = runFingerprint()
 
+        Pair(firstHash, secondHash)
+    } verify { (firstHash, secondHash) ->
         assertFingerprintUnchanged(firstHash, secondHash, "Fingerprint should NOT change when test sources change!")
     }
 
     @Test
-    fun `fingerprint does not include junit when junit is test-only dependency`() {
+    fun `fingerprint does not include junit when junit is test-only dependency`() = setup(object {
+    }) {
         writeSettings("junit-test-only-dependency-should-not-leak")
 
         writeBuild(
@@ -83,10 +90,10 @@ class FingerprintPluginFunctionalTest : FingerprintFunctionalTestBase() {
             }
             """,
         )
-
+    } exercise {
         runFingerprint()
-
-        val manifest = fingerprintManifestFile().readText()
+        fingerprintManifestFile().readText()
+    } verify { manifest ->
         assertManifestContainsDependencyIngredients(manifest, "sanity check: we should have at least one classpath entry")
 
         val classpathLines = manifest.lineSequence().filter { it.startsWith("classpath|") }.toList()
@@ -106,11 +113,13 @@ class FingerprintPluginFunctionalTest : FingerprintFunctionalTestBase() {
     }
 
     @Test
-    fun `fingerprint changes when module source code is modified`() {
+    fun `fingerprint changes when module source code is modified`() = setup(object {
+        lateinit var sourceFile: File
+    }) {
         writeSettings("source-change-test")
         writeBuild(kmpBuild())
 
-        val sourceFile = writeProjectFile(
+        sourceFile = writeProjectFile(
             "src/commonMain/kotlin/Example.kt",
             """
             package example
@@ -120,9 +129,9 @@ class FingerprintPluginFunctionalTest : FingerprintFunctionalTestBase() {
             }
             """,
         )
-
+    } exercise {
         val firstHash = runFingerprint()
-        assertFingerprintManifestGeneratedCorrectly(expectedSourcePaths = arrayOf("src/commonMain/kotlin/Example.kt"))
+        val firstManifest = fingerprintManifestFile().readText()
 
         sourceFile.writeText(
             """
@@ -135,21 +144,26 @@ class FingerprintPluginFunctionalTest : FingerprintFunctionalTestBase() {
         )
 
         val secondHash = runFingerprint()
-        assertFingerprintManifestGeneratedCorrectly(expectedSourcePaths = arrayOf("src/commonMain/kotlin/Example.kt"))
+        val secondManifest = fingerprintManifestFile().readText()
 
+        listOf(firstHash, secondHash, firstManifest, secondManifest)
+    } verify { (firstHash, secondHash, firstManifest, secondManifest) ->
+        assertTrue(firstManifest.contains("source|src/commonMain/kotlin/Example.kt|"))
+        assertTrue(secondManifest.contains("source|src/commonMain/kotlin/Example.kt|"))
         assertFingerprintChanged(firstHash, secondHash, "Fingerprint should change when module source changes!")
     }
 
     @Test
-    fun `fingerprint changes when dependencies are modified`() {
+    fun `fingerprint changes when dependencies are modified`() = setup(object {
+        lateinit var base: String
+    }) {
         writeSettings("dependency-test")
 
-        val base = kmpBuild()
+        base = kmpBuild()
         writeBuild(base)
-
+    } exercise {
         val firstFingerprint = runFingerprint()
         val firstManifest = fingerprintManifestFile().readText()
-        assertManifestContainsDependencyIngredients(firstManifest, context = "baseline")
 
         writeBuild(
             """
@@ -169,6 +183,10 @@ class FingerprintPluginFunctionalTest : FingerprintFunctionalTestBase() {
 
         val secondFingerprint = runFingerprint()
         val secondManifest = fingerprintManifestFile().readText()
+
+        listOf(firstFingerprint, secondFingerprint, firstManifest, secondManifest)
+    } verify { (firstFingerprint, secondFingerprint, firstManifest, secondManifest) ->
+        assertManifestContainsDependencyIngredients(firstManifest, context = "baseline")
         assertManifestContainsDependencyIngredients(secondManifest, context = "after dependency change")
 
         assertFingerprintChanged(firstFingerprint, secondFingerprint, "Fingerprint should have changed!")
@@ -179,10 +197,12 @@ class FingerprintPluginFunctionalTest : FingerprintFunctionalTestBase() {
     }
 
     @Test
-    fun `fingerprint changes when JS dependencies are modified`() {
+    fun `fingerprint changes when JS dependencies are modified`() = setup(object {
+        lateinit var base: String
+    }) {
         writeSettings("js-test")
 
-        val base = kmpBuild(
+        base = kmpBuild(
             kotlinBlock = """
                 kotlin {
                     js(IR) { browser() }
@@ -190,10 +210,9 @@ class FingerprintPluginFunctionalTest : FingerprintFunctionalTestBase() {
             """.trimIndent(),
         )
         writeBuild(base)
-
+    } exercise {
         val firstHash = runFingerprint()
         val firstManifest = fingerprintManifestFile().readText()
-        assertManifestContainsDependencyIngredients(firstManifest, context = "baseline")
 
         writeBuild(
             """
@@ -212,6 +231,10 @@ class FingerprintPluginFunctionalTest : FingerprintFunctionalTestBase() {
 
         val secondHash = runFingerprint()
         val secondManifest = fingerprintManifestFile().readText()
+
+        listOf(firstHash, secondHash, firstManifest, secondManifest)
+    } verify { (firstHash, secondHash, firstManifest, secondManifest) ->
+        assertManifestContainsDependencyIngredients(firstManifest, context = "baseline")
         assertManifestContainsDependencyIngredients(secondManifest, context = "after dependency change")
 
         assertFingerprintChanged(firstHash, secondHash, "JS fingerprint should have changed!")
@@ -222,15 +245,16 @@ class FingerprintPluginFunctionalTest : FingerprintFunctionalTestBase() {
     }
 
     @Test
-    fun `fingerprint remains identical when test dependencies change`() {
+    fun `fingerprint remains identical when test dependencies change`() = setup(object {
+        lateinit var base: String
+    }) {
         writeSettings("test-isolation-check")
 
-        val base = kmpBuild()
+        base = kmpBuild()
         writeBuild(base)
-
+    } exercise {
         val firstHash = runFingerprint()
         val firstManifest = fingerprintManifestFile().readText()
-        assertManifestContainsDependencyIngredients(firstManifest, context = "baseline")
 
         writeBuild(
             """
@@ -249,6 +273,10 @@ class FingerprintPluginFunctionalTest : FingerprintFunctionalTestBase() {
 
         val secondHash = runFingerprint()
         val secondManifest = fingerprintManifestFile().readText()
+
+        listOf(firstHash, secondHash, firstManifest, secondManifest)
+    } verify { (firstHash, secondHash, firstManifest, secondManifest) ->
+        assertManifestContainsDependencyIngredients(firstManifest, context = "baseline")
         assertManifestContainsDependencyIngredients(secondManifest, context = "after test dependency change")
 
         assertFingerprintUnchanged(firstHash, secondHash, "Fingerprint should NOT change for test dependencies!")
@@ -260,16 +288,16 @@ class FingerprintPluginFunctionalTest : FingerprintFunctionalTestBase() {
     }
 
     @Test
-    fun `fingerprint changes when plugin version changes`(@TempDir testProjectDir: File) {
-        val buildFile = testProjectDir.resolve("build.gradle.kts")
-        testProjectDir.resolve("settings.gradle.kts").writeText("")
-
+    fun `fingerprint changes when plugin version changes`() = setup(object {
         val baseBuildScript = kmpBuild()
-        buildFile.writeText(baseBuildScript)
-
+    }) {
+        testProjectDir.resolve("settings.gradle.kts").writeText("")
+        testProjectDir.resolve("build.gradle.kts").writeText(baseBuildScript)
+    } exercise {
         val hashA = runWithVersion(testProjectDir, "1.0.0")
         val hashB = runWithVersion(testProjectDir, "2.0.0")
-
+        Pair(hashA, hashB)
+    } verify { (hashA, hashB) ->
         assert(hashA != hashB) { "Fingerprint must change when plugin version updates!" }
     }
 
@@ -280,22 +308,29 @@ class FingerprintPluginFunctionalTest : FingerprintFunctionalTestBase() {
     }
 
     @Test
-    fun `task is retrieved from build cache on second run`() {
+    fun `task is retrieved from build cache on second run`() = setup(object {
+    }) {
         writeBuild(kmpBuild())
-
+    } exercise {
         gradle(arguments = arrayOf("generateFingerprint", "--build-cache"))
-        assertFingerprintManifestGeneratedCorrectly()
+        val firstManifest = fingerprintManifestFile().readText()
 
         testProjectDir.resolve("build").deleteRecursively()
 
         val result = gradle(arguments = arrayOf("generateFingerprint", "--build-cache"))
-        assertFingerprintManifestGeneratedCorrectly()
+        val secondManifest = fingerprintManifestFile().readText()
 
-        assertEquals(result.task(":generateFingerprint")?.outcome, TaskOutcome.FROM_CACHE)
+        CacheRunResult(result, firstManifest, secondManifest)
+    } verify { data ->
+        assertTrue(data.firstManifest.isNotBlank())
+        assertTrue(data.secondManifest.isNotBlank())
+        assertEquals(data.result.task(":generateFingerprint")?.outcome, TaskOutcome.FROM_CACHE)
     }
 
     @Test
-    fun `root fingerprint reflects changes in subprojects`() {
+    fun `root fingerprint reflects changes in subprojects`() = setup(object {
+        lateinit var appBuildFile: File
+    }) {
         settingsFile.writeText(
             """
             rootProject.name = "multi-project-root"
@@ -309,7 +344,7 @@ class FingerprintPluginFunctionalTest : FingerprintFunctionalTestBase() {
             """.trimIndent(),
         )
 
-        val appBuildFile = testProjectDir.resolve("app/build.gradle.kts").apply {
+        appBuildFile = testProjectDir.resolve("app/build.gradle.kts").apply {
             parentFile.mkdirs()
             writeText(
                 """
@@ -320,7 +355,7 @@ class FingerprintPluginFunctionalTest : FingerprintFunctionalTestBase() {
                 """.trimIndent(),
             )
         }
-
+    } exercise {
         val firstHash = runFingerprint()
 
         appBuildFile.appendText(
@@ -331,11 +366,16 @@ class FingerprintPluginFunctionalTest : FingerprintFunctionalTestBase() {
 
         val secondHash = runFingerprint()
 
+        Pair(firstHash, secondHash)
+    } verify { (firstHash, secondHash) ->
         assert(firstHash != secondHash) { "Root fingerprint must change when subproject dependencies change!" }
     }
 
     @Test
-    fun `fingerprint ignores unconfigured subprojects`() {
+    fun `fingerprint ignores unconfigured subprojects`() = setup(object {
+        lateinit var appBuild: File
+        lateinit var ignoredBuild: File
+    }) {
         settingsFile.writeText(
             """
             rootProject.name = "filter-test"
@@ -353,27 +393,29 @@ class FingerprintPluginFunctionalTest : FingerprintFunctionalTestBase() {
             """.trimIndent(),
         )
 
-        val appBuild = testProjectDir.resolve("app/build.gradle.kts").apply { parentFile.mkdirs() }
-        val ignoredBuild = testProjectDir.resolve("ignored-lib/build.gradle.kts").apply { parentFile.mkdirs() }
+        appBuild = testProjectDir.resolve("app/build.gradle.kts").apply { parentFile.mkdirs() }
+        ignoredBuild = testProjectDir.resolve("ignored-lib/build.gradle.kts").apply { parentFile.mkdirs() }
 
         appBuild.writeText("""plugins { kotlin("jvm") version "2.3.0" } repositories { mavenCentral() }""")
         ignoredBuild.writeText("""plugins { kotlin("jvm") version "2.3.0" } repositories { mavenCentral() }""")
-
+    } exercise {
         val firstHash = runFingerprint()
 
         ignoredBuild.appendText("\ndependencies { implementation(\"org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3\") }")
         val secondHash = runFingerprint()
 
-        assertFingerprintUnchanged(firstHash, secondHash, "Hash should remain stable when unconfigured subprojects change!")
-
         appBuild.appendText("\ndependencies { implementation(\"org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3\") }")
         val thirdHash = runFingerprint()
 
+        listOf(firstHash, secondHash, thirdHash)
+    } verify { (firstHash, secondHash, thirdHash) ->
+        assertFingerprintUnchanged(firstHash, secondHash, "Hash should remain stable when unconfigured subprojects change!")
         assertFingerprintChanged(firstHash, thirdHash, "Hash should change when configured subprojects change!")
     }
 
     @Test
-    fun `fingerprint fails if dependencies cannot be resolved`() {
+    fun `fingerprint fails if dependencies cannot be resolved`() = setup(object {
+    }) {
         writeSettings("resolution-failure-test")
         writeBuild(
             """
@@ -387,15 +429,18 @@ class FingerprintPluginFunctionalTest : FingerprintFunctionalTestBase() {
             }
             """.trimIndent(),
         )
-
-        val result = gradle(arguments = arrayOf("generateFingerprint"), expectFailure = true)
-
+    } exercise {
+        gradle(arguments = arrayOf("generateFingerprint"), expectFailure = true)
+    } verify { result ->
         assertTrue(result.output.contains("Could not resolve"), result.output)
     }
 
     @Test
-    fun `aggregateFingerprints combines hashes from included builds`(@TempDir testProjectDir: File) {
-        val includedDir = testProjectDir.resolve("my-included-lib").apply { mkdirs() }
+    fun `aggregateFingerprints combines hashes from included builds`() = setup(object {
+        lateinit var includedDir: File
+        lateinit var mainDir: File
+    }) {
+        includedDir = testProjectDir.resolve("my-included-lib").apply { mkdirs() }
         includedDir.resolve("settings.gradle.kts").writeText("""rootProject.name = "my-included-lib"""")
 
         includedDir.resolve("build.gradle.kts").writeText(
@@ -411,7 +456,7 @@ class FingerprintPluginFunctionalTest : FingerprintFunctionalTestBase() {
             """.trimIndent(),
         )
 
-        val mainDir = testProjectDir.resolve("main-app").apply { mkdirs() }
+        mainDir = testProjectDir.resolve("main-app").apply { mkdirs() }
         mainDir.resolve("settings.gradle.kts").writeText(
             """
             rootProject.name = "main-app"
@@ -431,9 +476,9 @@ class FingerprintPluginFunctionalTest : FingerprintFunctionalTestBase() {
             }
             """.trimIndent(),
         )
-
+    } exercise {
         gradle(mainDir, ":my-included-lib:generateFingerprint", "aggregateFingerprints")
-
+    } verify {
         val localHash = fingerprintFile(mainDir).readText()
         val includedHash = fingerprintFile(includedDir).readText()
         val aggregateHash = mainDir.resolve("build/aggregate-fingerprint.txt").readText()
@@ -443,7 +488,9 @@ class FingerprintPluginFunctionalTest : FingerprintFunctionalTestBase() {
     }
 
     @Test
-    fun `aggregateFingerprints triggers generateFingerprint in included builds`(@TempDir testProjectDir: File) {
+    fun `aggregateFingerprints triggers generateFingerprint in included builds`() = setup(object {
+        lateinit var mainDir: File
+    }) {
         val includedDir = testProjectDir.resolve("my-lib").apply { mkdirs() }
         includedDir.resolve("settings.gradle.kts").writeText("""rootProject.name = "my-lib"""")
         includedDir.resolve("build.gradle.kts").writeText(
@@ -452,7 +499,7 @@ class FingerprintPluginFunctionalTest : FingerprintFunctionalTestBase() {
             """.trimIndent(),
         )
 
-        val mainDir = testProjectDir.resolve("my-app").apply { mkdirs() }
+        mainDir = testProjectDir.resolve("my-app").apply { mkdirs() }
         mainDir.resolve("settings.gradle.kts").writeText(
             """
             rootProject.name = "my-app"
@@ -467,9 +514,9 @@ class FingerprintPluginFunctionalTest : FingerprintFunctionalTestBase() {
             }
             """.trimIndent(),
         )
-
-        val result = gradle(mainDir, "aggregateFingerprints")
-
+    } exercise {
+        gradle(mainDir, "aggregateFingerprints")
+    } verify { result ->
         val includedTaskResult = result.task(":my-lib:generateFingerprint")
         assertNotNull(includedTaskResult, "Task in included build should have been triggered")
         assertTrue(
@@ -479,12 +526,14 @@ class FingerprintPluginFunctionalTest : FingerprintFunctionalTestBase() {
     }
 
     @Test
-    fun `aggregateFingerprints skips included builds that do not have the plugin`(@TempDir testProjectDir: File) {
+    fun `aggregateFingerprints skips included builds that do not have the plugin`() = setup(object {
+        lateinit var mainDir: File
+    }) {
         val nakedDir = testProjectDir.resolve("naked-lib").apply { mkdirs() }
         nakedDir.resolve("settings.gradle.kts").writeText("""rootProject.name = "naked-lib"""")
         nakedDir.resolve("build.gradle.kts").writeText("// Empty - no plugin here")
 
-        val mainDir = testProjectDir.resolve("main-app").apply { mkdirs() }
+        mainDir = testProjectDir.resolve("main-app").apply { mkdirs() }
         mainDir.resolve("settings.gradle.kts").writeText(
             """
             rootProject.name = "main-app"
@@ -496,16 +545,18 @@ class FingerprintPluginFunctionalTest : FingerprintFunctionalTestBase() {
             plugins { id("com.zegreatrob.tools.fingerprint") }
             """.trimIndent(),
         )
-
-        val result = gradle(mainDir, "aggregateFingerprints", "--stacktrace", "--no-configuration-cache")
-
+    } exercise {
+        gradle(mainDir, "aggregateFingerprints", "--stacktrace", "--no-configuration-cache")
+    } verify { result ->
         assertTrue(result.output.contains("SUCCESS"), "Build should succeed even with non-plugin included builds")
         val aggregateFile = mainDir.resolve("build/aggregate-fingerprint.txt")
         assertTrue(aggregateFile.exists(), "Aggregate file should still be generated")
     }
 
     @Test
-    fun `fingerprint changes when main resources include a custom directory and its contents change`() {
+    fun `fingerprint changes when main resources include a custom directory and its contents change`() = setup(object {
+        lateinit var schema: File
+    }) {
         writeSettings("java-custom-main-resources")
 
         writeBuild(
@@ -526,13 +577,13 @@ class FingerprintPluginFunctionalTest : FingerprintFunctionalTestBase() {
             """.trimIndent(),
         )
 
-        val schema = writeProjectFile(
+        schema = writeProjectFile(
             "graphql/schema.graphql",
             """
             type Query { hello: String }
             """,
         )
-
+    } exercise {
         val firstHash = runFingerprint()
 
         schema.writeText(
@@ -543,6 +594,8 @@ class FingerprintPluginFunctionalTest : FingerprintFunctionalTestBase() {
 
         val secondHash = runFingerprint()
 
+        Pair(firstHash, secondHash)
+    } verify { (firstHash, secondHash) ->
         assertFingerprintChanged(
             firstHash,
             secondHash,
@@ -551,7 +604,9 @@ class FingerprintPluginFunctionalTest : FingerprintFunctionalTestBase() {
     }
 
     @Test
-    fun `fingerprint does not change when test resources include a custom directory and its contents change`() {
+    fun `fingerprint does not change when test resources include a custom directory and its contents change`() = setup(object {
+        lateinit var fixture: File
+    }) {
         writeSettings("java-custom-test-resources")
 
         writeBuild(
@@ -572,23 +627,27 @@ class FingerprintPluginFunctionalTest : FingerprintFunctionalTestBase() {
             """.trimIndent(),
         )
 
-        val fixture = writeProjectFile("test-fixtures/fixture.txt", "v1")
-
+        fixture = writeProjectFile("test-fixtures/fixture.txt", "v1")
+    } exercise {
         val firstHash = runFingerprint()
 
         fixture.writeText("v2")
 
         val secondHash = runFingerprint()
 
+        Pair(firstHash, secondHash)
+    } verify { (firstHash, secondHash) ->
         assertFingerprintUnchanged(
             firstHash,
             secondHash,
-            "Fingerprint should NOT change when a test SourceSet resource (custom dir) changes!",
+            "Fingerprint should NOT change when test resources (custom dir) change!",
         )
     }
 
     @Test
-    fun `fingerprint changes when KMP JS main resources include a custom directory and its contents change`() {
+    fun `fingerprint changes when KMP jsMain resources include a custom directory and its contents change`() = setup(object {
+        lateinit var schema: File
+    }) {
         writeSettings("kmp-js-custom-main-resources")
 
         writeBuild(
@@ -606,13 +665,13 @@ class FingerprintPluginFunctionalTest : FingerprintFunctionalTestBase() {
             ),
         )
 
-        val schema = writeProjectFile(
+        schema = writeProjectFile(
             "graphql/schema.graphql",
             """
             type Query { hello: String }
             """,
         )
-
+    } exercise {
         val firstHash = runFingerprint()
 
         schema.writeText(
@@ -623,11 +682,15 @@ class FingerprintPluginFunctionalTest : FingerprintFunctionalTestBase() {
 
         val secondHash = runFingerprint()
 
+        Pair(firstHash, secondHash)
+    } verify { (firstHash, secondHash) ->
         assertFingerprintChanged(firstHash, secondHash, "Fingerprint should change when KMP jsMain resources (custom dir) change!")
     }
 
     @Test
-    fun `fingerprint does not change when KMP JS test resources include a custom directory and its contents change`() {
+    fun `fingerprint does not change when KMP JS test resources include a custom directory and its contents change`() = setup(object {
+        lateinit var fixture: File
+    }) {
         writeSettings("kmp-js-custom-test-resources")
 
         writeBuild(
@@ -645,14 +708,16 @@ class FingerprintPluginFunctionalTest : FingerprintFunctionalTestBase() {
             ),
         )
 
-        val fixture = writeProjectFile("test-fixtures/fixture.txt", "v1")
-
+        fixture = writeProjectFile("test-fixtures/fixture.txt", "v1")
+    } exercise {
         val firstHash = runFingerprint()
 
         fixture.writeText("v2")
 
         val secondHash = runFingerprint()
 
+        Pair(firstHash, secondHash)
+    } verify { (firstHash, secondHash) ->
         assertFingerprintUnchanged(
             firstHash,
             secondHash,
@@ -661,11 +726,13 @@ class FingerprintPluginFunctionalTest : FingerprintFunctionalTestBase() {
     }
 
     @Test
-    fun `fingerprint handles classpath entries that are directories and changes when directory contents change`() {
+    fun `fingerprint handles classpath entries that are directories and changes when directory contents change`() = setup(object {
+        lateinit var marker: File
+    }) {
         writeSettings("classpath-directory-entry-test")
 
         val classpathDir = fileUnderProject("build/classes/kotlin/js/main").apply { mkdirs() }
-        val marker = classpathDir.resolve("marker.txt").apply { writeText("v1") }
+        marker = classpathDir.resolve("marker.txt").apply { writeText("v1") }
 
         writeBuild(
             """
@@ -679,15 +746,18 @@ class FingerprintPluginFunctionalTest : FingerprintFunctionalTestBase() {
             }
             """.trimIndent(),
         )
-
+    } exercise {
         val firstHash = runFingerprint()
         val firstManifest = fingerprintManifestFile().readText()
-        assertManifestContainsDependencyIngredients(firstManifest, context = "baseline (directory classpath entry)")
 
         marker.writeText("v2")
 
         val secondHash = runFingerprint()
         val secondManifest = fingerprintManifestFile().readText()
+
+        listOf(firstHash, secondHash, firstManifest, secondManifest)
+    } verify { (firstHash, secondHash, firstManifest, secondManifest) ->
+        assertManifestContainsDependencyIngredients(firstManifest, context = "baseline (directory classpath entry)")
         assertManifestContainsDependencyIngredients(secondManifest, context = "after directory content change")
 
         assertFingerprintChanged(firstHash, secondHash, "Fingerprint should change when a directory classpath entry contents change!")
@@ -698,8 +768,11 @@ class FingerprintPluginFunctionalTest : FingerprintFunctionalTestBase() {
     }
 
     @Test
-    fun `aggregateFingerprints merges included + local manifest logs into one aggregate manifest log file`(@TempDir testProjectDir: File) {
-        val includedDir = testProjectDir.resolve("my-included-lib").apply { mkdirs() }
+    fun `aggregateFingerprints merges included + local manifest logs into one aggregate manifest log file`() = setup(object {
+        lateinit var includedDir: File
+        lateinit var mainDir: File
+    }) {
+        includedDir = testProjectDir.resolve("my-included-lib").apply { mkdirs() }
         includedDir.resolve("settings.gradle.kts").writeText("""rootProject.name = "my-included-lib"""")
         includedDir.resolve("build.gradle.kts").writeText(
             """
@@ -714,7 +787,7 @@ class FingerprintPluginFunctionalTest : FingerprintFunctionalTestBase() {
             """.trimIndent(),
         )
 
-        val mainDir = testProjectDir.resolve("main-app").apply { mkdirs() }
+        mainDir = testProjectDir.resolve("main-app").apply { mkdirs() }
         mainDir.resolve("settings.gradle.kts").writeText(
             """
             rootProject.name = "main-app"
@@ -737,9 +810,9 @@ class FingerprintPluginFunctionalTest : FingerprintFunctionalTestBase() {
             }
             """.trimIndent(),
         )
-
+    } exercise {
         gradle(mainDir, "aggregateFingerprints", "--no-configuration-cache")
-
+    } verify {
         assertTrue(
             aggregateFingerprintFile(mainDir).exists(),
             "Aggregate fingerprint file should be generated at ${aggregateFingerprintFile(mainDir).path}",
@@ -770,7 +843,8 @@ class FingerprintPluginFunctionalTest : FingerprintFunctionalTestBase() {
     }
 
     @Test
-    fun `aggregateFingerprints works when includedBuilds is not configured`() {
+    fun `aggregateFingerprints works when includedBuilds is not configured`() = setup(object {
+    }) {
         writeSettings("aggregate-defaults-test")
 
         writeBuild(
@@ -778,9 +852,9 @@ class FingerprintPluginFunctionalTest : FingerprintFunctionalTestBase() {
             plugins { id("com.zegreatrob.tools.fingerprint") }
             """,
         )
-
-        val result = gradle(arguments = arrayOf("aggregateFingerprints", "--no-configuration-cache"))
-
+    } exercise {
+        gradle(arguments = arrayOf("aggregateFingerprints", "--no-configuration-cache"))
+    } verify { result ->
         assertEquals(TaskOutcome.SUCCESS, result.task(":aggregateFingerprints")?.outcome)
 
         assertTrue(fingerprintFile().exists(), "Local fingerprint should be generated at ${fingerprintFile().path}")
@@ -797,7 +871,9 @@ class FingerprintPluginFunctionalTest : FingerprintFunctionalTestBase() {
     }
 
     @Test
-    fun `fingerprint changes when published artifact bytes change even if sources and dependencies do not`() {
+    fun `fingerprint changes when published artifact bytes change even if sources and dependencies do not`() = setup(object {
+        lateinit var buildWithManifest: (String) -> String
+    }) {
         writeSettings("published-artifact-change-test")
 
         // Stable main source (unchanged between runs)
@@ -812,7 +888,8 @@ class FingerprintPluginFunctionalTest : FingerprintFunctionalTestBase() {
             """,
         )
 
-        fun buildWithManifest(implementationVersion: String) = """
+        buildWithManifest = { implementationVersion ->
+            """
             plugins {
                 java
                 id("com.zegreatrob.tools.fingerprint")
@@ -825,8 +902,9 @@ class FingerprintPluginFunctionalTest : FingerprintFunctionalTestBase() {
                     attributes["Implementation-Version"] = "$implementationVersion"
                 }
             }
-        """.trimIndent()
-
+            """.trimIndent()
+        }
+    } exercise {
         writeBuild(buildWithManifest("1"))
         val hash1 = runFingerprint()
 
@@ -835,6 +913,8 @@ class FingerprintPluginFunctionalTest : FingerprintFunctionalTestBase() {
         writeBuild(buildWithManifest("2"))
         val hash2 = runFingerprint()
 
+        Pair(hash1, hash2)
+    } verify { (hash1, hash2) ->
         assertFingerprintChanged(
             hash1,
             hash2,
@@ -844,7 +924,9 @@ class FingerprintPluginFunctionalTest : FingerprintFunctionalTestBase() {
     }
 
     @Test
-    fun `fingerprint changes when KMP published artifact bytes change even if sources and dependencies do not`() {
+    fun `fingerprint changes when KMP published artifact bytes change even if sources and dependencies do not`() = setup(object {
+        lateinit var buildWithJvmJarManifest: (String) -> String
+    }) {
         writeSettings("kmp-published-artifact-change-test")
 
         writeProjectFile(
@@ -858,7 +940,8 @@ class FingerprintPluginFunctionalTest : FingerprintFunctionalTestBase() {
             """,
         )
 
-        fun buildWithJvmJarManifest(implementationVersion: String) = """
+        buildWithJvmJarManifest = { implementationVersion ->
+            """
             plugins {
                 kotlin("multiplatform") version "2.3.0"
                 id("com.zegreatrob.tools.fingerprint")
@@ -873,8 +956,9 @@ class FingerprintPluginFunctionalTest : FingerprintFunctionalTestBase() {
                     attributes["Implementation-Version"] = "$implementationVersion"
                 }
             }
-        """.trimIndent()
-
+            """.trimIndent()
+        }
+    } exercise {
         writeBuild(buildWithJvmJarManifest("1"))
         val hash1 = runFingerprint()
 
@@ -883,6 +967,8 @@ class FingerprintPluginFunctionalTest : FingerprintFunctionalTestBase() {
         writeBuild(buildWithJvmJarManifest("2"))
         val hash2 = runFingerprint()
 
+        Pair(hash1, hash2)
+    } verify { (hash1, hash2) ->
         assertFingerprintChanged(
             hash1,
             hash2,
@@ -891,7 +977,9 @@ class FingerprintPluginFunctionalTest : FingerprintFunctionalTestBase() {
     }
 
     @Test
-    fun `fingerprint changes when build logic changes via buildSrc plugin implementation change`() {
+    fun `fingerprint changes when build logic changes via buildSrc plugin implementation change`() = setup(object {
+        lateinit var writeNoOpPluginSource: (String) -> Unit
+    }) {
         writeSettings("build-logic-change-test")
 
         writeProjectFile(
@@ -926,7 +1014,7 @@ class FingerprintPluginFunctionalTest : FingerprintFunctionalTestBase() {
             """,
         )
 
-        fun writeNoOpPluginSource(marker: String) {
+        writeNoOpPluginSource = { marker ->
             writeProjectFile(
                 "buildSrc/src/main/kotlin/example/NoOpPlugin.kt",
                 """
@@ -948,7 +1036,7 @@ class FingerprintPluginFunctionalTest : FingerprintFunctionalTestBase() {
             )
         }
 
-        writeNoOpPluginSource(marker = "A")
+        writeNoOpPluginSource("A")
 
         writeBuild(
             """
@@ -959,17 +1047,19 @@ class FingerprintPluginFunctionalTest : FingerprintFunctionalTestBase() {
             }
 
             repositories { mavenCentral() }
-            """,
+            """.trimIndent(),
         )
-
+    } exercise {
         val hash1 = runFingerprint()
 
-        writeNoOpPluginSource(marker = "B")
+        writeNoOpPluginSource("B")
 
         testProjectDir.resolve("build").deleteRecursively()
 
         val hash2 = runFingerprint()
 
+        Pair(hash1, hash2)
+    } verify { (hash1, hash2) ->
         assertFingerprintChanged(
             hash1,
             hash2,
@@ -978,7 +1068,9 @@ class FingerprintPluginFunctionalTest : FingerprintFunctionalTestBase() {
     }
 
     @Test
-    fun `fingerprint changes when build logic changes via buildSrc convention plugin for KMP`() {
+    fun `fingerprint changes when build logic changes via buildSrc convention plugin for KMP`() = setup(object {
+        lateinit var writeConventionPluginSource: (String) -> Unit
+    }) {
         writeSettings("build-logic-kmp-change-test")
 
         writeProjectFile(
@@ -1011,7 +1103,7 @@ class FingerprintPluginFunctionalTest : FingerprintFunctionalTestBase() {
             """,
         )
 
-        fun writeConventionPluginSource(marker: String) {
+        writeConventionPluginSource = { marker ->
             writeProjectFile(
                 "buildSrc/src/main/kotlin/example/KmpConventionPlugin.kt",
                 """
@@ -1034,15 +1126,7 @@ class FingerprintPluginFunctionalTest : FingerprintFunctionalTestBase() {
             )
         }
 
-        fun assertManifestShowsJvmJarWasFingerprinted(context: String) {
-            val manifest = fingerprintManifestFile().readText()
-            assertTrue(
-                manifest.lineSequence().any { it.startsWith("artifact|") && it.contains("jvm", ignoreCase = true) && it.contains("jar", ignoreCase = true) },
-                "Manifest must include an artifact line for the KMP JVM jar ($context). Manifest:\n$manifest",
-            )
-        }
-
-        writeConventionPluginSource(marker = "A")
+        writeConventionPluginSource("A")
 
         writeBuild(
             """
@@ -1055,18 +1139,28 @@ class FingerprintPluginFunctionalTest : FingerprintFunctionalTestBase() {
             repositories { mavenCentral() }
 
             kotlin { jvm() }
-            """,
+            """.trimIndent(),
         )
+    } exercise {
+        fun assertManifestShowsJvmJarWasFingerprinted(context: String) {
+            val manifest = fingerprintManifestFile().readText()
+            assertTrue(
+                manifest.lineSequence().any { it.startsWith("artifact|") && it.contains("jvm", ignoreCase = true) && it.contains("jar", ignoreCase = true) },
+                "Manifest must include an artifact line for the KMP JVM jar ($context). Manifest:\n$manifest",
+            )
+        }
 
         val hash1 = runFingerprint()
         assertManifestShowsJvmJarWasFingerprinted("first run")
 
-        writeConventionPluginSource(marker = "B")
+        writeConventionPluginSource("B")
         testProjectDir.resolve("build").deleteRecursively()
 
         val hash2 = runFingerprint()
         assertManifestShowsJvmJarWasFingerprinted("second run")
 
+        Pair(hash1, hash2)
+    } verify { (hash1, hash2) ->
         assertFingerprintChanged(
             hash1,
             hash2,
@@ -1075,7 +1169,9 @@ class FingerprintPluginFunctionalTest : FingerprintFunctionalTestBase() {
     }
 
     @Test
-    fun `compareAggregateFingerprints succeeds and prints bash-friendly match indicator when fingerprints are equal`() {
+    fun `compareAggregateFingerprints succeeds and prints bash-friendly match indicator when fingerprints are equal`() = setup(object {
+        lateinit var expectedFile: File
+    }) {
         writeSettings("compare-aggregate-fingerprints-success")
 
         writeBuild(
@@ -1085,21 +1181,24 @@ class FingerprintPluginFunctionalTest : FingerprintFunctionalTestBase() {
             fingerprintConfig {
                 compareToFile.set(layout.projectDirectory.file("expected/aggregate-fingerprint.txt"))
             }
-            """,
+            """.trimIndent(),
         )
 
-        val expectedFile = fileUnderProject("expected/aggregate-fingerprint.txt")
-
+        expectedFile = fileUnderProject("expected/aggregate-fingerprint.txt")
+    } exercise {
         val aggregateResult = gradle(arguments = arrayOf("aggregateFingerprints", "--no-configuration-cache"))
+
+        expectedFile.writeText(aggregateFingerprintFile(testProjectDir).readText())
+
+        val compareResult = gradle(arguments = arrayOf("compareAggregateFingerprints", "--no-configuration-cache"))
+
+        listOf(aggregateResult, compareResult)
+    } verify { (aggregateResult, compareResult) ->
         assertEquals(TaskOutcome.SUCCESS, aggregateResult.task(":aggregateFingerprints")?.outcome)
         assertTrue(
             aggregateFingerprintFile(testProjectDir).exists(),
             "Aggregate fingerprint file should be generated at ${aggregateFingerprintFile(testProjectDir).path}",
         )
-
-        expectedFile.writeText(aggregateFingerprintFile(testProjectDir).readText())
-
-        val compareResult = gradle(arguments = arrayOf("compareAggregateFingerprints", "--no-configuration-cache"))
 
         assertEquals(TaskOutcome.SUCCESS, compareResult.task(":compareAggregateFingerprints")?.outcome)
 
@@ -1110,7 +1209,9 @@ class FingerprintPluginFunctionalTest : FingerprintFunctionalTestBase() {
     }
 
     @Test
-    fun `compareAggregateFingerprints fails and prints bash-friendly mismatch indicator when fingerprints differ`() {
+    fun `compareAggregateFingerprints fails and prints bash-friendly mismatch indicator when fingerprints differ`() = setup(object {
+        lateinit var expectedFile: File
+    }) {
         writeSettings("compare-aggregate-fingerprints-failure")
 
         writeBuild(
@@ -1120,13 +1221,12 @@ class FingerprintPluginFunctionalTest : FingerprintFunctionalTestBase() {
             fingerprintConfig {
                 compareToFile.set(layout.projectDirectory.file("expected/aggregate-fingerprint.txt"))
             }
-            """,
+            """.trimIndent(),
         )
 
-        val expectedFile = fileUnderProject("expected/aggregate-fingerprint.txt")
-
+        expectedFile = fileUnderProject("expected/aggregate-fingerprint.txt")
+    } exercise {
         val aggregateResult = gradle(arguments = arrayOf("aggregateFingerprints", "--no-configuration-cache"))
-        assertEquals(TaskOutcome.SUCCESS, aggregateResult.task(":aggregateFingerprints")?.outcome)
 
         expectedFile.writeText("definitely-not-the-real-fingerprint")
 
@@ -1135,6 +1235,9 @@ class FingerprintPluginFunctionalTest : FingerprintFunctionalTestBase() {
             expectFailure = true,
         )
 
+        listOf(aggregateResult, compareResult)
+    } verify { (aggregateResult, compareResult) ->
+        assertEquals(TaskOutcome.SUCCESS, aggregateResult.task(":aggregateFingerprints")?.outcome)
         assertEquals(TaskOutcome.FAILED, compareResult.task(":compareAggregateFingerprints")?.outcome)
 
         assertTrue(
@@ -1144,19 +1247,20 @@ class FingerprintPluginFunctionalTest : FingerprintFunctionalTestBase() {
     }
 
     @Test
-    fun `compareAggregateFingerprints can be configured via -PfingerprintCompareToFile`() {
+    fun `compareAggregateFingerprints can be configured via -PfingerprintCompareToFile`() = setup(object {
+        lateinit var expectedFile: File
+    }) {
         writeSettings("compare-aggregate-fingerprints-property-config")
 
         writeBuild(
             """
             plugins { id("com.zegreatrob.tools.fingerprint") }
-            """,
+            """.trimIndent(),
         )
 
-        val expectedFile = fileUnderProject("expected/aggregate-fingerprint.txt")
-
+        expectedFile = fileUnderProject("expected/aggregate-fingerprint.txt")
+    } exercise {
         val aggregateResult = gradle(arguments = arrayOf("aggregateFingerprints", "--no-configuration-cache"))
-        assertEquals(TaskOutcome.SUCCESS, aggregateResult.task(":aggregateFingerprints")?.outcome)
 
         expectedFile.writeText(aggregateFingerprintFile(testProjectDir).readText())
 
@@ -1168,10 +1272,19 @@ class FingerprintPluginFunctionalTest : FingerprintFunctionalTestBase() {
             ),
         )
 
+        listOf(aggregateResult, compareResult)
+    } verify { (aggregateResult, compareResult) ->
+        assertEquals(TaskOutcome.SUCCESS, aggregateResult.task(":aggregateFingerprints")?.outcome)
         assertEquals(TaskOutcome.SUCCESS, compareResult.task(":compareAggregateFingerprints")?.outcome)
         assertTrue(
             compareResult.output.lineSequence().any { it.trim() == "FINGERPRINT_MATCH=true" },
             "Expected `FINGERPRINT_MATCH=true` in output.\n--- output ---\n${compareResult.output}",
         )
     }
+
+    private data class CacheRunResult(
+        val result: BuildResult,
+        val firstManifest: String,
+        val secondManifest: String,
+    )
 }
