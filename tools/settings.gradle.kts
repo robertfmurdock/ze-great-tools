@@ -24,7 +24,6 @@ include("tagger-core")
 include("tagger-gradle")
 include("tagger-json")
 include("tagger-plugin")
-include("tagger-test")
 include("tools-bom")
 
 includeBuild("../tools-plugins")

@@ -1,8 +1,8 @@
 <component name="ArtifactManager">
   <artifact type="jar" name="tagger-test-jvm">
-    <output-path>$PROJECT_DIR$/tools/tagger-test/build/libs</output-path>
+    <output-path>$PROJECT_DIR$/tools-tests/tagger-test/build/libs</output-path>
     <root id="archive" name="tagger-test-jvm.jar">
-      <element id="module-output" name="tools.tagger-test.jvmMain" />
+      <element id="module-output" name="tools-tests.tagger-test.jvmMain" />
     </root>
   </artifact>
 </component>

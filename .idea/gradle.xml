@@ -34,13 +34,20 @@
                   <project path="$PROJECT_DIR$/tools/tagger-gradle" />
                   <project path="$PROJECT_DIR$/tools/tagger-json" />
                   <project path="$PROJECT_DIR$/tools/tagger-plugin" />
-                  <project path="$PROJECT_DIR$/tools/tagger-test" />
                   <project path="$PROJECT_DIR$/tools/tools-bom" />
                 </projects>
               </build>
               <build path="$PROJECT_DIR$/tools-plugins" name="tools-plugins">
                 <projects>
                   <project path="$PROJECT_DIR$/tools-plugins" />
+                </projects>
+              </build>
+              <build path="$PROJECT_DIR$/tools-tests" name="tools-tests">
+                <projects>
+                  <project path="$PROJECT_DIR$/tools-tests" />
+                  <project path="$PROJECT_DIR$/tools-tests/tagger-core-test" />
+                  <project path="$PROJECT_DIR$/tools-tests/tagger-plugin-test" />
+                  <project path="$PROJECT_DIR$/tools-tests/tagger-test" />
                 </projects>
               </build>
             </builds>
@@ -57,6 +64,10 @@
             <option value="$PROJECT_DIR$/command-line-tools/tagger-cli" />
             <option value="$PROJECT_DIR$/tools" />
             <option value="$PROJECT_DIR$/tools-plugins" />
+            <option value="$PROJECT_DIR$/tools-tests" />
+            <option value="$PROJECT_DIR$/tools-tests/tagger-core-test" />
+            <option value="$PROJECT_DIR$/tools-tests/tagger-plugin-test" />
+            <option value="$PROJECT_DIR$/tools-tests/tagger-test" />
             <option value="$PROJECT_DIR$/tools/certifier-plugin" />
             <option value="$PROJECT_DIR$/tools/cli-tools" />
             <option value="$PROJECT_DIR$/tools/dependency-bom" />
@@ -74,7 +85,6 @@
             <option value="$PROJECT_DIR$/tools/tagger-gradle" />
             <option value="$PROJECT_DIR$/tools/tagger-json" />
             <option value="$PROJECT_DIR$/tools/tagger-plugin" />
-            <option value="$PROJECT_DIR$/tools/tagger-test" />
             <option value="$PROJECT_DIR$/tools/tools-bom" />
           </set>
         </option>

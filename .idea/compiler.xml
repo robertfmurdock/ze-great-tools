@@ -20,6 +20,16 @@
       <module name="com.zegreatrob.tools.tools.tagger-cli" target="11" />
       <module name="com.zegreatrob.tools.tools.tagger-cli.main" target="11" />
       <module name="com.zegreatrob.tools.tools.tagger-cli.test" target="11" />
+      <module name="tagger-tests.tagger-core-test" target="22" />
+      <module name="tagger-tests.tagger-core-test.jvmMain" target="22" />
+      <module name="tagger-tests.tagger-core-test.jvmTest" target="22" />
+      <module name="tagger-tests.tagger-plugin-test" target="22" />
+      <module name="tagger-tests.tagger-plugin-test.functionalTest" target="22" />
+      <module name="tagger-tests.tagger-plugin-test.main" target="22" />
+      <module name="tagger-tests.tagger-plugin-test.test" target="22" />
+      <module name="tagger-tests.tagger-test" target="22" />
+      <module name="tagger-tests.tagger-test.jvmMain" target="22" />
+      <module name="tagger-tests.tagger-test.jvmTest" target="22" />
       <module name="tools.digger" target="17" />
       <module name="tools.digger-cli.main" target="11" />
       <module name="tools.digger-cli.test" target="11" />
@@ -35,6 +45,10 @@
       <module name="tools.git-test.test" target="11" />
       <module name="tools.tagger-cli.main" target="11" />
       <module name="tools.tagger-cli.test" target="11" />
+      <module name="tools.tagger-plugin.functionalTest" target="21" />
+      <module name="tools.tagger-test" target="21" />
+      <module name="tools.tagger-test.jvmMain" target="21" />
+      <module name="tools.tagger-test.jvmTest" target="21" />
       <module name="tools.tagger-test.main" target="11" />
       <module name="tools.tagger-test.test" target="11" />
     </bytecodeTargetLevel>

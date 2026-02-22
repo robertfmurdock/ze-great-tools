@@ -5,10 +5,10 @@ pluginManagement {
     }
 }
 
-rootProject.name = "command-line-tools"
+rootProject.name = "tools-tests"
 
-include("digger-cli")
-include("tagger-cli")
+include("tagger-test")
+include("tagger-core-test")
+include("tagger-plugin-test")
 
 includeBuild("../tools")
-includeBuild("../tools-tests")
