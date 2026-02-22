@@ -48,6 +48,7 @@ tasks {
     }
     val testBuilds = listOf(
         gradle.includedBuild("tools"),
+        gradle.includedBuild("tools-tests"),
     )
     register<Copy>("collectResults") {
         dependsOn(provider { (getTasksByName("collectResults", true) - this).toList() })
