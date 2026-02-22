@@ -16,8 +16,6 @@ import kotlin.test.assertEquals
 import kotlin.test.fail
 
 interface CalculateVersionTestSpec {
-    private fun test(block: () -> Unit) = setup(object {}) exercise { block() } verify { }
-
     var projectDir: String
     val addFileNames: Set<String>
 
@@ -72,13 +70,9 @@ interface CalculateVersionTestSpec {
 
     fun execute(): TestResult
 
-    fun runCalculateVersionSuccessfully(): String = when (val result = execute()) {
-        is TestResult.Success -> result.message
-        is TestResult.Failure -> fail("Expected success but got ${result.reason}")
-    }
-
     @Test
-    fun withNoTagsProducesError() = setup(object {}) {
+    fun withNoTagsProducesError() = setup(object {
+    }) {
         configureWithDefaults()
         initializeGitRepo(listOf("init", "[patch] commit 1", "[patch] commit 2"))
     } exercise {
@@ -96,9 +90,9 @@ interface CalculateVersionTestSpec {
     }
 
     @Test
-    fun whenNoRemoteProduceError() = setup(object {}) {
+    fun whenNoRemoteProduceError() = setup(object {
+    }) {
         configureWithDefaults()
-
         initializeGitRepo(
             directory = projectDir,
             remoteUrl = null,
@@ -119,7 +113,8 @@ interface CalculateVersionTestSpec {
     }
 
     @Test
-    fun whenNoRemoteButDisableDetachedIsFalseDoNotError() = setup(object {}) {
+    fun whenNoRemoteButDisableDetachedIsFalseDoNotError() = setup(object {
+    }) {
         configureWithOverrides(disableDetached = false)
         initializeGitRepo(
             directory = projectDir,
@@ -138,9 +133,7 @@ interface CalculateVersionTestSpec {
     }
 
     @Test
-    fun whenCurrentCommitAlreadyHasTagWillUseTag() = setup(object {}) {
-        configureWithDefaults()
-
+    fun whenCurrentCommitAlreadyHasTagWillUseTag() = setup(object {
         val gitAdapter = GitAdapter(
             projectDir,
             mapOf(
@@ -149,6 +142,8 @@ interface CalculateVersionTestSpec {
                 "GIT_CONFIG_SYSTEM" to (getEnvironmentVariable("GIT_CONFIG_SYSTEM") ?: ""),
             ),
         )
+    }) {
+        configureWithDefaults()
         gitAdapter.init()
         gitAdapter.config("commit.gpgsign", "false")
         gitAdapter.add(".")
@@ -173,9 +168,9 @@ interface CalculateVersionTestSpec {
     }
 
     @Test
-    fun whenPreviousTagDoesNotHaveThreeNumbersWillError() = setup(object {}) {
+    fun whenPreviousTagDoesNotHaveThreeNumbersWillError() = setup(object {
+    }) {
         configureWithDefaults()
-
         initializeGitRepo(listOf("init", "[patch] commit 1", "[patch] commit 2"), initialTag = "1.2")
     } exercise {
         execute()
@@ -191,9 +186,9 @@ interface CalculateVersionTestSpec {
     }
 
     @Test
-    fun withAllPatchCommitsOnlyIncrementsPatch() = setup(object {}) {
+    fun withAllPatchCommitsOnlyIncrementsPatch() = setup(object {
+    }) {
         configureWithDefaults()
-
         initializeGitRepo(listOf("init", "[patch] commit 1", "[patch] commit 2"), initialTag = "1.2.3")
     } exercise {
         execute()
@@ -205,9 +200,9 @@ interface CalculateVersionTestSpec {
     }
 
     @Test
-    fun givenNoImplicitPatchCalculatingVersionWithUnlabeledCommitsDoesNotIncrement() = setup(object {}) {
+    fun givenNoImplicitPatchCalculatingVersionWithUnlabeledCommitsDoesNotIncrement() = setup(object {
+    }) {
         configureWithOverrides(implicitPatch = false)
-
         initializeGitRepo(commits = listOf("init", "commit 1", "commit 2"), initialTag = "1.2.3")
     } exercise {
         execute()
@@ -219,9 +214,9 @@ interface CalculateVersionTestSpec {
     }
 
     @Test
-    fun givenInitialTagWithSuffixIgnoreSuffixAndFollowNormalRules() = setup(object {}) {
+    fun givenInitialTagWithSuffixIgnoreSuffixAndFollowNormalRules() = setup(object {
+    }) {
         configureWithOverrides(implicitPatch = false)
-
         initializeGitRepo(commits = listOf("init", "commit 1", "commit 2"), initialTag = "1.2.3-SNAPSHOT")
     } exercise {
         execute()
@@ -233,9 +228,9 @@ interface CalculateVersionTestSpec {
     }
 
     @Test
-    fun givenImplicitPatchCalculatingVersionWithUnlabeledCommitsIncrementsPatch() = setup(object {}) {
+    fun givenImplicitPatchCalculatingVersionWithUnlabeledCommitsIncrementsPatch() = setup(object {
+    }) {
         configureWithOverrides(implicitPatch = true)
-
         initializeGitRepo(commits = listOf("init", "commit 1", "commit 2"), initialTag = "1.2.3")
     } exercise {
         execute()
@@ -247,9 +242,9 @@ interface CalculateVersionTestSpec {
     }
 
     @Test
-    fun givenImplicitPatchCalculatingVersionWithNoneAndThenUnlabeledCommitsIncrementsPatch() = setup(object {}) {
+    fun givenImplicitPatchCalculatingVersionWithNoneAndThenUnlabeledCommitsIncrementsPatch() = setup(object {
+    }) {
         configureWithOverrides(implicitPatch = true)
-
         initializeGitRepo(commits = listOf("init", "[none] commit 1", "commit 2"), initialTag = "1.2.3")
     } exercise {
         execute()
@@ -261,9 +256,9 @@ interface CalculateVersionTestSpec {
     }
 
     @Test
-    fun givenImplicitPatchCalculatingVersionWithNoneCommitsDoesNotIncrementAndIsAlwaysSnapshot() = setup(object {}) {
+    fun givenImplicitPatchCalculatingVersionWithNoneCommitsDoesNotIncrementAndIsAlwaysSnapshot() = setup(object {
+    }) {
         configureWithOverrides(implicitPatch = true)
-
         initializeGitRepo(commits = listOf("init", "[None] commit 1", "[none] commit 2"), initialTag = "1.2.3")
     } exercise {
         execute()
@@ -317,7 +312,6 @@ interface CalculateVersionTestSpec {
             implicitPatch = false,
             versionRegex = versionRegex,
         )
-
         initializeGitRepo(
             commits = commits,
             initialTag = initialTag,
@@ -341,7 +335,6 @@ interface CalculateVersionTestSpec {
             implicitPatch = false,
             versionRegex = versionRegex,
         )
-
         initializeGitRepo(
             commits = commits,
             initialTag = initialTag,
@@ -362,7 +355,6 @@ interface CalculateVersionTestSpec {
         val initialTag = "1.2.3"
     }) {
         configureWithOverrides(implicitPatch = false, minorRegex = minorRegex)
-
         initializeGitRepo(
             commits = commits,
             initialTag = initialTag,
@@ -383,7 +375,6 @@ interface CalculateVersionTestSpec {
         val initialTag = "1.2.3"
     }) {
         configureWithOverrides(implicitPatch = false, patchRegex = patchRegex)
-
         initializeGitRepo(commits = commits, initialTag = initialTag)
     } exercise {
         execute()
@@ -404,7 +395,6 @@ interface CalculateVersionTestSpec {
             implicitPatch = false,
             versionRegex = versionRegex,
         )
-
         initializeGitRepo(commits = commits, initialTag = initialTag)
     } exercise {
         execute()
@@ -425,7 +415,6 @@ interface CalculateVersionTestSpec {
             implicitPatch = true,
             noneRegex = noneRegex,
         )
-
         initializeGitRepo(commits = commits, initialTag = initialTag)
     } exercise {
         execute()
@@ -446,7 +435,6 @@ interface CalculateVersionTestSpec {
             implicitPatch = true,
             versionRegex = versionRegex,
         )
-
         initializeGitRepo(commits = commits, initialTag = initialTag)
     } exercise {
         execute()
@@ -463,7 +451,6 @@ interface CalculateVersionTestSpec {
         val initialTag = "1.2.3"
     }) {
         configureWithDefaults()
-
         initializeGitRepo(
             commits = commits,
             initialTag = initialTag,
@@ -504,7 +491,6 @@ interface CalculateVersionTestSpec {
         val initialTag = "1.2.3"
     }) {
         configureWithOverrides(forceSnapshot = true)
-
         initializeGitRepo(
             commits = commits,
             initialTag = initialTag,
@@ -524,7 +510,6 @@ interface CalculateVersionTestSpec {
         val initialTag = "1.2.3"
     }) {
         configureWithOverrides(forceSnapshot = true)
-
         initializeGitRepo(
             commits = commits,
             initialTag = initialTag,

@@ -19,8 +19,6 @@ import kotlin.test.assertIsNot
 import kotlin.test.assertNotEquals
 
 interface TagTestSpec {
-    private fun test(block: () -> Unit) = setup(object {}) exercise { block() } verify { }
-
     var projectDir: String
     val addFileNames: Set<String>
 

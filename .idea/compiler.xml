@@ -30,6 +30,9 @@
       <module name="tagger-tests.tagger-test" target="22" />
       <module name="tagger-tests.tagger-test.jvmMain" target="22" />
       <module name="tagger-tests.tagger-test.jvmTest" target="22" />
+      <module name="tools-tests.digger-plugin-test" target="22" />
+      <module name="tools-tests.digger-plugin-test.jvmMain" target="22" />
+      <module name="tools-tests.digger-plugin-test.jvmTest" target="22" />
       <module name="tools.digger" target="17" />
       <module name="tools.digger-cli.main" target="11" />
       <module name="tools.digger-cli.test" target="11" />

@@ -14,8 +14,6 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 interface GenerateSettingsFileTestSpec {
-    private fun test(block: () -> Unit) = setup(object {}) exercise { block() } verify { }
-
     private val taggerFile get() = "$projectDir/.tagger"
 
     var projectDir: String
@@ -39,79 +37,85 @@ interface GenerateSettingsFileTestSpec {
         }
 
     @Test
-    fun willGenerateSettingsFileToStandardOutByDefault() = test {
-        val result = execute()
-
+    fun willGenerateSettingsFileToStandardOutByDefault() = setup(object {
+    }) exercise {
+        execute()
+    } verify { result ->
         assertEquals(TestResult.Success(prettyJson.encodeToString(runtimeDefaultConfig)), result)
     }
 
     @Test
-    fun willGenerateSettingsFileFileWithArgument() = test {
-        val result = execute(file = "")
-
+    fun willGenerateSettingsFileFileWithArgument() = setup(object {
+    }) exercise {
+        execute(file = "")
+    } verify { result ->
         assertEquals(TestResult.Success("Saved to .tagger"), result)
         assertEquals(runtimeDefaultConfig, readFromFile(taggerFile)?.let(prettyJson::decodeFromString))
     }
 
     @Test
-    fun willGenerateSettingsFileFileWithArgumentAtSpecifiedLocation() = test {
+    fun willGenerateSettingsFileFileWithArgumentAtSpecifiedLocation() = setup(object {
         val fileName = "tagger-settings.json"
-        val result = execute(file = fileName)
-
+    }) exercise {
+        execute(file = fileName)
+    } verify { result ->
         assertEquals(TestResult.Success("Saved to $fileName"), result)
         assertEquals(runtimeDefaultConfig, readFromFile("$projectDir/$fileName")?.let(prettyJson::decodeFromString))
     }
 
     @Test
-    fun whenFileAlreadyExistsWillNotGenerateSettingsFileFileWithArgument() = test {
+    fun whenFileAlreadyExistsWillNotGenerateSettingsFileFileWithArgument() = setup(object {
+    }) {
         "Something already here".writeToFile(taggerFile)
-        val result = execute(file = "")
-
+    } exercise {
+        execute(file = "")
+    } verify { result ->
         assertEquals(TestResult.Failure("File already exists."), result)
     }
 
     @Test
-    fun givenMergeArgumentWhenFileAlreadyExistsWillNotGenerateSettingsFileFileWithArgument() = test {
-        Json.encodeToString(
-            TaggerConfig(
-                releaseBranch = "jim",
-                implicitPatch = false,
-                userName = "jimbo",
-            ),
+    fun givenMergeArgumentWhenFileAlreadyExistsWillNotGenerateSettingsFileFileWithArgument() = setup(object {
+        val config = TaggerConfig(
+            releaseBranch = "jim",
+            implicitPatch = false,
+            userName = "jimbo",
         )
-            .writeToFile(taggerFile)
+    }) {
+        Json.encodeToString(config).writeToFile(taggerFile)
         execute(merge = true)
-        val result = execute(file = "")
+    } exercise {
+        execute(file = "")
+    } verify { result ->
         assertEquals(result is TestResult.Success, true, "$result")
-
         assertEquals(
             runtimeDefaultConfig.copy(
-                releaseBranch = "jim",
-                implicitPatch = false,
-                userName = "jimbo",
+                releaseBranch = config.releaseBranch,
+                implicitPatch = config.implicitPatch,
+                userName = config.userName,
             ),
             readFromFile(taggerFile)?.let(Json::decodeFromString),
         )
     }
 
     @Test
-    fun givenMergeArgumentWillMergeExistingFileIntoOutput() = test {
-        Json.encodeToString(
-            TaggerConfig(
-                releaseBranch = "jim",
-                implicitPatch = false,
-                userName = "jimbo",
-            ),
+    fun givenMergeArgumentWillMergeExistingFileIntoOutput() = setup(object {
+        val config = TaggerConfig(
+            releaseBranch = "jim",
+            implicitPatch = false,
+            userName = "jimbo",
         )
-            .writeToFile(taggerFile)
-        val result = execute(merge = true)
+    }) {
+        Json.encodeToString(config).writeToFile(taggerFile)
+    } exercise {
+        execute(merge = true)
+    } verify { result ->
         assertEquals(
             TestResult.Success(
                 prettyJson.encodeToString(
                     runtimeDefaultConfig.copy(
-                        releaseBranch = "jim",
-                        implicitPatch = false,
-                        userName = "jimbo",
+                        releaseBranch = config.releaseBranch,
+                        implicitPatch = config.implicitPatch,
+                        userName = config.userName,
                     ),
                 ),
             ),

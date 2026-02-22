@@ -1,0 +1,6 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="digger-plugin-test-js">
+    <output-path>$PROJECT_DIR$/tools-tests/digger-plugin-test/build/libs</output-path>
+    <root id="archive" name="digger-plugin-test-js.jar" />
+  </artifact>
+</component>

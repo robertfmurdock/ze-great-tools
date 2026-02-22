@@ -45,6 +45,8 @@
               <build path="$PROJECT_DIR$/tools-tests" name="tools-tests">
                 <projects>
                   <project path="$PROJECT_DIR$/tools-tests" />
+                  <project path="$PROJECT_DIR$/tools-tests/digger-core-test" />
+                  <project path="$PROJECT_DIR$/tools-tests/digger-json-test" />
                   <project path="$PROJECT_DIR$/tools-tests/tagger-core-test" />
                   <project path="$PROJECT_DIR$/tools-tests/tagger-plugin-test" />
                   <project path="$PROJECT_DIR$/tools-tests/tagger-test" />
@@ -65,6 +67,8 @@
             <option value="$PROJECT_DIR$/tools" />
             <option value="$PROJECT_DIR$/tools-plugins" />
             <option value="$PROJECT_DIR$/tools-tests" />
+            <option value="$PROJECT_DIR$/tools-tests/digger-core-test" />
+            <option value="$PROJECT_DIR$/tools-tests/digger-json-test" />
             <option value="$PROJECT_DIR$/tools-tests/tagger-core-test" />
             <option value="$PROJECT_DIR$/tools-tests/tagger-plugin-test" />
             <option value="$PROJECT_DIR$/tools-tests/tagger-test" />
