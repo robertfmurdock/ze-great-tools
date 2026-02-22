@@ -22,8 +22,10 @@ fingerprintConfig {
         "digger-json",
         "digger-model",
         "digger-plugin",
+        "digger-gradle",
         "fingerprint-plugin",
         "tagger-plugin",
+        "tagger-gradle",
     )
 }
 
