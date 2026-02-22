@@ -120,8 +120,10 @@ class FingerprintPluginAggregateFunctionalTest : FingerprintFunctionalTestBase()
 
     @Test
     fun `aggregateFingerprints works when includedBuilds is not configured`() = setup(object {}) {
-        writeSettings("aggregate-defaults-test")
-        writeBuild("""plugins { id("com.zegreatrob.tools.fingerprint") }""")
+        val projectName = "aggregate-defaults-test"
+        val buildScript = """plugins { id("com.zegreatrob.tools.fingerprint") }"""
+
+        writeProject(projectName, buildScript)
     } exercise {
         gradle(arguments = arrayOf("aggregateFingerprints", "--no-configuration-cache"))
     } verify { result ->

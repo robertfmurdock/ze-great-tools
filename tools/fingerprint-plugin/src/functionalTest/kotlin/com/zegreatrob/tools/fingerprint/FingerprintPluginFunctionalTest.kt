@@ -13,17 +13,16 @@ class FingerprintPluginFunctionalTest : FingerprintFunctionalTestBase() {
 
     @Test
     fun `plugin generates fingerprint file in KMP project`() = setup(object {
-    }) {
-        writeSettings("kmp-test-project")
-        writeBuild(
-            kmpBuild(
-                kotlinBlock = """
-                    kotlin {
-                        jvm()
-                    }
-                """.trimIndent(),
-            ),
+        val projectName = "kmp-test-project"
+        val buildScript = kmpBuild(
+            kotlinBlock = """
+                kotlin {
+                    jvm()
+                }
+            """.trimIndent(),
         )
+    }) {
+        writeProject(projectName, buildScript)
     } exercise {
         gradle(arguments = arrayOf("generateFingerprint", "--configuration-cache"), forwardOutput = true)
     } verify {
@@ -71,11 +70,8 @@ class FingerprintPluginFunctionalTest : FingerprintFunctionalTestBase() {
 
     @Test
     fun `fingerprint does not include junit when junit is test-only dependency`() = setup(object {
-    }) {
-        writeSettings("junit-test-only-dependency-should-not-leak")
-
-        writeBuild(
-            """
+        val projectName = "junit-test-only-dependency-should-not-leak"
+        val buildScript = """
             plugins {
                 kotlin("jvm") version "2.3.0"
                 id("com.zegreatrob.tools.fingerprint")
@@ -88,8 +84,9 @@ class FingerprintPluginFunctionalTest : FingerprintFunctionalTestBase() {
             dependencies {
                 testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.2")
             }
-            """,
-        )
+        """.trimIndent()
+    }) {
+        writeProject(projectName, buildScript)
     } exercise {
         runFingerprint()
         fingerprintManifestFile().readText()
@@ -309,8 +306,9 @@ class FingerprintPluginFunctionalTest : FingerprintFunctionalTestBase() {
 
     @Test
     fun `task is retrieved from build cache on second run`() = setup(object {
+        val buildScript = kmpBuild()
     }) {
-        writeBuild(kmpBuild())
+        writeProject(buildScript = buildScript)
     } exercise {
         gradle(arguments = arrayOf("generateFingerprint", "--build-cache"))
         val firstManifest = fingerprintManifestFile().readText()
@@ -415,10 +413,8 @@ class FingerprintPluginFunctionalTest : FingerprintFunctionalTestBase() {
 
     @Test
     fun `fingerprint fails if dependencies cannot be resolved`() = setup(object {
-    }) {
-        writeSettings("resolution-failure-test")
-        writeBuild(
-            """
+        val projectName = "resolution-failure-test"
+        val buildScript = """
             plugins {
                 kotlin("jvm") version "2.3.0"
                 id("com.zegreatrob.tools.fingerprint")
@@ -427,8 +423,9 @@ class FingerprintPluginFunctionalTest : FingerprintFunctionalTestBase() {
             dependencies {
                 implementation("com.example:fake-lib:1.0.0")
             }
-            """.trimIndent(),
-        )
+        """.trimIndent()
+    }) {
+        writeProject(projectName, buildScript)
     } exercise {
         gradle(arguments = arrayOf("generateFingerprint"), expectFailure = true)
     } verify { result ->
@@ -844,14 +841,12 @@ class FingerprintPluginFunctionalTest : FingerprintFunctionalTestBase() {
 
     @Test
     fun `aggregateFingerprints works when includedBuilds is not configured`() = setup(object {
-    }) {
-        writeSettings("aggregate-defaults-test")
-
-        writeBuild(
-            """
+        val projectName = "aggregate-defaults-test"
+        val buildScript = """
             plugins { id("com.zegreatrob.tools.fingerprint") }
-            """,
-        )
+        """.trimIndent()
+    }) {
+        writeProject(projectName, buildScript)
     } exercise {
         gradle(arguments = arrayOf("aggregateFingerprints", "--no-configuration-cache"))
     } verify { result ->

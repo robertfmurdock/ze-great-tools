@@ -23,6 +23,11 @@ abstract class FingerprintFunctionalTestBase {
         buildFile.writeText(script.trimIndent())
     }
 
+    protected fun writeProject(name: String? = null, buildScript: String) {
+        writeSettings(name)
+        writeBuild(buildScript)
+    }
+
     protected fun fileUnderProject(relativePath: String): File = testProjectDir.resolve(relativePath).also { it.parentFile?.mkdirs() }
 
     protected fun writeProjectFile(relativePath: String, content: String): File = fileUnderProject(relativePath).also { it.writeText(content.trimIndent()) }

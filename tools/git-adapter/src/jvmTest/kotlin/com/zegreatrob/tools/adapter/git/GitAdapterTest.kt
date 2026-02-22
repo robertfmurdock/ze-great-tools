@@ -17,25 +17,29 @@ class GitAdapterTest {
     @Test
     fun `will include all tag segments from newest to oldest`() = asyncSetup(object {
         val wrapper = GitAdapter(projectDir.absolutePath)
+        val initialTag = "v1.0"
+        val newerTag = "1.10"
+        val newestTag = "1.101"
+        val commitMessage = "here's a message"
     }) {
         initializeGitRepo(
             directory = projectDir.absolutePath,
             addFileNames = emptySet(),
-            commits = listOf("here's a message"),
+            commits = listOf(commitMessage),
         ).apply {
             config("user.name", "Test")
             config("user.email", "Test")
-            newAnnotatedTag("v1.0", "HEAD", null, null)
+            newAnnotatedTag(initialTag, "HEAD", null, null)
         }
         delayLongEnoughToAffectGitDate()
-        wrapper.addCommitWithMessage("here's a message")
-        wrapper.newAnnotatedTag("1.10", "HEAD", null, null)
+        wrapper.addCommitWithMessage(commitMessage)
+        wrapper.newAnnotatedTag(newerTag, "HEAD", null, null)
         delayLongEnoughToAffectGitDate()
-        wrapper.addCommitWithMessage("here's a message")
-        wrapper.newAnnotatedTag("1.101", "HEAD", null, null)
+        wrapper.addCommitWithMessage(commitMessage)
+        wrapper.newAnnotatedTag(newestTag, "HEAD", null, null)
     } exercise {
         wrapper.listTags()
     } verify { result ->
-        assertEquals(listOf("1.101", "1.10", "v1.0"), result.map { it.name })
+        assertEquals(listOf(newestTag, newerTag, initialTag), result.map { it.name })
     }
 }
