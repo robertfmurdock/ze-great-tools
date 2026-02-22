@@ -24,7 +24,9 @@ dependencies {
     commonMainApi(project(":digger-model"))
     commonMainApi(project(":git-adapter"))
     commonTestImplementation(kotlin("test", embeddedKotlinVersion))
+    commonTestImplementation(libs.com.zegreatrob.testmints.standard)
     "jvmTestImplementation"(kotlin("test-junit5", embeddedKotlinVersion))
+    "jvmTestImplementation"(libs.com.zegreatrob.testmints.standard)
     "jvmTestImplementation"(project(":digger-test"))
 }
 

@@ -1,5 +1,6 @@
 package com.zegreatrob.tools.digger
 
+import com.zegreatrob.testmints.setup
 import com.zegreatrob.tools.digger.core.MessageDigger
 import com.zegreatrob.tools.digger.core.SemverType
 import kotlin.test.Test
@@ -7,11 +8,12 @@ import kotlin.test.assertEquals
 
 class MessageDiggerTest {
     @Test
-    fun canGetAllGroupsFromRegex() {
+    fun canGetAllGroupsFromRegex() = setup(object {
         val input =
             "[Cowdog-42] -3- I did that thing\nCo-authored-by: Some Guy <some@guy.io>\nCo-authored-by: Another Guy <another@guy.io>"
-        val (storyId, ease, coAuthors) = MessageDigger().digIntoMessage(input)
-
+    }) exercise {
+        MessageDigger().digIntoMessage(input)
+    } verify { (storyId, ease, coAuthors) ->
         assertEquals(expected = "Cowdog-42", actual = storyId)
         assertEquals(expected = 3, actual = ease)
         assertEquals(
@@ -21,11 +23,12 @@ class MessageDiggerTest {
     }
 
     @Test
-    fun onlyCoAuthorsWorksAsIntended() {
+    fun onlyCoAuthorsWorksAsIntended() = setup(object {
         val input =
             "I did that thing\nCo-authored-by: Some Guy <some@guy.io>\nCo-authored-by: Another Guy <another@guy.io>"
-        val (storyId, ease, coAuthors) = MessageDigger().digIntoMessage(input)
-
+    }) exercise {
+        MessageDigger().digIntoMessage(input)
+    } verify { (storyId, ease, coAuthors) ->
         assertEquals(
             expected = listOf("some@guy.io", "another@guy.io"),
             actual = coAuthors,
@@ -35,10 +38,11 @@ class MessageDiggerTest {
     }
 
     @Test
-    fun onlyEaseWorksAsIntended() {
+    fun onlyEaseWorksAsIntended() = setup(object {
         val input = "-3- I did that thing"
-        val (storyId, ease, coAuthors) = MessageDigger().digIntoMessage(input)
-
+    }) exercise {
+        MessageDigger().digIntoMessage(input)
+    } verify { (storyId, ease, coAuthors) ->
         assertEquals(expected = 3, actual = ease)
         assertEquals(expected = null, actual = storyId)
         assertEquals(
@@ -48,10 +52,11 @@ class MessageDiggerTest {
     }
 
     @Test
-    fun multipleEaseReturnsFirst() {
+    fun multipleEaseReturnsFirst() = setup(object {
         val input = "-3- -4- -5- I did that thing"
-        val (storyId, ease, coAuthors) = MessageDigger().digIntoMessage(input)
-
+    }) exercise {
+        MessageDigger().digIntoMessage(input)
+    } verify { (storyId, ease, coAuthors) ->
         assertEquals(expected = 3, actual = ease)
         assertEquals(expected = null, actual = storyId)
         assertEquals(
@@ -61,10 +66,11 @@ class MessageDiggerTest {
     }
 
     @Test
-    fun onlyStoryWorksAsIntended() {
+    fun onlyStoryWorksAsIntended() = setup(object {
         val input = "[Cowdog-42] I did that thing"
-        val (storyId, ease, coAuthors) = MessageDigger().digIntoMessage(input)
-
+    }) exercise {
+        MessageDigger().digIntoMessage(input)
+    } verify { (storyId, ease, coAuthors) ->
         assertEquals(expected = "Cowdog-42", actual = storyId)
         assertEquals(expected = null, actual = ease)
         assertEquals(
@@ -74,10 +80,11 @@ class MessageDiggerTest {
     }
 
     @Test
-    fun onlyMajorWorksAsIntended() {
+    fun onlyMajorWorksAsIntended() = setup(object {
         val input = "[major] I did that thing"
-        val result = MessageDigger().digIntoMessage(input)
-
+    }) exercise {
+        MessageDigger().digIntoMessage(input)
+    } verify { result ->
         assertEquals(expected = SemverType.Major, actual = result.semver)
         assertEquals(expected = null, actual = result.storyId)
         assertEquals(
@@ -87,10 +94,11 @@ class MessageDiggerTest {
     }
 
     @Test
-    fun onlyMinorWorksAsIntended() {
+    fun onlyMinorWorksAsIntended() = setup(object {
         val input = "[minor] I did that thing"
-        val result = MessageDigger().digIntoMessage(input)
-
+    }) exercise {
+        MessageDigger().digIntoMessage(input)
+    } verify { result ->
         assertEquals(expected = SemverType.Minor, actual = result.semver)
         assertEquals(expected = null, actual = result.storyId)
         assertEquals(
@@ -100,10 +108,11 @@ class MessageDiggerTest {
     }
 
     @Test
-    fun whenIncludingMajorMultipleSemverTagsRespectsLargestOne() {
+    fun whenIncludingMajorMultipleSemverTagsRespectsLargestOne() = setup(object {
         val input = "[minor] [major] [none] [patch] I did that thing"
-        val result = MessageDigger().digIntoMessage(input)
-
+    }) exercise {
+        MessageDigger().digIntoMessage(input)
+    } verify { result ->
         assertEquals(expected = SemverType.Major, actual = result.semver)
         assertEquals(expected = null, actual = result.storyId)
         assertEquals(
@@ -113,10 +122,11 @@ class MessageDiggerTest {
     }
 
     @Test
-    fun whenIncludingMinorMultipleSemverTagsRespectsLargestOne() {
+    fun whenIncludingMinorMultipleSemverTagsRespectsLargestOne() = setup(object {
         val input = "[minor] [none] [patch] I did that thing"
-        val result = MessageDigger().digIntoMessage(input)
-
+    }) exercise {
+        MessageDigger().digIntoMessage(input)
+    } verify { result ->
         assertEquals(expected = SemverType.Minor, actual = result.semver)
         assertEquals(expected = null, actual = result.storyId)
         assertEquals(
@@ -126,10 +136,11 @@ class MessageDiggerTest {
     }
 
     @Test
-    fun whenIncludingPatchMultipleSemverTagsRespectsLargestOne() {
+    fun whenIncludingPatchMultipleSemverTagsRespectsLargestOne() = setup(object {
         val input = "[none] [patch] I did that thing"
-        val result = MessageDigger().digIntoMessage(input)
-
+    }) exercise {
+        MessageDigger().digIntoMessage(input)
+    } verify { result ->
         assertEquals(expected = SemverType.Patch, actual = result.semver)
         assertEquals(expected = null, actual = result.storyId)
         assertEquals(
@@ -139,10 +150,11 @@ class MessageDiggerTest {
     }
 
     @Test
-    fun onlyPatchWorksAsIntended() {
+    fun onlyPatchWorksAsIntended() = setup(object {
         val input = "[patch] I did that thing"
-        val result = MessageDigger().digIntoMessage(input)
-
+    }) exercise {
+        MessageDigger().digIntoMessage(input)
+    } verify { result ->
         assertEquals(expected = SemverType.Patch, actual = result.semver)
         assertEquals(expected = null, actual = result.storyId)
         assertEquals(
@@ -152,10 +164,11 @@ class MessageDiggerTest {
     }
 
     @Test
-    fun onlyNoneWorksAsIntended() {
+    fun onlyNoneWorksAsIntended() = setup(object {
         val input = "[none] I did that thing"
-        val result = MessageDigger().digIntoMessage(input)
-
+    }) exercise {
+        MessageDigger().digIntoMessage(input)
+    } verify { result ->
         assertEquals(expected = SemverType.None, actual = result.semver)
         assertEquals(expected = null, actual = result.storyId)
         assertEquals(
@@ -165,14 +178,15 @@ class MessageDiggerTest {
     }
 
     @Test
-    fun givenAlternateMajorRegexWillCorrectlyIdentityTags() {
+    fun givenAlternateMajorRegexWillCorrectlyIdentityTags() = setup(object {
         val messageDigger =
             MessageDigger(
                 majorRegex = Regex("\\(.*big.*\\)"),
             )
         val input = "commit (big) 2"
-        val result = messageDigger.digIntoMessage(input)
-
+    }) exercise {
+        messageDigger.digIntoMessage(input)
+    } verify { result ->
         assertEquals(expected = SemverType.Major, actual = result.semver)
         assertEquals(expected = null, actual = result.storyId)
         assertEquals(
@@ -182,14 +196,15 @@ class MessageDiggerTest {
     }
 
     @Test
-    fun givenAlternateMinorRegexWillCorrectlyIdentityTags() {
+    fun givenAlternateMinorRegexWillCorrectlyIdentityTags() = setup(object {
         val messageDigger =
             MessageDigger(
                 minorRegex = Regex("\\(.*middle.*\\)"),
             )
         val input = "commit (middle) 2"
-        val result = messageDigger.digIntoMessage(input)
-
+    }) exercise {
+        messageDigger.digIntoMessage(input)
+    } verify { result ->
         assertEquals(expected = SemverType.Minor, actual = result.semver)
         assertEquals(expected = null, actual = result.storyId)
         assertEquals(
@@ -199,14 +214,15 @@ class MessageDiggerTest {
     }
 
     @Test
-    fun givenAlternatePatchRegexWillCorrectlyIdentityTags() {
+    fun givenAlternatePatchRegexWillCorrectlyIdentityTags() = setup(object {
         val messageDigger =
             MessageDigger(
                 patchRegex = Regex("\\(.*widdle.*\\)"),
             )
         val input = "commit (widdle) 2"
-        val result = messageDigger.digIntoMessage(input)
-
+    }) exercise {
+        messageDigger.digIntoMessage(input)
+    } verify { result ->
         assertEquals(expected = SemverType.Patch, actual = result.semver)
         assertEquals(expected = null, actual = result.storyId)
         assertEquals(
@@ -216,14 +232,15 @@ class MessageDiggerTest {
     }
 
     @Test
-    fun givenAlternateNoneRegexWillCorrectlyIdentityTags() {
+    fun givenAlternateNoneRegexWillCorrectlyIdentityTags() = setup(object {
         val messageDigger =
             MessageDigger(
                 noneRegex = Regex("\\(no\\)"),
             )
         val input = "commit (no) 2"
-        val result = messageDigger.digIntoMessage(input)
-
+    }) exercise {
+        messageDigger.digIntoMessage(input)
+    } verify { result ->
         assertEquals(expected = SemverType.None, actual = result.semver)
         assertEquals(expected = null, actual = result.storyId)
         assertEquals(
@@ -233,10 +250,11 @@ class MessageDiggerTest {
     }
 
     @Test
-    fun multipleStoryPrefersFirst() {
+    fun multipleStoryPrefersFirst() = setup(object {
         val input = "[Cowdog-42] [otherStuff] [Eeeeee] I did that thing"
-        val (storyId, ease, coAuthors) = MessageDigger(Regex("\\(.*big.*\\)")).digIntoMessage(input)
-
+    }) exercise {
+        MessageDigger(Regex("\\(.*big.*\\)")).digIntoMessage(input)
+    } verify { (storyId, ease, coAuthors) ->
         assertEquals(expected = "Cowdog-42", actual = storyId)
         assertEquals(expected = null, actual = ease)
         assertEquals(
@@ -246,30 +264,33 @@ class MessageDiggerTest {
     }
 
     @Test
-    fun includingStoryIdAndPatchWorksAsExpected() {
+    fun includingStoryIdAndPatchWorksAsExpected() = setup(object {
         val input = "[Cowdog-42] [patch] I did that thing"
-        val result = MessageDigger(Regex("\\(.*big.*\\)")).digIntoMessage(input)
-
+    }) exercise {
+        MessageDigger(Regex("\\(.*big.*\\)")).digIntoMessage(input)
+    } verify { result ->
         assertEquals(expected = "Cowdog-42", actual = result.storyId)
         assertEquals(expected = SemverType.Patch, actual = result.semver)
     }
 
     @Test
-    fun includingMajorAndStoryIdWorksAsExpected() {
+    fun includingMajorAndStoryIdWorksAsExpected() = setup(object {
         val input = "[major] [Cowdog-42]  I did that thing"
-        val result = MessageDigger().digIntoMessage(input)
-
+    }) exercise {
+        MessageDigger().digIntoMessage(input)
+    } verify { result ->
         assertEquals(expected = "Cowdog-42", actual = result.storyId)
         assertEquals(expected = SemverType.Major, actual = result.semver)
     }
 
     @Test
-    fun settingStoryRegexWithoutGroupWillFail() {
+    fun settingStoryRegexWithoutGroupWillFail() = setup(object {
         @Suppress("RegExpRedundantEscape")
         val badRegex = Regex("\\[.*\\]")
-        val result = kotlin.runCatching { MessageDigger(storyIdRegex = badRegex) }
+    }) exercise {
+        kotlin.runCatching { MessageDigger(storyIdRegex = badRegex) }
             .exceptionOrNull()
-
+    } verify { result ->
         assertEquals(
             expected = "StoryIdRegex must include a storyId group. The regex was: ${badRegex.pattern}",
             actual = result?.message,
@@ -277,12 +298,13 @@ class MessageDiggerTest {
     }
 
     @Test
-    fun settingEaseRegexWithoutGroupWillFail() {
+    fun settingEaseRegexWithoutGroupWillFail() = setup(object {
         @Suppress("RegExpRedundantEscape")
         val badRegex = Regex("\\[.*\\]")
-        val result = kotlin.runCatching { MessageDigger(easeRegex = badRegex) }
+    }) exercise {
+        kotlin.runCatching { MessageDigger(easeRegex = badRegex) }
             .exceptionOrNull()
-
+    } verify { result ->
         assertEquals(
             expected = "EaseRegex must include an ease group. The regex was: ${badRegex.pattern}",
             actual = result?.message,
