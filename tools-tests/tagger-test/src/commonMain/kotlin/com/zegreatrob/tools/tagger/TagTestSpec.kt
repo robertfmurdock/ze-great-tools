@@ -71,7 +71,10 @@ interface TagTestSpec {
     fun execute(version: String): TestResult
 
     @Test
-    fun whenUserNameAndEmailAreConfiguredTagWillTagAndPush() = test {
+    fun whenUserNameAndEmailAreConfiguredTagWillTagAndPush() = setup(object {
+        val expectedVersion = "1.0.0"
+        lateinit var gitAdapter: GitAdapter
+    }) {
         configureWithDefaults()
 
         val originDirectory = createTempDirectory()
@@ -80,19 +83,18 @@ interface TagTestSpec {
         originGitAdapter.config("receive.denyCurrentBranch", "ignore")
         originGitAdapter.disableGpgSign()
         originGitAdapter.addCommitWithMessage("init")
-        val gitAdapter = initializeGitRepo(
+        gitAdapter = initializeGitRepo(
             listOf("init", "[patch] commit 1", "[patch] commit 2"),
             remoteUrl = originDirectory,
         )
         gitAdapter.push()
 
-        runProcess(listOf("git", "config", "user.email", "test@zegreatrob.com"), this.projectDir)
-        runProcess(listOf("git", "config", "user.name", "RoB as Test"), this.projectDir)
-
-        val expectedVersion = "1.0.0"
-        val result = execute(expectedVersion)
+        runProcess(listOf("git", "config", "user.email", "test@zegreatrob.com"), projectDir)
+        runProcess(listOf("git", "config", "user.name", "RoB as Test"), projectDir)
+    } exercise {
+        execute(expectedVersion)
+    } verify { result ->
         assertIsNot<TestResult.Failure>(result, message = "$result")
-
         assertEquals(expectedVersion, gitAdapter.showTag("HEAD")?.name)
     }
 
@@ -101,7 +103,10 @@ interface TagTestSpec {
     }
 
     @Test
-    fun whenUserNameAndEmailAreParametersTagWillTagAndPush() = test {
+    fun whenUserNameAndEmailAreParametersTagWillTagAndPush() = setup(object {
+        val expectedVersion = "1.0.0"
+        lateinit var gitAdapter: GitAdapter
+    }) {
         configureWithOverrides(
             releaseBranch = "master",
             userName = "RoB as Test",
@@ -115,21 +120,24 @@ interface TagTestSpec {
         originGitAdapter.config("receive.denyCurrentBranch", "ignore")
         originGitAdapter.disableGpgSign()
         originGitAdapter.addCommitWithMessage("init")
-        val gitAdapter = initializeGitRepo(
+        gitAdapter = initializeGitRepo(
             listOf("init", "[patch] commit 1", "[patch] commit 2"),
             remoteUrl = originDirectory,
         )
         gitAdapter.push()
-
-        val expectedVersion = "1.0.0"
-        val result = execute(expectedVersion)
+    } exercise {
+        execute(expectedVersion)
+    } verify { result ->
         assertIsNot<TestResult.Failure>(result, message = "$result")
-
         assertEquals(expectedVersion, gitAdapter.showTag("HEAD")?.name)
     }
 
     @Test
-    fun tagWillFailWhenUserEmailAndNameAreNotConfigured() = test {
+    fun tagWillFailWhenUserEmailAndNameAreNotConfigured() = setup(object {
+        val version = "1.0.0"
+        val expectedError = "Committer identity unknown"
+        lateinit var gitAdapter: GitAdapter
+    }) {
         configureWithOverrides(releaseBranch = "master", warningsAsErrors = true)
 
         val originDirectory = createTempDirectory()
@@ -145,23 +153,27 @@ interface TagTestSpec {
         originGitAdapter.config("receive.denyCurrentBranch", "ignore")
         originGitAdapter.disableGpgSign()
         originGitAdapter.addCommitWithMessage("init")
-        val gitAdapter = initializeGitRepo(
+        gitAdapter = initializeGitRepo(
             listOf("init", "[patch] commit 1", "[patch] commit 2"),
             remoteUrl = originDirectory,
         )
         gitAdapter.push()
-
-        val version = "1.0.0"
-        val result = execute(version)
+    } exercise {
+        execute(version)
+    } verify { result ->
         assertContains(
             charSequence = assertIs<TestResult.Failure>(result).reason,
-            other = "Committer identity unknown",
+            other = expectedError,
         )
         assertNotEquals(version, gitAdapter.showTag("HEAD")?.name)
     }
 
     @Test
-    fun whenNotOnCorrectBranchAndWarningsAsErrorsTagWillNotDoAnythingAndError() = test {
+    fun whenNotOnCorrectBranchAndWarningsAsErrorsTagWillNotDoAnythingAndError() = setup(object {
+        val version = "1.0.0"
+        val expectedError = TagErrors.wrapper(TagErrors.skipMessageNotOnReleaseBranch("trunk", "master"))
+        lateinit var gitAdapter: GitAdapter
+    }) {
         configureWithOverrides(releaseBranch = "trunk", warningsAsErrors = true)
 
         val originDirectory = createTempDirectory()
@@ -170,26 +182,30 @@ interface TagTestSpec {
         originGitAdapter.config("receive.denyCurrentBranch", "ignore")
         originGitAdapter.disableGpgSign()
         originGitAdapter.addCommitWithMessage("init")
-        val gitAdapter = initializeGitRepo(
+        gitAdapter = initializeGitRepo(
             listOf("init", "[patch] commit 1", "[patch] commit 2"),
             remoteUrl = originDirectory,
         )
         gitAdapter.push()
 
-        runProcess(listOf("git", "config", "user.email", "test@zegreatrob.com"), this.projectDir)
-        runProcess(listOf("git", "config", "user.name", "RoB as Test"), this.projectDir)
-
-        val version = "1.0.0"
-        val result = execute(version)
+        runProcess(listOf("git", "config", "user.email", "test@zegreatrob.com"), projectDir)
+        runProcess(listOf("git", "config", "user.name", "RoB as Test"), projectDir)
+    } exercise {
+        execute(version)
+    } verify { result ->
         assertContains(
             charSequence = assertIs<TestResult.Failure>(result).reason,
-            other = TagErrors.wrapper(TagErrors.skipMessageNotOnReleaseBranch("trunk", "master")),
+            other = expectedError,
         )
         assertNotEquals(version, gitAdapter.showTag("HEAD")?.name)
     }
 
     @Test
-    fun whenNotOnCorrectBranchTagWillNotDoAnythingAndError() = test {
+    fun whenNotOnCorrectBranchTagWillNotDoAnythingAndError() = setup(object {
+        val version = "1.0.0"
+        val expectedMessage = TagErrors.wrapper(TagErrors.skipMessageNotOnReleaseBranch("trunk", "master"))
+        lateinit var gitAdapter: GitAdapter
+    }) {
         configureWithOverrides(releaseBranch = "trunk", warningsAsErrors = false)
 
         val originDirectory = createTempDirectory()
@@ -198,20 +214,20 @@ interface TagTestSpec {
         originGitAdapter.config("receive.denyCurrentBranch", "ignore")
         originGitAdapter.disableGpgSign()
         originGitAdapter.addCommitWithMessage("init")
-        val gitAdapter = initializeGitRepo(
+        gitAdapter = initializeGitRepo(
             listOf("init", "[patch] commit 1", "[patch] commit 2"),
             remoteUrl = originDirectory,
         )
         gitAdapter.push()
 
-        runProcess(listOf("git", "config", "user.email", "test@zegreatrob.com"), this.projectDir)
-        runProcess(listOf("git", "config", "user.name", "RoB as Test"), this.projectDir)
-
-        val version = "1.0.0"
-        val result = execute(version)
+        runProcess(listOf("git", "config", "user.email", "test@zegreatrob.com"), projectDir)
+        runProcess(listOf("git", "config", "user.name", "RoB as Test"), projectDir)
+    } exercise {
+        execute(version)
+    } verify { result ->
         assertContains(
             charSequence = assertIs<TestResult.Success>(result).message,
-            other = TagErrors.wrapper(TagErrors.skipMessageNotOnReleaseBranch("trunk", "master")),
+            other = expectedMessage,
         )
         assertNotEquals(version, gitAdapter.showTag("HEAD")?.name)
     }

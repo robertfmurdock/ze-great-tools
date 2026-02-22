@@ -78,11 +78,13 @@ interface CalculateVersionTestSpec {
     }
 
     @Test
-    fun withNoTagsProducesError() = test {
+    fun withNoTagsProducesError() = setup(object {}) {
         configureWithDefaults()
-
         initializeGitRepo(listOf("init", "[patch] commit 1", "[patch] commit 2"))
-        when (val result = execute()) {
+    } exercise {
+        execute()
+    } verify { result ->
+        when (result) {
             is TestResult.Failure ->
                 assertContains(
                     result.reason,
@@ -94,7 +96,7 @@ interface CalculateVersionTestSpec {
     }
 
     @Test
-    fun whenNoRemoteProduceError() = test {
+    fun whenNoRemoteProduceError() = setup(object {}) {
         configureWithDefaults()
 
         initializeGitRepo(
@@ -103,7 +105,10 @@ interface CalculateVersionTestSpec {
             addFileNames = addFileNames,
             commits = listOf("init", "commit (no) 1"),
         )
-        when (val result = execute()) {
+    } exercise {
+        execute()
+    } verify { result ->
+        when (result) {
             is TestResult.Failure -> assertContains(
                 result.reason,
                 "Inappropriate configuration: repository has no remote.",
@@ -114,7 +119,7 @@ interface CalculateVersionTestSpec {
     }
 
     @Test
-    fun whenNoRemoteButDisableDetachedIsFalseDoNotError() = test {
+    fun whenNoRemoteButDisableDetachedIsFalseDoNotError() = setup(object {}) {
         configureWithOverrides(disableDetached = false)
         initializeGitRepo(
             directory = projectDir,
@@ -123,12 +128,17 @@ interface CalculateVersionTestSpec {
             commits = listOf("init", "commit (no) 1"),
             initialTag = "1.2.3",
         )
-        val version = runCalculateVersionSuccessfully()
-        assertEquals("1.2.4-SNAPSHOT", version)
+    } exercise {
+        execute()
+    } verify { result ->
+        when (result) {
+            is TestResult.Success -> assertEquals("1.2.4-SNAPSHOT", result.message)
+            is TestResult.Failure -> fail("Expected success but got ${result.reason}")
+        }
     }
 
     @Test
-    fun whenCurrentCommitAlreadyHasTagWillUseTag() = test {
+    fun whenCurrentCommitAlreadyHasTagWillUseTag() = setup(object {}) {
         configureWithDefaults()
 
         val gitAdapter = GitAdapter(
@@ -153,18 +163,24 @@ interface CalculateVersionTestSpec {
         gitAdapter.addRemote(name = "origin", url = projectDir)
         gitAdapter.fetch()
         gitAdapter.setBranchUpstream("origin/main", "main")
-        val version = runCalculateVersionSuccessfully()
-
-        assertEquals("1.0.23-SNAPSHOT", version)
+    } exercise {
+        execute()
+    } verify { result ->
+        when (result) {
+            is TestResult.Success -> assertEquals("1.0.23-SNAPSHOT", result.message)
+            is TestResult.Failure -> fail("Expected success but got ${result.reason}")
+        }
     }
 
     @Test
-    fun whenPreviousTagDoesNotHaveThreeNumbersWillError() = test {
+    fun whenPreviousTagDoesNotHaveThreeNumbersWillError() = setup(object {}) {
         configureWithDefaults()
 
         initializeGitRepo(listOf("init", "[patch] commit 1", "[patch] commit 2"), initialTag = "1.2")
-
-        when (val result = execute()) {
+    } exercise {
+        execute()
+    } verify { result ->
+        when (result) {
             is TestResult.Failure -> assertContains(
                 result.reason,
                 "Inappropriate configuration: the most recent tag did not have all three semver components.",
@@ -175,204 +191,304 @@ interface CalculateVersionTestSpec {
     }
 
     @Test
-    fun withAllPatchCommitsOnlyIncrementsPatch() = test {
+    fun withAllPatchCommitsOnlyIncrementsPatch() = setup(object {}) {
         configureWithDefaults()
 
         initializeGitRepo(listOf("init", "[patch] commit 1", "[patch] commit 2"), initialTag = "1.2.3")
-        val version = runCalculateVersionSuccessfully()
-
-        assertEquals("1.2.4", version)
+    } exercise {
+        execute()
+    } verify { result ->
+        when (result) {
+            is TestResult.Success -> assertEquals("1.2.4", result.message)
+            is TestResult.Failure -> fail("Expected success but got ${result.reason}")
+        }
     }
 
     @Test
-    fun givenNoImplicitPatchCalculatingVersionWithUnlabeledCommitsDoesNotIncrement() = test {
+    fun givenNoImplicitPatchCalculatingVersionWithUnlabeledCommitsDoesNotIncrement() = setup(object {}) {
         configureWithOverrides(implicitPatch = false)
 
         initializeGitRepo(commits = listOf("init", "commit 1", "commit 2"), initialTag = "1.2.3")
-        val version = runCalculateVersionSuccessfully()
-
-        assertEquals("1.2.3-SNAPSHOT", version)
+    } exercise {
+        execute()
+    } verify { result ->
+        when (result) {
+            is TestResult.Success -> assertEquals("1.2.3-SNAPSHOT", result.message)
+            is TestResult.Failure -> fail("Expected success but got ${result.reason}")
+        }
     }
 
     @Test
-    fun givenInitialTagWithSuffixIgnoreSuffixAndFollowNormalRules() = test {
+    fun givenInitialTagWithSuffixIgnoreSuffixAndFollowNormalRules() = setup(object {}) {
         configureWithOverrides(implicitPatch = false)
 
         initializeGitRepo(commits = listOf("init", "commit 1", "commit 2"), initialTag = "1.2.3-SNAPSHOT")
-        val version = runCalculateVersionSuccessfully()
-
-        assertEquals("1.2.3-SNAPSHOT", version)
+    } exercise {
+        execute()
+    } verify { result ->
+        when (result) {
+            is TestResult.Success -> assertEquals("1.2.3-SNAPSHOT", result.message)
+            is TestResult.Failure -> fail("Expected success but got ${result.reason}")
+        }
     }
 
     @Test
-    fun givenImplicitPatchCalculatingVersionWithUnlabeledCommitsIncrementsPatch() = test {
+    fun givenImplicitPatchCalculatingVersionWithUnlabeledCommitsIncrementsPatch() = setup(object {}) {
         configureWithOverrides(implicitPatch = true)
 
         initializeGitRepo(commits = listOf("init", "commit 1", "commit 2"), initialTag = "1.2.3")
-        val version = runCalculateVersionSuccessfully()
-
-        assertEquals("1.2.4", version)
+    } exercise {
+        execute()
+    } verify { result ->
+        when (result) {
+            is TestResult.Success -> assertEquals("1.2.4", result.message)
+            is TestResult.Failure -> fail("Expected success but got ${result.reason}")
+        }
     }
 
     @Test
-    fun givenImplicitPatchCalculatingVersionWithNoneAndThenUnlabeledCommitsIncrementsPatch() = test {
+    fun givenImplicitPatchCalculatingVersionWithNoneAndThenUnlabeledCommitsIncrementsPatch() = setup(object {}) {
         configureWithOverrides(implicitPatch = true)
 
         initializeGitRepo(commits = listOf("init", "[none] commit 1", "commit 2"), initialTag = "1.2.3")
-        val version = runCalculateVersionSuccessfully()
-
-        assertEquals("1.2.4", version)
+    } exercise {
+        execute()
+    } verify { result ->
+        when (result) {
+            is TestResult.Success -> assertEquals("1.2.4", result.message)
+            is TestResult.Failure -> fail("Expected success but got ${result.reason}")
+        }
     }
 
     @Test
-    fun givenImplicitPatchCalculatingVersionWithNoneCommitsDoesNotIncrementAndIsAlwaysSnapshot() = test {
+    fun givenImplicitPatchCalculatingVersionWithNoneCommitsDoesNotIncrementAndIsAlwaysSnapshot() = setup(object {}) {
         configureWithOverrides(implicitPatch = true)
 
         initializeGitRepo(commits = listOf("init", "[None] commit 1", "[none] commit 2"), initialTag = "1.2.3")
-        val version = runCalculateVersionSuccessfully()
-
-        assertEquals("1.2.3-SNAPSHOT", version)
+    } exercise {
+        execute()
+    } verify { result ->
+        when (result) {
+            is TestResult.Success -> assertEquals("1.2.3-SNAPSHOT", result.message)
+            is TestResult.Failure -> fail("Expected success but got ${result.reason}")
+        }
     }
 
     @Test
-    fun withOneMinorCommitsOnlyIncrementsMinor() = test {
+    fun withOneMinorCommitsOnlyIncrementsMinor() = setup(object {
+        val commits = listOf("init", "[patch] commit 1", "[minor] commit 2", "[patch] commit 3")
+        val initialTag = "1.2.3"
+    }) {
+        configureWithDefaults()
+        initializeGitRepo(commits = commits, initialTag = initialTag)
+    } exercise {
+        execute()
+    } verify { result ->
+        when (result) {
+            is TestResult.Success -> assertEquals("1.3.0", result.message)
+            is TestResult.Failure -> fail("Expected success but got ${result.reason}")
+        }
+    }
+
+    @Test
+    fun canReplaceMajorRegex() = setup(object {
+        val majorRegex = ".*(big).*"
+        val commits = listOf("init", "[patch] commit 1", "commit (big) 2", "[patch] commit 3")
+        val initialTag = "1.2.3"
+    }) {
+        configureWithOverrides(implicitPatch = false, majorRegex = majorRegex)
+        initializeGitRepo(commits = commits, initialTag = initialTag)
+    } exercise {
+        execute()
+    } verify { result ->
+        when (result) {
+            is TestResult.Success -> assertEquals("2.0.0", result.message)
+            is TestResult.Failure -> fail("Expected success but got ${result.reason}")
+        }
+    }
+
+    @Test
+    fun unifiedGroupRegexCanReplaceMajorRegex() = setup(object {
+        val versionRegex = "(?<major>.*big.*)?(?<minor>.*mid.*)?(?<patch>.*widdle.*)?(?<none>.*no.*)?"
+        val commits = listOf("init", "[patch] commit 1", "commit (big) 2", "[patch] commit 3")
+        val initialTag = "1.2.3"
+    }) {
+        configureWithOverrides(
+            implicitPatch = false,
+            versionRegex = versionRegex,
+        )
+
+        initializeGitRepo(
+            commits = commits,
+            initialTag = initialTag,
+        )
+    } exercise {
+        execute()
+    } verify { result ->
+        when (result) {
+            is TestResult.Success -> assertEquals("2.0.0", result.message)
+            is TestResult.Failure -> fail("Expected success but got ${result.reason}")
+        }
+    }
+
+    @Test
+    fun unifiedGroupCanReplaceMinorRegex() = setup(object {
+        val versionRegex = "(?<major>.*big.*)?(?<minor>.*mid.*)?(?<patch>.*widdle.*)?(?<none>.*no.*)?"
+        val commits = listOf("init", "[patch] commit 1", "commit (middle) 2", "[patch] commit 3")
+        val initialTag = "1.2.3"
+    }) {
+        configureWithOverrides(
+            implicitPatch = false,
+            versionRegex = versionRegex,
+        )
+
+        initializeGitRepo(
+            commits = commits,
+            initialTag = initialTag,
+        )
+    } exercise {
+        execute()
+    } verify { result ->
+        when (result) {
+            is TestResult.Success -> assertEquals("1.3.0", result.message)
+            is TestResult.Failure -> fail("Expected success but got ${result.reason}")
+        }
+    }
+
+    @Test
+    fun canReplaceMinorRegex() = setup(object {
+        val minorRegex = ".*(middle).*"
+        val commits = listOf("init", "[patch] commit 1", "commit (middle) 2", "[patch] commit 3")
+        val initialTag = "1.2.3"
+    }) {
+        configureWithOverrides(implicitPatch = false, minorRegex = minorRegex)
+
+        initializeGitRepo(
+            commits = commits,
+            initialTag = initialTag,
+        )
+    } exercise {
+        execute()
+    } verify { result ->
+        when (result) {
+            is TestResult.Success -> assertEquals("1.3.0", result.message)
+            is TestResult.Failure -> fail("Expected success but got ${result.reason}")
+        }
+    }
+
+    @Test
+    fun canReplacePatchRegex() = setup(object {
+        val patchRegex = ".*(tiny).*"
+        val commits = listOf("init", "commit 1", "commit (tiny) 2", "commit 3")
+        val initialTag = "1.2.3"
+    }) {
+        configureWithOverrides(implicitPatch = false, patchRegex = patchRegex)
+
+        initializeGitRepo(commits = commits, initialTag = initialTag)
+    } exercise {
+        execute()
+    } verify { result ->
+        when (result) {
+            is TestResult.Success -> assertEquals("1.2.4", result.message)
+            is TestResult.Failure -> fail("Expected success but got ${result.reason}")
+        }
+    }
+
+    @Test
+    fun unifiedGroupCanReplacePatchRegex() = setup(object {
+        val versionRegex = "(?<major>.*big.*)?(?<minor>.*mid.*)?(?<patch>.*widdle.*)?(?<none>.*no.*)?"
+        val commits = listOf("init", "commit 1", "commit (widdle) 2", "commit 3")
+        val initialTag = "1.2.3"
+    }) {
+        configureWithOverrides(
+            implicitPatch = false,
+            versionRegex = versionRegex,
+        )
+
+        initializeGitRepo(commits = commits, initialTag = initialTag)
+    } exercise {
+        execute()
+    } verify { result ->
+        when (result) {
+            is TestResult.Success -> assertEquals("1.2.4", result.message)
+            is TestResult.Failure -> fail("Expected success but got ${result.reason}")
+        }
+    }
+
+    @Test
+    fun canReplaceNoneRegex() = setup(object {
+        val noneRegex = ".*(no).*"
+        val commits = listOf("init", "commit (no) 1")
+        val initialTag = "1.2.3"
+    }) {
+        configureWithOverrides(
+            implicitPatch = true,
+            noneRegex = noneRegex,
+        )
+
+        initializeGitRepo(commits = commits, initialTag = initialTag)
+    } exercise {
+        execute()
+    } verify { result ->
+        when (result) {
+            is TestResult.Success -> assertEquals("1.2.3-SNAPSHOT", result.message)
+            is TestResult.Failure -> fail("Expected success but got ${result.reason}")
+        }
+    }
+
+    @Test
+    fun unifiedGroupCanReplaceNoneRegex() = setup(object {
+        val versionRegex = "(?<major>.*big.*)?(?<minor>.*mid.*)?(?<patch>.*widdle.*)?(?<none>.*no.*)?"
+        val commits = listOf("init", "commit (no) 1")
+        val initialTag = "1.2.3"
+    }) {
+        configureWithOverrides(
+            implicitPatch = true,
+            versionRegex = versionRegex,
+        )
+
+        initializeGitRepo(commits = commits, initialTag = initialTag)
+    } exercise {
+        execute()
+    } verify { result ->
+        when (result) {
+            is TestResult.Success -> assertEquals("1.2.3-SNAPSHOT", result.message)
+            is TestResult.Failure -> fail("Expected success but got ${result.reason}")
+        }
+    }
+
+    @Test
+    fun calculatingVersionWithOneMajorCommitsOnlyIncrementsMajor() = setup(object {
+        val commits = listOf("init", "[major] commit 1", "[minor] commit 2", "[patch] commit 3")
+        val initialTag = "1.2.3"
+    }) {
         configureWithDefaults()
 
         initializeGitRepo(
-            commits = listOf("init", "[patch] commit 1", "[minor] commit 2", "[patch] commit 3"),
-            initialTag = "1.2.3",
+            commits = commits,
+            initialTag = initialTag,
         )
-        val version = runCalculateVersionSuccessfully()
-
-        assertEquals("1.3.0", version)
+    } exercise {
+        execute()
+    } verify { result ->
+        when (result) {
+            is TestResult.Success -> assertEquals("2.0.0", result.message)
+            is TestResult.Failure -> fail("Expected success but got ${result.reason}")
+        }
     }
 
     @Test
-    fun canReplaceMajorRegex() = test {
-        configureWithOverrides(implicitPatch = false, majorRegex = ".*(big).*")
-
-        initializeGitRepo(
-            commits = listOf("init", "[patch] commit 1", "commit (big) 2", "[patch] commit 3"),
-            initialTag = "1.2.3",
-        )
-        val version = runCalculateVersionSuccessfully()
-
-        assertEquals("2.0.0", version)
-    }
-
-    @Test
-    fun unifiedGroupRegexCanReplaceMajorRegex() = test {
-        configureWithOverrides(
-            implicitPatch = false,
-            versionRegex = "(?<major>.*big.*)?(?<minor>.*mid.*)?(?<patch>.*widdle.*)?(?<none>.*no.*)?",
-        )
-
-        initializeGitRepo(
-            commits = listOf("init", "[patch] commit 1", "commit (big) 2", "[patch] commit 3"),
-            initialTag = "1.2.3",
-        )
-
-        val version = runCalculateVersionSuccessfully()
-
-        assertEquals("2.0.0", version)
-    }
-
-    @Test
-    fun unifiedGroupCanReplaceMinorRegex() = test {
-        configureWithOverrides(
-            implicitPatch = false,
-            versionRegex = "(?<major>.*big.*)?(?<minor>.*mid.*)?(?<patch>.*widdle.*)?(?<none>.*no.*)?",
-        )
-
-        initializeGitRepo(
-            commits = listOf("init", "[patch] commit 1", "commit (middle) 2", "[patch] commit 3"),
-            initialTag = "1.2.3",
-        )
-        val version = runCalculateVersionSuccessfully()
-
-        assertEquals("1.3.0", version)
-    }
-
-    @Test
-    fun canReplaceMinorRegex() = test {
-        configureWithOverrides(implicitPatch = false, minorRegex = ".*(middle).*")
-
-        initializeGitRepo(
-            commits = listOf("init", "[patch] commit 1", "commit (middle) 2", "[patch] commit 3"),
-            initialTag = "1.2.3",
-        )
-        val version = runCalculateVersionSuccessfully()
-
-        assertEquals("1.3.0", version)
-    }
-
-    @Test
-    fun canReplacePatchRegex() = test {
-        configureWithOverrides(implicitPatch = false, patchRegex = ".*(tiny).*")
-
-        initializeGitRepo(commits = listOf("init", "commit 1", "commit (tiny) 2", "commit 3"), initialTag = "1.2.3")
-        val version = runCalculateVersionSuccessfully()
-
-        assertEquals("1.2.4", version)
-    }
-
-    @Test
-    fun unifiedGroupCanReplacePatchRegex() = test {
-        configureWithOverrides(
-            implicitPatch = false,
-            versionRegex = "(?<major>.*big.*)?(?<minor>.*mid.*)?(?<patch>.*widdle.*)?(?<none>.*no.*)?",
-        )
-
-        initializeGitRepo(commits = listOf("init", "commit 1", "commit (widdle) 2", "commit 3"), initialTag = "1.2.3")
-        val version = runCalculateVersionSuccessfully()
-
-        assertEquals("1.2.4", version)
-    }
-
-    @Test
-    fun canReplaceNoneRegex() = test {
-        configureWithOverrides(
-            implicitPatch = true,
-            noneRegex = ".*(no).*",
-        )
-
-        initializeGitRepo(commits = listOf("init", "commit (no) 1"), initialTag = "1.2.3")
-        val version = runCalculateVersionSuccessfully()
-
-        assertEquals("1.2.3-SNAPSHOT", version)
-    }
-
-    @Test
-    fun unifiedGroupCanReplaceNoneRegex() = test {
-        configureWithOverrides(
-            implicitPatch = true,
-            versionRegex = "(?<major>.*big.*)?(?<minor>.*mid.*)?(?<patch>.*widdle.*)?(?<none>.*no.*)?",
-        )
-
-        initializeGitRepo(commits = listOf("init", "commit (no) 1"), initialTag = "1.2.3")
-        val version = runCalculateVersionSuccessfully()
-
-        assertEquals("1.2.3-SNAPSHOT", version)
-    }
-
-    @Test
-    fun calculatingVersionWithOneMajorCommitsOnlyIncrementsMajor() = test {
-        configureWithDefaults()
-
-        initializeGitRepo(
-            commits = listOf("init", "[major] commit 1", "[minor] commit 2", "[patch] commit 3"),
-            initialTag = "1.2.3",
-        )
-        val version = runCalculateVersionSuccessfully()
-        assertEquals("2.0.0", version)
-    }
-
-    @Test
-    fun unifiedGroupWillReportErrorsWhenMissingGroupsWithCorrectNames() = test {
-        configureWithOverrides(implicitPatch = true, versionRegex = ".*")
-
-        initializeGitRepo(listOf("init", "commit (no) 1"), "1.2.3")
-        when (val result = execute()) {
+    fun unifiedGroupWillReportErrorsWhenMissingGroupsWithCorrectNames() = setup(object {
+        val versionRegex = ".*"
+        val commits = listOf("init", "commit (no) 1")
+        val initialTag = "1.2.3"
+    }) {
+        configureWithOverrides(implicitPatch = true, versionRegex = versionRegex)
+        initializeGitRepo(commits = commits, initialTag = initialTag)
+    } exercise {
+        execute()
+    } verify { result ->
+        when (result) {
             is TestResult.Failure -> assertContains(
                 result.reason,
                 "version regex must include groups named 'major', 'minor', 'patch', and 'none'.",
@@ -383,28 +499,40 @@ interface CalculateVersionTestSpec {
     }
 
     @Test
-    fun forceSnapshotMakesReleaseVersionsBecomeSnapshots() = test {
+    fun forceSnapshotMakesReleaseVersionsBecomeSnapshots() = setup(object {
+        val commits = listOf("init", "[patch] commit 1")
+        val initialTag = "1.2.3"
+    }) {
         configureWithOverrides(forceSnapshot = true)
 
         initializeGitRepo(
-            commits = listOf("init", "[patch] commit 1"),
-            initialTag = "1.2.3",
+            commits = commits,
+            initialTag = initialTag,
         )
-
-        val version = runCalculateVersionSuccessfully()
-        assertEquals("1.2.4-SNAPSHOT", version)
+    } exercise {
+        execute()
+    } verify { result ->
+        when (result) {
+            is TestResult.Success -> assertEquals("1.2.4-SNAPSHOT", result.message)
+            is TestResult.Failure -> fail("Expected success but got ${result.reason}")
+        }
     }
 
     @Test
-    fun forceSnapshotReportsForcedReason() = test {
+    fun forceSnapshotReportsForcedReason() = setup(object {
+        val commits = listOf("init", "[patch] commit 1")
+        val initialTag = "1.2.3"
+    }) {
         configureWithOverrides(forceSnapshot = true)
 
         initializeGitRepo(
-            commits = listOf("init", "[patch] commit 1"),
-            initialTag = "1.2.3",
+            commits = commits,
+            initialTag = initialTag,
         )
-
-        when (val result = execute()) {
+    } exercise {
+        execute()
+    } verify { result ->
+        when (result) {
             is TestResult.Success -> {
                 assertEquals("1.2.4-SNAPSHOT", result.message)
                 assertTrue(

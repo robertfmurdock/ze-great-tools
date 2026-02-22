@@ -5,20 +5,30 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class AsSemverComponentsTest {
-    private fun test(block: () -> Unit) = setup(object {}) exercise { block() } verify { }
-
     @Test
-    fun canParseSimpleVersion() = test {
-        assertEquals(listOf(3, 1, 7), "v3.1.7".asSemverComponents())
+    fun canParseSimpleVersion() = setup(object {
+        val version = "v3.1.7"
+    }) exercise {
+        version.asSemverComponents()
+    } verify { result ->
+        assertEquals(listOf(3, 1, 7), result)
     }
 
     @Test
-    fun willIgnoreVersionPrefix() = test {
-        assertEquals(listOf(1, 2, 3), "v1.2.3".asSemverComponents())
+    fun willIgnoreVersionPrefix() = setup(object {
+        val version = "v1.2.3"
+    }) exercise {
+        version.asSemverComponents()
+    } verify { result ->
+        assertEquals(listOf(1, 2, 3), result)
     }
 
     @Test
-    fun willIgnoreMassivePrefix() = test {
-        assertEquals(listOf(3, 2, 1), "vsjdhfksdjhf3.2.1".asSemverComponents())
+    fun willIgnoreMassivePrefix() = setup(object {
+        val version = "vsjdhfksdjhf3.2.1"
+    }) exercise {
+        version.asSemverComponents()
+    } verify { result ->
+        assertEquals(listOf(3, 2, 1), result)
     }
 }

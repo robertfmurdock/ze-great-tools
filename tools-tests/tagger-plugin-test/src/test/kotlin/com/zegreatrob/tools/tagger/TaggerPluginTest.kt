@@ -33,7 +33,6 @@ class TaggerPluginTest {
     } verify {
         val rootCheck = rootProject.tasks.named("check").get()
         val innerProject1Check = innerProject1.tasks.register("check")
-
         val tagTask = rootProject.tasks.findByName("tag")!!
 
         assertTrue(

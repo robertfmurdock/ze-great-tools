@@ -17,6 +17,14 @@ class TaggerForceSnapshotPropertyFunctionalTest {
     fun `can force snapshot via -PtaggerForceSnapshot`() = setup(object {
         val buildFile = projectDir.resolve("build.gradle.kts")
         val settingsFile = projectDir.resolve("settings.gradle")
+        val runner = GradleRunner.create()
+            .withProjectDir(projectDir)
+            .forwardOutput()
+            .withArguments(
+                "calculateVersion",
+                "-q",
+                "-PtaggerForceSnapshot=true",
+            )
     }) {
         settingsFile.writeText("includeBuild(\"\${System.getProperty(\"user.dir\")}/../../tools\")")
         buildFile.writeText(
@@ -38,16 +46,7 @@ class TaggerForceSnapshotPropertyFunctionalTest {
             commits = listOf("init", "[patch] commit 1"),
         )
     } exercise {
-        GradleRunner.create()
-            .withProjectDir(projectDir)
-            .forwardOutput()
-            .withArguments(
-                "calculateVersion",
-                "-q",
-                "-PtaggerForceSnapshot=true",
-            )
-            .build()
-            .output
+        runner.build().output
     } verify { output ->
         assertContains(output, "1.2.4-SNAPSHOT")
         assertContains(output, "FORCED")

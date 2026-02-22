@@ -1,8 +1,13 @@
 # AI Agent Guidelines
 
-To ensure the highest quality and stability of the project, all AI agents working on this repository must follow these rules:
+All AI agents working on this repository must follow these rules:
 
-1. **Verification Before Submission**: Before calling the `submit` tool, you MUST run `./gradlew check` on the entire project to ensure that your changes haven't introduced any regressions and that all tests (including functional and multiplatform tests) pass. Using the build cache and not rerunning all tasks is fine, unless there is suspicion that something is wrong with the caching system.
-2. **Standardized Testing**: When adding or converting tests, use the [TestMints](https://github.com/robertfmurdock/testmints) library. Follow the anonymous-object setup pattern as demonstrated in `tools/digger-plugin/src/test/kotlin/com/zegreatrob/tools/digger/DiggerPluginTest.kt`. Construct objects (e.g., command instances, clients, fixtures) inside the setup object, and only call the method under test inside `exercise`. If the setup requires steps for side effects (e.g., creating resources that aren't directly referenced in the test), use the callback parameter of the `setup` function as shown in `tools/tagger-plugin/src/test/kotlin/com/zegreatrob/tools/tagger/TaggerPluginTest.kt`.
-3. **Exercise and Verify**: The `exercise` block should be reserved for the function subject to being tested. All setup and side effects should be performed within the `setup` or its callback.
+1. **Verification Before Submission**: Before calling the `submit` tool, run `./gradlew check` for the entire project. Build cache is fine unless caching seems suspicious.
+2. **TestMints Pattern**: When adding or converting tests, use [TestMints](https://github.com/robertfmurdock/testmints) with the anonymous-object setup pattern (see `tools/digger-plugin/src/test/kotlin/com/zegreatrob/tools/digger/DiggerPluginTest.kt`).
+3. **Setup / Exercise / Verify Discipline**:
+   - Construct objects in `setup`.
+   - Put the single subject action in `exercise`.
+   - Put all assertions and lookups in `verify`, including simple ones like `findByName`.
+   - If setup needs side effects not referenced later, use the `setup { ... }` callback (see `tools/tagger-plugin/src/test/kotlin/com/zegreatrob/tools/tagger/TaggerPluginTest.kt`).
 4. **Java Toolchain**: This project uses Java Toolchain 21. Ensure any new modules or environment checks respect this version.
+5. **Efficient Verification**: For multi-test refactors, batch edits per file or logical cluster, then run targeted compile tasks (e.g., `:module:compileKotlinJvm` / `:compileKotlinJs`) after each batch. Run `./gradlew :tools-tests:check` once per file or at the end for full confidence. Prefer quieter Gradle output (`--quiet` or `--console=plain`) when possible.
