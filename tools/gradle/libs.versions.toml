@@ -13,4 +13,4 @@ io-github-gradle-nexus-publish-plugin = "io.github.gradle-nexus.publish-plugin:2
 nl-littlerobots-version-catalog-update = "nl.littlerobots.version-catalog-update:1.1.0"
 
 [versions]
-com-zegreatrob-testmints = "12.5.45"
+com-zegreatrob-testmints = "12.6.0"
