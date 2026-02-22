@@ -2,6 +2,7 @@
 
 package com.zegreatrob.tools.digger.json
 
+import com.zegreatrob.testmints.setup
 import com.zegreatrob.tools.digger.model.Contribution
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.buildJsonObject
@@ -16,37 +17,36 @@ import kotlin.uuid.Uuid
 
 class ContributionParserTest {
     @Test
-    fun canRoundTripSuccessfully() {
+    fun canRoundTripSuccessfully() = setup(object {
         val contribution = stubContribution()
-        val loaded = ContributionParser.parseContribution(contribution.toJsonString())
-        assertEquals(contribution, loaded)
+    }) exercise {
+        ContributionParser.parseContribution(contribution.toJsonString())
+    } verify { result ->
+        assertEquals(contribution, result)
     }
 
     @Test
-    fun willIgnoreExtraAttributes() {
+    fun willIgnoreExtraAttributes() = setup(object {
         val contribution = stubContribution()
         val jsonString = contribution.toJsonString()
-
         val jsonElement = Json.parseToJsonElement(jsonString)
-
         val augmentedJsonElement = buildJsonObject {
             jsonElement.jsonObject.forEach {
                 put(it.key, it.value)
             }
             put("extraExtra", "readAllAboutIt")
         }
-
-        val loaded = ContributionParser.parseContribution(augmentedJsonElement.toString())
-        assertEquals(contribution, loaded)
+    }) exercise {
+        ContributionParser.parseContribution(augmentedJsonElement.toString())
+    } verify { result ->
+        assertEquals(contribution, result)
     }
 
     @Test
-    fun willTolerateMissingAttributes() {
+    fun willTolerateMissingAttributes() = setup(object {
         val contribution = stubContribution()
         val jsonString = contribution.toJsonString()
-
         val jsonElement = Json.parseToJsonElement(jsonString)
-
         val notMandatoryAttributes = listOf(
             "dateTime",
             "firstCommitDateTime",
@@ -55,7 +55,6 @@ class ContributionParserTest {
             "semver",
             "label",
         )
-
         val augmentedJsonElement = buildJsonObject {
             jsonElement.jsonObject.forEach {
                 if (it.key !in notMandatoryAttributes) {
@@ -63,8 +62,9 @@ class ContributionParserTest {
                 }
             }
         }
-
-        val loaded = ContributionParser.parseContribution(augmentedJsonElement.toString())
+    }) exercise {
+        ContributionParser.parseContribution(augmentedJsonElement.toString())
+    } verify { result ->
         assertEquals(
             contribution.copy(
                 dateTime = null,
@@ -74,15 +74,17 @@ class ContributionParserTest {
                 semver = null,
                 label = null,
             ),
-            loaded,
+            result,
         )
     }
 
     @Test
-    fun canRoundTripListSuccessfully() {
+    fun canRoundTripListSuccessfully() = setup(object {
         val contributions = listOf(stubContribution(), stubContribution(), stubContribution())
-        val loaded = ContributionParser.parseContributions(contributions.toJsonString())
-        assertEquals(contributions, loaded)
+    }) exercise {
+        ContributionParser.parseContributions(contributions.toJsonString())
+    } verify { result ->
+        assertEquals(contributions, result)
     }
 
     private fun stubContribution() = Contribution(
