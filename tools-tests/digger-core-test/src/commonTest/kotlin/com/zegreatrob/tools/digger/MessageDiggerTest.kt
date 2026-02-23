@@ -2,6 +2,7 @@ package com.zegreatrob.tools.digger
 
 import com.zegreatrob.minassert.assertIsEqualTo
 import com.zegreatrob.testmints.setup
+import com.zegreatrob.tools.digger.core.MessageDigResult
 import com.zegreatrob.tools.digger.core.MessageDigger
 import com.zegreatrob.tools.digger.core.SemverType
 import kotlin.test.Test
@@ -13,10 +14,15 @@ class MessageDiggerTest {
             "[Cowdog-42] -3- I did that thing\nCo-authored-by: Some Guy <some@guy.io>\nCo-authored-by: Another Guy <another@guy.io>"
     }) exercise {
         MessageDigger().digIntoMessage(input)
-    } verify { (storyId, ease, coAuthors) ->
-        storyId.assertIsEqualTo("Cowdog-42")
-        ease.assertIsEqualTo(3)
-        coAuthors.assertIsEqualTo(listOf("some@guy.io", "another@guy.io"))
+    } verify { result ->
+        result.assertIsEqualTo(
+            MessageDigResult(
+                storyId = "Cowdog-42",
+                ease = 3,
+                coauthors = listOf("some@guy.io", "another@guy.io"),
+                semver = null,
+            ),
+        )
     }
 
     @Test
@@ -25,10 +31,15 @@ class MessageDiggerTest {
             "I did that thing\nCo-authored-by: Some Guy <some@guy.io>\nCo-authored-by: Another Guy <another@guy.io>"
     }) exercise {
         MessageDigger().digIntoMessage(input)
-    } verify { (storyId, ease, coAuthors) ->
-        coAuthors.assertIsEqualTo(listOf("some@guy.io", "another@guy.io"))
-        storyId.assertIsEqualTo(null)
-        ease.assertIsEqualTo(null)
+    } verify { result ->
+        result.assertIsEqualTo(
+            MessageDigResult(
+                storyId = null,
+                ease = null,
+                coauthors = listOf("some@guy.io", "another@guy.io"),
+                semver = null,
+            ),
+        )
     }
 
     @Test
@@ -36,10 +47,15 @@ class MessageDiggerTest {
         val input = "-3- I did that thing"
     }) exercise {
         MessageDigger().digIntoMessage(input)
-    } verify { (storyId, ease, coAuthors) ->
-        ease.assertIsEqualTo(3)
-        storyId.assertIsEqualTo(null)
-        coAuthors.assertIsEqualTo(emptyList())
+    } verify { result ->
+        result.assertIsEqualTo(
+            MessageDigResult(
+                storyId = null,
+                ease = 3,
+                coauthors = emptyList(),
+                semver = null,
+            ),
+        )
     }
 
     @Test
@@ -47,10 +63,15 @@ class MessageDiggerTest {
         val input = "-3- -4- -5- I did that thing"
     }) exercise {
         MessageDigger().digIntoMessage(input)
-    } verify { (storyId, ease, coAuthors) ->
-        ease.assertIsEqualTo(3)
-        storyId.assertIsEqualTo(null)
-        coAuthors.assertIsEqualTo(emptyList())
+    } verify { result ->
+        result.assertIsEqualTo(
+            MessageDigResult(
+                storyId = null,
+                ease = 3,
+                coauthors = emptyList(),
+                semver = null,
+            ),
+        )
     }
 
     @Test
@@ -58,10 +79,15 @@ class MessageDiggerTest {
         val input = "[Cowdog-42] I did that thing"
     }) exercise {
         MessageDigger().digIntoMessage(input)
-    } verify { (storyId, ease, coAuthors) ->
-        storyId.assertIsEqualTo("Cowdog-42")
-        ease.assertIsEqualTo(null)
-        coAuthors.assertIsEqualTo(emptyList())
+    } verify { result ->
+        result.assertIsEqualTo(
+            MessageDigResult(
+                storyId = "Cowdog-42",
+                ease = null,
+                coauthors = emptyList(),
+                semver = null,
+            ),
+        )
     }
 
     @Test
@@ -70,9 +96,14 @@ class MessageDiggerTest {
     }) exercise {
         MessageDigger().digIntoMessage(input)
     } verify { result ->
-        result.semver.assertIsEqualTo(SemverType.Major)
-        result.storyId.assertIsEqualTo(null)
-        result.coauthors.assertIsEqualTo(emptyList())
+        result.assertIsEqualTo(
+            MessageDigResult(
+                storyId = null,
+                ease = null,
+                coauthors = emptyList(),
+                semver = SemverType.Major,
+            ),
+        )
     }
 
     @Test
@@ -81,9 +112,14 @@ class MessageDiggerTest {
     }) exercise {
         MessageDigger().digIntoMessage(input)
     } verify { result ->
-        result.semver.assertIsEqualTo(SemverType.Minor)
-        result.storyId.assertIsEqualTo(null)
-        result.coauthors.assertIsEqualTo(emptyList())
+        result.assertIsEqualTo(
+            MessageDigResult(
+                storyId = null,
+                ease = null,
+                coauthors = emptyList(),
+                semver = SemverType.Minor,
+            ),
+        )
     }
 
     @Test
@@ -92,9 +128,14 @@ class MessageDiggerTest {
     }) exercise {
         MessageDigger().digIntoMessage(input)
     } verify { result ->
-        result.semver.assertIsEqualTo(SemverType.Major)
-        result.storyId.assertIsEqualTo(null)
-        result.coauthors.assertIsEqualTo(emptyList())
+        result.assertIsEqualTo(
+            MessageDigResult(
+                storyId = null,
+                ease = null,
+                coauthors = emptyList(),
+                semver = SemverType.Major,
+            ),
+        )
     }
 
     @Test
@@ -103,9 +144,14 @@ class MessageDiggerTest {
     }) exercise {
         MessageDigger().digIntoMessage(input)
     } verify { result ->
-        result.semver.assertIsEqualTo(SemverType.Minor)
-        result.storyId.assertIsEqualTo(null)
-        result.coauthors.assertIsEqualTo(emptyList())
+        result.assertIsEqualTo(
+            MessageDigResult(
+                storyId = null,
+                ease = null,
+                coauthors = emptyList(),
+                semver = SemverType.Minor,
+            ),
+        )
     }
 
     @Test
@@ -114,9 +160,14 @@ class MessageDiggerTest {
     }) exercise {
         MessageDigger().digIntoMessage(input)
     } verify { result ->
-        result.semver.assertIsEqualTo(SemverType.Patch)
-        result.storyId.assertIsEqualTo(null)
-        result.coauthors.assertIsEqualTo(emptyList())
+        result.assertIsEqualTo(
+            MessageDigResult(
+                storyId = null,
+                ease = null,
+                coauthors = emptyList(),
+                semver = SemverType.Patch,
+            ),
+        )
     }
 
     @Test
@@ -125,9 +176,14 @@ class MessageDiggerTest {
     }) exercise {
         MessageDigger().digIntoMessage(input)
     } verify { result ->
-        result.semver.assertIsEqualTo(SemverType.Patch)
-        result.storyId.assertIsEqualTo(null)
-        result.coauthors.assertIsEqualTo(emptyList())
+        result.assertIsEqualTo(
+            MessageDigResult(
+                storyId = null,
+                ease = null,
+                coauthors = emptyList(),
+                semver = SemverType.Patch,
+            ),
+        )
     }
 
     @Test
@@ -136,9 +192,14 @@ class MessageDiggerTest {
     }) exercise {
         MessageDigger().digIntoMessage(input)
     } verify { result ->
-        result.semver.assertIsEqualTo(SemverType.None)
-        result.storyId.assertIsEqualTo(null)
-        result.coauthors.assertIsEqualTo(emptyList())
+        result.assertIsEqualTo(
+            MessageDigResult(
+                storyId = null,
+                ease = null,
+                coauthors = emptyList(),
+                semver = SemverType.None,
+            ),
+        )
     }
 
     @Test
@@ -151,9 +212,14 @@ class MessageDiggerTest {
     }) exercise {
         messageDigger.digIntoMessage(input)
     } verify { result ->
-        result.semver.assertIsEqualTo(SemverType.Major)
-        result.storyId.assertIsEqualTo(null)
-        result.coauthors.assertIsEqualTo(emptyList())
+        result.assertIsEqualTo(
+            MessageDigResult(
+                storyId = null,
+                ease = null,
+                coauthors = emptyList(),
+                semver = SemverType.Major,
+            ),
+        )
     }
 
     @Test
@@ -166,9 +232,14 @@ class MessageDiggerTest {
     }) exercise {
         messageDigger.digIntoMessage(input)
     } verify { result ->
-        result.semver.assertIsEqualTo(SemverType.Minor)
-        result.storyId.assertIsEqualTo(null)
-        result.coauthors.assertIsEqualTo(emptyList())
+        result.assertIsEqualTo(
+            MessageDigResult(
+                storyId = null,
+                ease = null,
+                coauthors = emptyList(),
+                semver = SemverType.Minor,
+            ),
+        )
     }
 
     @Test
@@ -181,9 +252,14 @@ class MessageDiggerTest {
     }) exercise {
         messageDigger.digIntoMessage(input)
     } verify { result ->
-        result.semver.assertIsEqualTo(SemverType.Patch)
-        result.storyId.assertIsEqualTo(null)
-        result.coauthors.assertIsEqualTo(emptyList())
+        result.assertIsEqualTo(
+            MessageDigResult(
+                storyId = null,
+                ease = null,
+                coauthors = emptyList(),
+                semver = SemverType.Patch,
+            ),
+        )
     }
 
     @Test
@@ -196,9 +272,14 @@ class MessageDiggerTest {
     }) exercise {
         messageDigger.digIntoMessage(input)
     } verify { result ->
-        result.semver.assertIsEqualTo(SemverType.None)
-        result.storyId.assertIsEqualTo(null)
-        result.coauthors.assertIsEqualTo(emptyList())
+        result.assertIsEqualTo(
+            MessageDigResult(
+                storyId = null,
+                ease = null,
+                coauthors = emptyList(),
+                semver = SemverType.None,
+            ),
+        )
     }
 
     @Test
@@ -206,10 +287,15 @@ class MessageDiggerTest {
         val input = "[Cowdog-42] [otherStuff] [Eeeeee] I did that thing"
     }) exercise {
         MessageDigger(Regex("\\(.*big.*\\)")).digIntoMessage(input)
-    } verify { (storyId, ease, coAuthors) ->
-        storyId.assertIsEqualTo("Cowdog-42")
-        ease.assertIsEqualTo(null)
-        coAuthors.assertIsEqualTo(emptyList())
+    } verify { result ->
+        result.assertIsEqualTo(
+            MessageDigResult(
+                storyId = "Cowdog-42",
+                ease = null,
+                coauthors = emptyList(),
+                semver = null,
+            ),
+        )
     }
 
     @Test
@@ -218,8 +304,14 @@ class MessageDiggerTest {
     }) exercise {
         MessageDigger(Regex("\\(.*big.*\\)")).digIntoMessage(input)
     } verify { result ->
-        result.storyId.assertIsEqualTo("Cowdog-42")
-        result.semver.assertIsEqualTo(SemverType.Patch)
+        result.assertIsEqualTo(
+            MessageDigResult(
+                storyId = "Cowdog-42",
+                ease = null,
+                coauthors = emptyList(),
+                semver = SemverType.Patch,
+            ),
+        )
     }
 
     @Test
@@ -228,8 +320,14 @@ class MessageDiggerTest {
     }) exercise {
         MessageDigger().digIntoMessage(input)
     } verify { result ->
-        result.storyId.assertIsEqualTo("Cowdog-42")
-        result.semver.assertIsEqualTo(SemverType.Major)
+        result.assertIsEqualTo(
+            MessageDigResult(
+                storyId = "Cowdog-42",
+                ease = null,
+                coauthors = emptyList(),
+                semver = SemverType.Major,
+            ),
+        )
     }
 
     @Test
@@ -237,8 +335,7 @@ class MessageDiggerTest {
         @Suppress("RegExpRedundantEscape")
         val badRegex = Regex("\\[.*\\]")
     }) exercise {
-        kotlin.runCatching { MessageDigger(storyIdRegex = badRegex) }
-            .exceptionOrNull()
+        kotlin.runCatching { MessageDigger(storyIdRegex = badRegex) }.exceptionOrNull()
     } verify { result ->
         result?.message.assertIsEqualTo(
             "StoryIdRegex must include a storyId group. The regex was: ${badRegex.pattern}",

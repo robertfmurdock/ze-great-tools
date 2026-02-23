@@ -128,7 +128,6 @@ interface TagTestSpec {
     @Test
     fun tagWillFailWhenUserEmailAndNameAreNotConfigured() = setup(object {
         val version = "1.0.0"
-        val expectedError = "Committer identity unknown"
         lateinit var gitAdapter: GitAdapter
     }) {
         configureWithOverrides(releaseBranch = "master", warningsAsErrors = true)
@@ -155,6 +154,7 @@ interface TagTestSpec {
         execute(version)
     } verify { result ->
         val failure = result as? TestResult.Failure
+        val expectedError = "Committer identity unknown"
         failure.assertIsNotEqualTo(null, "Expected failure result.")
         failure?.reason?.contains(expectedError).assertIsEqualTo(
             true,
@@ -166,7 +166,6 @@ interface TagTestSpec {
     @Test
     fun whenNotOnCorrectBranchAndWarningsAsErrorsTagWillNotDoAnythingAndError() = setup(object {
         val version = "1.0.0"
-        val expectedError = TagErrors.wrapper(TagErrors.skipMessageNotOnReleaseBranch("trunk", "master"))
         lateinit var gitAdapter: GitAdapter
     }) {
         configureWithOverrides(releaseBranch = "trunk", warningsAsErrors = true)
@@ -189,6 +188,7 @@ interface TagTestSpec {
         execute(version)
     } verify { result ->
         val failure = result as? TestResult.Failure
+        val expectedError = TagErrors.wrapper(TagErrors.skipMessageNotOnReleaseBranch("trunk", "master"))
         failure.assertIsNotEqualTo(null, "Expected failure result.")
         failure?.reason?.contains(expectedError).assertIsEqualTo(
             true,
@@ -200,7 +200,6 @@ interface TagTestSpec {
     @Test
     fun whenNotOnCorrectBranchTagWillNotDoAnythingAndError() = setup(object {
         val version = "1.0.0"
-        val expectedMessage = TagErrors.wrapper(TagErrors.skipMessageNotOnReleaseBranch("trunk", "master"))
         lateinit var gitAdapter: GitAdapter
     }) {
         configureWithOverrides(releaseBranch = "trunk", warningsAsErrors = false)
@@ -223,6 +222,7 @@ interface TagTestSpec {
         execute(version)
     } verify { result ->
         val success = result as? TestResult.Success
+        val expectedMessage = TagErrors.wrapper(TagErrors.skipMessageNotOnReleaseBranch("trunk", "master"))
         success.assertIsNotEqualTo(null, "Expected success result.")
         success?.message?.contains(expectedMessage).assertIsEqualTo(
             true,
