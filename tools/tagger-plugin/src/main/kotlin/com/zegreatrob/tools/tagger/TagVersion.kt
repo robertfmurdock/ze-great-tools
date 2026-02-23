@@ -1,21 +1,39 @@
 package com.zegreatrob.tools.tagger
 
+import com.zegreatrob.tools.adapter.git.GitAdapter
 import com.zegreatrob.tools.tagger.core.TagResult
+import com.zegreatrob.tools.tagger.core.TaggerCore
 import com.zegreatrob.tools.tagger.core.tag
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
+import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.InputDirectory
+import org.gradle.api.tasks.Optional
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 
-interface TaggerExtensionSyntax {
-    var taggerExtension: TaggerExtension
-}
+abstract class TagVersion : DefaultTask() {
+    @get:InputDirectory
+    @get:PathSensitive(PathSensitivity.RELATIVE)
+    abstract val workingDirectory: DirectoryProperty
 
-open class TagVersion :
-    DefaultTask(),
-    TaggerExtensionSyntax {
-    @Input
-    override lateinit var taggerExtension: TaggerExtension
+    @get:Input
+    @get:Optional
+    abstract val releaseBranch: Property<String>
+
+    @get:Input
+    @get:Optional
+    abstract val userName: Property<String>
+
+    @get:Input
+    @get:Optional
+    abstract val userEmail: Property<String>
+
+    @get:Input
+    abstract val warningsAsErrors: Property<Boolean>
 
     @Input
     lateinit var version: String
@@ -25,8 +43,9 @@ open class TagVersion :
     private fun isSnapshot() = version.contains("SNAPSHOT")
 
     @TaskAction
-    fun execute() = taggerExtension.run {
-        when (val result = core.tag(this@TagVersion.version, releaseBranch, userName, userEmail)) {
+    fun execute() {
+        val core = TaggerCore(GitAdapter(workingDirectory.get().asFile.absolutePath))
+        when (val result = core.tag(version, releaseBranch.orNull, userName.orNull, userEmail.orNull)) {
             TagResult.Success -> {}
 
             is TagResult.Error -> if (warningsAsErrors.get()) {

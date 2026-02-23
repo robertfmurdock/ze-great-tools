@@ -1,17 +1,23 @@
 package com.zegreatrob.tools.tagger
 
+import com.zegreatrob.tools.adapter.git.GitAdapter
+import com.zegreatrob.tools.tagger.core.TaggerCore
+import com.zegreatrob.tools.tagger.core.lastVersionAndTag
 import org.gradle.api.DefaultTask
-import org.gradle.api.tasks.Input
+import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.tasks.InputDirectory
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 
-open class PreviousVersion :
-    DefaultTask(),
-    TaggerExtensionSyntax {
-    @Input
-    override lateinit var taggerExtension: TaggerExtension
+abstract class PreviousVersion : DefaultTask() {
+    @get:InputDirectory
+    @get:PathSensitive(PathSensitivity.RELATIVE)
+    abstract val workingDirectory: DirectoryProperty
 
     @TaskAction
     fun execute() {
-        logger.quiet(taggerExtension.lastVersionAndTag()?.first)
+        val core = TaggerCore(GitAdapter(workingDirectory.get().asFile.absolutePath))
+        logger.quiet(core.lastVersionAndTag()?.first)
     }
 }

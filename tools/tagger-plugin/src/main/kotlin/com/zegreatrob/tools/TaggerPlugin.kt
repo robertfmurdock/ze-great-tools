@@ -14,8 +14,8 @@ class TaggerPlugin : Plugin<Project> {
     override fun apply(project: Project) {
         project.plugins.apply("base")
 
-        val tagger = project.extensions.create("tagger", TaggerExtension::class.java, project)
-        tagger.workingDirectory.convention(project.rootDir)
+        val tagger = project.extensions.create("tagger", TaggerExtension::class.java, project.objects)
+        tagger.workingDirectory.convention(project.layout.projectDirectory)
 
         project.findProperty("taggerForceSnapshot")
             ?.toString()
@@ -25,17 +25,28 @@ class TaggerPlugin : Plugin<Project> {
         val exportToGithub = project.findProperty("exportToGithub")
 
         project.tasks.register("previousVersion", PreviousVersion::class.java) { task ->
-            task.taggerExtension = tagger
+            task.workingDirectory.set(tagger.workingDirectory)
         }
         project.tasks.register("calculateVersion", CalculateVersion::class.java) { task ->
-            task.taggerExtension = tagger
-            if (exportToGithub != null) {
-                task.exportToGithubEnv = true
-            }
+            task.workingDirectory.set(tagger.workingDirectory)
+            task.releaseBranch.set(tagger.releaseBranchProperty)
+            task.implicitPatch.set(tagger.implicitPatch)
+            task.disableDetached.set(tagger.disableDetached)
+            task.forceSnapshot.set(tagger.forceSnapshot)
+            task.versionRegex.set(tagger.versionRegex)
+            task.noneRegex.set(tagger.noneRegex)
+            task.patchRegex.set(tagger.patchRegex)
+            task.minorRegex.set(tagger.minorRegex)
+            task.majorRegex.set(tagger.majorRegex)
+            task.exportToGithubEnv.set(exportToGithub != null)
         }
 
         val tag = project.tasks.register("tag", TagVersion::class.java) { task ->
-            task.taggerExtension = tagger
+            task.workingDirectory.set(tagger.workingDirectory)
+            task.releaseBranch.set(tagger.releaseBranchProperty)
+            task.userName.set(tagger.userNameProperty)
+            task.userEmail.set(tagger.userEmailProperty)
+            task.warningsAsErrors.set(tagger.warningsAsErrors)
             task.version = "${project.version}"
             task.mustRunAfter(project.tasks.named("check"))
             task.mustRunAfter(project.provider { project.getTasksByName("check", true).toList() })
@@ -46,7 +57,7 @@ class TaggerPlugin : Plugin<Project> {
         }
 
         project.tasks.register("commitReport", CommitReport::class.java) { task ->
-            task.taggerExtension = tagger
+            task.workingDirectory.set(tagger.workingDirectory)
         }
 
         val githubRelease = project.tasks.register("githubRelease", Exec::class.java) { task ->
@@ -79,7 +90,8 @@ class TaggerPlugin : Plugin<Project> {
         }
 
         project.tasks.register("release", ReleaseVersion::class.java) { task ->
-            task.taggerExtension = tagger
+            task.workingDirectory.set(tagger.workingDirectory)
+            task.releaseBranch.set(tagger.releaseBranchProperty)
             task.version = "${project.version}"
             task.enabled = !project.version.toString().contains("SNAPSHOT")
             task.dependsOn(project.tasks.named("assemble"))

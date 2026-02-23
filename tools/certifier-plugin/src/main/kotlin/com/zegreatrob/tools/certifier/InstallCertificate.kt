@@ -6,22 +6,20 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskAction
 import org.gradle.jvm.toolchain.JavaLanguageVersion
 import org.gradle.jvm.toolchain.JavaToolchainService
-import org.gradle.process.ExecResult
-import org.gradle.process.ProcessExecutionException
-import org.gradle.process.internal.DefaultExecSpec
-import org.gradle.process.internal.ExecAction
-import org.gradle.process.internal.ExecActionFactory
+import org.gradle.process.ExecOperations
 import java.io.ByteArrayOutputStream
 import javax.inject.Inject
 
 @Suppress("unused")
-open class InstallCertificate
+abstract class InstallCertificate
 @Inject
 constructor(
     private val objectFactory: ObjectFactory,
-    private val execActionFactory: ExecActionFactory,
     private val javaToolchainService: JavaToolchainService,
 ) : DefaultTask() {
+    @get:Inject
+    abstract val execOperations: ExecOperations
+
     @Input
     val jdkSelector = objectFactory.property(String::class.java)
 
@@ -30,30 +28,35 @@ constructor(
 
     @TaskAction
     fun installCertificate() {
-        var execSpec: DefaultExecSpec = objectFactory.newInstance(DefaultExecSpec::class.java)
         val cert = certificatePath.get()
         val javaLauncher =
             javaToolchainService.launcherFor { spec ->
                 spec.getLanguageVersion().set(JavaLanguageVersion.of(jdkSelector.get()))
             }
         val javaHome = javaLauncher.get().metadata.installationPath
-        execSpec.commandLine(
-            ("$javaHome/bin/keytool -importcert -file $cert -alias $cert -cacerts -storepass changeit -noprompt")
-                .split(" "),
-        )
-        val execAction: ExecAction = execActionFactory.newExecAction()
 
         val outStream = ByteArrayOutputStream()
-        execAction.standardOutput = outStream
+        val result = execOperations.exec { spec ->
+            spec.commandLine(
+                javaHome.file("bin/keytool").asFile.absolutePath,
+                "-importcert",
+                "-file",
+                cert,
+                "-alias",
+                cert,
+                "-cacerts",
+                "-storepass",
+                "changeit",
+                "-noprompt",
+            )
+            spec.standardOutput = outStream
+            spec.errorOutput = outStream
+            spec.isIgnoreExitValue = true
+        }
 
-        execSpec.copyTo(execAction)
-        try {
-            objectFactory.property(ExecResult::class.java).set(execAction.execute())
-        } catch (_: ProcessExecutionException) {
-            val results = outStream.toString()
-            if (!results.contains("already exists")) {
-                throw Exception("Unexpected error.\n$results")
-            }
+        val results = outStream.toString()
+        if (result.exitValue != 0 && !results.contains("already exists")) {
+            throw Exception("Unexpected error.\n$results")
         }
     }
 }

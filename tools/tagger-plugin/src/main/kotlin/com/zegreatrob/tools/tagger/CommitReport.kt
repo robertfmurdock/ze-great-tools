@@ -1,20 +1,25 @@
 package com.zegreatrob.tools.tagger
 
+import com.zegreatrob.tools.adapter.git.GitAdapter
+import com.zegreatrob.tools.tagger.core.TaggerCore
 import com.zegreatrob.tools.tagger.core.tagReport
 import org.gradle.api.DefaultTask
-import org.gradle.api.tasks.Input
+import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.tasks.InputDirectory
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 
-open class CommitReport :
-    DefaultTask(),
-    TaggerExtensionSyntax {
-    @Input
-    override lateinit var taggerExtension: TaggerExtension
+abstract class CommitReport : DefaultTask() {
+    @get:InputDirectory
+    @get:PathSensitive(PathSensitivity.RELATIVE)
+    abstract val workingDirectory: DirectoryProperty
 
     @TaskAction
     fun execute() {
+        val core = TaggerCore(GitAdapter(workingDirectory.get().asFile.absolutePath))
         println("COMMIT REPORT-------")
-        println("--------------------${taggerExtension.core.tagReport()}")
+        println("--------------------${core.tagReport()}")
         println("COMMIT REPORT OVAH--")
     }
 }

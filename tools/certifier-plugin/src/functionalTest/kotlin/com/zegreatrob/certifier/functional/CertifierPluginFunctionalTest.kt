@@ -16,6 +16,47 @@ class CertifierPluginFunctionalTest {
     private val ignoreFile by lazy { projectDir.resolve(".gitignore") }
 
     @Test
+    fun installCertIsConfigurationCacheCompatible() = setup(object {
+        val certificatePath = this@CertifierPluginFunctionalTest.javaClass.getResource("/localhost.crt")?.toURI()?.path
+        val args = listOf("installCert", "--configuration-cache", "-m")
+    }) {
+        settingsFile.writeText("")
+        ignoreFile.writeText(".gradle")
+        buildFile.writeText(
+            """
+            plugins {
+                id("com.zegreatrob.tools.certifier")
+            }
+
+            tasks {
+                installCert {
+                    jdkSelector = "21"
+                    certificatePath = "$certificatePath"
+                }
+            }
+
+            """.trimIndent(),
+        )
+    } exercise {
+        val firstRun = GradleRunner.create()
+            .forwardOutput()
+            .withPluginClasspath()
+            .withArguments(args)
+            .withProjectDir(projectDir)
+            .build()
+        val secondRun = GradleRunner.create()
+            .forwardOutput()
+            .withPluginClasspath()
+            .withArguments(args)
+            .withProjectDir(projectDir)
+            .build()
+        firstRun to secondRun
+    } verify { (firstRun, secondRun) ->
+        firstRun.output.contains("Configuration cache entry stored").assertIsEqualTo(true, firstRun.output)
+        secondRun.output.contains("Reusing configuration cache.").assertIsEqualTo(true, secondRun.output)
+    }
+
+    @Test
     fun canRunInstallCertTask() = setup(object {
         val certificatePath = this@CertifierPluginFunctionalTest.javaClass.getResource("/localhost.crt")?.toURI()?.path
         val runner = GradleRunner.create()

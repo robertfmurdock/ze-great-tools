@@ -6,58 +6,55 @@ import com.zegreatrob.tools.tagger.core.VersionRegex
 import com.zegreatrob.tools.tagger.core.calculateNextVersion
 import com.zegreatrob.tools.tagger.core.lastVersionAndTag
 import org.gradle.api.GradleException
-import org.gradle.api.Project
 import org.gradle.api.model.ObjectFactory
-import org.gradle.api.tasks.Input
-import java.io.File
 
 open class TaggerExtension(
-    @Transient val rootProject: Project,
     objectFactory: ObjectFactory,
 ) {
-    @Input
-    var releaseBranch: String? = null
+    internal val releaseBranchProperty = objectFactory.property(String::class.java)
+    var releaseBranch: String?
+        get() = releaseBranchProperty.orNull
+        set(value) {
+            value?.let { releaseBranchProperty.set(it) }
+        }
 
-    @Input
-    var userName: String? = null
+    internal val userNameProperty = objectFactory.property(String::class.java)
+    var userName: String?
+        get() = userNameProperty.orNull
+        set(value) {
+            value?.let { userNameProperty.set(it) }
+        }
 
-    @Input
-    var userEmail: String? = null
+    internal val userEmailProperty = objectFactory.property(String::class.java)
+    var userEmail: String?
+        get() = userEmailProperty.orNull
+        set(value) {
+            value?.let { userEmailProperty.set(it) }
+        }
 
-    @Input
-    var warningsAsErrors = objectFactory.property(Boolean::class.java).convention(false)
+    val warningsAsErrors = objectFactory.property(Boolean::class.java).convention(false)
 
-    @Input
-    var workingDirectory = objectFactory.property(File::class.java)
+    val workingDirectory = objectFactory.directoryProperty()
 
-    @Input
-    var implicitPatch = objectFactory.property(Boolean::class.java).convention(true)
+    val implicitPatch = objectFactory.property(Boolean::class.java).convention(true)
 
-    @Input
-    var disableDetached = objectFactory.property(Boolean::class.java).convention(true)
+    val disableDetached = objectFactory.property(Boolean::class.java).convention(true)
 
-    @Input
-    var forceSnapshot = objectFactory.property(Boolean::class.java).convention(false)
+    val forceSnapshot = objectFactory.property(Boolean::class.java).convention(false)
 
-    @Input
-    var githubReleaseEnabled = objectFactory.property(Boolean::class.java).convention(false)
+    val githubReleaseEnabled = objectFactory.property(Boolean::class.java).convention(false)
 
-    @Input
-    var versionRegex = objectFactory.property(Regex::class.java).convention(null)
+    val versionRegex = objectFactory.property(Regex::class.java).convention(null)
 
-    @Input
-    var noneRegex = objectFactory.property(Regex::class.java).convention(VersionRegex.Defaults.none)
+    val noneRegex = objectFactory.property(Regex::class.java).convention(VersionRegex.Defaults.none)
 
-    @Input
-    var patchRegex = objectFactory.property(Regex::class.java).convention(VersionRegex.Defaults.patch)
+    val patchRegex = objectFactory.property(Regex::class.java).convention(VersionRegex.Defaults.patch)
 
-    @Input
-    var minorRegex = objectFactory.property(Regex::class.java).convention(VersionRegex.Defaults.minor)
+    val minorRegex = objectFactory.property(Regex::class.java).convention(VersionRegex.Defaults.minor)
 
-    @Input
-    var majorRegex = objectFactory.property(Regex::class.java).convention(VersionRegex.Defaults.major)
+    val majorRegex = objectFactory.property(Regex::class.java).convention(VersionRegex.Defaults.major)
 
-    val core get() = TaggerCore(GitAdapter(workingDirectory.get().absolutePath))
+    val core get() = TaggerCore(GitAdapter(workingDirectory.get().asFile.absolutePath))
 
     fun lastVersionAndTag() = core.lastVersionAndTag()
 
@@ -66,7 +63,8 @@ open class TaggerExtension(
         versionRegex = versionRegex(),
         disableDetached = disableDetached.get(),
         forceSnapshot = forceSnapshot.get(),
-        releaseBranch = releaseBranch ?: throw GradleException("Please configure the tagger release branch."),
+        releaseBranch = releaseBranchProperty.orNull
+            ?: throw GradleException("Please configure the tagger release branch."),
     )
 
     private fun versionRegex() = VersionRegex(
@@ -78,7 +76,7 @@ open class TaggerExtension(
     )
 }
 
-private fun Regex.validateVersionRegex() {
+internal fun Regex.validateVersionRegex() {
     if (
         VersionRegex.containsAllGroups(pattern)
     ) {
