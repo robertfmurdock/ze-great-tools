@@ -2,6 +2,7 @@
 
 package com.zegreatrob.tools.digger.json
 
+import com.zegreatrob.minassert.assertIsEqualTo
 import com.zegreatrob.testmints.setup
 import com.zegreatrob.tools.digger.model.Contribution
 import kotlinx.serialization.json.Json
@@ -10,7 +11,6 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.put
 import kotlin.random.Random
 import kotlin.test.Test
-import kotlin.test.assertEquals
 import kotlin.time.Instant
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
@@ -22,7 +22,7 @@ class ContributionParserTest {
     }) exercise {
         ContributionParser.parseContribution(contribution.toJsonString())
     } verify { result ->
-        assertEquals(contribution, result)
+        result.assertIsEqualTo(contribution)
     }
 
     @Test
@@ -39,7 +39,7 @@ class ContributionParserTest {
     }) exercise {
         ContributionParser.parseContribution(augmentedJsonElement.toString())
     } verify { result ->
-        assertEquals(contribution, result)
+        result.assertIsEqualTo(contribution)
     }
 
     @Test
@@ -65,7 +65,7 @@ class ContributionParserTest {
     }) exercise {
         ContributionParser.parseContribution(augmentedJsonElement.toString())
     } verify { result ->
-        assertEquals(
+        result.assertIsEqualTo(
             contribution.copy(
                 dateTime = null,
                 firstCommitDateTime = null,
@@ -74,7 +74,6 @@ class ContributionParserTest {
                 semver = null,
                 label = null,
             ),
-            result,
         )
     }
 
@@ -84,7 +83,7 @@ class ContributionParserTest {
     }) exercise {
         ContributionParser.parseContributions(contributions.toJsonString())
     } verify { result ->
-        assertEquals(contributions, result)
+        result.assertIsEqualTo(contributions)
     }
 
     private fun stubContribution() = Contribution(

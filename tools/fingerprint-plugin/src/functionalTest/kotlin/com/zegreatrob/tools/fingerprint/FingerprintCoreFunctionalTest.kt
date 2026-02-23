@@ -1,12 +1,11 @@
 package com.zegreatrob.tools.fingerprint
 
+import com.zegreatrob.minassert.assertIsEqualTo
 import com.zegreatrob.testmints.setup
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.TaskOutcome
 import org.junit.jupiter.api.Test
 import java.io.File
-import kotlin.test.assertEquals
-import kotlin.test.assertTrue
 
 class FingerprintCoreFunctionalTest : FingerprintFunctionalTestBase() {
 
@@ -26,7 +25,8 @@ class FingerprintCoreFunctionalTest : FingerprintFunctionalTestBase() {
         gradle(arguments = arrayOf("generateFingerprint", "--configuration-cache"), forwardOutput = true)
     } verify {
         val fingerprintFile = fingerprintFile()
-        assertTrue(fingerprintFile.exists(), "Fingerprint file should be generated at ${fingerprintFile.path}")
+        fingerprintFile.exists()
+            .assertIsEqualTo(true, "Fingerprint file should be generated at ${fingerprintFile.path}")
         assertFingerprintManifestGeneratedCorrectly()
     }
 
@@ -88,8 +88,8 @@ class FingerprintCoreFunctionalTest : FingerprintFunctionalTestBase() {
         val classpathLines = manifest.lineSequence().filter { it.startsWith("classpath|") }.toList()
         val junitClasspathLines = classpathLines.filter { it.contains("junit", ignoreCase = true) }
 
-        assertTrue(
-            junitClasspathLines.isEmpty(),
+        junitClasspathLines.isEmpty().assertIsEqualTo(
+            true,
             """
             JUnit must not be treated as a production dependency ingredient when it's only declared in testImplementation.
             Found classpath lines containing 'junit':
@@ -134,8 +134,8 @@ class FingerprintCoreFunctionalTest : FingerprintFunctionalTestBase() {
 
         Pair(baseline, afterChange)
     } verify { (baseline, afterChange) ->
-        assertTrue(baseline.manifest.contains("source|$sourcePath|"))
-        assertTrue(afterChange.manifest.contains("source|$sourcePath|"))
+        baseline.manifest.contains("source|$sourcePath|").assertIsEqualTo(true)
+        afterChange.manifest.contains("source|$sourcePath|").assertIsEqualTo(true)
         assertFingerprintChanged(baseline.hash, afterChange.hash, "Fingerprint should change when module source changes!")
     }
 
@@ -152,7 +152,7 @@ class FingerprintCoreFunctionalTest : FingerprintFunctionalTestBase() {
         val hashB = runWithVersion(testProjectDir, newVersion)
         Pair(hashA, hashB)
     } verify { (hashA, hashB) ->
-        assert(hashA != hashB) { "Fingerprint must change when plugin version updates!" }
+        (hashA != hashB).assertIsEqualTo(true, "Fingerprint must change when plugin version updates!")
     }
 
     private fun runWithVersion(dir: File, version: String): String {
@@ -177,9 +177,9 @@ class FingerprintCoreFunctionalTest : FingerprintFunctionalTestBase() {
 
         CacheRunResult(result, firstManifest, secondManifest)
     } verify { data ->
-        assertTrue(data.firstManifest.isNotBlank())
-        assertTrue(data.secondManifest.isNotBlank())
-        assertEquals(data.result.task(":generateFingerprint")?.outcome, TaskOutcome.FROM_CACHE)
+        data.firstManifest.isNotBlank().assertIsEqualTo(true)
+        data.secondManifest.isNotBlank().assertIsEqualTo(true)
+        data.result.task(":generateFingerprint")?.outcome.assertIsEqualTo(TaskOutcome.FROM_CACHE)
     }
 
     @Test
@@ -200,7 +200,7 @@ class FingerprintCoreFunctionalTest : FingerprintFunctionalTestBase() {
     } exercise {
         gradle(arguments = arrayOf("generateFingerprint"), expectFailure = true)
     } verify { result ->
-        assertTrue(result.output.contains("Could not resolve"), result.output)
+        result.output.contains("Could not resolve").assertIsEqualTo(true, result.output)
     }
 
     @Test
@@ -245,8 +245,8 @@ class FingerprintCoreFunctionalTest : FingerprintFunctionalTestBase() {
             afterChange.hash,
             "Fingerprint should change when a directory classpath entry contents change!",
         )
-        assertTrue(
-            baseline.manifest != afterChange.manifest,
+        (baseline.manifest != afterChange.manifest).assertIsEqualTo(
+            true,
             "Manifest should change when a directory classpath entry contents change.\n--- first ---\n${baseline.manifest}\n--- second ---\n${afterChange.manifest}",
         )
     }

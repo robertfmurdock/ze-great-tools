@@ -19,6 +19,7 @@ dependencies {
     commonMainImplementation("com.zegreatrob.tools:tagger-core")
     commonMainImplementation("com.zegreatrob.tools:cli-tools")
     commonMainImplementation("org.jetbrains.kotlinx:kotlinx-serialization-json")
+    commonMainImplementation(libs.com.zegreatrob.testmints.minassert)
     commonMainImplementation(libs.com.zegreatrob.testmints.standard)
     commonMainApi("com.zegreatrob.tools:git-test")
     commonMainApi(libs.org.jetbrains.kotlin.kotlin.test)

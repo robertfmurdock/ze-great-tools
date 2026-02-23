@@ -1,5 +1,6 @@
 package com.zegreatrob.tools.digger
 
+import com.zegreatrob.minassert.assertIsEqualTo
 import com.zegreatrob.testmints.async.asyncSetup
 import com.zegreatrob.tools.adapter.git.CommitRef
 import com.zegreatrob.tools.adapter.git.TagRef
@@ -17,7 +18,6 @@ import kotlinx.coroutines.delay
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
-import kotlin.test.assertEquals
 
 interface AllContributionTestSpec : SetupWithOverrides {
     var projectDir: String
@@ -84,7 +84,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
     } exercise {
         runAllContributionData()
     } verify { allOutput ->
-        assertEquals(
+        parseAll(allOutput).assertIsEqualTo(
             listOf(
                 toContribution(
                     lastCommit = secondCommit,
@@ -106,7 +106,6 @@ interface AllContributionTestSpec : SetupWithOverrides {
                     ),
                 ),
             ),
-            parseAll(allOutput),
         )
     }
 
@@ -142,7 +141,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
     } exercise {
         runAllContributionData()
     } verify { allOutput ->
-        assertEquals(
+        parseAll(allOutput).assertIsEqualTo(
             listOf(
                 toContribution(
                     firstCommit = thirdCommit,
@@ -164,7 +163,6 @@ interface AllContributionTestSpec : SetupWithOverrides {
                     expectedAuthors = defaultAuthors,
                 ),
             ),
-            parseAll(allOutput),
         )
     }
 
@@ -202,7 +200,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
     } exercise {
         runAllContributionData()
     } verify { allOutput ->
-        assertEquals(
+        parseAll(allOutput).assertIsEqualTo(
             listOf(
                 toContribution(
                     firstCommit = secondCommit,
@@ -217,7 +215,6 @@ interface AllContributionTestSpec : SetupWithOverrides {
                     expectedAuthors = defaultAuthors,
                 ),
             ),
-            parseAll(allOutput),
         )
     }
 
@@ -259,7 +256,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
     } exercise {
         runAllContributionData()
     } verify { allOutput ->
-        assertEquals(
+        parseAll(allOutput).assertIsEqualTo(
             listOf(
                 toContribution(
                     firstCommit = secondCommit,
@@ -281,7 +278,6 @@ interface AllContributionTestSpec : SetupWithOverrides {
                     expectedAuthors = defaultAuthors,
                 ),
             ),
-            parseAll(allOutput),
         )
     }
 
@@ -320,7 +316,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
     } exercise {
         runAllContributionData()
     } verify { allOutput ->
-        assertEquals(
+        parseAll(allOutput).assertIsEqualTo(
             listOf(
                 toContribution(
                     lastCommit = mergeCommit,
@@ -340,7 +336,6 @@ interface AllContributionTestSpec : SetupWithOverrides {
                     expectedAuthors = defaultAuthors,
                 ),
             ),
-            parseAll(allOutput),
         )
     }
 
@@ -379,7 +374,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
     } exercise {
         runAllContributionData()
     } verify { allOutput ->
-        assertEquals(
+        parseAll(allOutput).assertIsEqualTo(
             listOf(
                 toContribution(
                     lastCommit = mergeCommit,
@@ -394,7 +389,6 @@ interface AllContributionTestSpec : SetupWithOverrides {
                     expectedAuthors = defaultAuthors,
                 ),
             ),
-            parseAll(allOutput),
         )
     }
 
@@ -436,7 +430,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
     } exercise {
         runAllContributionData()
     } verify { allOutput ->
-        assertEquals(
+        parseAll(allOutput).assertIsEqualTo(
             listOf(
                 toContribution(
                     lastCommit = merge2Commit,
@@ -451,7 +445,6 @@ interface AllContributionTestSpec : SetupWithOverrides {
                     expectedAuthors = defaultAuthors,
                 ),
             ),
-            parseAll(allOutput),
         )
     }
 
@@ -492,7 +485,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
     } exercise {
         runAllContributionData()
     } verify { allOutput ->
-        assertEquals(
+        parseAll(allOutput).assertIsEqualTo(
             listOf(
                 toContribution(
                     lastCommit = merge2Commit,
@@ -514,7 +507,6 @@ interface AllContributionTestSpec : SetupWithOverrides {
                     expectedAuthors = defaultAuthors,
                 ),
             ),
-            parseAll(allOutput),
         )
     }
 
@@ -545,7 +537,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
     } exercise {
         runAllContributionData()
     } verify { allOutput ->
-        assertEquals(
+        parseAll(allOutput).assertIsEqualTo(
             listOf(
                 toContribution(
                     lastCommit = secondCommit,
@@ -559,7 +551,6 @@ interface AllContributionTestSpec : SetupWithOverrides {
                     expectedEase = 4,
                 ),
             ),
-            parseAll(allOutput),
         )
     }
 
@@ -580,7 +571,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
     } exercise {
         runAllContributionData()
     } verify { allOutput ->
-        assertEquals(
+        parseAll(allOutput).assertIsEqualTo(
             listOf(
                 toContribution(
                     lastCommit = secondCommit,
@@ -595,7 +586,6 @@ interface AllContributionTestSpec : SetupWithOverrides {
                     expectedStoryId = "DOGCOW-17",
                 ),
             ),
-            parseAll(allOutput),
         )
     }
 
@@ -611,7 +601,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
     } exercise {
         runAllContributionData()
     } verify { allOutput ->
-        assertEquals(
+        parseAll(allOutput).assertIsEqualTo(
             listOf(
                 toContribution(
                     lastCommit = secondCommit,
@@ -622,7 +612,6 @@ interface AllContributionTestSpec : SetupWithOverrides {
                     expectedStoryId = "DOGCOW-17",
                 ),
             ),
-            parseAll(allOutput),
         )
     }
 
@@ -638,7 +627,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
     } exercise {
         runAllContributionData()
     } verify { allOutput ->
-        assertEquals(
+        parseAll(allOutput).assertIsEqualTo(
             listOf(
                 toContribution(
                     lastCommit = secondCommit,
@@ -650,7 +639,6 @@ interface AllContributionTestSpec : SetupWithOverrides {
                     expectedLabel = "AwesomeProject",
                 ),
             ),
-            parseAll(allOutput),
         )
     }
 
@@ -666,7 +654,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
     } exercise {
         runAllContributionData()
     } verify { allOutput ->
-        assertEquals(
+        parseAll(allOutput).assertIsEqualTo(
             listOf(
                 toContribution(
                     lastCommit = secondCommit,
@@ -676,7 +664,6 @@ interface AllContributionTestSpec : SetupWithOverrides {
                     expectedEase = 4,
                 ),
             ),
-            parseAll(allOutput),
         )
     }
 
@@ -688,7 +675,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
     } exercise {
         runAllContributionData()
     } verify { allOutput ->
-        assertEquals(listOf("Major"), parseAll(allOutput).map { it.semver })
+        parseAll(allOutput).map { it.semver }.assertIsEqualTo(listOf("Major"))
     }
 
     @Test
@@ -699,7 +686,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
     } exercise {
         runAllContributionData()
     } verify { allOutput ->
-        assertEquals(listOf("Minor"), parseAll(allOutput).map { it.semver })
+        parseAll(allOutput).map { it.semver }.assertIsEqualTo(listOf("Minor"))
     }
 
     @Test
@@ -710,7 +697,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
     } exercise {
         runAllContributionData()
     } verify { allOutput ->
-        assertEquals(listOf("Patch"), parseAll(allOutput).map { it.semver })
+        parseAll(allOutput).map { it.semver }.assertIsEqualTo(listOf("Patch"))
     }
 
     @Test
@@ -721,7 +708,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
     } exercise {
         runAllContributionData()
     } verify { allOutput ->
-        assertEquals(listOf("None"), parseAll(allOutput).map { it.semver })
+        parseAll(allOutput).map { it.semver }.assertIsEqualTo(listOf("None"))
     }
 
     @Test
@@ -733,7 +720,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
         runAllContributionData()
     } verify { allOutput ->
         val contributions = parseAll(allOutput)
-        assertEquals(listOf("CowDog-99"), contributions.map { it.storyId })
+        contributions.map { it.storyId }.assertIsEqualTo(listOf("CowDog-99"))
     }
 
     @Test
@@ -745,7 +732,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
         runAllContributionData()
     } verify { allOutput ->
         val contributions = parseAll(allOutput)
-        assertEquals(listOf(4), contributions.map { it.ease })
+        contributions.map { it.ease }.assertIsEqualTo(listOf(4))
     }
 
     private fun toContribution(

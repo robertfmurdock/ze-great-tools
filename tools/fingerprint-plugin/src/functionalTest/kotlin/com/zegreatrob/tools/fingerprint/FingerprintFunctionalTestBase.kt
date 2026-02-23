@@ -1,11 +1,11 @@
 package com.zegreatrob.tools.fingerprint
 
+import com.zegreatrob.minassert.assertIsEqualTo
+import com.zegreatrob.minassert.assertIsNotEqualTo
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
 import org.junit.jupiter.api.io.TempDir
 import java.io.File
-import kotlin.test.assertEquals
-import kotlin.test.assertTrue
 
 abstract class FingerprintFunctionalTestBase {
 
@@ -73,47 +73,48 @@ abstract class FingerprintFunctionalTestBase {
         vararg expectedSourcePaths: String,
     ) {
         val manifestFile = fingerprintManifestFile(dir)
-        assertTrue(
-            manifestFile.exists(),
+        manifestFile.exists().assertIsEqualTo(
+            true,
             "Fingerprint manifest file should be generated at ${manifestFile.path}",
         )
 
         val manifest = manifestFile.readText()
 
         val pluginVersionLine = manifest.lineSequence().firstOrNull { it.startsWith("pluginVersion|") }
-        assertTrue(
-            pluginVersionLine != null,
+        pluginVersionLine.assertIsNotEqualTo(
+            null,
             "Manifest must contain a pluginVersion line. Content:\n$manifest",
         )
 
         val actualVersion = pluginVersionLine
-            .substringAfter("pluginVersion|")
-            .substringBefore('|')
+            ?.substringAfter("pluginVersion|")
+            ?.substringBefore('|')
 
-        assertTrue(
-            actualVersion.isNotBlank(),
-            "Manifest pluginVersion value must not be blank. Line: $pluginVersionLine",
-        )
+        actualVersion
+            ?.isNotBlank()
+            .assertIsEqualTo(
+                true,
+                "Manifest pluginVersion value must not be blank. Line: $pluginVersionLine",
+            )
 
         if (expectedPluginVersion != null) {
-            assertEquals(
+            actualVersion.assertIsEqualTo(
                 expectedPluginVersion,
-                actualVersion,
                 "Manifest pluginVersion must match expected. Expected=$expectedPluginVersion Actual=$actualVersion",
             )
         }
 
         expectedSourcePaths.forEach { path ->
-            assertTrue(
-                manifest.contains("source|$path|"),
+            manifest.contains("source|$path|").assertIsEqualTo(
+                true,
                 "Manifest should include source entry for '$path'. Content:\n$manifest",
             )
         }
     }
 
     protected fun assertManifestContainsDependencyIngredients(manifest: String, context: String) {
-        assertTrue(
-            manifest.lineSequence().any { it.startsWith("classpath|") },
+        manifest.lineSequence().any { it.startsWith("classpath|") }.assertIsEqualTo(
+            true,
             "Manifest should include dependency/classpath ingredients ($context). Content:\n$manifest",
         )
     }
@@ -146,11 +147,11 @@ abstract class FingerprintFunctionalTestBase {
     }
 
     protected fun assertFingerprintChanged(before: String, after: String, message: String) {
-        assert(before != after) { "$message Old: $before, New: $after" }
+        (before != after).assertIsEqualTo(true, "$message Old: $before, New: $after")
     }
 
     protected fun assertFingerprintUnchanged(before: String, after: String, message: String) {
-        assert(before == after) { "$message Old: $before, New: $after" }
+        (before == after).assertIsEqualTo(true, "$message Old: $before, New: $after")
     }
 
     protected fun kmpBuild(

@@ -1,5 +1,6 @@
 package com.zegreatrob.tools.tagger
 
+import com.zegreatrob.minassert.assertIsEqualTo
 import com.zegreatrob.testmints.setup
 import com.zegreatrob.tools.cli.readFromFile
 import com.zegreatrob.tools.cli.writeToFile
@@ -11,7 +12,6 @@ import kotlinx.serialization.json.Json
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
-import kotlin.test.assertEquals
 
 interface GenerateSettingsFileTestSpec {
     private val taggerFile get() = "$projectDir/.tagger"
@@ -41,7 +41,7 @@ interface GenerateSettingsFileTestSpec {
     }) exercise {
         execute()
     } verify { result ->
-        assertEquals(TestResult.Success(prettyJson.encodeToString(runtimeDefaultConfig)), result)
+        result.assertIsEqualTo(TestResult.Success(prettyJson.encodeToString(runtimeDefaultConfig)))
     }
 
     @Test
@@ -49,8 +49,10 @@ interface GenerateSettingsFileTestSpec {
     }) exercise {
         execute(file = "")
     } verify { result ->
-        assertEquals(TestResult.Success("Saved to .tagger"), result)
-        assertEquals(runtimeDefaultConfig, readFromFile(taggerFile)?.let(prettyJson::decodeFromString))
+        result.assertIsEqualTo(TestResult.Success("Saved to .tagger"))
+        readFromFile(taggerFile)
+            ?.let { prettyJson.decodeFromString<TaggerConfig>(it) }
+            .assertIsEqualTo(runtimeDefaultConfig)
     }
 
     @Test
@@ -59,8 +61,10 @@ interface GenerateSettingsFileTestSpec {
     }) exercise {
         execute(file = fileName)
     } verify { result ->
-        assertEquals(TestResult.Success("Saved to $fileName"), result)
-        assertEquals(runtimeDefaultConfig, readFromFile("$projectDir/$fileName")?.let(prettyJson::decodeFromString))
+        result.assertIsEqualTo(TestResult.Success("Saved to $fileName"))
+        readFromFile("$projectDir/$fileName")
+            ?.let { prettyJson.decodeFromString<TaggerConfig>(it) }
+            .assertIsEqualTo(runtimeDefaultConfig)
     }
 
     @Test
@@ -70,7 +74,7 @@ interface GenerateSettingsFileTestSpec {
     } exercise {
         execute(file = "")
     } verify { result ->
-        assertEquals(TestResult.Failure("File already exists."), result)
+        result.assertIsEqualTo(TestResult.Failure("File already exists."))
     }
 
     @Test
@@ -86,15 +90,16 @@ interface GenerateSettingsFileTestSpec {
     } exercise {
         execute(file = "")
     } verify { result ->
-        assertEquals(result is TestResult.Success, true, "$result")
-        assertEquals(
-            runtimeDefaultConfig.copy(
-                releaseBranch = config.releaseBranch,
-                implicitPatch = config.implicitPatch,
-                userName = config.userName,
-            ),
-            readFromFile(taggerFile)?.let(Json::decodeFromString),
-        )
+        (result is TestResult.Success).assertIsEqualTo(true, "$result")
+        readFromFile(taggerFile)
+            ?.let { Json.decodeFromString<TaggerConfig>(it) }
+            .assertIsEqualTo(
+                runtimeDefaultConfig.copy(
+                    releaseBranch = config.releaseBranch,
+                    implicitPatch = config.implicitPatch,
+                    userName = config.userName,
+                ),
+            )
     }
 
     @Test
@@ -109,7 +114,7 @@ interface GenerateSettingsFileTestSpec {
     } exercise {
         execute(merge = true)
     } verify { result ->
-        assertEquals(
+        result.assertIsEqualTo(
             TestResult.Success(
                 prettyJson.encodeToString(
                     runtimeDefaultConfig.copy(
@@ -119,7 +124,6 @@ interface GenerateSettingsFileTestSpec {
                     ),
                 ),
             ),
-            result,
         )
     }
 }

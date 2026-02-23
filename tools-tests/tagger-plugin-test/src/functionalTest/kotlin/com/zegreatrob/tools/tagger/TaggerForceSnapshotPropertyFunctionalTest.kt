@@ -1,12 +1,12 @@
 package com.zegreatrob.tools.tagger
 
+import com.zegreatrob.minassert.assertIsEqualTo
 import com.zegreatrob.testmints.setup
 import com.zegreatrob.tools.test.git.initializeGitRepo
 import org.gradle.testkit.runner.GradleRunner
 import org.junit.jupiter.api.io.TempDir
 import java.io.File
 import kotlin.test.Test
-import kotlin.test.assertContains
 
 class TaggerForceSnapshotPropertyFunctionalTest {
 
@@ -48,7 +48,7 @@ class TaggerForceSnapshotPropertyFunctionalTest {
     } exercise {
         runner.build().output
     } verify { output ->
-        assertContains(output, "1.2.4-SNAPSHOT")
-        assertContains(output, "FORCED")
+        output.contains("1.2.4-SNAPSHOT").assertIsEqualTo(true, "Expected snapshot version in output.\n$output")
+        output.contains("FORCED").assertIsEqualTo(true, "Expected FORCED reason in output.\n$output")
     }
 }

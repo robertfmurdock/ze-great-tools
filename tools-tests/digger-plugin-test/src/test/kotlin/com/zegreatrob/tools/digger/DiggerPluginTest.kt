@@ -1,9 +1,9 @@
 package com.zegreatrob.tools.digger
 
+import com.zegreatrob.minassert.assertIsNotEqualTo
 import com.zegreatrob.testmints.setup
 import org.gradle.testfixtures.ProjectBuilder
 import kotlin.test.Test
-import kotlin.test.assertNotNull
 
 class DiggerPluginTest {
     @Test
@@ -12,6 +12,6 @@ class DiggerPluginTest {
     }) exercise {
         project.plugins.apply("com.zegreatrob.tools.digger")
     } verify {
-        assertNotNull(project.tasks.findByName("currentContributionData"))
+        project.tasks.findByName("currentContributionData").assertIsNotEqualTo(null)
     }
 }

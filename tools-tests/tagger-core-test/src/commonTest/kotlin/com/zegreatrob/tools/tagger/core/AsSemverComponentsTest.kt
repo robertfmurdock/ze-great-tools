@@ -1,8 +1,8 @@
 package com.zegreatrob.tools.tagger.core
 
+import com.zegreatrob.minassert.assertIsEqualTo
 import com.zegreatrob.testmints.setup
 import kotlin.test.Test
-import kotlin.test.assertEquals
 
 class AsSemverComponentsTest {
     @Test
@@ -11,7 +11,7 @@ class AsSemverComponentsTest {
     }) exercise {
         version.asSemverComponents()
     } verify { result ->
-        assertEquals(listOf(3, 1, 7), result)
+        result.assertIsEqualTo(listOf(3, 1, 7))
     }
 
     @Test
@@ -20,7 +20,7 @@ class AsSemverComponentsTest {
     }) exercise {
         version.asSemverComponents()
     } verify { result ->
-        assertEquals(listOf(1, 2, 3), result)
+        result.assertIsEqualTo(listOf(1, 2, 3))
     }
 
     @Test
@@ -29,6 +29,6 @@ class AsSemverComponentsTest {
     }) exercise {
         version.asSemverComponents()
     } verify { result ->
-        assertEquals(listOf(3, 2, 1), result)
+        result.assertIsEqualTo(listOf(3, 2, 1))
     }
 }

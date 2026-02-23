@@ -1,10 +1,10 @@
 package com.zegreatrob.tools.tagger
 
+import com.zegreatrob.minassert.assertIsEqualTo
+import com.zegreatrob.minassert.assertIsNotEqualTo
 import com.zegreatrob.testmints.setup
 import org.gradle.testfixtures.ProjectBuilder
 import kotlin.test.Test
-import kotlin.test.assertNotNull
-import kotlin.test.assertTrue
 
 class TaggerPluginTest {
     @Test
@@ -13,7 +13,7 @@ class TaggerPluginTest {
     }) exercise {
         project.plugins.apply("com.zegreatrob.tools.tagger")
     } verify {
-        assertNotNull(project.tasks.findByName("calculateVersion"))
+        project.tasks.findByName("calculateVersion").assertIsNotEqualTo(null)
     }
 
     @Test
@@ -35,15 +35,11 @@ class TaggerPluginTest {
         val innerProject1Check = innerProject1.tasks.register("check")
         val tagTask = rootProject.tasks.findByName("tag")!!
 
-        assertTrue(
-            tagTask.mustRunAfter.getDependencies(tagTask)
-                .contains(rootCheck),
-            "Did not run after root check",
-        )
-        assertTrue(
-            tagTask.mustRunAfter.getDependencies(tagTask)
-                .contains(innerProject1Check.get()),
-            "Did not run after inner project check",
-        )
+        tagTask.mustRunAfter.getDependencies(tagTask)
+            .contains(rootCheck)
+            .assertIsEqualTo(true, "Did not run after root check")
+        tagTask.mustRunAfter.getDependencies(tagTask)
+            .contains(innerProject1Check.get())
+            .assertIsEqualTo(true, "Did not run after inner project check")
     }
 }

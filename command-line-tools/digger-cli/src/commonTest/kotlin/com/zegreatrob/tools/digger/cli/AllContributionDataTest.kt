@@ -1,9 +1,9 @@
 package com.zegreatrob.tools.digger.cli
 
 import com.github.ajalt.clikt.testing.test
+import com.zegreatrob.minassert.assertIsEqualTo
 import com.zegreatrob.tools.cli.readFromFile
 import com.zegreatrob.tools.digger.AllContributionTestSpec
-import kotlin.test.assertEquals
 
 class AllContributionDataTest : AllContributionTestSpec {
 
@@ -52,7 +52,7 @@ class AllContributionDataTest : AllContributionTestSpec {
         AllContributionData()
             .test(arguments)
             .output
-            .let { assertEquals("Data written to ${outputFile}\n", it) }
+            .let { it.assertIsEqualTo("Data written to ${outputFile}\n") }
         return readFromFile(outputFile) ?: ""
     }
 }

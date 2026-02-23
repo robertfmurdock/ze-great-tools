@@ -1,8 +1,8 @@
 package com.zegreatrob.tools.fingerprint
 
+import com.zegreatrob.minassert.assertIsEqualTo
 import com.zegreatrob.testmints.setup
 import org.junit.jupiter.api.Test
-import kotlin.test.assertTrue
 
 class FingerprintArtifactFunctionalTest : FingerprintFunctionalTestBase() {
 
@@ -279,10 +279,12 @@ class FingerprintArtifactFunctionalTest : FingerprintFunctionalTestBase() {
     } exercise {
         fun assertManifestShowsJvmJarWasFingerprinted(context: String) {
             val manifest = fingerprintManifestFile().readText()
-            assertTrue(
-                manifest.lineSequence().any { it.startsWith("artifact|") && it.contains("jvm", ignoreCase = true) && it.contains("jar", ignoreCase = true) },
-                "Manifest must include an artifact line for the KMP JVM jar ($context). Manifest:\n$manifest",
-            )
+            manifest.lineSequence()
+                .any { it.startsWith("artifact|") && it.contains("jvm", ignoreCase = true) && it.contains("jar", ignoreCase = true) }
+                .assertIsEqualTo(
+                    true,
+                    "Manifest must include an artifact line for the KMP JVM jar ($context). Manifest:\n$manifest",
+                )
         }
 
         val baselineHash = runFingerprint()

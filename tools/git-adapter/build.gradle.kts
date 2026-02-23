@@ -25,6 +25,7 @@ dependencies {
     commonMainApi("org.jetbrains.kotlinx:kotlinx-datetime")
     commonTestImplementation(kotlin("test", embeddedKotlinVersion))
     commonTestImplementation(project(":git-test"))
+    commonTestImplementation(libs.com.zegreatrob.testmints.minassert)
     commonTestImplementation(libs.com.zegreatrob.testmints.standard)
     commonTestImplementation(libs.com.zegreatrob.testmints.async)
     "jvmTestImplementation"(kotlin("test-junit5", embeddedKotlinVersion))

@@ -1,11 +1,11 @@
 package com.zegreatrob.tools.digger.cli
 
 import com.github.ajalt.clikt.testing.test
+import com.zegreatrob.minassert.assertIsEqualTo
+import com.zegreatrob.minassert.assertIsNotEqualTo
 import com.zegreatrob.testmints.setup
 import com.zegreatrob.tools.test.git.getEnvironmentVariable
 import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertNotNull
 
 class DiggerTest {
 
@@ -14,10 +14,10 @@ class DiggerTest {
         val expectedVersion = getEnvironmentVariable("EXPECTED_VERSION")
         val command = cli()
     }) {
-        assertNotNull(expectedVersion, "Test not setup correctly - include build version")
+        expectedVersion.assertIsNotEqualTo(null, "Test not setup correctly - include build version")
     } exercise {
         command.test("--version")
     } verify { result ->
-        assertEquals("digger version $expectedVersion", result.output.trim())
+        result.output.trim().assertIsEqualTo("digger version $expectedVersion")
     }
 }

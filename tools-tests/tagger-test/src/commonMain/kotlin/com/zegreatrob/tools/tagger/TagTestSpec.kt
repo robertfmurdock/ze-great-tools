@@ -1,5 +1,7 @@
 package com.zegreatrob.tools.tagger
 
+import com.zegreatrob.minassert.assertIsEqualTo
+import com.zegreatrob.minassert.assertIsNotEqualTo
 import com.zegreatrob.testmints.setup
 import com.zegreatrob.tools.adapter.git.GitAdapter
 import com.zegreatrob.tools.adapter.git.runProcess
@@ -12,11 +14,6 @@ import com.zegreatrob.tools.test.git.removeDirectory
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
-import kotlin.test.assertContains
-import kotlin.test.assertEquals
-import kotlin.test.assertIs
-import kotlin.test.assertIsNot
-import kotlin.test.assertNotEquals
 
 interface TagTestSpec {
     var projectDir: String
@@ -34,14 +31,12 @@ interface TagTestSpec {
 
     @BeforeTest
     fun checkPrerequisites() {
-        assertEquals(
+        getEnvironmentVariable("GIT_CONFIG_GLOBAL").assertIsEqualTo(
             "/dev/null",
-            getEnvironmentVariable("GIT_CONFIG_GLOBAL"),
             "Ensure this is set for the test to work as intended",
         )
-        assertEquals(
+        getEnvironmentVariable("GIT_CONFIG_SYSTEM").assertIsEqualTo(
             "/dev/null",
-            getEnvironmentVariable("GIT_CONFIG_SYSTEM"),
             "Ensure this is set for the test to work as intended",
         )
     }
@@ -92,8 +87,8 @@ interface TagTestSpec {
     } exercise {
         execute(expectedVersion)
     } verify { result ->
-        assertIsNot<TestResult.Failure>(result, message = "$result")
-        assertEquals(expectedVersion, gitAdapter.showTag("HEAD")?.name)
+        (result is TestResult.Failure).assertIsEqualTo(false, "$result")
+        gitAdapter.showTag("HEAD")?.name.assertIsEqualTo(expectedVersion)
     }
 
     fun GitAdapter.disableGpgSign() {
@@ -126,8 +121,8 @@ interface TagTestSpec {
     } exercise {
         execute(expectedVersion)
     } verify { result ->
-        assertIsNot<TestResult.Failure>(result, message = "$result")
-        assertEquals(expectedVersion, gitAdapter.showTag("HEAD")?.name)
+        (result is TestResult.Failure).assertIsEqualTo(false, "$result")
+        gitAdapter.showTag("HEAD")?.name.assertIsEqualTo(expectedVersion)
     }
 
     @Test
@@ -159,11 +154,13 @@ interface TagTestSpec {
     } exercise {
         execute(version)
     } verify { result ->
-        assertContains(
-            charSequence = assertIs<TestResult.Failure>(result).reason,
-            other = expectedError,
+        val failure = result as? TestResult.Failure
+        failure.assertIsNotEqualTo(null, "Expected failure result.")
+        failure?.reason?.contains(expectedError).assertIsEqualTo(
+            true,
+            "Expected error to include: $expectedError\nActual:\n${failure?.reason}",
         )
-        assertNotEquals(version, gitAdapter.showTag("HEAD")?.name)
+        gitAdapter.showTag("HEAD")?.name.assertIsNotEqualTo(version)
     }
 
     @Test
@@ -191,11 +188,13 @@ interface TagTestSpec {
     } exercise {
         execute(version)
     } verify { result ->
-        assertContains(
-            charSequence = assertIs<TestResult.Failure>(result).reason,
-            other = expectedError,
+        val failure = result as? TestResult.Failure
+        failure.assertIsNotEqualTo(null, "Expected failure result.")
+        failure?.reason?.contains(expectedError).assertIsEqualTo(
+            true,
+            "Expected error to include: $expectedError\nActual:\n${failure?.reason}",
         )
-        assertNotEquals(version, gitAdapter.showTag("HEAD")?.name)
+        gitAdapter.showTag("HEAD")?.name.assertIsNotEqualTo(version)
     }
 
     @Test
@@ -223,10 +222,12 @@ interface TagTestSpec {
     } exercise {
         execute(version)
     } verify { result ->
-        assertContains(
-            charSequence = assertIs<TestResult.Success>(result).message,
-            other = expectedMessage,
+        val success = result as? TestResult.Success
+        success.assertIsNotEqualTo(null, "Expected success result.")
+        success?.message?.contains(expectedMessage).assertIsEqualTo(
+            true,
+            "Expected message to include: $expectedMessage\nActual:\n${success?.message}",
         )
-        assertNotEquals(version, gitAdapter.showTag("HEAD")?.name)
+        gitAdapter.showTag("HEAD")?.name.assertIsNotEqualTo(version)
     }
 }

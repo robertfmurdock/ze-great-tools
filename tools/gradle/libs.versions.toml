@@ -1,5 +1,6 @@
 [libraries]
 com-zegreatrob-testmints-async = { module = "com.zegreatrob.testmints:async", version.ref = "com-zegreatrob-testmints" }
+com-zegreatrob-testmints-minassert = { module = "com.zegreatrob.testmints:minassert", version.ref = "com-zegreatrob-testmints" }
 com-zegreatrob-testmints-standard = { module = "com.zegreatrob.testmints:standard", version.ref = "com-zegreatrob-testmints" }
 org-jetbrains-kotlinx-kotlinx-coroutines-bom = "org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.10.2"
 org-jetbrains-kotlinx-kotlinx-datetime = "org.jetbrains.kotlinx:kotlinx-datetime:0.7.1"

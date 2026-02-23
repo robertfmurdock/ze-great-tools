@@ -1,10 +1,10 @@
 package com.zegreatrob.tools.adapter.git
 
+import com.zegreatrob.minassert.assertIsEqualTo
 import com.zegreatrob.testmints.async.asyncSetup
 import com.zegreatrob.tools.test.git.addCommitWithMessage
 import com.zegreatrob.tools.test.git.delayLongEnoughToAffectGitDate
 import com.zegreatrob.tools.test.git.initializeGitRepo
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.io.TempDir
 import java.io.File
 import kotlin.test.Test
@@ -40,6 +40,6 @@ class GitAdapterTest {
     } exercise {
         wrapper.listTags()
     } verify { result ->
-        assertEquals(listOf(newestTag, newerTag, initialTag), result.map { it.name })
+        result.map { it.name }.assertIsEqualTo(listOf(newestTag, newerTag, initialTag))
     }
 }

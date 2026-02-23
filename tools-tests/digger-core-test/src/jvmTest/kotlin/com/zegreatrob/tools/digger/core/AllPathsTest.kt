@@ -1,5 +1,6 @@
 package com.zegreatrob.tools.digger.core
 
+import com.zegreatrob.minassert.assertIsEqualTo
 import com.zegreatrob.testmints.setup
 import com.zegreatrob.tools.adapter.git.CommitRef
 import com.zegreatrob.tools.adapter.git.GitAdapter
@@ -10,7 +11,6 @@ import com.zegreatrob.tools.test.git.switchToNewBranch
 import org.junit.jupiter.api.io.TempDir
 import java.io.File
 import kotlin.test.Test
-import kotlin.test.assertEquals
 
 class AllPathsTest {
 
@@ -455,9 +455,8 @@ class AllPathsTest {
         expected: Set<List<CommitRef>>,
         allPaths: MutableList<List<CommitRef>>,
     ) {
-        assertEquals(
+        allPaths.toSet().justIds().assertIsEqualTo(
             expected.justIds(),
-            allPaths.toSet().justIds(),
             errorMessage(expected, allPaths.toSet()),
         )
     }

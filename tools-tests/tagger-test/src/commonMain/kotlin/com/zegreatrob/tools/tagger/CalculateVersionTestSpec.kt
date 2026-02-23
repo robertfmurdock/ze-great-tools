@@ -1,5 +1,6 @@
 package com.zegreatrob.tools.tagger
 
+import com.zegreatrob.minassert.assertIsEqualTo
 import com.zegreatrob.testmints.setup
 import com.zegreatrob.tools.adapter.git.GitAdapter
 import com.zegreatrob.tools.test.git.addCommitWithMessage
@@ -9,10 +10,7 @@ import com.zegreatrob.tools.test.git.initializeGitRepo
 import com.zegreatrob.tools.test.git.removeDirectory
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
-import kotlin.test.DefaultAsserter.assertTrue
 import kotlin.test.Test
-import kotlin.test.assertContains
-import kotlin.test.assertEquals
 import kotlin.test.fail
 
 interface CalculateVersionTestSpec {
@@ -56,14 +54,12 @@ interface CalculateVersionTestSpec {
 
     @BeforeTest
     fun checkPrerequisites() {
-        assertEquals(
+        getEnvironmentVariable("GIT_CONFIG_GLOBAL").assertIsEqualTo(
             "/dev/null",
-            getEnvironmentVariable("GIT_CONFIG_GLOBAL"),
             "Ensure this is set for the test to work as intended",
         )
-        assertEquals(
+        getEnvironmentVariable("GIT_CONFIG_SYSTEM").assertIsEqualTo(
             "/dev/null",
-            getEnvironmentVariable("GIT_CONFIG_SYSTEM"),
             "Ensure this is set for the test to work as intended",
         )
     }
@@ -80,9 +76,11 @@ interface CalculateVersionTestSpec {
     } verify { result ->
         when (result) {
             is TestResult.Failure ->
-                assertContains(
-                    result.reason,
+                result.reason.contains(
                     Regex("Inappropriate configuration: repository has no tags.\\s*\n\\s*If this is a new repository, use `tag` to set the initial version."),
+                ).assertIsEqualTo(
+                    true,
+                    "Expected missing tags error. Output:\n${result.reason}",
                 )
 
             is TestResult.Success -> fail("Should not have succeeded.")
@@ -103,10 +101,9 @@ interface CalculateVersionTestSpec {
         execute()
     } verify { result ->
         when (result) {
-            is TestResult.Failure -> assertContains(
-                result.reason,
-                "Inappropriate configuration: repository has no remote.",
-            )
+            is TestResult.Failure ->
+                result.reason.contains("Inappropriate configuration: repository has no remote.")
+                    .assertIsEqualTo(true, "Expected missing remote error. Output:\n${result.reason}")
 
             is TestResult.Success -> fail("Should not have succeeded.")
         }
@@ -127,7 +124,7 @@ interface CalculateVersionTestSpec {
         execute()
     } verify { result ->
         when (result) {
-            is TestResult.Success -> assertEquals("1.2.4-SNAPSHOT", result.message)
+            is TestResult.Success -> result.message.assertIsEqualTo("1.2.4-SNAPSHOT")
             is TestResult.Failure -> fail("Expected success but got ${result.reason}")
         }
     }
@@ -162,7 +159,7 @@ interface CalculateVersionTestSpec {
         execute()
     } verify { result ->
         when (result) {
-            is TestResult.Success -> assertEquals("1.0.23-SNAPSHOT", result.message)
+            is TestResult.Success -> result.message.assertIsEqualTo("1.0.23-SNAPSHOT")
             is TestResult.Failure -> fail("Expected success but got ${result.reason}")
         }
     }
@@ -176,10 +173,13 @@ interface CalculateVersionTestSpec {
         execute()
     } verify { result ->
         when (result) {
-            is TestResult.Failure -> assertContains(
-                result.reason,
-                "Inappropriate configuration: the most recent tag did not have all three semver components.",
-            )
+            is TestResult.Failure ->
+                result.reason.contains(
+                    "Inappropriate configuration: the most recent tag did not have all three semver components.",
+                ).assertIsEqualTo(
+                    true,
+                    "Expected malformed tag error. Output:\n${result.reason}",
+                )
 
             is TestResult.Success -> fail("Should not have succeeded.")
         }
@@ -194,7 +194,7 @@ interface CalculateVersionTestSpec {
         execute()
     } verify { result ->
         when (result) {
-            is TestResult.Success -> assertEquals("1.2.4", result.message)
+            is TestResult.Success -> result.message.assertIsEqualTo("1.2.4")
             is TestResult.Failure -> fail("Expected success but got ${result.reason}")
         }
     }
@@ -208,7 +208,7 @@ interface CalculateVersionTestSpec {
         execute()
     } verify { result ->
         when (result) {
-            is TestResult.Success -> assertEquals("1.2.3-SNAPSHOT", result.message)
+            is TestResult.Success -> result.message.assertIsEqualTo("1.2.3-SNAPSHOT")
             is TestResult.Failure -> fail("Expected success but got ${result.reason}")
         }
     }
@@ -222,7 +222,7 @@ interface CalculateVersionTestSpec {
         execute()
     } verify { result ->
         when (result) {
-            is TestResult.Success -> assertEquals("1.2.3-SNAPSHOT", result.message)
+            is TestResult.Success -> result.message.assertIsEqualTo("1.2.3-SNAPSHOT")
             is TestResult.Failure -> fail("Expected success but got ${result.reason}")
         }
     }
@@ -236,7 +236,7 @@ interface CalculateVersionTestSpec {
         execute()
     } verify { result ->
         when (result) {
-            is TestResult.Success -> assertEquals("1.2.4", result.message)
+            is TestResult.Success -> result.message.assertIsEqualTo("1.2.4")
             is TestResult.Failure -> fail("Expected success but got ${result.reason}")
         }
     }
@@ -250,7 +250,7 @@ interface CalculateVersionTestSpec {
         execute()
     } verify { result ->
         when (result) {
-            is TestResult.Success -> assertEquals("1.2.4", result.message)
+            is TestResult.Success -> result.message.assertIsEqualTo("1.2.4")
             is TestResult.Failure -> fail("Expected success but got ${result.reason}")
         }
     }
@@ -264,7 +264,7 @@ interface CalculateVersionTestSpec {
         execute()
     } verify { result ->
         when (result) {
-            is TestResult.Success -> assertEquals("1.2.3-SNAPSHOT", result.message)
+            is TestResult.Success -> result.message.assertIsEqualTo("1.2.3-SNAPSHOT")
             is TestResult.Failure -> fail("Expected success but got ${result.reason}")
         }
     }
@@ -280,7 +280,7 @@ interface CalculateVersionTestSpec {
         execute()
     } verify { result ->
         when (result) {
-            is TestResult.Success -> assertEquals("1.3.0", result.message)
+            is TestResult.Success -> result.message.assertIsEqualTo("1.3.0")
             is TestResult.Failure -> fail("Expected success but got ${result.reason}")
         }
     }
@@ -297,7 +297,7 @@ interface CalculateVersionTestSpec {
         execute()
     } verify { result ->
         when (result) {
-            is TestResult.Success -> assertEquals("2.0.0", result.message)
+            is TestResult.Success -> result.message.assertIsEqualTo("2.0.0")
             is TestResult.Failure -> fail("Expected success but got ${result.reason}")
         }
     }
@@ -320,7 +320,7 @@ interface CalculateVersionTestSpec {
         execute()
     } verify { result ->
         when (result) {
-            is TestResult.Success -> assertEquals("2.0.0", result.message)
+            is TestResult.Success -> result.message.assertIsEqualTo("2.0.0")
             is TestResult.Failure -> fail("Expected success but got ${result.reason}")
         }
     }
@@ -343,7 +343,7 @@ interface CalculateVersionTestSpec {
         execute()
     } verify { result ->
         when (result) {
-            is TestResult.Success -> assertEquals("1.3.0", result.message)
+            is TestResult.Success -> result.message.assertIsEqualTo("1.3.0")
             is TestResult.Failure -> fail("Expected success but got ${result.reason}")
         }
     }
@@ -363,7 +363,7 @@ interface CalculateVersionTestSpec {
         execute()
     } verify { result ->
         when (result) {
-            is TestResult.Success -> assertEquals("1.3.0", result.message)
+            is TestResult.Success -> result.message.assertIsEqualTo("1.3.0")
             is TestResult.Failure -> fail("Expected success but got ${result.reason}")
         }
     }
@@ -380,7 +380,7 @@ interface CalculateVersionTestSpec {
         execute()
     } verify { result ->
         when (result) {
-            is TestResult.Success -> assertEquals("1.2.4", result.message)
+            is TestResult.Success -> result.message.assertIsEqualTo("1.2.4")
             is TestResult.Failure -> fail("Expected success but got ${result.reason}")
         }
     }
@@ -400,7 +400,7 @@ interface CalculateVersionTestSpec {
         execute()
     } verify { result ->
         when (result) {
-            is TestResult.Success -> assertEquals("1.2.4", result.message)
+            is TestResult.Success -> result.message.assertIsEqualTo("1.2.4")
             is TestResult.Failure -> fail("Expected success but got ${result.reason}")
         }
     }
@@ -420,7 +420,7 @@ interface CalculateVersionTestSpec {
         execute()
     } verify { result ->
         when (result) {
-            is TestResult.Success -> assertEquals("1.2.3-SNAPSHOT", result.message)
+            is TestResult.Success -> result.message.assertIsEqualTo("1.2.3-SNAPSHOT")
             is TestResult.Failure -> fail("Expected success but got ${result.reason}")
         }
     }
@@ -440,7 +440,7 @@ interface CalculateVersionTestSpec {
         execute()
     } verify { result ->
         when (result) {
-            is TestResult.Success -> assertEquals("1.2.3-SNAPSHOT", result.message)
+            is TestResult.Success -> result.message.assertIsEqualTo("1.2.3-SNAPSHOT")
             is TestResult.Failure -> fail("Expected success but got ${result.reason}")
         }
     }
@@ -459,7 +459,7 @@ interface CalculateVersionTestSpec {
         execute()
     } verify { result ->
         when (result) {
-            is TestResult.Success -> assertEquals("2.0.0", result.message)
+            is TestResult.Success -> result.message.assertIsEqualTo("2.0.0")
             is TestResult.Failure -> fail("Expected success but got ${result.reason}")
         }
     }
@@ -476,10 +476,13 @@ interface CalculateVersionTestSpec {
         execute()
     } verify { result ->
         when (result) {
-            is TestResult.Failure -> assertContains(
-                result.reason,
-                "version regex must include groups named 'major', 'minor', 'patch', and 'none'.",
-            )
+            is TestResult.Failure ->
+                result.reason.contains(
+                    "version regex must include groups named 'major', 'minor', 'patch', and 'none'.",
+                ).assertIsEqualTo(
+                    true,
+                    "Expected version regex groups error. Output:\n${result.reason}",
+                )
 
             is TestResult.Success -> fail("Should not have succeeded.")
         }
@@ -499,7 +502,7 @@ interface CalculateVersionTestSpec {
         execute()
     } verify { result ->
         when (result) {
-            is TestResult.Success -> assertEquals("1.2.4-SNAPSHOT", result.message)
+            is TestResult.Success -> result.message.assertIsEqualTo("1.2.4-SNAPSHOT")
             is TestResult.Failure -> fail("Expected success but got ${result.reason}")
         }
     }
@@ -519,10 +522,10 @@ interface CalculateVersionTestSpec {
     } verify { result ->
         when (result) {
             is TestResult.Success -> {
-                assertEquals("1.2.4-SNAPSHOT", result.message)
-                assertTrue(
-                    actual = result.details.contains("FORCED"),
-                    message = "Expected snapshot reason output to include FORCED. Details:\n${result.details}",
+                result.message.assertIsEqualTo("1.2.4-SNAPSHOT")
+                result.details.contains("FORCED").assertIsEqualTo(
+                    true,
+                    "Expected snapshot reason output to include FORCED. Details:\n${result.details}",
                 )
             }
 

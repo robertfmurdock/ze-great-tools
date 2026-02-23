@@ -18,6 +18,7 @@ dependencies {
     commonMainImplementation("com.zegreatrob.tools:digger-core")
     commonMainImplementation("com.zegreatrob.tools:digger-json")
     commonMainImplementation(libs.com.zegreatrob.testmints.async)
+    commonMainImplementation(libs.com.zegreatrob.testmints.minassert)
     commonMainImplementation(libs.com.zegreatrob.testmints.standard)
     commonMainApi("com.zegreatrob.tools:git-test")
     commonMainApi(libs.org.jetbrains.kotlin.kotlin.test)

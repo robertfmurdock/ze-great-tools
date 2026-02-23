@@ -1,10 +1,9 @@
 package com.zegreatrob.tools.fingerprint
 
+import com.zegreatrob.minassert.assertIsEqualTo
 import com.zegreatrob.testmints.setup
 import org.junit.jupiter.api.Test
 import java.io.File
-import kotlin.test.assertEquals
-import kotlin.test.assertTrue
 
 class FingerprintDependencyFunctionalTest : FingerprintFunctionalTestBase() {
 
@@ -35,8 +34,8 @@ class FingerprintDependencyFunctionalTest : FingerprintFunctionalTestBase() {
         assertManifestContainsDependencyIngredients(afterChange.manifest, context = "after dependency change")
 
         assertFingerprintChanged(baseline.hash, afterChange.hash, "Fingerprint should have changed!")
-        assertTrue(
-            baseline.manifest != afterChange.manifest,
+        (baseline.manifest != afterChange.manifest).assertIsEqualTo(
+            true,
             "Manifest should change when non-test dependencies change.\n--- first ---\n${baseline.manifest}\n--- second ---\n${afterChange.manifest}",
         )
     }
@@ -81,8 +80,8 @@ class FingerprintDependencyFunctionalTest : FingerprintFunctionalTestBase() {
         assertManifestContainsDependencyIngredients(afterChange.manifest, context = "after dependency change")
 
         assertFingerprintChanged(baseline.hash, afterChange.hash, "JS fingerprint should have changed!")
-        assertTrue(
-            baseline.manifest != afterChange.manifest,
+        (baseline.manifest != afterChange.manifest).assertIsEqualTo(
+            true,
             "Manifest should change when JS main dependencies change.\n--- first ---\n${baseline.manifest}\n--- second ---\n${afterChange.manifest}",
         )
     }
@@ -121,9 +120,8 @@ class FingerprintDependencyFunctionalTest : FingerprintFunctionalTestBase() {
         assertManifestContainsDependencyIngredients(afterChange.manifest, context = "after test dependency change")
 
         assertFingerprintUnchanged(baseline.hash, afterChange.hash, "Fingerprint should NOT change for test dependencies!")
-        assertEquals(
+        afterChange.manifest.assertIsEqualTo(
             baseline.manifest,
-            afterChange.manifest,
             "Manifest should NOT change for test-only dependency changes.\n--- first ---\n${baseline.manifest}\n--- second ---\n${afterChange.manifest}",
         )
     }
@@ -165,7 +163,10 @@ class FingerprintDependencyFunctionalTest : FingerprintFunctionalTestBase() {
 
         Pair(baselineHash, afterChangeHash)
     } verify { (baselineHash, afterChangeHash) ->
-        assert(baselineHash != afterChangeHash) { "Root fingerprint must change when subproject dependencies change!" }
+        (baselineHash != afterChangeHash).assertIsEqualTo(
+            true,
+            "Root fingerprint must change when subproject dependencies change!",
+        )
     }
 
     @Test

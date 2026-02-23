@@ -15,9 +15,11 @@ kotlin {
 
 dependencies {
     commonTestImplementation("com.zegreatrob.tools:digger-core")
+    commonTestImplementation(libs.com.zegreatrob.testmints.minassert)
     commonTestImplementation(libs.com.zegreatrob.testmints.standard)
     commonTestImplementation(libs.org.jetbrains.kotlin.kotlin.test)
     "jvmTestImplementation"(libs.org.jetbrains.kotlin.kotlin.test.junit5)
+    "jvmTestImplementation"(libs.com.zegreatrob.testmints.minassert)
     "jvmTestImplementation"(libs.com.zegreatrob.testmints.standard)
     "jvmTestImplementation"("com.zegreatrob.tools:git-test")
 }

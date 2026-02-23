@@ -1,9 +1,9 @@
 package com.zegreatrob.tools.digger.cli
 
 import com.github.ajalt.clikt.testing.test
+import com.zegreatrob.minassert.assertIsEqualTo
 import com.zegreatrob.tools.cli.readFromFile
 import com.zegreatrob.tools.digger.CurrentContributionTestSpec
-import kotlin.test.assertEquals
 
 class CurrentContributionDataTest : CurrentContributionTestSpec {
 
@@ -46,7 +46,7 @@ class CurrentContributionDataTest : CurrentContributionTestSpec {
 
     override fun runCurrentContributionData(): String {
         CurrentContributionData().test(arguments).output
-            .let { assertEquals("Data written to ${outputFile}\n", it) }
+            .let { it.assertIsEqualTo("Data written to ${outputFile}\n") }
         return readFromFile(outputFile) ?: ""
     }
 }

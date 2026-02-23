@@ -1,12 +1,11 @@
 package com.zegreatrob.tools.fingerprint
 
+import com.zegreatrob.minassert.assertIsEqualTo
+import com.zegreatrob.minassert.assertIsNotEqualTo
 import com.zegreatrob.testmints.setup
 import org.gradle.testkit.runner.TaskOutcome
 import org.junit.jupiter.api.Test
 import java.io.File
-import kotlin.test.assertEquals
-import kotlin.test.assertNotNull
-import kotlin.test.assertTrue
 
 class FingerprintAggregateFunctionalTest : FingerprintFunctionalTestBase() {
 
@@ -58,8 +57,8 @@ class FingerprintAggregateFunctionalTest : FingerprintFunctionalTestBase() {
         val includedHash = fingerprintFile(includedDir).readText()
         val aggregateHash = mainDir.resolve("build/aggregate-fingerprint.txt").readText()
 
-        assert(aggregateHash != localHash) { "Aggregate should not match local hash" }
-        assert(aggregateHash != includedHash) { "Aggregate should not match included hash" }
+        (aggregateHash != localHash).assertIsEqualTo(true, "Aggregate should not match local hash")
+        (aggregateHash != includedHash).assertIsEqualTo(true, "Aggregate should not match included hash")
     }
 
     @Test
@@ -89,11 +88,9 @@ class FingerprintAggregateFunctionalTest : FingerprintFunctionalTestBase() {
         gradle(mainDir, "aggregateFingerprints")
     } verify { result ->
         val includedTaskResult = result.task(":$includedBuildName:generateFingerprint")
-        assertNotNull(includedTaskResult, "Task in included build should have been triggered")
-        assertTrue(
-            includedTaskResult.outcome == TaskOutcome.SUCCESS || includedTaskResult.outcome == TaskOutcome.UP_TO_DATE,
-            "Included task should have executed successfully",
-        )
+        includedTaskResult.assertIsNotEqualTo(null, "Task in included build should have been triggered")
+        (includedTaskResult?.outcome == TaskOutcome.SUCCESS || includedTaskResult?.outcome == TaskOutcome.UP_TO_DATE)
+            .assertIsEqualTo(true, "Included task should have executed successfully")
     }
 
     @Test
@@ -115,9 +112,10 @@ class FingerprintAggregateFunctionalTest : FingerprintFunctionalTestBase() {
     } exercise {
         gradle(mainDir, "aggregateFingerprints", "--stacktrace", "--no-configuration-cache")
     } verify { result ->
-        assertTrue(result.output.contains("SUCCESS"), "Build should succeed even with non-plugin included builds")
+        result.output.contains("SUCCESS")
+            .assertIsEqualTo(true, "Build should succeed even with non-plugin included builds")
         val aggregateFile = mainDir.resolve("build/aggregate-fingerprint.txt")
-        assertTrue(aggregateFile.exists(), "Aggregate file should still be generated")
+        aggregateFile.exists().assertIsEqualTo(true, "Aggregate file should still be generated")
     }
 
     @Test
@@ -167,31 +165,31 @@ class FingerprintAggregateFunctionalTest : FingerprintFunctionalTestBase() {
     } exercise {
         gradle(mainDir, "aggregateFingerprints", "--no-configuration-cache")
     } verify {
-        assertTrue(
-            aggregateFingerprintFile(mainDir).exists(),
+        aggregateFingerprintFile(mainDir).exists().assertIsEqualTo(
+            true,
             "Aggregate fingerprint file should be generated at ${aggregateFingerprintFile(mainDir).path}",
         )
 
         val aggregateManifest = aggregateFingerprintManifestFile(mainDir)
-        assertTrue(
-            aggregateManifest.exists(),
+        aggregateManifest.exists().assertIsEqualTo(
+            true,
             "Aggregate manifest log should be generated at ${aggregateManifest.path}",
         )
 
         val text = aggregateManifest.readText()
 
-        assertTrue(
-            text.contains(includedMarkerName),
+        text.contains(includedMarkerName).assertIsEqualTo(
+            true,
             "Aggregate manifest should include evidence from the included build manifest.\n--- aggregate ---\n$text",
         )
-        assertTrue(
-            text.contains(mainMarkerName),
+        text.contains(mainMarkerName).assertIsEqualTo(
+            true,
             "Aggregate manifest should include evidence from the local/main manifest.\n--- aggregate ---\n$text",
         )
 
         val pluginVersionLines = text.lineSequence().filter { it.startsWith("pluginVersion|") }.toList()
-        assertTrue(
-            pluginVersionLines.size >= 2,
+        (pluginVersionLines.size >= 2).assertIsEqualTo(
+            true,
             "Aggregate manifest should contain pluginVersion lines from multiple manifests. Found=${pluginVersionLines.size}\n--- aggregate ---\n$text",
         )
     }
@@ -207,17 +205,18 @@ class FingerprintAggregateFunctionalTest : FingerprintFunctionalTestBase() {
     } exercise {
         gradle(arguments = arrayOf("aggregateFingerprints", "--no-configuration-cache"))
     } verify { result ->
-        assertEquals(TaskOutcome.SUCCESS, result.task(":aggregateFingerprints")?.outcome)
+        result.task(":aggregateFingerprints")?.outcome.assertIsEqualTo(TaskOutcome.SUCCESS)
 
-        assertTrue(fingerprintFile().exists(), "Local fingerprint should be generated at ${fingerprintFile().path}")
+        fingerprintFile().exists()
+            .assertIsEqualTo(true, "Local fingerprint should be generated at ${fingerprintFile().path}")
         assertFingerprintManifestGeneratedCorrectly()
 
-        assertTrue(
-            aggregateFingerprintFile(testProjectDir).exists(),
+        aggregateFingerprintFile(testProjectDir).exists().assertIsEqualTo(
+            true,
             "Aggregate fingerprint file should be generated at ${aggregateFingerprintFile(testProjectDir).path}",
         )
-        assertTrue(
-            aggregateFingerprintManifestFile(testProjectDir).exists(),
+        aggregateFingerprintManifestFile(testProjectDir).exists().assertIsEqualTo(
+            true,
             "Aggregate manifest log should be generated at ${aggregateFingerprintManifestFile(testProjectDir).path}",
         )
     }

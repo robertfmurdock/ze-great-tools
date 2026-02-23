@@ -1,5 +1,6 @@
 package com.zegreatrob.tools.digger
 
+import com.zegreatrob.minassert.assertIsEqualTo
 import com.zegreatrob.testmints.async.asyncSetup
 import com.zegreatrob.tools.adapter.git.CommitRef
 import com.zegreatrob.tools.adapter.git.TagRef
@@ -18,7 +19,6 @@ import kotlinx.coroutines.delay
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
-import kotlin.test.assertEquals
 
 interface CurrentContributionTestSpec : SetupWithOverrides {
     var projectDir: String
@@ -47,14 +47,12 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
 
     @BeforeTest
     fun checkPrerequisites() {
-        assertEquals(
+        getEnvironmentVariable("GIT_CONFIG_GLOBAL").assertIsEqualTo(
             "/dev/null",
-            getEnvironmentVariable("GIT_CONFIG_GLOBAL"),
             "Ensure this is set for the test to work as intended",
         )
-        assertEquals(
+        getEnvironmentVariable("GIT_CONFIG_SYSTEM").assertIsEqualTo(
             "/dev/null",
-            getEnvironmentVariable("GIT_CONFIG_SYSTEM"),
             "Ensure this is set for the test to work as intended",
         )
     }
@@ -78,14 +76,13 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
     } exercise {
         runCurrentContributionData()
     } verify { output ->
-        assertEquals(
+        parseCurrentAuthors(output).assertIsEqualTo(
             listOf(
                 "first@guy.edu",
                 "funk@test.io",
                 "second@gui.io",
                 "test@funk.edu",
             ),
-            parseCurrentAuthors(output),
         )
     }
 
@@ -103,10 +100,7 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
     } exercise {
         runCurrentContributionData()
     } verify { output ->
-        assertEquals(
-            label,
-            parseContribution(output)?.label,
-        )
+        parseContribution(output)?.label.assertIsEqualTo(label)
     }
 
     @Test
@@ -121,10 +115,7 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
     } exercise {
         runCurrentContributionData()
     } verify { output ->
-        assertEquals(
-            projectDir.split("/").last(),
-            parseContribution(output)?.label,
-        )
+        parseContribution(output)?.label.assertIsEqualTo(projectDir.split("/").last())
     }
 
     @Test
@@ -146,8 +137,8 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
     } exercise {
         runCurrentContributionData()
     } verify { output ->
-        assertEquals("Patch", parseSemver(output))
-        assertEquals(null, parseStoryId(output))
+        parseSemver(output).assertIsEqualTo("Patch")
+        parseStoryId(output).assertIsEqualTo(null)
     }
 
     @Test
@@ -175,8 +166,8 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
     } exercise {
         runCurrentContributionData()
     } verify { output ->
-        assertEquals("Major", parseSemver(output))
-        assertEquals(null, parseStoryId(output))
+        parseSemver(output).assertIsEqualTo("Major")
+        parseStoryId(output).assertIsEqualTo(null)
     }
 
     @Test
@@ -208,7 +199,7 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
     } exercise {
         runCurrentContributionData()
     } verify { output ->
-        assertEquals(
+        parseCurrentAuthors(output).assertIsEqualTo(
             listOf(
                 "first@guy.edu",
                 "fourth@guy.edu",
@@ -217,7 +208,6 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
                 "test@funk.edu",
                 "third@guy.edu",
             ),
-            parseCurrentAuthors(output),
         )
     }
 
@@ -260,14 +250,13 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
     } exercise {
         runCurrentContributionData()
     } verify { output ->
-        assertEquals(
+        parseCurrentAuthors(output).assertIsEqualTo(
             listOf(
                 "fourth@guy.edu",
                 "funk@test.io",
                 "test@funk.edu",
                 "third@guy.edu",
             ),
-            parseCurrentAuthors(output),
         )
     }
 
@@ -314,8 +303,8 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
         runCurrentContributionData()
     } verify { output ->
         val contribution = parseContribution(output)
-        assertEquals(nowTag.name, contribution?.tagName)
-        assertEquals(nowTag.dateTime, contribution?.tagDateTime)
+        contribution?.tagName.assertIsEqualTo(nowTag.name)
+        contribution?.tagDateTime.assertIsEqualTo(nowTag.dateTime)
     }
 
     @Test
@@ -349,14 +338,13 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
     } exercise {
         runCurrentContributionData()
     } verify { output ->
-        assertEquals(
+        parseCurrentAuthors(output).assertIsEqualTo(
             listOf(
                 "fourth@gui.io",
                 "funk@test.io",
                 "test@funk.edu",
                 "third@guy.edu",
             ),
-            parseCurrentAuthors(output),
         )
     }
 
@@ -372,7 +360,7 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
     } exercise {
         runCurrentContributionData()
     } verify { output ->
-        assertEquals("Major", parseContribution(output)?.semver)
+        parseContribution(output)?.semver.assertIsEqualTo("Major")
     }
 
     @Test
@@ -387,7 +375,7 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
     } exercise {
         runCurrentContributionData()
     } verify { output ->
-        assertEquals("Minor", parseContribution(output)?.semver)
+        parseContribution(output)?.semver.assertIsEqualTo("Minor")
     }
 
     @Test
@@ -402,7 +390,7 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
     } exercise {
         runCurrentContributionData()
     } verify { output ->
-        assertEquals("Patch", parseContribution(output)?.semver)
+        parseContribution(output)?.semver.assertIsEqualTo("Patch")
     }
 
     @Test
@@ -417,7 +405,7 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
     } exercise {
         runCurrentContributionData()
     } verify { output ->
-        assertEquals("None", parseContribution(output)?.semver)
+        parseContribution(output)?.semver.assertIsEqualTo("None")
     }
 
     @Test
@@ -433,7 +421,7 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
         runCurrentContributionData()
     } verify { output ->
         val contribution = parseContribution(output)
-        assertEquals("CowDog-99", contribution?.storyId)
+        contribution?.storyId.assertIsEqualTo("CowDog-99")
     }
 
     @Test
@@ -449,7 +437,7 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
         runCurrentContributionData()
     } verify { output ->
         val contribution = parseContribution(output)
-        assertEquals(4, contribution?.ease)
+        contribution?.ease.assertIsEqualTo(4)
     }
 
     @Test
@@ -486,7 +474,7 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
     } exercise {
         runCurrentContributionData()
     } verify { allOutput ->
-        assertEquals(
+        parseContribution(allOutput).assertIsEqualTo(
             toContribution(
                 lastCommit = merge2Commit,
                 firstCommit = secondCommit,
@@ -494,7 +482,6 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
                 tag = secondRelease,
                 expectedAuthors = defaultAuthors,
             ),
-            parseContribution(allOutput),
         )
     }
 
@@ -533,14 +520,13 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
     } exercise {
         runCurrentContributionData()
     } verify { allOutput ->
-        assertEquals(
+        parseContribution(allOutput).assertIsEqualTo(
             toContribution(
                 lastCommit = merge2Commit,
                 firstCommit = secondCommit,
                 expectedCommitCount = 7,
                 expectedAuthors = defaultAuthors,
             ),
-            parseContribution(allOutput),
         )
     }
 
@@ -573,7 +559,7 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
     } exercise {
         runCurrentContributionData()
     } verify { allOutput ->
-        assertEquals(
+        parseContribution(allOutput).assertIsEqualTo(
             toContribution(
                 lastCommit = lastCommit,
                 firstCommit = secondCommit,
@@ -581,7 +567,6 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
                 tag = thirdRelease,
                 expectedAuthors = defaultAuthors,
             ),
-            parseContribution(allOutput),
         )
     }
 

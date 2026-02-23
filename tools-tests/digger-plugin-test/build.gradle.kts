@@ -18,6 +18,7 @@ testing {
 configurations["functionalTestImplementation"].extendsFrom(configurations["testImplementation"])
 
 dependencies {
+    testImplementation(libs.com.zegreatrob.testmints.minassert)
     testImplementation(libs.com.zegreatrob.testmints.standard)
     testImplementation(libs.org.jetbrains.kotlin.kotlin.test.junit5)
     testImplementation("com.zegreatrob.tools:digger-gradle")

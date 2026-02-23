@@ -1,11 +1,10 @@
 package com.zegreatrob.tools.fingerprint
 
+import com.zegreatrob.minassert.assertIsEqualTo
 import com.zegreatrob.testmints.setup
 import org.gradle.testkit.runner.TaskOutcome
 import org.junit.jupiter.api.Test
 import java.io.File
-import kotlin.test.assertEquals
-import kotlin.test.assertTrue
 
 class FingerprintAggregateCompareFunctionalTest : FingerprintFunctionalTestBase() {
 
@@ -35,16 +34,16 @@ class FingerprintAggregateCompareFunctionalTest : FingerprintFunctionalTestBase(
 
         Pair(aggregateResult, compareResult)
     } verify { (aggregateResult, compareResult) ->
-        assertEquals(TaskOutcome.SUCCESS, aggregateResult.task(":aggregateFingerprints")?.outcome)
-        assertTrue(
-            aggregateFingerprintFile(testProjectDir).exists(),
+        aggregateResult.task(":aggregateFingerprints")?.outcome.assertIsEqualTo(TaskOutcome.SUCCESS)
+        aggregateFingerprintFile(testProjectDir).exists().assertIsEqualTo(
+            true,
             "Aggregate fingerprint file should be generated at ${aggregateFingerprintFile(testProjectDir).path}",
         )
 
-        assertEquals(TaskOutcome.SUCCESS, compareResult.task(":compareAggregateFingerprints")?.outcome)
+        compareResult.task(":compareAggregateFingerprints")?.outcome.assertIsEqualTo(TaskOutcome.SUCCESS)
 
-        assertTrue(
-            compareResult.output.lineSequence().any { it.trim() == "FINGERPRINT_MATCH=true" },
+        compareResult.output.lineSequence().any { it.trim() == "FINGERPRINT_MATCH=true" }.assertIsEqualTo(
+            true,
             "Expected a bash-friendly match indicator line `FINGERPRINT_MATCH=true` in output.\n--- output ---\n${compareResult.output}",
         )
     }
@@ -79,11 +78,11 @@ class FingerprintAggregateCompareFunctionalTest : FingerprintFunctionalTestBase(
 
         Pair(aggregateResult, compareResult)
     } verify { (aggregateResult, compareResult) ->
-        assertEquals(TaskOutcome.SUCCESS, aggregateResult.task(":aggregateFingerprints")?.outcome)
-        assertEquals(TaskOutcome.FAILED, compareResult.task(":compareAggregateFingerprints")?.outcome)
+        aggregateResult.task(":aggregateFingerprints")?.outcome.assertIsEqualTo(TaskOutcome.SUCCESS)
+        compareResult.task(":compareAggregateFingerprints")?.outcome.assertIsEqualTo(TaskOutcome.FAILED)
 
-        assertTrue(
-            compareResult.output.lineSequence().any { it.trim() == "FINGERPRINT_MATCH=false" },
+        compareResult.output.lineSequence().any { it.trim() == "FINGERPRINT_MATCH=false" }.assertIsEqualTo(
+            true,
             "Expected a bash-friendly mismatch indicator line `FINGERPRINT_MATCH=false` in output.\n--- output ---\n${compareResult.output}",
         )
     }
@@ -114,10 +113,10 @@ class FingerprintAggregateCompareFunctionalTest : FingerprintFunctionalTestBase(
 
         Pair(aggregateResult, compareResult)
     } verify { (aggregateResult, compareResult) ->
-        assertEquals(TaskOutcome.SUCCESS, aggregateResult.task(":aggregateFingerprints")?.outcome)
-        assertEquals(TaskOutcome.SUCCESS, compareResult.task(":compareAggregateFingerprints")?.outcome)
-        assertTrue(
-            compareResult.output.lineSequence().any { it.trim() == "FINGERPRINT_MATCH=true" },
+        aggregateResult.task(":aggregateFingerprints")?.outcome.assertIsEqualTo(TaskOutcome.SUCCESS)
+        compareResult.task(":compareAggregateFingerprints")?.outcome.assertIsEqualTo(TaskOutcome.SUCCESS)
+        compareResult.output.lineSequence().any { it.trim() == "FINGERPRINT_MATCH=true" }.assertIsEqualTo(
+            true,
             "Expected `FINGERPRINT_MATCH=true` in output.\n--- output ---\n${compareResult.output}",
         )
     }

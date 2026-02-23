@@ -1,11 +1,11 @@
 package com.zegreatrob.tools.tagger.cli
 
 import com.github.ajalt.clikt.testing.test
+import com.zegreatrob.minassert.assertIsEqualTo
+import com.zegreatrob.minassert.assertIsNotEqualTo
 import com.zegreatrob.testmints.setup
 import com.zegreatrob.tools.test.git.getEnvironmentVariable
 import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertNotNull
 
 class TaggerTest {
     @Test
@@ -14,7 +14,7 @@ class TaggerTest {
     }) exercise {
         tagger.test("--quiet")
     } verify { result ->
-        assertEquals("", result.output)
+        result.output.assertIsEqualTo("")
     }
 
     @Test
@@ -23,7 +23,7 @@ class TaggerTest {
     }) exercise {
         tagger.test("-q")
     } verify { result ->
-        assertEquals("", result.output)
+        result.output.assertIsEqualTo("")
     }
 
     @Test
@@ -31,10 +31,10 @@ class TaggerTest {
         val expectedVersion = getEnvironmentVariable("EXPECTED_VERSION")
         val command = cli()
     }) {
-        assertNotNull(expectedVersion, "Test not setup correctly - include build version")
+        expectedVersion.assertIsNotEqualTo(null, "Test not setup correctly - include build version")
     } exercise {
         command.test("-q --version")
     } verify { result ->
-        assertEquals("tagger version $expectedVersion", result.output.trim())
+        result.output.trim().assertIsEqualTo("tagger version $expectedVersion")
     }
 }

@@ -1,11 +1,11 @@
 package com.zegreatrob.certifier.functional
 
+import com.zegreatrob.minassert.assertIsEqualTo
 import com.zegreatrob.testmints.setup
 import org.gradle.testkit.runner.GradleRunner
 import org.junit.jupiter.api.io.TempDir
 import java.io.File
 import kotlin.test.Test
-import kotlin.test.assertContains
 
 class CertifierPluginFunctionalTest {
     @field:TempDir
@@ -74,7 +74,8 @@ class CertifierPluginFunctionalTest {
     } exercise {
         runner.buildAndFail()
     } verify { result ->
-        assertContains(result.output, "property 'jdkSelector' doesn't have a configured value")
+        result.output.contains("property 'jdkSelector' doesn't have a configured value")
+            .assertIsEqualTo(true, result.output)
     }
 
     @Test
@@ -103,6 +104,7 @@ class CertifierPluginFunctionalTest {
     } exercise {
         runner.buildAndFail()
     } verify { result ->
-        assertContains(result.output, "property 'certificatePath' doesn't have a configured value")
+        result.output.contains("property 'certificatePath' doesn't have a configured value")
+            .assertIsEqualTo(true, result.output)
     }
 }
