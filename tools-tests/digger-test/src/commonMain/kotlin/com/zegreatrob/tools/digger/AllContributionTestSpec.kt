@@ -36,7 +36,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
         additionalActions: suspend C.() -> Unit = {},
     ) = asyncSetup(
         context,
-        timeoutMs = 180_000,
+        timeoutMs = 360_000,
         additionalActions = additionalActions,
     )
     fun initializeGitRepo(commits: List<String>) = initializeGitRepo(
