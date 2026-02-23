@@ -5,8 +5,8 @@ import com.zegreatrob.tools.cli.writeToFile
 import com.zegreatrob.tools.tagger.TagTestSpec
 import com.zegreatrob.tools.tagger.TestResult
 import com.zegreatrob.tools.tagger.json.TaggerConfig
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+
 class TagCommandConfigFileTest : TagTestSpec {
 
     override lateinit var projectDir: String

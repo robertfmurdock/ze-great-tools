@@ -5,7 +5,6 @@ import com.zegreatrob.minassert.assertIsNotEqualTo
 import com.zegreatrob.testmints.setup
 import org.gradle.testkit.runner.TaskOutcome
 import org.junit.jupiter.api.Test
-import java.io.File
 
 class FingerprintAggregateFunctionalTest : FingerprintFunctionalTestBase() {
 

@@ -4,7 +4,6 @@ import com.zegreatrob.minassert.assertIsEqualTo
 import com.zegreatrob.testmints.setup
 import org.gradle.testkit.runner.TaskOutcome
 import org.junit.jupiter.api.Test
-import java.io.File
 
 class FingerprintAggregateCompareFunctionalTest : FingerprintFunctionalTestBase() {
 

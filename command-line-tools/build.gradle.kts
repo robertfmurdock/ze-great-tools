@@ -1,4 +1,6 @@
 import nl.littlerobots.vcu.plugin.versionSelector
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
+import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 
 
 repositories {
@@ -15,6 +17,22 @@ plugins {
 }
 
 group = "com.zegreatrob.tools"
+
+subprojects {
+    plugins.withId("org.jetbrains.kotlin.multiplatform") {
+        extensions.configure<KotlinMultiplatformExtension>("kotlin") {
+            @OptIn(ExperimentalKotlinGradlePluginApi::class)
+            compilerOptions {
+                allWarningsAsErrors = true
+            }
+        }
+    }
+    plugins.withId("org.jmailen.kotlinter") {
+        tasks.matching { it.name == "check" }.configureEach {
+            dependsOn(tasks.matching { it.name == "lintKotlin" })
+        }
+    }
+}
 
 tasks {
     assemble { dependsOn(provider { (getTasksByName("assemble", true) - this).toList() }) }

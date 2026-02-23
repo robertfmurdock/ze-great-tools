@@ -1,3 +1,7 @@
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
+import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
+import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
+
 plugins {
     base
     id("com.zegreatrob.tools.plugins.lint")
@@ -16,6 +20,23 @@ subprojects {
     apply(plugin = "base")
     apply(plugin = "com.zegreatrob.tools.plugins.lint")
     apply(plugin = "com.zegreatrob.tools.plugins.reports")
+
+    plugins.withId("org.jetbrains.kotlin.multiplatform") {
+        extensions.configure<KotlinMultiplatformExtension>("kotlin") {
+            @OptIn(ExperimentalKotlinGradlePluginApi::class)
+            compilerOptions {
+                allWarningsAsErrors = true
+            }
+        }
+    }
+    plugins.withId("org.jetbrains.kotlin.jvm") {
+        extensions.configure<KotlinJvmProjectExtension>("kotlin") {
+            @OptIn(ExperimentalKotlinGradlePluginApi::class)
+            compilerOptions {
+                allWarningsAsErrors = true
+            }
+        }
+    }
 }
 
 tasks {

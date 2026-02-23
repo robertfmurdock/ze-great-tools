@@ -1,5 +1,6 @@
 
 import nl.littlerobots.vcu.plugin.versionSelector
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jmailen.gradle.kotlinter.tasks.FormatTask
 import org.jmailen.gradle.kotlinter.tasks.LintTask
 
@@ -30,6 +31,9 @@ tasks {
     }
     withType<LintTask> {
         exclude { spec -> spec.file.absolutePath.contains("generated-sources") }
+    }
+    withType<KotlinCompile> {
+        compilerOptions.allWarningsAsErrors.set(true)
     }
 }
 

@@ -2,7 +2,6 @@ package com.zegreatrob.tools.fingerprint
 
 import com.zegreatrob.testmints.setup
 import org.junit.jupiter.api.Test
-import java.io.File
 
 class FingerprintResourcesFunctionalTest : FingerprintFunctionalTestBase() {
 
