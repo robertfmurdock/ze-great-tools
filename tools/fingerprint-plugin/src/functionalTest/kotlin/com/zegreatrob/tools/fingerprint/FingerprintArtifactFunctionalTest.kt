@@ -41,18 +41,18 @@ class FingerprintArtifactFunctionalTest : FingerprintFunctionalTestBase() {
         )
     } exercise {
         writeBuild(buildWithManifest(initialVersion))
-        val hash1 = runFingerprint()
+        val baselineHash = runFingerprint()
 
         testProjectDir.resolve("build").deleteRecursively()
 
         writeBuild(buildWithManifest(updatedVersion))
-        val hash2 = runFingerprint()
+        val afterChangeHash = runFingerprint()
 
-        Pair(hash1, hash2)
-    } verify { (hash1, hash2) ->
+        Pair(baselineHash, afterChangeHash)
+    } verify { (baselineHash, afterChangeHash) ->
         assertFingerprintChanged(
-            hash1,
-            hash2,
+            baselineHash,
+            afterChangeHash,
             "Fingerprint should change when the produced JAR bytes change (e.g., manifest attribute change), " +
                 "even if sources and dependencies are unchanged.",
         )
@@ -95,18 +95,18 @@ class FingerprintArtifactFunctionalTest : FingerprintFunctionalTestBase() {
         )
     } exercise {
         writeBuild(buildWithJvmJarManifest(initialVersion))
-        val hash1 = runFingerprint()
+        val baselineHash = runFingerprint()
 
         testProjectDir.resolve("build").deleteRecursively()
 
         writeBuild(buildWithJvmJarManifest(updatedVersion))
-        val hash2 = runFingerprint()
+        val afterChangeHash = runFingerprint()
 
-        Pair(hash1, hash2)
-    } verify { (hash1, hash2) ->
+        Pair(baselineHash, afterChangeHash)
+    } verify { (baselineHash, afterChangeHash) ->
         assertFingerprintChanged(
-            hash1,
-            hash2,
+            baselineHash,
+            afterChangeHash,
             "Fingerprint should change when a KMP published artifact (jvmJar) bytes change, even if sources/deps are unchanged.",
         )
     }
@@ -185,19 +185,19 @@ class FingerprintArtifactFunctionalTest : FingerprintFunctionalTestBase() {
             """.trimIndent(),
         )
     } exercise {
-        val hash1 = runFingerprint()
+        val baselineHash = runFingerprint()
 
         writeNoOpPluginSource(updatedMarker)
 
         testProjectDir.resolve("build").deleteRecursively()
 
-        val hash2 = runFingerprint()
+        val afterChangeHash = runFingerprint()
 
-        Pair(hash1, hash2)
-    } verify { (hash1, hash2) ->
+        Pair(baselineHash, afterChangeHash)
+    } verify { (baselineHash, afterChangeHash) ->
         assertFingerprintChanged(
-            hash1,
-            hash2,
+            baselineHash,
+            afterChangeHash,
             "Fingerprint should change when build logic (buildSrc plugin code) changes AND that change affects produced artifact bytes.",
         )
     }
@@ -285,20 +285,20 @@ class FingerprintArtifactFunctionalTest : FingerprintFunctionalTestBase() {
             )
         }
 
-        val hash1 = runFingerprint()
+        val baselineHash = runFingerprint()
         assertManifestShowsJvmJarWasFingerprinted("first run")
 
         writeConventionPluginSource(updatedMarker)
         testProjectDir.resolve("build").deleteRecursively()
 
-        val hash2 = runFingerprint()
+        val afterChangeHash = runFingerprint()
         assertManifestShowsJvmJarWasFingerprinted("second run")
 
-        Pair(hash1, hash2)
-    } verify { (hash1, hash2) ->
+        Pair(baselineHash, afterChangeHash)
+    } verify { (baselineHash, afterChangeHash) ->
         assertFingerprintChanged(
-            hash1,
-            hash2,
+            baselineHash,
+            afterChangeHash,
             "Fingerprint should change when KMP convention build logic changes AND that change affects published artifact bytes (jvmJar).",
         )
     }

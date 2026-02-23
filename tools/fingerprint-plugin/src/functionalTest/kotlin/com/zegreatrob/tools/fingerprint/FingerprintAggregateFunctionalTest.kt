@@ -19,11 +19,10 @@ class FingerprintAggregateFunctionalTest : FingerprintFunctionalTestBase() {
         val mainMarkerName = "main-marker.txt"
         val mainMarkerContent = "app-content"
         val pluginVersion = "1.0"
-        lateinit var includedDir: File
-        lateinit var mainDir: File
+        val includedDir = projectDir(includedBuildName)
+        val mainDir = projectDir(mainBuildName)
     }) {
-        includedDir = testProjectDir.resolve(includedBuildName).apply { mkdirs() }
-        includedDir.resolve("settings.gradle.kts").writeText("""rootProject.name = "$includedBuildName"""")
+        writeSettings(includedDir, includedBuildName)
 
         includedDir.resolve("build.gradle.kts").writeText(
             """
@@ -38,13 +37,7 @@ class FingerprintAggregateFunctionalTest : FingerprintFunctionalTestBase() {
             """.trimIndent(),
         )
 
-        mainDir = testProjectDir.resolve(mainBuildName).apply { mkdirs() }
-        mainDir.resolve("settings.gradle.kts").writeText(
-            """
-            rootProject.name = "$mainBuildName"
-            includeBuild("../$includedBuildName")
-            """.trimIndent(),
-        )
+        writeSettings(mainDir, mainBuildName, includeBuildName = includedBuildName)
 
         mainDir.resolve("build.gradle.kts").writeText(
             """
@@ -73,23 +66,17 @@ class FingerprintAggregateFunctionalTest : FingerprintFunctionalTestBase() {
     fun `aggregateFingerprints triggers generateFingerprint in included builds`() = setup(object {
         val includedBuildName = "my-lib"
         val mainBuildName = "my-app"
-        lateinit var mainDir: File
+        val mainDir = projectDir(mainBuildName)
     }) {
-        val includedDir = testProjectDir.resolve(includedBuildName).apply { mkdirs() }
-        includedDir.resolve("settings.gradle.kts").writeText("""rootProject.name = "$includedBuildName"""")
+        val includedDir = projectDir(includedBuildName)
+        writeSettings(includedDir, includedBuildName)
         includedDir.resolve("build.gradle.kts").writeText(
             """
             plugins { id("com.zegreatrob.tools.fingerprint") }
             """.trimIndent(),
         )
 
-        mainDir = testProjectDir.resolve(mainBuildName).apply { mkdirs() }
-        mainDir.resolve("settings.gradle.kts").writeText(
-            """
-            rootProject.name = "$mainBuildName"
-            includeBuild("../$includedBuildName")
-            """.trimIndent(),
-        )
+        writeSettings(mainDir, mainBuildName, includeBuildName = includedBuildName)
         mainDir.resolve("build.gradle.kts").writeText(
             """
             plugins { id("com.zegreatrob.tools.fingerprint") }
@@ -113,19 +100,13 @@ class FingerprintAggregateFunctionalTest : FingerprintFunctionalTestBase() {
     fun `aggregateFingerprints skips included builds that do not have the plugin`() = setup(object {
         val includedBuildName = "naked-lib"
         val mainBuildName = "main-app"
-        lateinit var mainDir: File
+        val mainDir = projectDir(mainBuildName)
     }) {
-        val nakedDir = testProjectDir.resolve(includedBuildName).apply { mkdirs() }
-        nakedDir.resolve("settings.gradle.kts").writeText("""rootProject.name = "$includedBuildName"""")
+        val nakedDir = projectDir(includedBuildName)
+        writeSettings(nakedDir, includedBuildName)
         nakedDir.resolve("build.gradle.kts").writeText("// Empty - no plugin here")
 
-        mainDir = testProjectDir.resolve(mainBuildName).apply { mkdirs() }
-        mainDir.resolve("settings.gradle.kts").writeText(
-            """
-            rootProject.name = "$mainBuildName"
-            includeBuild("../$includedBuildName")
-            """.trimIndent(),
-        )
+        writeSettings(mainDir, mainBuildName, includeBuildName = includedBuildName)
         mainDir.resolve("build.gradle.kts").writeText(
             """
             plugins { id("com.zegreatrob.tools.fingerprint") }
@@ -149,11 +130,10 @@ class FingerprintAggregateFunctionalTest : FingerprintFunctionalTestBase() {
         val mainMarkerContent = "main-content"
         val includedPluginVersion = "included-1.0"
         val mainPluginVersion = "main-1.0"
-        lateinit var includedDir: File
-        lateinit var mainDir: File
+        val includedDir = projectDir(includedBuildName)
+        val mainDir = projectDir(mainBuildName)
     }) {
-        includedDir = testProjectDir.resolve(includedBuildName).apply { mkdirs() }
-        includedDir.resolve("settings.gradle.kts").writeText("""rootProject.name = "$includedBuildName"""")
+        writeSettings(includedDir, includedBuildName)
         includedDir.resolve("build.gradle.kts").writeText(
             """
             plugins { id("com.zegreatrob.tools.fingerprint") }
@@ -167,13 +147,7 @@ class FingerprintAggregateFunctionalTest : FingerprintFunctionalTestBase() {
             """.trimIndent(),
         )
 
-        mainDir = testProjectDir.resolve(mainBuildName).apply { mkdirs() }
-        mainDir.resolve("settings.gradle.kts").writeText(
-            """
-            rootProject.name = "$mainBuildName"
-            includeBuild("../$includedBuildName")
-            """.trimIndent(),
-        )
+        writeSettings(mainDir, mainBuildName, includeBuildName = includedBuildName)
         mainDir.resolve("build.gradle.kts").writeText(
             """
             plugins { id("com.zegreatrob.tools.fingerprint") }

@@ -13,7 +13,7 @@ class FingerprintAggregateCompareFunctionalTest : FingerprintFunctionalTestBase(
     fun `compareAggregateFingerprints succeeds and prints bash-friendly match indicator when fingerprints are equal`() = setup(object {
         val expectedFilePath = "expected/aggregate-fingerprint.txt"
         val compareArgs = arrayOf("compareAggregateFingerprints", "--no-configuration-cache")
-        lateinit var expectedFile: File
+        val expectedFile = fileUnderProject(expectedFilePath)
     }) {
         writeSettings("compare-aggregate-fingerprints-success")
 
@@ -26,8 +26,6 @@ class FingerprintAggregateCompareFunctionalTest : FingerprintFunctionalTestBase(
             }
             """.trimIndent(),
         )
-
-        expectedFile = fileUnderProject(expectedFilePath)
     } exercise {
         val aggregateResult = gradle(arguments = arrayOf("aggregateFingerprints", "--no-configuration-cache"))
 
@@ -35,7 +33,7 @@ class FingerprintAggregateCompareFunctionalTest : FingerprintFunctionalTestBase(
 
         val compareResult = gradle(arguments = compareArgs)
 
-        listOf(aggregateResult, compareResult)
+        Pair(aggregateResult, compareResult)
     } verify { (aggregateResult, compareResult) ->
         assertEquals(TaskOutcome.SUCCESS, aggregateResult.task(":aggregateFingerprints")?.outcome)
         assertTrue(
@@ -56,7 +54,7 @@ class FingerprintAggregateCompareFunctionalTest : FingerprintFunctionalTestBase(
         val expectedFilePath = "expected/aggregate-fingerprint.txt"
         val compareArgs = arrayOf("compareAggregateFingerprints", "--no-configuration-cache")
         val mismatchedFingerprint = "definitely-not-the-real-fingerprint"
-        lateinit var expectedFile: File
+        val expectedFile = fileUnderProject(expectedFilePath)
     }) {
         writeSettings("compare-aggregate-fingerprints-failure")
 
@@ -69,8 +67,6 @@ class FingerprintAggregateCompareFunctionalTest : FingerprintFunctionalTestBase(
             }
             """.trimIndent(),
         )
-
-        expectedFile = fileUnderProject(expectedFilePath)
     } exercise {
         val aggregateResult = gradle(arguments = arrayOf("aggregateFingerprints", "--no-configuration-cache"))
 
@@ -81,7 +77,7 @@ class FingerprintAggregateCompareFunctionalTest : FingerprintFunctionalTestBase(
             expectFailure = true,
         )
 
-        listOf(aggregateResult, compareResult)
+        Pair(aggregateResult, compareResult)
     } verify { (aggregateResult, compareResult) ->
         assertEquals(TaskOutcome.SUCCESS, aggregateResult.task(":aggregateFingerprints")?.outcome)
         assertEquals(TaskOutcome.FAILED, compareResult.task(":compareAggregateFingerprints")?.outcome)
@@ -100,7 +96,7 @@ class FingerprintAggregateCompareFunctionalTest : FingerprintFunctionalTestBase(
             "--no-configuration-cache",
             "-PfingerprintCompareToFile=expected/aggregate-fingerprint.txt",
         )
-        lateinit var expectedFile: File
+        val expectedFile = fileUnderProject(expectedFilePath)
     }) {
         writeSettings("compare-aggregate-fingerprints-property-config")
 
@@ -109,8 +105,6 @@ class FingerprintAggregateCompareFunctionalTest : FingerprintFunctionalTestBase(
             plugins { id("com.zegreatrob.tools.fingerprint") }
             """.trimIndent(),
         )
-
-        expectedFile = fileUnderProject(expectedFilePath)
     } exercise {
         val aggregateResult = gradle(arguments = arrayOf("aggregateFingerprints", "--no-configuration-cache"))
 
@@ -118,7 +112,7 @@ class FingerprintAggregateCompareFunctionalTest : FingerprintFunctionalTestBase(
 
         val compareResult = gradle(arguments = compareArgs)
 
-        listOf(aggregateResult, compareResult)
+        Pair(aggregateResult, compareResult)
     } verify { (aggregateResult, compareResult) ->
         assertEquals(TaskOutcome.SUCCESS, aggregateResult.task(":aggregateFingerprints")?.outcome)
         assertEquals(TaskOutcome.SUCCESS, compareResult.task(":compareAggregateFingerprints")?.outcome)

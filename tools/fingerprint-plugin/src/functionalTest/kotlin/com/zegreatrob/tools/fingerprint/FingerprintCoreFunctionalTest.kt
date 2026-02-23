@@ -40,25 +40,24 @@ class FingerprintCoreFunctionalTest : FingerprintFunctionalTestBase() {
                 fun value(): Int = 2
             }
         """.trimIndent()
-        lateinit var testSourceFile: File
+        val testSourceFile = fileUnderProject(testSourcePath)
     }) {
         writeSettings("test-source-change-test")
         writeBuild(kmpBuild())
 
-        testSourceFile = writeProjectFile(
-            testSourcePath,
+        testSourceFile.writeText(
             """
             package example
 
             class ExampleTest {
                 fun value(): Int = 1
             }
-            """,
+            """.trimIndent(),
         )
     } exercise {
         runFingerprintTwiceAfter(change = { testSourceFile.writeText(updatedTestSource) })
-    } verify { (firstHash, secondHash) ->
-        assertFingerprintUnchanged(firstHash, secondHash, "Fingerprint should NOT change when test sources change!")
+    } verify { (baselineHash, afterChangeHash) ->
+        assertFingerprintUnchanged(baselineHash, afterChangeHash, "Fingerprint should NOT change when test sources change!")
     }
 
     @Test
@@ -112,33 +111,32 @@ class FingerprintCoreFunctionalTest : FingerprintFunctionalTestBase() {
                 fun value(): Int = 2
             }
         """.trimIndent()
-        lateinit var sourceFile: File
+        val sourceFile = fileUnderProject(sourcePath)
     }) {
         writeSettings("source-change-test")
         writeBuild(kmpBuild())
 
-        sourceFile = writeProjectFile(
-            sourcePath,
+        sourceFile.writeText(
             """
             package example
 
             class Example {
                 fun value(): Int = 1
             }
-            """,
+            """.trimIndent(),
         )
     } exercise {
-        val (firstHash, firstManifest) = runFingerprintWithManifest()
+        val baseline = runFingerprintWithManifest()
 
         sourceFile.writeText(updatedSource)
 
-        val (secondHash, secondManifest) = runFingerprintWithManifest()
+        val afterChange = runFingerprintWithManifest()
 
-        listOf(firstHash, secondHash, firstManifest, secondManifest)
-    } verify { (firstHash, secondHash, firstManifest, secondManifest) ->
-        assertTrue(firstManifest.contains("source|$sourcePath|"))
-        assertTrue(secondManifest.contains("source|$sourcePath|"))
-        assertFingerprintChanged(firstHash, secondHash, "Fingerprint should change when module source changes!")
+        Pair(baseline, afterChange)
+    } verify { (baseline, afterChange) ->
+        assertTrue(baseline.manifest.contains("source|$sourcePath|"))
+        assertTrue(afterChange.manifest.contains("source|$sourcePath|"))
+        assertFingerprintChanged(baseline.hash, afterChange.hash, "Fingerprint should change when module source changes!")
     }
 
     @Test
@@ -208,14 +206,15 @@ class FingerprintCoreFunctionalTest : FingerprintFunctionalTestBase() {
     @Test
     fun `fingerprint handles classpath entries that are directories and changes when directory contents change`() = setup(object {
         val classpathDirPath = "build/classes/kotlin/js/main"
+        val markerFileName = "marker.txt"
         val initialMarker = "v1"
         val updatedMarker = "v2"
-        lateinit var marker: File
+        val marker = fileUnderProject("$classpathDirPath/$markerFileName")
     }) {
         writeSettings("classpath-directory-entry-test")
 
         val classpathDir = fileUnderProject(classpathDirPath).apply { mkdirs() }
-        marker = classpathDir.resolve("marker.txt").apply { writeText(initialMarker) }
+        marker.writeText(initialMarker)
 
         writeBuild(
             """
@@ -230,21 +229,25 @@ class FingerprintCoreFunctionalTest : FingerprintFunctionalTestBase() {
             """.trimIndent(),
         )
     } exercise {
-        val (firstHash, firstManifest) = runFingerprintWithManifest()
+        val baseline = runFingerprintWithManifest()
 
         marker.writeText(updatedMarker)
 
-        val (secondHash, secondManifest) = runFingerprintWithManifest()
+        val afterChange = runFingerprintWithManifest()
 
-        listOf(firstHash, secondHash, firstManifest, secondManifest)
-    } verify { (firstHash, secondHash, firstManifest, secondManifest) ->
-        assertManifestContainsDependencyIngredients(firstManifest, context = "baseline (directory classpath entry)")
-        assertManifestContainsDependencyIngredients(secondManifest, context = "after directory content change")
+        Pair(baseline, afterChange)
+    } verify { (baseline, afterChange) ->
+        assertManifestContainsDependencyIngredients(baseline.manifest, context = "baseline (directory classpath entry)")
+        assertManifestContainsDependencyIngredients(afterChange.manifest, context = "after directory content change")
 
-        assertFingerprintChanged(firstHash, secondHash, "Fingerprint should change when a directory classpath entry contents change!")
+        assertFingerprintChanged(
+            baseline.hash,
+            afterChange.hash,
+            "Fingerprint should change when a directory classpath entry contents change!",
+        )
         assertTrue(
-            firstManifest != secondManifest,
-            "Manifest should change when a directory classpath entry contents change.\n--- first ---\n$firstManifest\n--- second ---\n$secondManifest",
+            baseline.manifest != afterChange.manifest,
+            "Manifest should change when a directory classpath entry contents change.\n--- first ---\n${baseline.manifest}\n--- second ---\n${afterChange.manifest}",
         )
     }
 

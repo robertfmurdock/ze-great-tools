@@ -16,7 +16,16 @@ abstract class FingerprintFunctionalTestBase {
     protected val settingsFile by lazy { testProjectDir.resolve("settings.gradle.kts") }
 
     protected fun writeSettings(name: String? = null) {
-        settingsFile.writeText(name?.let { """rootProject.name = "$it"""" } ?: "")
+        if (name == null) {
+            settingsFile.writeText("")
+        } else {
+            writeSettings(testProjectDir, name)
+        }
+    }
+
+    protected fun writeSettings(dir: File, name: String, includeBuildName: String? = null) {
+        val includeLine = includeBuildName?.let { "\nincludeBuild(\"../$it\")" }.orEmpty()
+        dir.resolve("settings.gradle.kts").writeText("""rootProject.name = "$name"$includeLine""")
     }
 
     protected fun writeBuild(script: String) {
@@ -40,6 +49,8 @@ abstract class FingerprintFunctionalTestBase {
     protected fun fileUnderProject(relativePath: String): File = testProjectDir.resolve(relativePath).also { it.parentFile?.mkdirs() }
 
     protected fun writeProjectFile(relativePath: String, content: String): File = fileUnderProject(relativePath).also { it.writeText(content.trimIndent()) }
+
+    protected fun projectDir(name: String): File = testProjectDir.resolve(name).apply { mkdirs() }
 
     protected fun gradle(
         projectDir: File = testProjectDir,
@@ -112,10 +123,15 @@ abstract class FingerprintFunctionalTestBase {
         return fingerprintFile(dir).readText()
     }
 
-    protected fun runFingerprintWithManifest(dir: File = testProjectDir, vararg extraArgs: String): Pair<String, String> {
+    protected data class FingerprintRun(
+        val hash: String,
+        val manifest: String,
+    )
+
+    protected fun runFingerprintWithManifest(dir: File = testProjectDir, vararg extraArgs: String): FingerprintRun {
         val hash = runFingerprint(dir, *extraArgs)
         val manifest = fingerprintManifestFile(dir).readText()
-        return Pair(hash, manifest)
+        return FingerprintRun(hash = hash, manifest = manifest)
     }
 
     protected fun runFingerprintTwiceAfter(
