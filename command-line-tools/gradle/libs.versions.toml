@@ -1,10 +1,11 @@
 [versions]
+com-zegreatrob-testmints = "12.6.1"
 kotlin = "2.3.10"
 
 [libraries]
 com-github-ajalt-clikt-clikt = "com.github.ajalt.clikt:clikt:5.1.0"
-com-zegreatrob-testmints-minassert = "com.zegreatrob.testmints:minassert:12.6.1"
-com-zegreatrob-testmints-standard = "com.zegreatrob.testmints:standard:12.6.1"
+com-zegreatrob-testmints-minassert = { module = "com.zegreatrob.testmints:minassert", version.ref = "com-zegreatrob-testmints" }
+com-zegreatrob-testmints-standard = { module = "com.zegreatrob.testmints:standard", version.ref = "com-zegreatrob-testmints" }
 org-jetbrains-kotlin-kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin" }
 org-jetbrains-kotlin-kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 org-jetbrains-kotlin-kotlin-test-junit5 = { module = "org.jetbrains.kotlin:kotlin-test-junit5", version.ref = "kotlin" }
