@@ -48,11 +48,17 @@ class AllContributionDataTest : AllContributionTestSpec {
         ) + majorEntries
     }
 
-    override fun runAllContributionData(): String {
-        AllContributionData()
+    override fun runAllContributionData(): AllContributionTestSpec.AllContributionDataResult {
+        val output = AllContributionData()
             .test(arguments)
             .output
-            .let { it.assertIsEqualTo("Data written to ${outputFile}\n") }
-        return readFromFile(outputFile) ?: ""
+        return AllContributionTestSpec.AllContributionDataResult(
+            output = output,
+            data = readFromFile(outputFile) ?: "",
+        )
+    }
+
+    override fun verifyOutput(result: AllContributionTestSpec.AllContributionDataResult) {
+        result.output.assertIsEqualTo("Data written to ${outputFile}\n")
     }
 }

@@ -12,6 +12,7 @@ class DiggerPluginTest {
     }) exercise {
         project.plugins.apply("com.zegreatrob.tools.digger")
     } verify {
-        project.tasks.findByName("currentContributionData").assertIsNotEqualTo(null)
+        project.tasks.findByName("currentContributionData")
+            .assertIsNotEqualTo(null, "Expected currentContributionData task to be registered")
     }
 }

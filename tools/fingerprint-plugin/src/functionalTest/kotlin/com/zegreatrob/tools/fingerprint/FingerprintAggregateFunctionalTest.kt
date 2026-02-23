@@ -64,9 +64,9 @@ class FingerprintAggregateFunctionalTest : FingerprintFunctionalTestBase() {
     fun `aggregateFingerprints triggers generateFingerprint in included builds`() = setup(object {
         val includedBuildName = "my-lib"
         val mainBuildName = "my-app"
+        val includedDir = projectDir(includedBuildName)
         val mainDir = projectDir(mainBuildName)
     }) {
-        val includedDir = projectDir(includedBuildName)
         writeSettings(includedDir, includedBuildName)
         includedDir.resolve("build.gradle.kts").writeText(
             """
@@ -96,9 +96,9 @@ class FingerprintAggregateFunctionalTest : FingerprintFunctionalTestBase() {
     fun `aggregateFingerprints skips included builds that do not have the plugin`() = setup(object {
         val includedBuildName = "naked-lib"
         val mainBuildName = "main-app"
+        val nakedDir = projectDir(includedBuildName)
         val mainDir = projectDir(mainBuildName)
     }) {
-        val nakedDir = projectDir(includedBuildName)
         writeSettings(nakedDir, includedBuildName)
         nakedDir.resolve("build.gradle.kts").writeText("// Empty - no plugin here")
 

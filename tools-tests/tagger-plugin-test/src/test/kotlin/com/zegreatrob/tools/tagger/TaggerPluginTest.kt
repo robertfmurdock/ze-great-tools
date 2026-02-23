@@ -13,7 +13,8 @@ class TaggerPluginTest {
     }) exercise {
         project.plugins.apply("com.zegreatrob.tools.tagger")
     } verify {
-        project.tasks.findByName("calculateVersion").assertIsNotEqualTo(null)
+        project.tasks.findByName("calculateVersion")
+            .assertIsNotEqualTo(null, "Expected calculateVersion task to be registered")
     }
 
     @Test
@@ -23,16 +24,16 @@ class TaggerPluginTest {
             .withParent(rootProject)
             .withName("p1")
             .build()
-    }) {
-        ProjectBuilder.builder()
+        val innerProject2 = ProjectBuilder.builder()
             .withParent(rootProject)
             .withName("p2")
             .build()
-    } exercise {
+    }) exercise {
         rootProject.plugins.apply("com.zegreatrob.tools.tagger")
     } verify {
         val rootCheck = rootProject.tasks.named("check").get()
         val innerProject1Check = innerProject1.tasks.register("check")
+        val innerProject2Check = innerProject2.tasks.register("check")
         val tagTask = rootProject.tasks.findByName("tag")!!
 
         tagTask.mustRunAfter.getDependencies(tagTask)
@@ -41,5 +42,8 @@ class TaggerPluginTest {
         tagTask.mustRunAfter.getDependencies(tagTask)
             .contains(innerProject1Check.get())
             .assertIsEqualTo(true, "Did not run after inner project check")
+        tagTask.mustRunAfter.getDependencies(tagTask)
+            .contains(innerProject2Check.get())
+            .assertIsEqualTo(true, "Did not run after second inner project check")
     }
 }

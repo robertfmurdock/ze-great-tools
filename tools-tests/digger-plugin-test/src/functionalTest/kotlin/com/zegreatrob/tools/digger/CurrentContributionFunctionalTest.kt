@@ -64,13 +64,17 @@ class CurrentContributionFunctionalTest : CurrentContributionTestSpec {
         )
     }
 
-    override fun runCurrentContributionData(): String {
+    override fun runCurrentContributionData(): CurrentContributionTestSpec.CurrentContributionDataResult {
         val currentOutput by lazy { "$projectDir/build/digger/current.json" }
-        GradleRunner.create()
+        val output = GradleRunner.create()
             .forwardOutput()
             .withArguments("currentContributionData", "-q")
             .withProjectDir(File(projectDir))
             .build()
-        return File(currentOutput).readText()
+            .output
+        return CurrentContributionTestSpec.CurrentContributionDataResult(
+            output = output,
+            data = File(currentOutput).readText(),
+        )
     }
 }

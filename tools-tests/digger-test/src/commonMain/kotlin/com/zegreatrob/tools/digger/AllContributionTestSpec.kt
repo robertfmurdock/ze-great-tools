@@ -20,11 +20,17 @@ import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 interface AllContributionTestSpec : SetupWithOverrides {
+    data class AllContributionDataResult(
+        val output: String,
+        val data: String,
+    )
+
     var projectDir: String
     val addFileNames: Set<String>
 
     fun setupWithDefaults()
-    fun runAllContributionData(): String
+    fun runAllContributionData(): AllContributionDataResult
+    fun verifyOutput(result: AllContributionDataResult) = Unit
     private fun <C : Any> longAsyncSetup(
         context: C,
         additionalActions: suspend C.() -> Unit = {},
@@ -83,8 +89,9 @@ interface AllContributionTestSpec : SetupWithOverrides {
             )
     } exercise {
         runAllContributionData()
-    } verify { allOutput ->
-        parseAll(allOutput).assertIsEqualTo(
+    } verify { result ->
+        verifyOutput(result)
+        parseAll(result.data).assertIsEqualTo(
             listOf(
                 toContribution(
                     lastCommit = secondCommit,
@@ -140,8 +147,9 @@ interface AllContributionTestSpec : SetupWithOverrides {
         release2 = gitAdapter.addTag("release-2")
     } exercise {
         runAllContributionData()
-    } verify { allOutput ->
-        parseAll(allOutput).assertIsEqualTo(
+    } verify { result ->
+        verifyOutput(result)
+        parseAll(result.data).assertIsEqualTo(
             listOf(
                 toContribution(
                     firstCommit = thirdCommit,
@@ -199,8 +207,9 @@ interface AllContributionTestSpec : SetupWithOverrides {
         release2 = gitAdapter.addTag("release-2")
     } exercise {
         runAllContributionData()
-    } verify { allOutput ->
-        parseAll(allOutput).assertIsEqualTo(
+    } verify { result ->
+        verifyOutput(result)
+        parseAll(result.data).assertIsEqualTo(
             listOf(
                 toContribution(
                     firstCommit = secondCommit,
@@ -255,8 +264,9 @@ interface AllContributionTestSpec : SetupWithOverrides {
         thirdRelease = gitAdapter.addTag("release-3")
     } exercise {
         runAllContributionData()
-    } verify { allOutput ->
-        parseAll(allOutput).assertIsEqualTo(
+    } verify { result ->
+        verifyOutput(result)
+        parseAll(result.data).assertIsEqualTo(
             listOf(
                 toContribution(
                     firstCommit = secondCommit,
@@ -315,8 +325,9 @@ interface AllContributionTestSpec : SetupWithOverrides {
         thirdRelease = gitAdapter.addTag("release3")
     } exercise {
         runAllContributionData()
-    } verify { allOutput ->
-        parseAll(allOutput).assertIsEqualTo(
+    } verify { result ->
+        verifyOutput(result)
+        parseAll(result.data).assertIsEqualTo(
             listOf(
                 toContribution(
                     lastCommit = mergeCommit,
@@ -373,8 +384,9 @@ interface AllContributionTestSpec : SetupWithOverrides {
         thirdRelease = gitAdapter.addTag("v20.176.37")
     } exercise {
         runAllContributionData()
-    } verify { allOutput ->
-        parseAll(allOutput).assertIsEqualTo(
+    } verify { result ->
+        verifyOutput(result)
+        parseAll(result.data).assertIsEqualTo(
             listOf(
                 toContribution(
                     lastCommit = mergeCommit,
@@ -429,8 +441,9 @@ interface AllContributionTestSpec : SetupWithOverrides {
         thirdRelease = gitAdapter.addTag("release3")
     } exercise {
         runAllContributionData()
-    } verify { allOutput ->
-        parseAll(allOutput).assertIsEqualTo(
+    } verify { result ->
+        verifyOutput(result)
+        parseAll(result.data).assertIsEqualTo(
             listOf(
                 toContribution(
                     lastCommit = merge2Commit,
@@ -484,8 +497,9 @@ interface AllContributionTestSpec : SetupWithOverrides {
         thirdRelease = gitAdapter.addTag("release3")
     } exercise {
         runAllContributionData()
-    } verify { allOutput ->
-        parseAll(allOutput).assertIsEqualTo(
+    } verify { result ->
+        verifyOutput(result)
+        parseAll(result.data).assertIsEqualTo(
             listOf(
                 toContribution(
                     lastCommit = merge2Commit,
@@ -536,8 +550,9 @@ interface AllContributionTestSpec : SetupWithOverrides {
             )
     } exercise {
         runAllContributionData()
-    } verify { allOutput ->
-        parseAll(allOutput).assertIsEqualTo(
+    } verify { result ->
+        verifyOutput(result)
+        parseAll(result.data).assertIsEqualTo(
             listOf(
                 toContribution(
                     lastCommit = secondCommit,
@@ -570,8 +585,9 @@ interface AllContributionTestSpec : SetupWithOverrides {
         secondCommit = gitAdapter.addCommitWithMessage("[DOGCOW-18] -3- here's a message")
     } exercise {
         runAllContributionData()
-    } verify { allOutput ->
-        parseAll(allOutput).assertIsEqualTo(
+    } verify { result ->
+        verifyOutput(result)
+        parseAll(result.data).assertIsEqualTo(
             listOf(
                 toContribution(
                     lastCommit = secondCommit,
@@ -600,8 +616,9 @@ interface AllContributionTestSpec : SetupWithOverrides {
         secondCommit = gitAdapter.addCommitWithMessage("[DOGCOW-17] -3- here's a message")
     } exercise {
         runAllContributionData()
-    } verify { allOutput ->
-        parseAll(allOutput).assertIsEqualTo(
+    } verify { result ->
+        verifyOutput(result)
+        parseAll(result.data).assertIsEqualTo(
             listOf(
                 toContribution(
                     lastCommit = secondCommit,
@@ -626,8 +643,9 @@ interface AllContributionTestSpec : SetupWithOverrides {
         secondCommit = gitAdapter.addCommitWithMessage("[DOGCOW-18] -3- here's a message")
     } exercise {
         runAllContributionData()
-    } verify { allOutput ->
-        parseAll(allOutput).assertIsEqualTo(
+    } verify { result ->
+        verifyOutput(result)
+        parseAll(result.data).assertIsEqualTo(
             listOf(
                 toContribution(
                     lastCommit = secondCommit,
@@ -653,8 +671,9 @@ interface AllContributionTestSpec : SetupWithOverrides {
         secondCommit = gitAdapter.addCommitWithMessage("-3- here's a message")
     } exercise {
         runAllContributionData()
-    } verify { allOutput ->
-        parseAll(allOutput).assertIsEqualTo(
+    } verify { result ->
+        verifyOutput(result)
+        parseAll(result.data).assertIsEqualTo(
             listOf(
                 toContribution(
                     lastCommit = secondCommit,
@@ -674,8 +693,9 @@ interface AllContributionTestSpec : SetupWithOverrides {
         initializeGitRepo(commits = listOf("[patch] commit 1", "commit (big) 2", "[patch] commit 3"))
     } exercise {
         runAllContributionData()
-    } verify { allOutput ->
-        parseAll(allOutput).map { it.semver }.assertIsEqualTo(listOf("Major"))
+    } verify { result ->
+        verifyOutput(result)
+        parseAll(result.data).map { it.semver }.assertIsEqualTo(listOf("Major"))
     }
 
     @Test
@@ -685,8 +705,9 @@ interface AllContributionTestSpec : SetupWithOverrides {
         initializeGitRepo(commits = listOf("[patch] commit 1", "commit (middle) 2", "[patch] commit 3"))
     } exercise {
         runAllContributionData()
-    } verify { allOutput ->
-        parseAll(allOutput).map { it.semver }.assertIsEqualTo(listOf("Minor"))
+    } verify { result ->
+        verifyOutput(result)
+        parseAll(result.data).map { it.semver }.assertIsEqualTo(listOf("Minor"))
     }
 
     @Test
@@ -696,8 +717,9 @@ interface AllContributionTestSpec : SetupWithOverrides {
         initializeGitRepo(commits = listOf("commit 1", "commit (tiny) 2", "commit 3"))
     } exercise {
         runAllContributionData()
-    } verify { allOutput ->
-        parseAll(allOutput).map { it.semver }.assertIsEqualTo(listOf("Patch"))
+    } verify { result ->
+        verifyOutput(result)
+        parseAll(result.data).map { it.semver }.assertIsEqualTo(listOf("Patch"))
     }
 
     @Test
@@ -707,8 +729,9 @@ interface AllContributionTestSpec : SetupWithOverrides {
         initializeGitRepo(commits = listOf("commit (no) 1"))
     } exercise {
         runAllContributionData()
-    } verify { allOutput ->
-        parseAll(allOutput).map { it.semver }.assertIsEqualTo(listOf("None"))
+    } verify { result ->
+        verifyOutput(result)
+        parseAll(result.data).map { it.semver }.assertIsEqualTo(listOf("None"))
     }
 
     @Test
@@ -718,8 +741,9 @@ interface AllContributionTestSpec : SetupWithOverrides {
         initializeGitRepo(commits = listOf("commit -CowDog-99- 1"))
     } exercise {
         runAllContributionData()
-    } verify { allOutput ->
-        val contributions = parseAll(allOutput)
+    } verify { result ->
+        verifyOutput(result)
+        val contributions = parseAll(result.data)
         contributions.map { it.storyId }.assertIsEqualTo(listOf("CowDog-99"))
     }
 
@@ -730,8 +754,9 @@ interface AllContributionTestSpec : SetupWithOverrides {
         initializeGitRepo(commits = listOf("commit [4] 1"))
     } exercise {
         runAllContributionData()
-    } verify { allOutput ->
-        val contributions = parseAll(allOutput)
+    } verify { result ->
+        verifyOutput(result)
+        val contributions = parseAll(result.data)
         contributions.map { it.ease }.assertIsEqualTo(listOf(4))
     }
 

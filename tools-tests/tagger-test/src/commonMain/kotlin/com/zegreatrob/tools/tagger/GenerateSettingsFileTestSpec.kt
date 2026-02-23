@@ -86,8 +86,8 @@ interface GenerateSettingsFileTestSpec {
         )
     }) {
         Json.encodeToString(config).writeToFile(taggerFile)
-        execute(merge = true)
     } exercise {
+        execute(merge = true)
         execute(file = "")
     } verify { result ->
         (result is TestResult.Success).assertIsEqualTo(true, "$result")

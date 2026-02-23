@@ -44,9 +44,15 @@ class CurrentContributionDataTest : CurrentContributionTestSpec {
         )
     }
 
-    override fun runCurrentContributionData(): String {
-        CurrentContributionData().test(arguments).output
-            .let { it.assertIsEqualTo("Data written to ${outputFile}\n") }
-        return readFromFile(outputFile) ?: ""
+    override fun runCurrentContributionData(): CurrentContributionTestSpec.CurrentContributionDataResult {
+        val output = CurrentContributionData().test(arguments).output
+        return CurrentContributionTestSpec.CurrentContributionDataResult(
+            output = output,
+            data = readFromFile(outputFile) ?: "",
+        )
+    }
+
+    override fun verifyOutput(result: CurrentContributionTestSpec.CurrentContributionDataResult) {
+        result.output.assertIsEqualTo("Data written to ${outputFile}\n")
     }
 }

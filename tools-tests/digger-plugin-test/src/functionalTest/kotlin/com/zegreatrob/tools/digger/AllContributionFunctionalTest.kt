@@ -65,12 +65,16 @@ class AllContributionFunctionalTest : AllContributionTestSpec {
         )
     }
 
-    override fun runAllContributionData(): String {
-        GradleRunner.create()
+    override fun runAllContributionData(): AllContributionTestSpec.AllContributionDataResult {
+        val output = GradleRunner.create()
             .forwardOutput()
             .withArguments("allContributionData", "-q")
             .withProjectDir(File(projectDir))
             .build()
-        return File(allOutput).readText()
+            .output
+        return AllContributionTestSpec.AllContributionDataResult(
+            output = output,
+            data = File(allOutput).readText(),
+        )
     }
 }

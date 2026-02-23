@@ -3,6 +3,7 @@ package com.zegreatrob.certifier.functional
 import com.zegreatrob.minassert.assertIsEqualTo
 import com.zegreatrob.testmints.setup
 import org.gradle.testkit.runner.GradleRunner
+import org.gradle.testkit.runner.TaskOutcome
 import org.junit.jupiter.api.io.TempDir
 import java.io.File
 import kotlin.test.Test
@@ -17,7 +18,10 @@ class CertifierPluginFunctionalTest {
 
     @Test
     fun installCertIsConfigurationCacheCompatible() = setup(object {
-        val certificatePath = this@CertifierPluginFunctionalTest.javaClass.getResource("/localhost.crt")?.toURI()?.path
+        val certificatePath = this@CertifierPluginFunctionalTest.javaClass.getResource("/localhost.crt")
+            ?.toURI()
+            ?.path
+            ?: error("Test not setup correctly - missing /localhost.crt")
         val args = listOf("installCert", "--configuration-cache", "-m")
     }) {
         settingsFile.writeText("")
@@ -58,7 +62,10 @@ class CertifierPluginFunctionalTest {
 
     @Test
     fun canRunInstallCertTask() = setup(object {
-        val certificatePath = this@CertifierPluginFunctionalTest.javaClass.getResource("/localhost.crt")?.toURI()?.path
+        val certificatePath = this@CertifierPluginFunctionalTest.javaClass.getResource("/localhost.crt")
+            ?.toURI()
+            ?.path
+            ?: error("Test not setup correctly - missing /localhost.crt")
         val runner = GradleRunner.create()
             .forwardOutput()
             .withPluginClasspath()
@@ -84,12 +91,16 @@ class CertifierPluginFunctionalTest {
         )
     } exercise {
         runner.build()
-    } verify {
+    } verify { result ->
+        result.task(":installCert")?.outcome.assertIsEqualTo(TaskOutcome.SUCCESS)
     }
 
     @Test
     fun willEmitErrorWhenNoJdkSelected() = setup(object {
-        val certificatePath = this@CertifierPluginFunctionalTest.javaClass.getResource("/localhost.crt")?.toURI()?.path
+        val certificatePath = this@CertifierPluginFunctionalTest.javaClass.getResource("/localhost.crt")
+            ?.toURI()
+            ?.path
+            ?: error("Test not setup correctly - missing /localhost.crt")
         val runner = GradleRunner.create()
             .forwardOutput()
             .withPluginClasspath()
