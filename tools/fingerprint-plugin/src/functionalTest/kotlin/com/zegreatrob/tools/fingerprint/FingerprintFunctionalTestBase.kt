@@ -23,6 +23,15 @@ abstract class FingerprintFunctionalTestBase {
         buildFile.writeText(script.trimIndent())
     }
 
+    protected fun writeBuildWith(base: String, extra: String) {
+        writeBuild(
+            """
+            $base
+            $extra
+            """.trimIndent(),
+        )
+    }
+
     protected fun writeProject(name: String? = null, buildScript: String) {
         writeSettings(name)
         writeBuild(buildScript)
@@ -101,6 +110,23 @@ abstract class FingerprintFunctionalTestBase {
     protected fun runFingerprint(dir: File = testProjectDir, vararg extraArgs: String): String {
         gradle(dir, "generateFingerprint", "--configuration-cache", *extraArgs)
         return fingerprintFile(dir).readText()
+    }
+
+    protected fun runFingerprintWithManifest(dir: File = testProjectDir, vararg extraArgs: String): Pair<String, String> {
+        val hash = runFingerprint(dir, *extraArgs)
+        val manifest = fingerprintManifestFile(dir).readText()
+        return Pair(hash, manifest)
+    }
+
+    protected fun runFingerprintTwiceAfter(
+        change: () -> Unit,
+        dir: File = testProjectDir,
+        vararg extraArgs: String,
+    ): Pair<String, String> {
+        val firstHash = runFingerprint(dir, *extraArgs)
+        change()
+        val secondHash = runFingerprint(dir, *extraArgs)
+        return Pair(firstHash, secondHash)
     }
 
     protected fun assertFingerprintChanged(before: String, after: String, message: String) {
