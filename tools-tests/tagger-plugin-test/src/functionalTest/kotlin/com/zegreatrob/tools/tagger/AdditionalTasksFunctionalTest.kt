@@ -56,6 +56,36 @@ class AdditionalTasksFunctionalTest {
         removeDirectory(projectDir)
     }
 
+    @Test
+    fun releaseDryRunAvoidsImplicitGitHeadDependency() = setup(object {
+        val projectDir = createTempDirectory()
+        val addFileNames = setOf("build.gradle.kts", "settings.gradle", ".gitignore")
+    }) {
+        writeSettings(projectDir)
+        writeBuildFileWithDigger(projectDir)
+        writeGitIgnore(projectDir)
+        initializeGitRepo(
+            directory = projectDir,
+            remoteUrl = projectDir,
+            addFileNames = addFileNames,
+            initialTag = "1.0.0",
+            commits = listOf("init"),
+        )
+    } exercise {
+        runGradle(
+            projectDir = projectDir,
+            task = "release",
+            quiet = false,
+            extraArgs = listOf("--dry-run", "--warning-mode=all", "--console=plain"),
+        )
+    } verify { output ->
+        output.contains("implicit dependency")
+            .assertIsEqualTo(false, "Unexpected implicit dependency warning.\n$output")
+        output.contains("validation_problems")
+            .assertIsEqualTo(false, "Unexpected validation problems output.\n$output")
+        removeDirectory(projectDir)
+    }
+
     private fun writeSettings(projectDir: String) {
         File("$projectDir/settings.gradle").writeText(
             "includeBuild(\"${System.getProperty("user.dir")}/../../tools\")",
@@ -75,14 +105,39 @@ class AdditionalTasksFunctionalTest {
         )
     }
 
+    private fun writeBuildFileWithDigger(projectDir: String) {
+        File("$projectDir/build.gradle.kts").writeText(
+            """
+            plugins {
+                id("com.zegreatrob.tools.tagger")
+                id("com.zegreatrob.tools.digger")
+            }
+            version = "1.2.3"
+            tagger {
+                releaseBranch = "master"
+            }
+            """.trimIndent(),
+        )
+    }
+
     private fun writeGitIgnore(projectDir: String) {
         File("$projectDir/.gitignore").writeText(".gradle")
     }
 
-    private fun runGradle(projectDir: String, task: String): String {
+    private fun runGradle(
+        projectDir: String,
+        task: String,
+        quiet: Boolean = true,
+        extraArgs: List<String> = emptyList(),
+    ): String {
         val runner = GradleRunner.create()
         runner.withProjectDir(File(projectDir))
-        runner.withArguments(task, "-q")
+        val args = mutableListOf(task)
+        if (quiet) {
+            args.add("-q")
+        }
+        args.addAll(extraArgs)
+        runner.withArguments(args)
         return runner.build().output.trim()
     }
 }

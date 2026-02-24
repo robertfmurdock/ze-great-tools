@@ -11,6 +11,7 @@ import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
@@ -18,9 +19,12 @@ import org.gradle.api.tasks.TaskAction
 import java.io.FileOutputStream
 
 abstract class CalculateVersion : DefaultTask() {
+    @get:Internal
+    abstract val workingDirectory: DirectoryProperty
+
     @get:InputDirectory
     @get:PathSensitive(PathSensitivity.RELATIVE)
-    abstract val workingDirectory: DirectoryProperty
+    abstract val gitDirectory: DirectoryProperty
 
     @get:Input
     @get:Optional

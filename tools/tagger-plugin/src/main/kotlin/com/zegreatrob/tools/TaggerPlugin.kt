@@ -26,9 +26,11 @@ class TaggerPlugin : Plugin<Project> {
 
         project.tasks.register("previousVersion", PreviousVersion::class.java) { task ->
             task.workingDirectory.set(tagger.workingDirectory)
+            task.gitDirectory.set(tagger.workingDirectory.dir(".git"))
         }
         project.tasks.register("calculateVersion", CalculateVersion::class.java) { task ->
             task.workingDirectory.set(tagger.workingDirectory)
+            task.gitDirectory.set(tagger.workingDirectory.dir(".git"))
             task.releaseBranch.set(tagger.releaseBranchProperty)
             task.implicitPatch.set(tagger.implicitPatch)
             task.disableDetached.set(tagger.disableDetached)
@@ -43,6 +45,7 @@ class TaggerPlugin : Plugin<Project> {
 
         val tag = project.tasks.register("tag", TagVersion::class.java) { task ->
             task.workingDirectory.set(tagger.workingDirectory)
+            task.gitDirectory.set(tagger.workingDirectory.dir(".git"))
             task.releaseBranch.set(tagger.releaseBranchProperty)
             task.userName.set(tagger.userNameProperty)
             task.userEmail.set(tagger.userEmailProperty)
@@ -58,6 +61,7 @@ class TaggerPlugin : Plugin<Project> {
 
         project.tasks.register("commitReport", CommitReport::class.java) { task ->
             task.workingDirectory.set(tagger.workingDirectory)
+            task.gitDirectory.set(tagger.workingDirectory.dir(".git"))
         }
 
         val githubRelease = project.tasks.register("githubRelease", Exec::class.java) { task ->
@@ -91,6 +95,7 @@ class TaggerPlugin : Plugin<Project> {
 
         project.tasks.register("release", ReleaseVersion::class.java) { task ->
             task.workingDirectory.set(tagger.workingDirectory)
+            task.gitDirectory.set(tagger.workingDirectory.dir(".git"))
             task.releaseBranch.set(tagger.releaseBranchProperty)
             task.version = "${project.version}"
             task.enabled = !project.version.toString().contains("SNAPSHOT")

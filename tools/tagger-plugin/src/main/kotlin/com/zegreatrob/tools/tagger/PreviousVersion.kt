@@ -6,14 +6,18 @@ import com.zegreatrob.tools.tagger.core.lastVersionAndTag
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.tasks.InputDirectory
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 
 abstract class PreviousVersion : DefaultTask() {
+    @get:Internal
+    abstract val workingDirectory: DirectoryProperty
+
     @get:InputDirectory
     @get:PathSensitive(PathSensitivity.RELATIVE)
-    abstract val workingDirectory: DirectoryProperty
+    abstract val gitDirectory: DirectoryProperty
 
     @TaskAction
     fun execute() {
