@@ -1,4 +1,5 @@
 pluginManagement {
+    includeBuild("../tools-plugins")
     repositories {
         gradlePluginPortal()
         mavenCentral()

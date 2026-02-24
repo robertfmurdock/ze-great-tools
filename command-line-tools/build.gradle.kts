@@ -20,6 +20,9 @@ group = "com.zegreatrob.tools"
 
 subprojects {
     plugins.withId("org.jetbrains.kotlin.multiplatform") {
+        dependencies {
+            add("commonTestImplementation", platform(libs.com.zegreatrob.testmints.bom))
+        }
         extensions.configure<KotlinMultiplatformExtension>("kotlin") {
             @OptIn(ExperimentalKotlinGradlePluginApi::class)
             compilerOptions {
