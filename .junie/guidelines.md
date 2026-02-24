@@ -11,6 +11,7 @@ All AI agents working on this repository must follow these rules:
    - Use `setup { ... }` callbacks only for required steps that cannot live in the setup object (see `tools/tagger-plugin/src/test/kotlin/com/zegreatrob/tools/tagger/TaggerPluginTest.kt`).
    - Exercise focuses on the core subject of the test, usually a single call (or a tight cluster of related calls).
    - Verify handles all lookups and validation, including simple ones like `findByName`.
+   - When a test needs cleanup, use `verifyAnd { ... } teardown { ... }` together so teardown always runs and stays visually paired with verification (see `tools-tests/tagger-plugin-test/src/functionalTest/kotlin/com/zegreatrob/tools/tagger/AdditionalTasksFunctionalTest.kt`).
    - When exercise produces both stdout and file output, return a small result object so verify can assert both cleanly.
 4. **Assertions & Expectations**:
    - Prefer `assertIsEqualTo` with data objects for clearer diffs.

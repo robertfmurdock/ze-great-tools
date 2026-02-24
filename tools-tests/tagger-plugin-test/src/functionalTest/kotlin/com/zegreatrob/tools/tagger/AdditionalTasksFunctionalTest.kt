@@ -28,8 +28,9 @@ class AdditionalTasksFunctionalTest {
         )
     } exercise {
         runGradle(projectDir, "previousVersion")
-    } verify { output ->
+    } verifyAnd { output ->
         output.trim().assertIsEqualTo(initialTag)
+    } teardown {
         removeDirectory(projectDir)
     }
 
@@ -50,9 +51,10 @@ class AdditionalTasksFunctionalTest {
         )
     } exercise {
         runGradle(projectDir, "commitReport")
-    } verify { output ->
+    } verifyAnd { output ->
         output.contains("COMMIT REPORT-------").assertIsEqualTo(true)
         output.contains("COMMIT REPORT OVAH--").assertIsEqualTo(true)
+    } teardown {
         removeDirectory(projectDir)
     }
 
@@ -78,11 +80,12 @@ class AdditionalTasksFunctionalTest {
             quiet = false,
             extraArgs = listOf("--dry-run", "--warning-mode=all", "--console=plain"),
         )
-    } verify { output ->
+    } verifyAnd { output ->
         output.contains("implicit dependency")
             .assertIsEqualTo(false, "Unexpected implicit dependency warning.\n$output")
         output.contains("validation_problems")
             .assertIsEqualTo(false, "Unexpected validation problems output.\n$output")
+    } teardown {
         removeDirectory(projectDir)
     }
 
