@@ -74,18 +74,11 @@ jobs:
       - name: Release 🔨
         run: ./gradlew release -Pversion=${{ env.TAGGER_VERSION }} -Pgradle.publish.key=${{ secrets.GRADLE_PUBLISH_KEY }} -Pgradle.publish.secret=${{ secrets.GRADLE_PUBLISH_SECRET }}  --no-configuration-cache --scan
       - name: Include fingerprint
+        if: ${{ env.FINGERPRINT_MATCHES_PREVIOUS == 'false' }}
         continue-on-error: true
         run: |
-          cp command-line-tools/build/fingerprint.txt build/cli.txt
-          cp command-line-tools/build/fingerprint-manifest.log build/cli.log
-          cp tools/build/fingerprint.txt build/tools.txt
-          cp tools/build/fingerprint-manifest.log build/tools.log
           gh release upload ${{ env.TAGGER_VERSION }} \
             build/aggregate-fingerprint.txt \
-            build/cli.txt \
-            build/cli.log \
-            build/tools.txt \
-            build/tools.log \
             build/aggregate-fingerprint-manifest.log \
             --clobber
       - name: Update Contributions
