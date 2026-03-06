@@ -2,10 +2,12 @@ package com.zegreatrob.tools.digger
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 
+@CacheableTask
 abstract class HeadTask : DefaultTask() {
     @Internal
     lateinit var diggerExtension: DiggerExtension
