@@ -2,6 +2,7 @@ package com.zegreatrob.tools.certifier
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.model.ObjectFactory
+import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskAction
 import org.gradle.jvm.toolchain.JavaLanguageVersion
@@ -11,6 +12,7 @@ import java.io.ByteArrayOutputStream
 import javax.inject.Inject
 
 @Suppress("unused")
+@CacheableTask
 abstract class InstallCertificate
 @Inject
 constructor(
