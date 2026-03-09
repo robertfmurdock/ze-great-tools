@@ -49,6 +49,10 @@ jobs:
         if: ${{ github.ref == 'refs/heads/master' }}
         with:
           domain: robertfmurdock
+      - name: Prime Gradle
+        continue-on-error: true
+        run: |
+          ./gradlew --version
       - name: Check Fingerprint 🔨
         continue-on-error: true
         run: |
