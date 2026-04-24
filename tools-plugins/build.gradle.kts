@@ -38,7 +38,7 @@ tasks {
 }
 
 versionCatalogUpdate {
-    val rejectRegex = "^[0-9.]+[0-9](-RC|-M[0-9]*|-RC[0-9]*.*|-beta.*|-Beta.*|-alpha.*|-dev.*)$".toRegex()
+    val rejectRegex = "^[0-9.]+[0-9](-RC|-M[0-9]*|-RC[0-9]*.*|-beta.*|-Beta.*|-alpha.*|-dev.*|.*-compat.*|-rc[0-9]*)$".toRegex()
     versionSelector { versionCandidate ->
         !rejectRegex.matches(versionCandidate.candidate.version)
     }
