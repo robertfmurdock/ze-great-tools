@@ -4,7 +4,7 @@ com-zegreatrob-testmints-bom = { module = "com.zegreatrob.testmints:testmints-bo
 com-zegreatrob-testmints-minassert = { module = "com.zegreatrob.testmints:minassert" }
 com-zegreatrob-testmints-standard = { module = "com.zegreatrob.testmints:standard" }
 org-jetbrains-kotlinx-kotlinx-coroutines-bom = "org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.10.2"
-org-jetbrains-kotlinx-kotlinx-datetime = "org.jetbrains.kotlinx:kotlinx-datetime:0.7.1"
+org-jetbrains-kotlinx-kotlinx-datetime = "org.jetbrains.kotlinx:kotlinx-datetime:0.8.0"
 # @pin
 org-jetbrains-kotlinx-kotlinx-serialization-bom = "org.jetbrains.kotlinx:kotlinx-serialization-bom:1.9.0"
 org-junit-junit-bom = "org.junit:junit-bom:6.0.3"
