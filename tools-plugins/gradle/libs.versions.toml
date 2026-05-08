@@ -1,5 +1,5 @@
 [libraries]
-org-apache-logging-log4j-log4j-core = "org.apache.logging.log4j:log4j-core:2.25.4"
+org-apache-logging-log4j-log4j-core = "org.apache.logging.log4j:log4j-core:2.26.0"
 org-jmailen-gradle-kotlinter-gradle = "org.jmailen.gradle:kotlinter-gradle:5.4.2"
 
 [plugins]
