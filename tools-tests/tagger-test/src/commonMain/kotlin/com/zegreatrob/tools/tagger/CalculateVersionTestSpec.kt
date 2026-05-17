@@ -102,7 +102,7 @@ interface CalculateVersionTestSpec {
     } verify { result ->
         when (result) {
             is TestResult.Failure ->
-                result.reason.contains("Inappropriate configuration: repository has no remote.")
+                result.reason.contains("Inappropriate configuration: HEAD has no upstream tracking branch.")
                     .assertIsEqualTo(true, "Expected missing remote error. Output:\n${result.reason}")
 
             is TestResult.Success -> fail("Should not have succeeded.")

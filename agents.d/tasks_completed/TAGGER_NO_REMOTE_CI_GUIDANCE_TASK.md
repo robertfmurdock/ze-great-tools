@@ -55,14 +55,14 @@ checkout step, with a link to the same doc.
 ## Checklist
 
 ### Code changes
-- [ ] `docs/tagger-detached-head.md` created with root-cause explanation, GitHub Actions fix,
+- [x] `docs/tagger-detached-head.md` created with root-cause explanation, GitHub Actions fix,
   and `disableDetached = false` alternative
-- [ ] `FailureVersionReasons.NoRemote` message updated to short form with doc link
-- [ ] (Optional) `disableDetached` KDoc in `TaggerExtension.kt` links to doc
+- [x] `FailureVersionReasons.NoRemote` message updated to short form with doc link
+- [x] (Optional) `disableDetached` KDoc in `TaggerExtension.kt` links to doc
 
 ### Validation
-- [ ] Existing `NoRemote` test in `CalculateVersionTestSpec` updated to assert on new message text
-- [ ] `./gradlew :tools-tests:check` passes
+- [x] Existing `NoRemote` test in `CalculateVersionTestSpec` updated to assert on new message text
+- [x] `./gradlew :tools-tests:check` passes
 - [ ] Move this file to `agents.d/tasks_completed/`
 
 ## Definition of done

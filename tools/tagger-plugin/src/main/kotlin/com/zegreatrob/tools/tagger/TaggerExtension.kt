@@ -38,6 +38,11 @@ open class TaggerExtension(
 
     val implicitPatch = objectFactory.property(Boolean::class.java).convention(true)
 
+    /**
+     * When true (default), versioning fails if HEAD has no upstream tracking branch (detached HEAD).
+     * Fix the CI checkout step instead of disabling this check.
+     * See: https://github.com/robertfmurdock/ze-great-tools/blob/main/docs/tagger-detached-head.md
+     */
     val disableDetached = objectFactory.property(Boolean::class.java).convention(true)
 
     val forceSnapshot = objectFactory.property(Boolean::class.java).convention(false)
