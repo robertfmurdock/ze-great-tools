@@ -1,29 +1,48 @@
 # Code Style Playbook
 
-Use this playbook when a task involves writing or modifying source code in any
-language used in this repository.
+## Test-Driven Development
+When adding new behavior or task explicitly requires TDD:
 
-## Function Design
-- Prefer short, well-named functions: target fewer than 10 lines per function.
-  Break this rule only when the alternative is less readable — clarity wins.
-- Name functions to express intent, not implementation detail.
+### Red-Green-Refactor
+- One test at a time: write, see it fail for the right reason, fix, see it pass, repeat
+- Each test drives one objective change
+- When a scenario produces multiple related outputs, check them all in one test
+- Extend existing tests with new assertions when they fit the same scenario
+- "Chop down" call chains: break before `?.` and before `.assertIsEqualTo` so assertions visually descend
+
+```kotlin
+// Good: assertion stands out at bottom left
+data["version"]
+    ?.jsonPrimitive
+    ?.content
+    .assertIsEqualTo("1.2.4")
+
+// Bad: hard to parse
+data["version"]?.jsonPrimitive?.content.assertIsEqualTo("1.2.4")
+```
+
+### Avoid
+- Multiple tests before implementing any
+- Feature first, tests second
+- Batched `./gradlew check` without seeing individual failures
+- Redundant tests verifying the same behavior
+
+## Functions
+- Target <10 lines; break only when clarity demands it
+- Name intent, not implementation
 
 ## Comments
-- After writing a comment, take a refactor pass to embed its content into the
-  code itself — better names, extracted functions, clearer structure. A comment
-  that survives this pass is one whose WHY genuinely cannot be expressed in code.
+- Refactor comment content into code (names, structure, extracted functions)
+- Keep only WHY that cannot be expressed in code
 
-## Data and Control Flow
-- Prefer immutable data structures and functional transformations (`map`, `filter`,
-  `fold`, etc.) over mutable accumulators and imperative loops. Avoid loops whose
-  exit path depends on `break`, `continue`, or accumulated mutable state — these
-  obscure intent and complicate reasoning. When a loop is necessary, make its
-  termination condition and output unambiguous.
+## Data Flow
+- Prefer immutable structures and functional transforms (`map`, `filter`, `fold`)
+- Avoid loops with `break`, `continue`, or mutable accumulators
+- Make termination and output unambiguous
 
-## General Style
-- Keep edits minimal and limited to task scope.
-- For a feature or bugfix task, "task scope" includes any method or function that
-  contains or references the touched lines — not just the touched lines themselves.
-- For a refactoring task, "task scope" includes any file containing the touched lines — not just the touched lines themselves.
-- Preserve existing behavior unless the task explicitly changes it.
-- Follow existing patterns and module ownership.
+## Scope
+- Keep edits minimal
+- Feature/bugfix: scope is any function touching changed lines
+- Refactor: scope is any file touching changed lines
+- Preserve behavior unless task changes it
+- Follow existing patterns
