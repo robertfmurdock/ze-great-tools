@@ -191,4 +191,107 @@ class CalculateVersionCommandTest : CalculateVersionTestSpec {
         assertNotNull(json.jsonObject["error"], "Expected error field in JSON output")
         assertNotNull(json.jsonObject["code"], "Expected error code in JSON output")
     }
+
+    @Test
+    fun withFormatTextPreservesPreviousBehavior() = setup(object {
+        val commits = listOf("init", "[patch] commit 1", "[patch] commit 2")
+        val initialTag = "1.2.3"
+    }) {
+        initializeGitRepo(commits = commits, initialTag = initialTag)
+        baseArguments = listOf(
+            "calculate-version",
+            "--release-branch=master",
+            "--format=text",
+            projectDir,
+        )
+    } exercise {
+        cli().test(baseArguments)
+    } verify { result ->
+        result.statusCode.assertIsEqualTo(0, "Command failed. Output: ${result.output}")
+        result.stdout.trim().assertIsEqualTo("1.2.4", "Text format should output version only")
+        // Verify it's NOT JSON
+        result.stdout.contains("{").assertIsEqualTo(false, "Text format should not contain JSON")
+    }
+
+    @Test
+    fun defaultFormatIsText() = setup(object {
+        val commits = listOf("init", "[patch] commit 1")
+        val initialTag = "1.2.3"
+    }) {
+        initializeGitRepo(commits = commits, initialTag = initialTag)
+        baseArguments = listOf(
+            "calculate-version",
+            "--release-branch=master",
+            projectDir,
+        )
+    } exercise {
+        cli().test(baseArguments)
+    } verify { result ->
+        result.statusCode.assertIsEqualTo(0, "Command failed. Output: ${result.output}")
+        result.stdout.trim().assertIsEqualTo("1.2.4")
+        result.stdout.contains("{").assertIsEqualTo(false, "Default format should be text, not JSON")
+    }
+
+    @Test
+    fun jsonOutputGoesToStdout() = setup(object {
+        val commits = listOf("init", "[patch] commit 1")
+        val initialTag = "1.2.3"
+    }) {
+        initializeGitRepo(commits = commits, initialTag = initialTag)
+        baseArguments = listOf(
+            "calculate-version",
+            "--release-branch=master",
+            "--format=json",
+            projectDir,
+        )
+    } exercise {
+        cli().test(baseArguments)
+    } verify { result ->
+        result.statusCode.assertIsEqualTo(0)
+        // Verify JSON is in stdout, not stderr
+        result.stdout.contains("\"status\"").assertIsEqualTo(true, "JSON should be in stdout")
+        result.stderr.isEmpty().assertIsEqualTo(true, "JSON mode should not write to stderr for success")
+    }
+
+    @Test
+    fun jsonFormatWithQuietFlagStillWorks() = setup(object {
+        val commits = listOf("init", "[patch] commit 1")
+        val initialTag = "1.2.3"
+    }) {
+        initializeGitRepo(commits = commits, initialTag = initialTag)
+        baseArguments = listOf(
+            "-q",
+            "calculate-version",
+            "--release-branch=master",
+            "--format=json",
+            projectDir,
+        )
+    } exercise {
+        cli().test(baseArguments)
+    } verify { result ->
+        result.statusCode.assertIsEqualTo(0)
+        val json = Json.parseToJsonElement(result.stdout)
+        json.jsonObject["status"]?.jsonPrimitive?.content.assertIsEqualTo("success")
+        assertNotNull(json.jsonObject["data"])
+    }
+
+    @Test
+    fun jsonErrorsGoToStdout() = setup(object {
+        val commits = listOf("init", "[patch] commit 1")
+    }) {
+        initializeGitRepo(commits = commits, initialTag = null)
+        baseArguments = listOf(
+            "calculate-version",
+            "--release-branch=master",
+            "--format=json",
+            projectDir,
+        )
+    } exercise {
+        cli().test(baseArguments)
+    } verify { result ->
+        result.statusCode.assertIsEqualTo(1)
+        // Error JSON should still be in stdout, not stderr
+        result.stdout.contains("\"status\"").assertIsEqualTo(true, "JSON error should be in stdout")
+        result.stdout.contains("\"error\"").assertIsEqualTo(true, "JSON error should be in stdout")
+    }
 }

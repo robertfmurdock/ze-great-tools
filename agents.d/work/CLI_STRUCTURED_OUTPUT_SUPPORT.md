@@ -287,23 +287,23 @@ For each command:
 - [x] Run `./gradlew :command-line-tools:tagger-cli:check`
 
 ### Phase 3: digger-cli implementation (TDD)
-- [ ] Write failing test: `current-contribution-data --format=json`
-- [ ] Verify test fails correctly
-- [ ] Implement `--format` flag (or envelope wrapping)
-- [ ] Verify test passes
-- [ ] Write failing test: `all-contribution-data --format=json`
-- [ ] Verify test fails correctly
-- [ ] Implement `--format` flag
-- [ ] Verify test passes
-- [ ] Add comprehensive test coverage
-- [ ] Run `./gradlew :command-line-tools:digger-cli:check`
+- [x] Write failing test: `current-contribution-data --format=json`
+- [x] Verify test fails correctly
+- [x] Implement `--format` flag (or envelope wrapping)
+- [x] Verify test passes
+- [x] Write failing test: `all-contribution-data --format=json`
+- [x] Verify test fails correctly
+- [x] Implement `--format` flag
+- [x] Verify test passes
+- [x] Add comprehensive test coverage
+- [x] Run `./gradlew :command-line-tools:digger-cli:check`
 
 ### Phase 4: Integration and validation
-- [ ] Test all commands with `--format=json` manually
-- [ ] Test in actual CI environment (bash, PowerShell)
-- [ ] Verify JSON is parseable by common tools (`jq`, `node -pe`, Python)
-- [ ] Test error cases produce valid JSON
-- [ ] Run `./gradlew check` for full repo
+- [x] Test all commands with `--format=json` manually
+- [x] Test in actual CI environment (bash, PowerShell)
+- [x] Verify JSON is parseable by common tools (`jq`, `node -pe`, Python)
+- [x] Test error cases produce valid JSON
+- [x] Run `./gradlew check` for full repo
 
 ### Phase 5: Documentation
 - [ ] Update help text for all commands to show `--format` option

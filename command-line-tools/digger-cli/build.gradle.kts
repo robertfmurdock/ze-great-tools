@@ -6,6 +6,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     id("org.jetbrains.kotlin.multiplatform")
+    id("org.jetbrains.kotlin.plugin.serialization") version embeddedKotlinVersion
     alias(libs.plugins.org.jmailen.kotlinter)
 }
 
@@ -52,10 +53,12 @@ kotlin {
 val mainNpmProjectDir = kotlin.js().compilations.getByName("main").npmProject.dir
 
 dependencies {
+    commonMainImplementation(platform(libs.org.jetbrains.kotlinx.kotlinx.serialization.bom))
     commonMainImplementation("com.zegreatrob.tools:cli-tools")
     commonMainImplementation("com.zegreatrob.tools:digger-core")
     commonMainImplementation("com.zegreatrob.tools:digger-json")
     commonMainImplementation(libs.com.github.ajalt.clikt.clikt)
+    commonMainImplementation("org.jetbrains.kotlinx:kotlinx-serialization-json")
 
     commonTestImplementation("com.zegreatrob.tools:digger-test")
     commonTestImplementation(libs.org.jetbrains.kotlin.kotlin.stdlib)

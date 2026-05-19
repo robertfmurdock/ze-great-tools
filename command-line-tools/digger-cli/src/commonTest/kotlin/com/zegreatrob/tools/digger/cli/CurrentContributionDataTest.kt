@@ -2,8 +2,14 @@ package com.zegreatrob.tools.digger.cli
 
 import com.github.ajalt.clikt.testing.test
 import com.zegreatrob.minassert.assertIsEqualTo
+import com.zegreatrob.testmints.setup
 import com.zegreatrob.tools.cli.readFromFile
 import com.zegreatrob.tools.digger.CurrentContributionTestSpec
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
+import kotlin.test.Test
+import kotlin.test.assertNotNull
 
 class CurrentContributionDataTest : CurrentContributionTestSpec {
 
@@ -54,5 +60,66 @@ class CurrentContributionDataTest : CurrentContributionTestSpec {
 
     override fun verifyOutput(result: CurrentContributionTestSpec.CurrentContributionDataResult) {
         result.output.assertIsEqualTo("Data written to ${outputFile}\n")
+    }
+
+    @Test
+    fun withFormatJsonOutputsValidJson() = setup(object {
+        val commits = listOf("[major] initial commit", "[minor] add feature")
+    }) {
+        initializeGitRepo(commits = commits)
+        arguments = listOf(
+            "--format=json",
+            projectDir,
+        )
+    } exercise {
+        CurrentContributionData().test(arguments)
+    } verify { result ->
+        result.statusCode.assertIsEqualTo(0, "Command failed. Stdout: ${result.stdout}\nStderr: ${result.stderr}")
+
+        val json = Json.parseToJsonElement(result.stdout)
+        json.jsonObject["status"]?.jsonPrimitive?.content.assertIsEqualTo("success")
+        assertNotNull(json.jsonObject["data"], "Expected data field in JSON output")
+    }
+
+    @Test
+    fun withFormatTextPreservesCurrentBehavior() = setup(object {
+        val commits = listOf("[major] initial commit", "[minor] add feature")
+    }) {
+        initializeGitRepo(commits = commits)
+        arguments = listOf(
+            "--format=text",
+            "--output-file=$outputFile",
+            projectDir,
+        )
+    } exercise {
+        CurrentContributionData().test(arguments)
+    } verify { result ->
+        result.statusCode.assertIsEqualTo(0)
+        result.output.contains("Data written to").assertIsEqualTo(true, "Expected text mode to write to file")
+        val fileContent = readFromFile(outputFile)
+        assertNotNull(fileContent, "Expected file to be written in text mode")
+    }
+
+    @Test
+    fun withInvalidFormatShowsAvailableOptions() = setup(object {
+        val commits = listOf("[major] initial commit")
+    }) {
+        initializeGitRepo(commits = commits)
+        arguments = listOf(
+            "--format=yaml",
+            projectDir,
+        )
+    } exercise {
+        CurrentContributionData().test(arguments)
+    } verify { result ->
+        result.statusCode.assertIsEqualTo(1, "Command should fail with invalid format")
+        result.output.contains("text", ignoreCase = true).assertIsEqualTo(
+            true,
+            "Error should mention 'text' option. Output: ${result.output}",
+        )
+        result.output.contains("json", ignoreCase = true).assertIsEqualTo(
+            true,
+            "Error should mention 'json' option. Output: ${result.output}",
+        )
     }
 }

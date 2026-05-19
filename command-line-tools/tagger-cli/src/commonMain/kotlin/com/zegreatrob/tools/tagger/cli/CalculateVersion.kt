@@ -106,15 +106,14 @@ class CalculateVersion : CliktCommand() {
         snapshotReasons: List<SnapshotReason>,
     ) {
         val isSnapshot = version.endsWith("-SNAPSHOT")
-        echo(
-            versionSuccessResponse(
-                VersionData(
-                    version = version,
-                    snapshot = isSnapshot,
-                    snapshotReasons = snapshotReasons.map { it.toString() },
-                ),
+        val jsonOutput = versionSuccessResponse(
+            VersionData(
+                version = version,
+                snapshot = isSnapshot,
+                snapshotReasons = snapshotReasons.map { it.toString() },
             ),
         )
+        echo(jsonOutput)
     }
 
     private fun versionRegex() = VersionRegex(

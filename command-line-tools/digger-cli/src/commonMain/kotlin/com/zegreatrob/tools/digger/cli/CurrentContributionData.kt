@@ -1,6 +1,7 @@
 package com.zegreatrob.tools.digger.cli
 
 import com.github.ajalt.clikt.core.CliktCommand
+import com.github.ajalt.clikt.core.CliktError
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.option
@@ -9,6 +10,7 @@ import com.zegreatrob.tools.cli.writeToFile
 import com.zegreatrob.tools.digger.core.DiggerCore
 import com.zegreatrob.tools.digger.core.MessageDigger
 import com.zegreatrob.tools.digger.json.toJsonString
+import kotlinx.serialization.json.Json
 
 class CurrentContributionData : CliktCommand() {
     private val dir by argument("git-repo")
@@ -21,6 +23,13 @@ class CurrentContributionData : CliktCommand() {
     private val storyIdRegex by option()
     private val easeRegex by option()
     private val tagRegex by option()
+    private val formatString by option("--format").default("text")
+    private val format: OutputFormat
+        get() = try {
+            OutputFormat.fromString(formatString)
+        } catch (e: IllegalArgumentException) {
+            throw CliktError(e.message ?: "Invalid format")
+        }
 
     private val core
         get() = DiggerCore(
@@ -37,8 +46,19 @@ class CurrentContributionData : CliktCommand() {
             tagRegex = tagRegex?.let(::Regex) ?: DiggerCore.Defaults.tagRegex,
         )
 
-    override fun run() = core.currentContributionData()
-        .toJsonString()
-        .writeToFile(outputFile)
-        .also { echo("Data written to $outputFile") }
+    override fun run() {
+        val jsonString = core.currentContributionData().toJsonString()
+        when (format) {
+            OutputFormat.JSON -> {
+                val dataElement = Json.parseToJsonElement(jsonString)
+                echo(successResponse(dataElement))
+            }
+
+            OutputFormat.TEXT -> {
+                jsonString
+                    .writeToFile(outputFile)
+                    .also { echo("Data written to $outputFile") }
+            }
+        }
+    }
 }
