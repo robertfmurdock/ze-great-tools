@@ -21,6 +21,24 @@ data["version"]
 data["version"]?.jsonPrimitive?.content.assertIsEqualTo("1.2.4")
 ```
 
+### Assertions
+- Prefer minassert's `assertIsEqualTo` over kotlin.test assertions
+- Provides clearer diffs when comparing data objects
+- Always "chop down" chains leading to assertions (break before `?.` and before the assertion call)
+- For nullable checks where the value matters, extract to a variable first rather than using `assertNotNull` inline
+
+```kotlin
+// Good: clear what's being tested, clean diff on failure
+json.jsonObject["status"]
+    ?.jsonPrimitive
+    ?.content
+    .assertIsEqualTo("success")
+
+// Bad: harder to read, worse failure messages
+assertNotNull(json.jsonObject["status"])
+assertEquals("success", json.jsonObject["status"]?.jsonPrimitive?.content)
+```
+
 ### Avoid
 - Multiple tests before implementing any
 - Feature first, tests second
