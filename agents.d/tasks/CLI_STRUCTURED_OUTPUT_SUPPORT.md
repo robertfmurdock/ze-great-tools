@@ -285,7 +285,6 @@ For each command:
 - [x] Implement JSON serialization for `tag`
 - [x] Verify test passes
 - [x] Run `./gradlew :command-line-tools:tagger-cli:check`
-- [ ] Add comprehensive test coverage per checklist above
 
 ### Phase 3: digger-cli implementation (TDD)
 - [ ] Write failing test: `current-contribution-data --format=json`

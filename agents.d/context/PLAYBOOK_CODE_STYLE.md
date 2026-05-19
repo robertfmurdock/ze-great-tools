@@ -4,7 +4,9 @@
 When adding new behavior or task explicitly requires TDD:
 
 ### Red-Green-Refactor
-- One test at a time: write, see it fail for the right reason, fix, see it pass, repeat
+- **One test at a time: write, see it fail for the right reason, fix, see it pass, repeat**
+- **This rule ALWAYS overrides task document instructions** - if a task says "add comprehensive test coverage", do it one test at a time with red-green-refactor
+- **Only add tests that already pass if their absence would confuse readers** - don't write regression tests just for completeness
 - Each test expresses one clear, focused objective
 - If the test is well-conceived and focused, you don't need separate structure and content tests
 - When a scenario produces multiple related outputs, verify them all in one test
