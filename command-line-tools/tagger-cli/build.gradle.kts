@@ -5,6 +5,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     id("org.jetbrains.kotlin.multiplatform")
+    id("org.jetbrains.kotlin.plugin.serialization") version embeddedKotlinVersion
     alias(libs.plugins.org.jmailen.kotlinter)
 }
 

@@ -16,6 +16,24 @@ import com.zegreatrob.tools.tagger.core.VersionRegex
 import com.zegreatrob.tools.tagger.core.VersionResult
 import com.zegreatrob.tools.tagger.core.calculateNextVersion
 
+enum class OutputFormat {
+    TEXT,
+    JSON,
+    ;
+
+    companion object {
+        fun fromString(value: String): OutputFormat = when (value.lowercase()) {
+            "text" -> TEXT
+
+            "json" -> JSON
+
+            else -> throw IllegalArgumentException(
+                "Invalid format '$value'. Must be one of: ${entries.joinToString(", ") { it.name.lowercase() }}",
+            )
+        }
+    }
+}
+
 class CalculateVersion : CliktCommand() {
 
     init {
@@ -29,6 +47,13 @@ class CalculateVersion : CliktCommand() {
     private val disableDetached by option().boolean().default(true)
     private val forceSnapshot by option().boolean().default(false)
     private val releaseBranch by option()
+    private val formatString by option("--format").default("text")
+    private val format: OutputFormat
+        get() = try {
+            OutputFormat.fromString(formatString)
+        } catch (e: IllegalArgumentException) {
+            throw CliktError(e.message ?: "Invalid format")
+        }
     private val majorRegex by option().default(VersionRegex.Defaults.major.pattern)
     private val minorRegex by option().default(VersionRegex.Defaults.minor.pattern)
     private val patchRegex by option().default(VersionRegex.Defaults.patch.pattern)
@@ -49,8 +74,19 @@ class CalculateVersion : CliktCommand() {
             )
             .run {
                 when (this) {
-                    is VersionResult.Success -> output(message = version, errorMessage = snapshotReasons)
-                    is VersionResult.Failure -> throw CliktError(message)
+                    is VersionResult.Success -> when (format) {
+                        OutputFormat.JSON -> outputJson(version = version, snapshotReasons = snapshotReasons)
+                        OutputFormat.TEXT -> output(message = version, errorMessage = snapshotReasons)
+                    }
+
+                    is VersionResult.Failure -> when (format) {
+                        OutputFormat.JSON -> {
+                            echo(errorResponse(message, "CONFIGURATION_ERROR"))
+                            throw CliktError("", printError = false, statusCode = 1)
+                        }
+
+                        OutputFormat.TEXT -> throw CliktError(message)
+                    }
                 }
             }
     }
@@ -63,6 +99,22 @@ class CalculateVersion : CliktCommand() {
         if (errorMessage.isNotEmpty()) {
             echo(errorMessage, err = true)
         }
+    }
+
+    private fun outputJson(
+        version: String,
+        snapshotReasons: List<SnapshotReason>,
+    ) {
+        val isSnapshot = version.endsWith("-SNAPSHOT")
+        echo(
+            versionSuccessResponse(
+                VersionData(
+                    version = version,
+                    snapshot = isSnapshot,
+                    snapshotReasons = snapshotReasons.map { it.toString() },
+                ),
+            ),
+        )
     }
 
     private fun versionRegex() = VersionRegex(
