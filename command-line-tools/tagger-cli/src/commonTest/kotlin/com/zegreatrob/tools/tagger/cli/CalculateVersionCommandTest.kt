@@ -74,7 +74,6 @@ class CalculateVersionCommandTest : CalculateVersionTestSpec {
     }) {
         initializeGitRepo(commits = commits, initialTag = initialTag)
         baseArguments = listOf(
-            "-q",
             "calculate-version",
             "--release-branch=master",
             "--format=json",
@@ -97,7 +96,6 @@ class CalculateVersionCommandTest : CalculateVersionTestSpec {
     }) {
         initializeGitRepo(commits = commits, initialTag = initialTag)
         baseArguments = listOf(
-            "-q",
             "calculate-version",
             "--release-branch=master",
             "--format=json",
@@ -125,7 +123,6 @@ class CalculateVersionCommandTest : CalculateVersionTestSpec {
     }) {
         initializeGitRepo(commits = commits, initialTag = initialTag)
         baseArguments = listOf(
-            "-q",
             "calculate-version",
             "--release-branch=master",
             "--format=json",
@@ -154,7 +151,6 @@ class CalculateVersionCommandTest : CalculateVersionTestSpec {
     }) {
         initializeGitRepo(commits = commits, initialTag = initialTag)
         baseArguments = listOf(
-            "-q",
             "calculate-version",
             "--release-branch=master",
             "--format=yaml",
@@ -180,7 +176,6 @@ class CalculateVersionCommandTest : CalculateVersionTestSpec {
     }) {
         initializeGitRepo(commits = commits, initialTag = null)
         baseArguments = listOf(
-            "-q",
             "calculate-version",
             "--release-branch=master",
             "--format=json",

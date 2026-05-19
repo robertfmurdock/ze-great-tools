@@ -5,8 +5,10 @@ When adding new behavior or task explicitly requires TDD:
 
 ### Red-Green-Refactor
 - One test at a time: write, see it fail for the right reason, fix, see it pass, repeat
-- Each test drives one objective change
-- When a scenario produces multiple related outputs, check them all in one test
+- Each test expresses one clear, focused objective
+- If the test is well-conceived and focused, you don't need separate structure and content tests
+- When a scenario produces multiple related outputs, verify them all in one test
+- Only write multiple tests when they represent genuinely different scenarios or variations
 - Extend existing tests with new assertions when they fit the same scenario
 - "Chop down" call chains: break before `?.` and before `.assertIsEqualTo` so assertions visually descend
 
@@ -23,6 +25,7 @@ data["version"]?.jsonPrimitive?.content.assertIsEqualTo("1.2.4")
 
 ### Assertions
 - Prefer minassert's `assertIsEqualTo` over kotlin.test assertions
+- Most assertions reduce to equality checks; use `assertIsEqualTo` as the default
 - Provides clearer diffs when comparing data objects
 - Always "chop down" chains leading to assertions (break before `?.` and before the assertion call)
 - For nullable checks where the value matters, extract to a variable first rather than using `assertNotNull` inline
@@ -64,3 +67,7 @@ assertEquals("success", json.jsonObject["status"]?.jsonPrimitive?.content)
 - Refactor: scope is any file touching changed lines
 - Preserve behavior unless task changes it
 - Follow existing patterns
+
+## Formatting
+- Run `./gradlew formatKotlin` to fix linting issues
+- Use the formatter instead of manual edits when possible

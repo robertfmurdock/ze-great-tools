@@ -15,7 +15,7 @@ class Tagger : CliktCommand() {
         .flag(default = false)
 
     override fun run() {
-        if (!quiet) {
+        if (!quiet && currentContext.invokedSubcommand == null) {
             echo("Welcome to Tagger CLI.")
         }
     }

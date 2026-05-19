@@ -28,17 +28,34 @@ class Tag : CliktCommand() {
     private val userName: String? by option()
     private val userEmail: String? by option()
     private val warningsAsErrors by option().boolean().default(false)
+    private val formatString by option("--format").default("text")
+    private val format: OutputFormat
+        get() = try {
+            OutputFormat.fromString(formatString)
+        } catch (e: IllegalArgumentException) {
+            throw CliktError(e.message ?: "Invalid format")
+        }
     override fun run() {
         TaggerCore(GitAdapter(workingDirectory))
             .tag(version, releaseBranch, userName, userEmail)
             .let {
                 when (it) {
-                    TagResult.Success -> echo("Success!")
+                    TagResult.Success -> when (format) {
+                        OutputFormat.JSON -> echo(tagSuccessResponse(TagData(tag = version)))
+                        OutputFormat.TEXT -> echo("Success!")
+                    }
 
-                    is TagResult.Error -> if (warningsAsErrors) {
-                        throw CliktError(it.message)
-                    } else {
-                        echo(it.message, err = true)
+                    is TagResult.Error -> when (format) {
+                        OutputFormat.JSON -> {
+                            echo(errorResponse(it.message, "TAG_ERROR"))
+                            throw CliktError("", printError = false, statusCode = if (warningsAsErrors) 1 else 0)
+                        }
+
+                        OutputFormat.TEXT -> if (warningsAsErrors) {
+                            throw CliktError(it.message)
+                        } else {
+                            echo(it.message, err = true)
+                        }
                     }
                 }
             }

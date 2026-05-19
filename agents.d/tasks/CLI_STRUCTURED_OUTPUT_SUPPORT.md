@@ -279,13 +279,13 @@ For each command:
 - [x] Write test: snapshot reasons included when present
 - [x] Write test: invalid format value shows available options
 - [x] Verify all calculate-version tests pass
-- [ ] Write failing test: `tag --format=json`
-- [ ] Verify test fails correctly
-- [ ] Implement `--format` flag for `tag`
-- [ ] Implement JSON serialization for `tag`
-- [ ] Verify test passes
+- [x] Write failing test: `tag --format=json`
+- [x] Verify test fails correctly
+- [x] Implement `--format` flag for `tag`
+- [x] Implement JSON serialization for `tag`
+- [x] Verify test passes
+- [x] Run `./gradlew :command-line-tools:tagger-cli:check`
 - [ ] Add comprehensive test coverage per checklist above
-- [ ] Run `./gradlew :command-line-tools:tagger-cli:check`
 
 ### Phase 3: digger-cli implementation (TDD)
 - [ ] Write failing test: `current-contribution-data --format=json`

@@ -23,6 +23,19 @@ data class ErrorResponse(
     val code: String,
 )
 
+@Serializable
+data class TagSuccessResponse(
+    val status: String,
+    val data: TagData,
+)
+
+@Serializable
+data class TagData(
+    val tag: String,
+)
+
 fun versionSuccessResponse(data: VersionData): String = Json.encodeToString(VersionSuccessResponse.serializer(), VersionSuccessResponse(status = "success", data = data))
+
+fun tagSuccessResponse(data: TagData): String = Json.encodeToString(TagSuccessResponse.serializer(), TagSuccessResponse(status = "success", data = data))
 
 fun errorResponse(message: String, code: String): String = Json.encodeToString(ErrorResponse.serializer(), ErrorResponse(status = "error", error = message, code = code))
