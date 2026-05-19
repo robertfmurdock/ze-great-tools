@@ -179,7 +179,7 @@ VERSION=$(npx tagger -q calculate-version ... 2>/dev/null)
 - [ ] Verify quiet mode is parseable with simple scripts
 - [ ] Verify stderr redirection doesn't lose errors
 - [ ] Test with npm warnings present (real-world scenario)
-- [ ] Move this file to `agents.d/tasks_completed/`
+- [ ] Move this file to `agents.d/work_completed/`
 
 ## Definition of done
 - Quiet mode outputs exactly the version to stdout, nothing else

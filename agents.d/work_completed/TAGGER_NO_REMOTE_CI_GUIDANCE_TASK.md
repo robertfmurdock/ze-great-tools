@@ -63,7 +63,7 @@ checkout step, with a link to the same doc.
 ### Validation
 - [x] Existing `NoRemote` test in `CalculateVersionTestSpec` updated to assert on new message text
 - [x] `./gradlew :tools-tests:check` passes
-- [ ] Move this file to `agents.d/tasks_completed/`
+- [ ] Move this file to `agents.d/work_completed/`
 
 ## Definition of done
 - A developer hitting the error reads the message, follows the link, and knows immediately

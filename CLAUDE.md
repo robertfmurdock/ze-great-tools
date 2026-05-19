@@ -2,12 +2,12 @@
 
 ## Read First
 - `agents.d/context/PERSONA.md`
-- `agents.d/context/TASK_CHECKLIST.md`
-- `agents.d/context/PLAYBOOK_CODE_STYLE.md`
+- `agents.d/context/WORK_CHECKLIST.md`
 - `.junie/guidelines.md` (project-specific testing and verification rules)
 
 ## Conditional Reads
 Load the relevant playbook based on your task type:
+- `agents.d/context/PLAYBOOK_CODE_STYLE.md` — when modifying source code
 - `agents.d/context/GRADLE_PLAYBOOK.md` — when modifying Gradle build logic or dependencies
 - `agents.d/context/GITHUB_ACTIONS_PLAYBOOK.md` — when adding or changing GitHub Actions workflows
 

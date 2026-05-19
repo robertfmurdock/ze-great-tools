@@ -319,7 +319,7 @@ For each command:
 - [ ] Manual testing in CI environment successful
 - [ ] Documentation complete and accurate
 - [ ] Backwards compatibility verified (text mode unchanged)
-- [ ] Move this file to `agents.d/tasks_completed/`
+- [ ] Move this file to `agents.d/work_completed/`
 
 ## Definition of done
 - All CLIs support `--format=json` flag

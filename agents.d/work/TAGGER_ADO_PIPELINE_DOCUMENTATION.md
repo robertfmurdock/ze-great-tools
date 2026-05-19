@@ -241,7 +241,7 @@ General CI guidance applicable to all platforms:
 - [ ] Test bootstrap workflow
 - [ ] Verify troubleshooting solutions work
 - [ ] Have someone unfamiliar with tagger try following the docs
-- [ ] Move this file to `agents.d/tasks_completed/`
+- [ ] Move this file to `agents.d/work_completed/`
 
 ## Definition of done
 - Complete ADO pipeline documentation exists

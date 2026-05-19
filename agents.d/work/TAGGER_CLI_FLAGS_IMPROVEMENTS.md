@@ -154,7 +154,7 @@ Would push to remote 'origin'.
 - [ ] Verify detached HEAD workflow works end-to-end
 - [ ] Verify dry-run accurately predicts behavior
 - [ ] Verify backwards compatibility with old flags
-- [ ] Move this file to `agents.d/tasks_completed/`
+- [ ] Move this file to `agents.d/work_completed/`
 
 ## Definition of done
 - All flags have intuitive names that match their behavior

@@ -113,7 +113,7 @@ Recreate it with:
 - [ ] Test with actual git push failure (403/permission denied)
 - [ ] Test with repo containing only lightweight tags
 - [ ] Verify error messages are clear and actionable
-- [ ] Move this file to `agents.d/tasks_completed/`
+- [ ] Move this file to `agents.d/work_completed/`
 
 ## Definition of done
 - Users hitting git push failures see actionable error messages with specific remediation steps, not Kotlin/JS stack traces
