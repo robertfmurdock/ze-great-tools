@@ -32,6 +32,7 @@ interface CalculateVersionTestSpec {
     fun configureWithOverrides(
         implicitPatch: Boolean? = null,
         disableDetached: Boolean? = null,
+        allowDetachedHead: Boolean? = null,
         majorRegex: String? = null,
         minorRegex: String? = null,
         patchRegex: String? = null,
@@ -113,6 +114,46 @@ interface CalculateVersionTestSpec {
     fun whenNoRemoteButDisableDetachedIsFalseDoNotError() = setup(object {
     }) {
         configureWithOverrides(disableDetached = false)
+        initializeGitRepo(
+            directory = projectDir,
+            remoteUrl = null,
+            addFileNames = addFileNames,
+            commits = listOf("init", "commit (no) 1"),
+            initialTag = "1.2.3",
+        )
+    } exercise {
+        execute()
+    } verify { result ->
+        when (result) {
+            is TestResult.Success -> result.message.assertIsEqualTo("1.2.4-SNAPSHOT")
+            is TestResult.Failure -> fail("Expected success but got ${result.reason}")
+        }
+    }
+
+    @Test
+    fun whenNoRemoteButAllowDetachedHeadIsTrueDoNotError() = setup(object {
+    }) {
+        configureWithOverrides(allowDetachedHead = true)
+        initializeGitRepo(
+            directory = projectDir,
+            remoteUrl = null,
+            addFileNames = addFileNames,
+            commits = listOf("init", "commit (no) 1"),
+            initialTag = "1.2.3",
+        )
+    } exercise {
+        execute()
+    } verify { result ->
+        when (result) {
+            is TestResult.Success -> result.message.assertIsEqualTo("1.2.4-SNAPSHOT")
+            is TestResult.Failure -> fail("Expected success but got ${result.reason}")
+        }
+    }
+
+    @Test
+    fun whenAllowDetachedHeadTrueOverridesDisableDetachedTrue() = setup(object {
+    }) {
+        configureWithOverrides(disableDetached = true, allowDetachedHead = true)
         initializeGitRepo(
             directory = projectDir,
             remoteUrl = null,

@@ -8,6 +8,7 @@ data class TaggerConfig(
     val releaseBranch: String? = null,
     val implicitPatch: Boolean? = null,
     val disableDetached: Boolean? = null,
+    val allowDetachedHead: Boolean? = null,
     val forceSnapshot: Boolean? = null,
     val majorRegex: String? = null,
     val minorRegex: String? = null,

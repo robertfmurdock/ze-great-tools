@@ -25,6 +25,7 @@ class CalculateVersionCommandConfigFileTest : CalculateVersionTestSpec {
     override fun configureWithOverrides(
         implicitPatch: Boolean?,
         disableDetached: Boolean?,
+        allowDetachedHead: Boolean?,
         majorRegex: String?,
         minorRegex: String?,
         patchRegex: String?,
@@ -35,6 +36,7 @@ class CalculateVersionCommandConfigFileTest : CalculateVersionTestSpec {
         var config = TaggerConfig()
         implicitPatch?.let { config = config.copy(implicitPatch = implicitPatch) }
         disableDetached?.let { config = config.copy(disableDetached = disableDetached) }
+        allowDetachedHead?.let { config = config.copy(allowDetachedHead = allowDetachedHead) }
         versionRegex?.let { config = config.copy(versionRegex = versionRegex) }
         majorRegex?.let { config = config.copy(majorRegex = majorRegex) }
         minorRegex?.let { config = config.copy(minorRegex = minorRegex) }

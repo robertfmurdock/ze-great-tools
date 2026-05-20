@@ -33,8 +33,8 @@ class CalculateVersion : CliktCommand() {
     private val workingDirectory get() = gitRepoArgument ?: gitRepoOption ?: throw CliktError("No target directory")
     private val implicitPatch by option().boolean().default(true)
     private val disableDetachedDeprecated by option("--disable-detached", hidden = true).boolean()
-    private val allowDetachedHead by option("--allow-detached-head").boolean().default(false)
-    private val disableDetached get() = disableDetachedDeprecated ?: !allowDetachedHead
+    private val allowDetachedHead by option("--allow-detached-head").boolean()
+    private val disableDetached get() = allowDetachedHead?.let { !it } ?: disableDetachedDeprecated ?: true
     private val forceSnapshot by option().boolean().default(false)
     private val releaseBranch by option()
     private val format by option(

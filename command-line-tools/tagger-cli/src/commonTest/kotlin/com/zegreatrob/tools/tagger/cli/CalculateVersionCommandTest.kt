@@ -33,6 +33,7 @@ class CalculateVersionCommandTest : CalculateVersionTestSpec {
     override fun configureWithOverrides(
         implicitPatch: Boolean?,
         disableDetached: Boolean?,
+        allowDetachedHead: Boolean?,
         majorRegex: String?,
         minorRegex: String?,
         patchRegex: String?,
@@ -44,6 +45,7 @@ class CalculateVersionCommandTest : CalculateVersionTestSpec {
             listOfNotNull(
                 implicitPatch?.let { "--implicit-patch=$it" },
                 disableDetached?.let { "--disable-detached=$it" },
+                allowDetachedHead?.let { "--allow-detached-head=$it" },
                 versionRegex?.let { "--version-regex=$it" },
                 majorRegex?.let { "--major-regex=$it" },
                 minorRegex?.let { "--minor-regex=$it" },
