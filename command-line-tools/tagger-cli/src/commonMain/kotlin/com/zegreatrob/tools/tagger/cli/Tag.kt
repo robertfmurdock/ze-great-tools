@@ -9,6 +9,7 @@ import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.required
 import com.github.ajalt.clikt.parameters.types.boolean
+import com.github.ajalt.clikt.parameters.types.enum
 import com.zegreatrob.tools.adapter.git.GitAdapter
 import com.zegreatrob.tools.tagger.core.TagResult
 import com.zegreatrob.tools.tagger.core.TaggerCore
@@ -28,13 +29,9 @@ class Tag : CliktCommand() {
     private val userName: String? by option()
     private val userEmail: String? by option()
     private val warningsAsErrors by option().boolean().default(false)
-    private val formatString by option("--format").default("text")
-    private val format: OutputFormat
-        get() = try {
-            OutputFormat.fromString(formatString)
-        } catch (e: IllegalArgumentException) {
-            throw CliktError(e.message ?: "Invalid format")
-        }
+    private val format by option("--format", help = "Output format: text (default) or json")
+        .enum<OutputFormat> { it.name.lowercase() }
+        .default(OutputFormat.TEXT)
     override fun run() {
         TaggerCore(GitAdapter(workingDirectory))
             .tag(version, releaseBranch, userName, userEmail)

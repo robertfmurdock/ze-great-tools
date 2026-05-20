@@ -1,10 +1,10 @@
 package com.zegreatrob.tools.digger.cli
 
 import com.github.ajalt.clikt.core.CliktCommand
-import com.github.ajalt.clikt.core.CliktError
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.option
+import com.github.ajalt.clikt.parameters.types.enum
 import com.zegreatrob.tools.adapter.git.GitAdapter
 import com.zegreatrob.tools.cli.writeToFile
 import com.zegreatrob.tools.digger.core.DiggerCore
@@ -23,13 +23,9 @@ class AllContributionData : CliktCommand() {
     private val storyIdRegex by option()
     private val easeRegex by option()
     private val tagRegex by option()
-    private val formatString by option("--format").default("text")
-    private val format: OutputFormat
-        get() = try {
-            OutputFormat.fromString(formatString)
-        } catch (e: IllegalArgumentException) {
-            throw CliktError(e.message ?: "Invalid format")
-        }
+    private val format by option("--format", help = "Output format: text (writes to file, default) or json (stdout)")
+        .enum<OutputFormat> { it.name.lowercase() }
+        .default(OutputFormat.TEXT)
 
     private val core
         get() = DiggerCore(

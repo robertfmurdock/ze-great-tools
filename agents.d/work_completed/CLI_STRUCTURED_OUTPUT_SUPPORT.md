@@ -306,19 +306,19 @@ For each command:
 - [x] Run `./gradlew check` for full repo
 
 ### Phase 5: Documentation
-- [ ] Update help text for all commands to show `--format` option
-- [ ] Update README with JSON output examples
-- [ ] Document JSON schema for each command
-- [ ] Add "Structured Output" section to README
-- [ ] Document error codes and meanings
-- [ ] Add CI integration examples using JSON
-- [ ] Update migration guide if needed (for digger changes)
+- [x] Update help text for all commands to show `--format` option
+- [x] Update README with JSON output examples
+- [x] Document JSON schema for each command
+- [x] Add "Structured Output" section to README
+- [x] Document error codes and meanings
+- [x] Add CI integration examples using JSON
+- [x] Update migration guide if needed (for digger changes)
 
 ### Final validation
-- [ ] All tests pass: `./gradlew check`
-- [ ] Manual testing in CI environment successful
-- [ ] Documentation complete and accurate
-- [ ] Backwards compatibility verified (text mode unchanged)
+- [x] All tests pass: `./gradlew check`
+- [x] Manual testing in CI environment successful
+- [x] Documentation complete and accurate
+- [x] Backwards compatibility verified (text mode unchanged)
 - [ ] Move this file to `agents.d/work_completed/`
 
 ## Definition of done

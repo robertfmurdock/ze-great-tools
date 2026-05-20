@@ -9,6 +9,7 @@ import com.github.ajalt.clikt.parameters.options.check
 import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.boolean
+import com.github.ajalt.clikt.parameters.types.enum
 import com.zegreatrob.tools.adapter.git.GitAdapter
 import com.zegreatrob.tools.tagger.core.SnapshotReason
 import com.zegreatrob.tools.tagger.core.TaggerCore
@@ -19,19 +20,6 @@ import com.zegreatrob.tools.tagger.core.calculateNextVersion
 enum class OutputFormat {
     TEXT,
     JSON,
-    ;
-
-    companion object {
-        fun fromString(value: String): OutputFormat = when (value.lowercase()) {
-            "text" -> TEXT
-
-            "json" -> JSON
-
-            else -> throw IllegalArgumentException(
-                "Invalid format '$value'. Must be one of: ${entries.joinToString(", ") { it.name.lowercase() }}",
-            )
-        }
-    }
 }
 
 class CalculateVersion : CliktCommand() {
@@ -47,13 +35,9 @@ class CalculateVersion : CliktCommand() {
     private val disableDetached by option().boolean().default(true)
     private val forceSnapshot by option().boolean().default(false)
     private val releaseBranch by option()
-    private val formatString by option("--format").default("text")
-    private val format: OutputFormat
-        get() = try {
-            OutputFormat.fromString(formatString)
-        } catch (e: IllegalArgumentException) {
-            throw CliktError(e.message ?: "Invalid format")
-        }
+    private val format by option("--format", help = "Output format: text (default) or json")
+        .enum<OutputFormat> { it.name.lowercase() }
+        .default(OutputFormat.TEXT)
     private val majorRegex by option().default(VersionRegex.Defaults.major.pattern)
     private val minorRegex by option().default(VersionRegex.Defaults.minor.pattern)
     private val patchRegex by option().default(VersionRegex.Defaults.patch.pattern)
