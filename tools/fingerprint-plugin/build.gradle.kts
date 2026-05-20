@@ -99,7 +99,7 @@ afterEvaluate {
             pom.licenses {
                 license {
                     name.set("MIT License")
-                    url.set(scmUrl)
+                    url.set("$scmUrl/blob/main/LICENSE")
                     distribution.set("repo")
                 }
             }

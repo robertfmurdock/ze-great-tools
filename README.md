@@ -45,3 +45,6 @@ A program for extracting contribution information from a git repository.
 
 See its [README](command-line-tools/digger-cli/README.md) for more.
 
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
