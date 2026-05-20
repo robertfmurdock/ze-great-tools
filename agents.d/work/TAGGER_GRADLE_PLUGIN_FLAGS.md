@@ -20,20 +20,27 @@ Propagate CLI flag improvements (--allow-detached-head) to tagger-plugin and dig
 - [x] Update TagVersion task to add allowDetachedHead parameter
   - Agent cycle: test → implement → refactor-light → verify pushable
   - Update plan if guidelines revealed new constraints
-- [ ] Wire tasks properly in TaggerPlugin to handle optional properties correctly
+- [x] Wire tasks properly in TaggerPlugin to handle optional properties correctly
   - Agent cycle: test → implement → refactor-light → verify pushable
   - Update plan if guidelines revealed new constraints
-- [ ] Verify all functional tests pass, especially backwards compatibility tests
+- [x] Verify all functional tests pass, especially backwards compatibility tests
   - Agent cycle: test → implement → refactor-light → verify pushable
   - Update plan if guidelines revealed new constraints
-- [ ] Consider whether digger-plugin needs similar updates
+- [x] Consider whether digger-plugin needs similar updates
   - Agent cycle: test → implement → refactor-light → verify pushable
   - Update plan if guidelines revealed new constraints
-- [ ] Final refactor pass (code style, patterns, efficiency)
-- [ ] Review changes against applicable playbooks and verify compliance
+  - Result: No updates needed - digger-plugin has no detached HEAD functionality
+- [x] Final refactor pass (code style, patterns, efficiency)
+- [x] Review changes against applicable playbooks and verify compliance
 - [ ] Move to agents.d/work_completed/
 
 ## Implementation Notes
+
+### Reuse Analysis (CLI vs Gradle Plugin)
+- CLI and Gradle plugin both implement property resolution logic (allowDetachedHead → disableDetached fallback)
+- Logic is similar but contexts differ (Clikt options vs Gradle Properties)
+- Extracting common function would require interface wrappers - not worth the complexity
+- Pattern is simple enough (3-line function) that duplication is acceptable
 
 ### Context from CLI Work
 The CLI now has:
@@ -60,5 +67,10 @@ The CLI now has:
 3. **Convention-based priority**: Set both in tasks, use presence detection carefully
 
 ## Validation
-- Commands: [filled in as work progresses]
-- Results: [filled in before completion]
+- Commands executed during work:
+  - `./gradlew :tools-tests:tagger-plugin-test:test` - unit tests for plugin
+  - `./gradlew :tools-tests:tagger-plugin-test:functionalTest` - functional tests for backwards compatibility
+  - `./gradlew :tools-tests:tagger-plugin-test:check` - full module verification
+  - `./gradlew formatKotlin` - code formatting
+  - `./gradlew check` - full project verification
+- Results: All checks pass, backwards compatibility maintained
