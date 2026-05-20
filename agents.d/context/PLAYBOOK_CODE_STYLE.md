@@ -31,6 +31,7 @@ data["version"]?.jsonPrimitive?.content.assertIsEqualTo("1.2.4")
 - Provides clearer diffs when comparing data objects
 - Always "chop down" chains leading to assertions (break before `?.` and before the assertion call)
 - For nullable checks where the value matters, extract to a variable first rather than using `assertNotNull` inline
+- **Test behavior and outcomes, not just structure**: Avoid symbolic tests that only verify presence (assertNotNull), type checks, or field existence without checking the actual effect or value those elements produce
 
 ```kotlin
 // Good: clear what's being tested, clean diff on failure
@@ -43,6 +44,11 @@ json.jsonObject["status"]
 assertNotNull(json.jsonObject["status"])
 assertEquals("success", json.jsonObject["status"]?.jsonPrimitive?.content)
 ```
+
+### Backward Compatibility
+- When introducing a new API or feature as an alternative to an existing one, **always test both the old and new APIs** to verify backward compatibility
+- Write tests showing the old API continues to work as expected alongside the new implementation
+- This applies even if existing tests covered the old API — explicitly verify no regression when alternatives are introduced
 
 ### Avoid
 - Multiple tests before implementing any
@@ -69,6 +75,16 @@ assertEquals("success", json.jsonObject["status"]?.jsonPrimitive?.content)
 - Refactor: scope is any file touching changed lines
 - Preserve behavior unless task changes it
 - Follow existing patterns
+
+## API Deprecation
+- **New feature must be fully functional and tested before deprecating the old one**
+- Deprecation annotations must include:
+  1. **Why** it's deprecated (reason)
+  2. **What** to use instead (replacement API)
+  3. **When** it may be removed (state "may be removed in next major version")
+- Use `ReplaceWith` to provide IDE migration hints when possible
+- Example: `@Deprecated("Use newApi() instead. May be removed in next major version", ReplaceWith("newApi()"))`
+- **Removal timing**: Deprecated code may be removed at any major version boundary, but never in minor or patch releases
 
 ## Formatting
 - Run `./gradlew formatKotlin` to fix linting issues

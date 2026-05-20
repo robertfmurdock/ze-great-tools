@@ -65,6 +65,7 @@ Each broad checklist item follows a test-driven cycle that repeats until the fea
 2. **Implement**: Do the simplest thing that could possibly work to make the test pass.
 3. **Refactor-light**: Clean up as you go — apply code style, remove duplication, improve naming. Keep pressure light; major refactoring comes later.
 4. **Verify pushable**: Run validation (smallest sufficient task set) to ensure the repository is in a safe, check-in-ready state.
+   - For [minor] or [patch] changes that introduce alternatives to existing APIs, explicitly verify backward compatibility — test that both old and new APIs work as expected.
 5. **Commit**: When all tests pass, commit with semver annotation:
    - `[major]` — breaking change
    - `[minor]` — new backward-compatible functionality
@@ -72,6 +73,16 @@ Each broad checklist item follows a test-driven cycle that repeats until the fea
    - `[none]` — no build output impact: docs, work cards, build config (e.g., `updating a card`, `work item update`)
 
 **Subagent pattern**: Orchestrator spawns specialized subagents for each phase (testing subagent → implementation subagent → refactor subagent). Orchestrator coordinates the cycle, updates the work card, and adapts the plan as constraints are discovered.
+
+### Deprecation Workflow
+When replacing existing functionality:
+1. **Build and test the new feature first** — it must be fully functional with behavioral tests proving feature parity before deprecating the old API.
+2. **Mark the old API as deprecated** with required elements:
+   - Why it's deprecated
+   - What replaces it (migration pattern)
+   - State "may be removed in next major version"
+3. **Test both old and new APIs** to verify backward compatibility.
+4. **Removal timing**: Deprecated code may be removed at any major version boundary, but never in [minor] or [patch] releases.
 
 ### Adaptation During Work
 - **Project guidelines take precedence over initial work card plans.** If PERSONA, playbooks, or discovered architecture constraints conflict with the work card plan, update the plan.

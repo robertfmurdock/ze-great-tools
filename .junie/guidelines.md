@@ -18,6 +18,10 @@ All AI agents working on this repository must follow these rules:
    - In verify, prefer assert-style checks; reserve `error(...)` for setup-only pre-reqs.
    - Expectation data in `verify` is fine; if used once, inline it inside the assertion with reasonable line breaks.
    - If the expectation is used more than once, define a variable in `verify`.
-5. **Test Names**: Keep names unique, brief, and scenario-focused.
+5. **Test Behavior, Not Structure**:
+   - Tests must verify outcomes and effects, not just presence or structure.
+   - Example: if adding a Gradle configuration property to enable functionality, test the functionality itself — the property's existence is a side effect of meeting the spec.
+   - Avoid symbolic tests that only check `assertNotNull`, type checks, or field presence without verifying the actual behavior those elements enable.
+6. **Test Names**: Keep names unique, brief, and scenario-focused.
 6. **Java Toolchain**: This project uses Java Toolchain 21. Ensure any new modules or environment checks respect this version.
 7. **Efficient Verification**: For multi-test refactors, batch edits per file or logical cluster, then run targeted compile tasks (e.g., `:module:compileKotlinJvm` / `:compileKotlinJs`) after each batch. Run `./gradlew :tools-tests:check` once per file or at the end for full confidence. Prefer quieter Gradle output (`--quiet` or `--console=plain`) when possible.
