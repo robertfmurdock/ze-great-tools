@@ -11,7 +11,7 @@ Make tagger flags more intuitive and support common CI workflows by addressing I
 - Changes must comply with TestMints patterns and verification requirements from `.junie/guidelines.md`
 
 ## Checklist
-- [ ] Review this work card for compliance with template and update to conform
+- [x] Review this work card for compliance with template and update to conform
 - [ ] Make --version flag clearer (required marker or auto-calculate)
   - Agent cycle: test → implement → refactor-light → verify pushable
   - Update plan if guidelines revealed new constraints
