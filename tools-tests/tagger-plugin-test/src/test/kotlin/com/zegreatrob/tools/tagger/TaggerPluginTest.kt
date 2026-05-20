@@ -113,4 +113,28 @@ class TaggerPluginTest {
         gitDirectoryMethod.isAnnotationPresent(InputDirectory::class.java)
             .assertIsEqualTo(true, "Expected gitDirectory to be an input.")
     }
+
+    @Test
+    fun `extension allowDetachedHead defaults to null`() = setup(object {
+        val project = ProjectBuilder.builder().build()
+    }) exercise {
+        project.plugins.apply("com.zegreatrob.tools.tagger")
+        project.extensions.getByType(TaggerExtension::class.java)
+    } verify { extension ->
+        extension.allowDetachedHead
+            .assertIsEqualTo(null, "Expected allowDetachedHead default value to be null")
+    }
+
+    @Test
+    fun `extension allowDetachedHead can be set to true`() = setup(object {
+        val project = ProjectBuilder.builder().build()
+    }) exercise {
+        project.plugins.apply("com.zegreatrob.tools.tagger")
+        val extension = project.extensions.getByType(TaggerExtension::class.java)
+        extension.allowDetachedHead = true
+        extension
+    } verify { extension ->
+        extension.allowDetachedHead
+            .assertIsEqualTo(true, "Expected allowDetachedHead to be settable")
+    }
 }

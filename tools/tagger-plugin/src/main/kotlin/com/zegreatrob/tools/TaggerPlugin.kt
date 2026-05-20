@@ -28,6 +28,7 @@ class TaggerPlugin : Plugin<Project> {
             task.workingDirectory.set(tagger.workingDirectory)
             task.gitDirectory.set(tagger.workingDirectory.dir(".git"))
         }
+        @Suppress("DEPRECATION")
         project.tasks.register("calculateVersion", CalculateVersion::class.java) { task ->
             task.workingDirectory.set(tagger.workingDirectory)
             task.gitDirectory.set(tagger.workingDirectory.dir(".git"))

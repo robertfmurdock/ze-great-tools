@@ -42,8 +42,23 @@ open class TaggerExtension(
      * When true (default), versioning fails if HEAD has no upstream tracking branch (detached HEAD).
      * Fix the CI checkout step instead of disabling this check.
      * See: https://github.com/robertfmurdock/ze-great-tools/blob/main/docs/tagger-detached-head.md
+     * @deprecated Use allowDetachedHead instead (inverted logic).
      */
+    @Deprecated("Use allowDetachedHead instead (inverted logic)")
     val disableDetached = objectFactory.property(Boolean::class.java).convention(true)
+
+    /**
+     * When true, versioning allows detached HEAD (no upstream tracking branch).
+     * When false (default), versioning fails on detached HEAD.
+     * Fix the CI checkout step instead of allowing detached HEAD.
+     * See: https://github.com/robertfmurdock/ze-great-tools/blob/main/docs/tagger-detached-head.md
+     */
+    internal val allowDetachedHeadProperty = objectFactory.property(Boolean::class.java)
+    var allowDetachedHead: Boolean?
+        get() = allowDetachedHeadProperty.orNull
+        set(value) {
+            value?.let { allowDetachedHeadProperty.set(it) }
+        }
 
     val forceSnapshot = objectFactory.property(Boolean::class.java).convention(false)
 
@@ -63,10 +78,15 @@ open class TaggerExtension(
 
     fun lastVersionAndTag() = core.lastVersionAndTag()
 
+    @Suppress("DEPRECATION")
+    private fun resolveDisableDetached(): Boolean = allowDetachedHeadProperty.orNull
+        ?.let { !it }
+        ?: disableDetached.get()
+
     fun calculateVersion() = core.calculateNextVersion(
         implicitPatch = implicitPatch.get(),
         versionRegex = versionRegex(),
-        disableDetached = disableDetached.get(),
+        disableDetached = resolveDisableDetached(),
         forceSnapshot = forceSnapshot.get(),
         releaseBranch = releaseBranchProperty.orNull
             ?: throw GradleException("Please configure the tagger release branch."),
