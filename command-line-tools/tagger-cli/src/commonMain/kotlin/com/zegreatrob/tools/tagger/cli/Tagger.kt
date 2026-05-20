@@ -1,11 +1,29 @@
 package com.zegreatrob.tools.tagger.cli
 
 import com.github.ajalt.clikt.core.CliktCommand
+import com.github.ajalt.clikt.core.Context
 import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.versionOption
 
 class Tagger : CliktCommand() {
+
+    override fun help(context: Context) = """
+        Output:
+          Text format writes version to stdout, diagnostics to stderr.
+          Command substitution captures only stdout: VERSION=${'$'}(tagger -q calculate-version ...)
+
+          -SNAPSHOT is appended when HEAD is not yet tagged with the calculated version.
+          After 'tagger tag', subsequent calculate-version returns bare version.
+
+          Snapshot reasons (on stderr) explain why -SNAPSHOT was added:
+            DIRTY               - uncommitted changes in working directory
+            AHEAD               - local branch ahead of remote
+            BEHIND              - local branch behind remote
+            NOT_RELEASE_BRANCH  - not on configured release branch
+            NO_NEW_VERSION      - no new commits since last tag
+            FORCED              - --force-snapshot=true was used
+    """.trimIndent()
 
     init {
         versionOption(Versions.taggerVersion)

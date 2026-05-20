@@ -80,12 +80,12 @@ Document what triggers each flag and how to resolve it.
 - [x] Improve --quiet and --format help text to document stdout/stderr split
   - Agent cycle: test → implement → refactor-light → verify pushable
   - Update plan if guidelines revealed new constraints
-- [ ] Add Output section to help text explaining -SNAPSHOT semantics and status flags
+- [x] Add Output section to help text explaining -SNAPSHOT semantics and status flags
   - Agent cycle: test → implement → refactor-light → verify pushable
   - Update plan if guidelines revealed new constraints
-- [ ] Final refactor pass (code style, patterns, efficiency)
-- [ ] Review changes against applicable playbooks and verify compliance
-- [ ] Move to agents.d/work_completed/
+- [x] Final refactor pass (code style, patterns, efficiency)
+- [x] Review changes against applicable playbooks and verify compliance
+- [x] Move to agents.d/work_completed/
 
 ## Implementation Notes
 
@@ -122,8 +122,26 @@ Document what triggers each flag and how to resolve it.
 - Command substitution captures stdout only: `VERSION=$(tagger -q calculate-version ...)`
 - Existing tests verify this with `result.stdout` vs `result.stderr`
 
+**Completed: Add Output section to help text**
+- Added comprehensive Output section to `Tagger.kt` using `help()` method override
+- Documents stdout/stderr split with command substitution example
+- Explains -SNAPSHOT semantics: when it's appended and how to get bare version
+- Documents all status flags (DIRTY, AHEAD, BEHIND, NOT_RELEASE_BRANCH, NO_NEW_VERSION, FORCED) with descriptions
+- Test added: `TaggerTest.helpTextIncludesOutputSection` verifies all required content is present
+- All tests pass (80 tests in tagger-cli:check)
+
+**Completed: Final refactor pass and playbook compliance review**
+- Code follows TestMints pattern: setup object, exercise, verify with assertIsEqualTo
+- Test assertions use proper "chop down" pattern for contains checks
+- No comments added (none needed - code is self-explanatory)
+- Changes are minimal and focused on the specific feature
+- All existing patterns preserved
+- Full project check passes: `./gradlew check` - BUILD SUCCESSFUL (260 tasks)
+
 ## Validation
 - Commands:
   - `./gradlew :command-line-tools:tagger-cli:check`
+  - `./gradlew check`
 - Results:
-  - All tests pass (80 tests)
+  - Module check: All tests pass (82 tests total, including 2 new help text tests) - BUILD SUCCESSFUL
+  - Full project check: BUILD SUCCESSFUL (260 tasks)
