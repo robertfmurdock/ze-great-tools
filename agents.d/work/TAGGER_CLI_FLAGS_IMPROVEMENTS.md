@@ -15,17 +15,17 @@ Make tagger flags more intuitive and support common CI workflows by addressing I
 - [x] Make --version flag clearer (required marker or auto-calculate)
   - Agent cycle: test → implement → refactor-light → verify pushable
   - Update plan if guidelines revealed new constraints
-- [ ] Rename --disable-detached to --allow-detached-head with clear semantics
+- [x] Rename --disable-detached to --allow-detached-head with clear semantics
   - Agent cycle: test → implement → refactor-light → verify pushable
   - Update plan if guidelines revealed new constraints
-- [ ] Add detached HEAD support to tag command
+- [x] Add detached HEAD support to tag command
   - Agent cycle: test → implement → refactor-light → verify pushable
   - Update plan if guidelines revealed new constraints
-- [ ] Add --dry-run flag to tag command
+- [x] Add --dry-run flag to tag command
   - Agent cycle: test → implement → refactor-light → verify pushable
   - Update plan if guidelines revealed new constraints
-- [ ] Final refactor pass (code style, patterns, efficiency)
-- [ ] Review changes against applicable playbooks and verify compliance
+- [x] Final refactor pass (code style, patterns, efficiency)
+- [x] Review changes against applicable playbooks and verify compliance
 - [ ] Move to agents.d/work_completed/
 
 ## Implementation Notes
@@ -76,7 +76,14 @@ Would push to remote 'origin'.
 ### Discoveries and Adaptations
 - Implemented Option A (mark as required) instead of Option B. Auto-calculation with -SNAPSHOT stripping would bypass important safety checks that signal when the repo state isn't ready for tagging.
 - Also improved snapshot error message to guide users to `calculate-version` for understanding why -SNAPSHOT was added.
+- Added --allow-detached-head to calculate-version command. Old --disable-detached flag still works (hidden) for backwards compatibility.
+- Added --allow-detached-head to tag command, allowing tagging in CI with detached HEAD (common in GitHub Actions checkout).
+- Added --dry-run to tag command to preview tag operations without executing them.
+- All changes followed TDD with red-green-refactor cycle, maintained backwards compatibility, and passed full `./gradlew check`.
 
 ## Validation
-- Commands: [filled in as work progresses]
-- Results: [filled in before completion]
+- Commands:
+  - `./gradlew :command-line-tools:tagger-cli:check` (after each feature)
+  - `./gradlew check` (final verification)
+  - `./gradlew formatKotlin`
+- Results: All tests passing, no regressions, formatting applied
