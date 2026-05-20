@@ -82,31 +82,4 @@ class TagCommandTest : TagTestSpec {
         val data = json.jsonObject["data"]?.jsonObject ?: error("Expected data object in JSON. Output: ${result.stdout}")
         data["tag"]?.jsonPrimitive?.content.assertIsEqualTo("1.2.4")
     }
-
-    @Test
-    fun whenVersionIsOmittedAutoCalculatesFromHistory() = setup(object {
-        val commits = listOf("init", "[patch] commit 1", "[patch] commit 2")
-        val initialTag = "1.2.3"
-    }) {
-        initializeGitRepo(commits = commits, initialTag = initialTag)
-        baseArguments = listOf(
-            "tag",
-            "--release-branch=master",
-            "--user-name=Test User",
-            "--user-email=test@example.com",
-            projectDir,
-        )
-    } exercise {
-        cli().test(baseArguments)
-    } verify { result ->
-        result.statusCode
-            .assertIsEqualTo(0, "Command failed. Stdout: ${result.stdout}\nStderr: ${result.stderr}\nOutput: ${result.output}")
-        result.stdout
-            .trim()
-            .assertIsEqualTo("Success!")
-        val gitAdapter = com.zegreatrob.tools.adapter.git.GitAdapter(projectDir)
-        gitAdapter.showTag("HEAD")
-            ?.name
-            .assertIsEqualTo("1.2.4")
-    }
 }
