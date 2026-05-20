@@ -41,6 +41,10 @@ abstract class TagVersion : DefaultTask() {
     @get:Input
     abstract val warningsAsErrors: Property<Boolean>
 
+    @get:Input
+    @get:Optional
+    abstract val allowDetachedHead: Property<Boolean>
+
     @Input
     lateinit var version: String
 
@@ -51,7 +55,15 @@ abstract class TagVersion : DefaultTask() {
     @TaskAction
     fun execute() {
         val core = TaggerCore(GitAdapter(workingDirectory.get().asFile.absolutePath))
-        when (val result = core.tag(version, releaseBranch.orNull, userName.orNull, userEmail.orNull)) {
+        when (
+            val result = core.tag(
+                version,
+                releaseBranch.orNull,
+                userName.orNull,
+                userEmail.orNull,
+                allowDetachedHead.getOrElse(false),
+            )
+        ) {
             TagResult.Success -> {}
 
             is TagResult.Error -> if (warningsAsErrors.get()) {

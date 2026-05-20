@@ -148,4 +148,15 @@ class TaggerPluginTest {
         task.allowDetachedHead
             .assertIsNotEqualTo(null, "Expected allowDetachedHead property to exist on CalculateVersion task")
     }
+
+    @Test
+    fun `tag task has allowDetachedHead property`() = setup(object {
+        val project = ProjectBuilder.builder().build()
+    }) exercise {
+        project.plugins.apply("com.zegreatrob.tools.tagger")
+        project.tasks.findByName("tag") as TagVersion
+    } verify { task ->
+        task.allowDetachedHead
+            .assertIsNotEqualTo(null, "Expected allowDetachedHead property to exist on TagVersion task")
+    }
 }
