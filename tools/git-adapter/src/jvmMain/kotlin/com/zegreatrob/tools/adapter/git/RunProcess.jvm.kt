@@ -12,7 +12,11 @@ actual fun runProcess(args: List<String>, workingDirectory: String, env: Map<Str
     val error = process.errorStream.readAllBytes().toString(Charset.defaultCharset())
     process.waitFor()
     if (process.exitValue() != 0) {
-        throw Error("$outputText\n$error")
+        throw ProcessError(
+            exitCode = process.exitValue(),
+            stderr = error,
+            command = args.joinToString(" "),
+        )
     }
     return outputText
 }

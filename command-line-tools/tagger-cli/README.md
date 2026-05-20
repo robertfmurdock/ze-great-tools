@@ -174,6 +174,79 @@ if [ "$STATUS" = "error" ]; then
 fi
 ```
 
+## Common Errors and Troubleshooting
+
+### Lightweight Tags
+
+**Error:** `found N tag(s) (...) but it is/they are lightweight.`
+
+**Cause:** Tagger requires annotated tags (created with `git tag -a`) because they store metadata like tagger name, email, and timestamp. Lightweight tags (created with `git tag <name>`) don't include this information.
+
+**Solution:** Recreate the tag(s) as annotated tags. The error message will provide exact commands, for example:
+
+```bash
+git tag -d 1.0.0
+git tag -a 1.0.0 <sha> -m "1.0.0"
+git push --force origin 1.0.0
+```
+
+Replace `<sha>` with the commit hash where the tag should point (often the same commit the lightweight tag pointed to).
+
+### Permission Errors When Pushing Tags
+
+**Error:** `Command failed: git push --tags (exit code 128)` or `exit code 403`
+
+**Common causes:**
+- The account running tagger doesn't have push permission on the repository
+- CI/CD pipelines often use restricted service accounts by default
+
+**Solutions:**
+
+**For Azure DevOps:**
+1. Go to Project Settings → Repositories → Security
+2. Find the Build Service identity (e.g., `<Project Name> Build Service`)
+3. Grant both `Contribute` and `Create tag` permissions
+4. Ensure "Allow scripts to access the OAuth token" is enabled in your pipeline YAML:
+   ```yaml
+   - checkout: self
+     persistCredentials: true
+   ```
+
+**For GitHub Actions:**
+1. Add write permissions to your workflow job:
+   ```yaml
+   jobs:
+     build:
+       permissions:
+         contents: write  # Required for pushing tags
+   ```
+2. Ensure you're not using a read-only `GITHUB_TOKEN`
+
+**For GitLab CI:**
+```yaml
+variables:
+  GIT_STRATEGY: clone
+  
+before_script:
+  - git config --global user.email "ci@example.com"
+  - git config --global user.name "CI Bot"
+```
+
+### No Tags Exist
+
+**Error:** `repository has no tags.`
+
+**Cause:** This is a new repository or no tags have been created yet.
+
+**Solution:** Create an initial tag manually to establish the version baseline:
+
+```bash
+git tag -a 0.1.0 -m "Initial version"
+git push origin 0.1.0
+```
+
+After this, tagger can calculate subsequent versions automatically.
+
 ### Help
 
 For a full listing of the available options in the program, please use the built-in help command.

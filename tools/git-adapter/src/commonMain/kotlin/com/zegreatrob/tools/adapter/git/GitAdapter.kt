@@ -62,6 +62,16 @@ class GitAdapter(private val workingDirectory: String, private val env: Map<Stri
         ),
     )
 
+    fun listAllTagNames(): List<String> = runProcess(
+        listOf(
+            "git",
+            "--no-pager",
+            "tag",
+            "--list",
+        ),
+    ).trim()
+        .let { if (it.isEmpty()) emptyList() else it.split("\n") }
+
     private fun parseTagRefs(outputText: String): List<TagRef> {
         val output = outputText.split("\n").mapNotNull {
             val commaSplit = it.split(",")

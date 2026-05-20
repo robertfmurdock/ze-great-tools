@@ -19,7 +19,13 @@ actual fun runProcess(args: List<String>, workingDirectory: String, env: Map<Str
         ),
     )
     if (spawn.status != 0) {
-        throw Exception(spawn.stderr?.toString("utf8").unsafeCast<String>())
+        val stderr = spawn.stderr?.toString("utf8").unsafeCast<String>()
+        val exitCode = spawn.status.unsafeCast<Int>()
+        throw ProcessError(
+            exitCode = exitCode,
+            stderr = stderr,
+            command = args.joinToString(" "),
+        )
     }
 
     return spawn.stdout?.toString("utf8").unsafeCast<String>()

@@ -23,8 +23,13 @@ fun TaggerCore.tag(version: String, releaseBranch: String?, userName: String?, u
             .map {
                 adapter.pushTags()
                 TagResult.Success
-            }.getOrElse {
-                TagResult.Error(it.message ?: "Unknown error during tagging")
+            }.getOrElse { error ->
+                TagResult.Error(
+                    when (error) {
+                        is com.zegreatrob.tools.adapter.git.ProcessError -> error.toUserMessage()
+                        else -> error.message ?: "Unknown error during tagging"
+                    },
+                )
             }
     }
 }

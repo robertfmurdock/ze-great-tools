@@ -7,7 +7,10 @@ sealed interface VersionResult {
         val snapshotReasons: List<SnapshotReason> = emptyList(),
     ) : VersionResult
 
-    data class Failure(val reasons: List<FailureVersionReasons>) : VersionResult {
-        val message get() = "Inappropriate configuration: ${reasons.joinToString("\n") { it.message }}"
+    data class Failure(
+        val reasons: List<FailureVersionReasons>,
+        val customMessage: String? = null,
+    ) : VersionResult {
+        val message get() = customMessage ?: "Inappropriate configuration: ${reasons.joinToString("\n") { it.message }}"
     }
 }

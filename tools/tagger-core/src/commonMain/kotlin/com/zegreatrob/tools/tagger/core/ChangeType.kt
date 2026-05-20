@@ -19,7 +19,14 @@ fun TaggerCore.calculateNextVersion(
         return VersionResult.Failure(listOf(FailureVersionReasons.NoRemote))
     }
     val (previousVersionNumber, lastTagDescription) = lastVersionAndTag()
-        ?: return VersionResult.Failure(listOf(FailureVersionReasons.NoTagsExist))
+        ?: run {
+            val allTagNames = adapter.listAllTagNames()
+            return if (allTagNames.isNotEmpty()) {
+                VersionResult.Failure(emptyList(), lightweightTagsFound(allTagNames))
+            } else {
+                VersionResult.Failure(listOf(FailureVersionReasons.NoTagsExist))
+            }
+        }
     val previousVersionComponents = previousVersionNumber.asSemverComponents()
         ?: return VersionResult.Failure(listOf(FailureVersionReasons.VersionMissingElements))
 
