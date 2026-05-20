@@ -4,7 +4,37 @@ Use this checklist for every implementation task.
 
 ## Terminology
 
-**Work Card (or "card")**: A markdown file in `agents.d/work/` that defines a task with goals, constraints, identified issues, and an implementation checklist. This is the project's task tracking system, NOT Claude Code's built-in task tracking tool. When the user asks you to "create a work card," you should create a markdown file in `agents.d/work/` following the format seen in existing work cards in that directory.
+**Work Card (or "card")**: A markdown file in `agents.d/work/` that defines a task with goals, constraints, identified issues, and an implementation checklist. This is the project's task tracking system, NOT Claude Code's built-in task tracking tool. When the user asks you to "create a work card," you should create a markdown file in `agents.d/work/` following the template below.
+
+## Work Card Template
+
+```markdown
+# [Feature Name]
+
+## Goal
+One-sentence outcome.
+
+## Constraints
+- Hard boundaries from PERSONA, playbooks, or architecture
+
+## Checklist
+- [ ] Review this work card for compliance with template and update to conform
+- [ ] [Broad feature slice 1]
+  - Agent cycle: test → implement → refactor-light → verify pushable
+  - Update plan if guidelines revealed new constraints
+- [ ] [Broad feature slice 2]
+  ...
+- [ ] Final refactor pass (code style, patterns, efficiency)
+- [ ] Review changes against applicable playbooks and verify compliance
+- [ ] Move to agents.d/work_completed/
+
+## Implementation Notes
+[Agents log discoveries, deviations, or learned constraints here as they work]
+
+## Validation
+- Commands: [filled in as work progresses]
+- Results: [filled in before completion]
+```
 
 ## Intake
 - Work cards live in `agents.d/work/`.
@@ -21,19 +51,37 @@ Use this checklist for every implementation task.
 - Confirm constraints and assumptions before coding.
 
 ## Implementation
-- If the work card has no `## Checklist` section, create one before writing any code.
-  List each planned slice as an unchecked item (`- [ ] ...`). This is the first slice.
-  The second-to-last item must always be `- [ ] Review changes against applicable playbooks and verify compliance`.
-  The final item must always be `- [ ] Move this file to agents.d/work_completed/`.
+
+### Work Card Structure
+- The first checklist item must always be: `Review this work card for compliance with template and update to conform`.
+- Checklist items should be broad feature slices, not micro-tasks.
+- The second-to-last item must always be `- [ ] Review changes against applicable playbooks and verify compliance`.
+- The final item must always be `- [ ] Move this file to agents.d/work_completed/`.
+
+### Agent Cycle Within Each Feature Slice
+Each broad checklist item follows a test-driven cycle that repeats until the feature slice is complete:
+
+1. **Test**: Write a single test that advances the feature. Confirm it fails for the intended reason or passes for the intended reason if verifying existing behavior.
+2. **Implement**: Do the simplest thing that could possibly work to make the test pass.
+3. **Refactor-light**: Clean up as you go — apply code style, remove duplication, improve naming. Keep pressure light; major refactoring comes later.
+4. **Verify pushable**: Run validation (smallest sufficient task set) to ensure the repository is in a safe, check-in-ready state.
+
+**Subagent pattern**: Orchestrator spawns specialized subagents for each phase (testing subagent → implementation subagent → refactor subagent). Orchestrator coordinates the cycle, updates the work card, and adapts the plan as constraints are discovered.
+
+### Adaptation During Work
+- **Project guidelines take precedence over initial work card plans.** If PERSONA, playbooks, or discovered architecture constraints conflict with the work card plan, update the plan.
+- Before marking a checklist item complete, review remaining items. If project guidelines revealed constraints not reflected in the plan, update the checklist and log the discovery in Implementation Notes.
+- Do not lock into the original spec — adapt as you learn.
+
+### General Practices
 - Keep changes focused on impacted modules.
 - Follow existing patterns and module ownership.
 - Before changing something that looks wrong (especially a flag or setting overriding a default), confirm it isn't intentional. Surface the ambiguity; don't silently "fix" it.
 - Prefer existing libraries and build tooling over custom implementations.
 - Update all linked artifacts for cross-layer changes.
-- **Each slice or step must be integration-oriented**: the repository should be in a safe,
-  check-in-ready state after every slice, so work can be paused and resumed at any slice boundary.
-- **End every slice by marking it complete in the work card** (`agents.d/work/<CARD>.md`).
-  Do not batch work card updates to the end — update as you go.
+- **Each checklist item must result in a pushable state**: the repository should be safe to check in after every item, so work can be paused and resumed at any boundary.
+- **Mark checklist items complete as you go** (`agents.d/work/<CARD>.md`). Do not batch updates to the end.
+- Log meaningful discoveries, deviations, or learned constraints in the Implementation Notes section as you work.
 
 ## Validation
 - Run smallest sufficient task set first for quick feedback.
@@ -43,9 +91,10 @@ Use this checklist for every implementation task.
   - confidence-anchor coverage exists at the intended boundary level,
   - variation coverage is pushed downward where possible without reducing confidence.
 - Review changes against applicable playbooks to verify compliance before marking work complete.
+- Fill in the Validation section of the work card with commands run and results as work progresses.
 
 ## Completion Report
 - List files changed and intent.
-- List validation commands run and results.
+- List validation commands run and results (should already be in work card Validation section).
 - Confirm all slices are marked `[x]` in the work card, then move it to `agents.d/work_completed/`.
 - State residual risks, skipped checks, or follow-ups.
