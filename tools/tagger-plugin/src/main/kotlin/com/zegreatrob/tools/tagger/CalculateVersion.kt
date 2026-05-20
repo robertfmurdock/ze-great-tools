@@ -36,7 +36,12 @@ abstract class CalculateVersion : DefaultTask() {
     abstract val implicitPatch: Property<Boolean>
 
     @get:Input
+    @Deprecated("Use allowDetachedHead instead (inverted logic)")
     abstract val disableDetached: Property<Boolean>
+
+    @get:Input
+    @get:Optional
+    abstract val allowDetachedHead: Property<Boolean>
 
     @get:Input
     abstract val forceSnapshot: Property<Boolean>
@@ -66,6 +71,11 @@ abstract class CalculateVersion : DefaultTask() {
         is VersionResult.Failure -> throw GradleException(result.message)
     }
 
+    @Suppress("DEPRECATION")
+    private fun resolveDisableDetached(): Boolean = allowDetachedHead.orNull
+        ?.let { !it }
+        ?: disableDetached.get()
+
     private fun calculateVersion(): VersionResult {
         val core = TaggerCore(GitAdapter(workingDirectory.get().asFile.absolutePath))
         return core.calculateNextVersion(
@@ -77,7 +87,7 @@ abstract class CalculateVersion : DefaultTask() {
                 major = majorRegex.get(),
                 unified = versionRegex.orNull?.also { it.validateVersionRegex() },
             ),
-            disableDetached = disableDetached.get(),
+            disableDetached = resolveDisableDetached(),
             forceSnapshot = forceSnapshot.get(),
             releaseBranch = releaseBranch.orNull
                 ?: throw GradleException("Please configure the tagger release branch."),

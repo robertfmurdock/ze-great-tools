@@ -137,4 +137,15 @@ class TaggerPluginTest {
         extension.allowDetachedHead
             .assertIsEqualTo(true, "Expected allowDetachedHead to be settable")
     }
+
+    @Test
+    fun `calculateVersion task has allowDetachedHead property`() = setup(object {
+        val project = ProjectBuilder.builder().build()
+    }) exercise {
+        project.plugins.apply("com.zegreatrob.tools.tagger")
+        project.tasks.findByName("calculateVersion") as CalculateVersion
+    } verify { task ->
+        task.allowDetachedHead
+            .assertIsNotEqualTo(null, "Expected allowDetachedHead property to exist on CalculateVersion task")
+    }
 }

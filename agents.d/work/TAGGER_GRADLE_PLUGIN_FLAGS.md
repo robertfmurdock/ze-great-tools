@@ -11,7 +11,7 @@ Propagate CLI flag improvements (--allow-detached-head) to tagger-plugin and dig
 
 ## Checklist
 - [x] Review this work card for compliance with template and update to conform
-- [ ] Add allowDetachedHead property to TaggerExtension with proper deprecation of disableDetached
+- [x] Add allowDetachedHead property to TaggerExtension with proper deprecation of disableDetached
   - Agent cycle: test → implement → refactor-light → verify pushable
   - Update plan if guidelines revealed new constraints
 - [ ] Update CalculateVersion task to support both old and new flags with proper fallback logic
