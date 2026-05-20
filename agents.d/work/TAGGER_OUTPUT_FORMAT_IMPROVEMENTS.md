@@ -1,191 +1,121 @@
-# Task: Fix tagger quiet mode and document output format
+# Tagger Output Format Improvements
 
 ## Goal
-Improve calculate-version output handling for CI/scripting use cases, making quiet mode truly quiet and documenting output semantics clearly.
+Improve calculate-version help text and add --strip-snapshot flag so AI agents and users can reliably script CI/versioning workflows.
 
-## Background
-Issue #310 identified output format issues that complicate CI integration:
-- Quiet mode (`-q`) still outputs multiple lines including status flags
-- `-SNAPSHOT` suffix semantics are undocumented
-- Status flags (`DIRTY`, `AHEAD`, etc.) are undocumented
-- No clear stdout vs stderr separation, making parsing fragile
+## Constraints
+- Maintain backwards compatibility for current behavior (version on stdout, diagnostics on stderr)
+- Errors must always go to stderr, never stdout
+- Each checklist item must result in a pushable state
+- Follow TestMints patterns from `.junie/guidelines.md`
+- Use `./gradlew` for all validation tasks
 
-These gaps force CI users to write brittle extraction logic with regex and `sed` pipelines.
+## Feature Details
 
-## Hard constraints
-- Maintain backwards compatibility for text output (default behavior)
-- Don't break existing CI scripts that parse current format
-- Ensure errors always go to stderr, never stdout
+### Help Text Improvements
+**Problem:** AI agents and users encountering tagger don't understand the stdout/stderr split, leading to fragile parsing with `2>/dev/null` that hides real errors.
 
-## What to change
-
-### 1. Make quiet mode truly quiet (Issue #310 item #7)
-
-**Current behavior:**
+**Current help text:**
 ```
-$ tagger -q calculate-version --release-branch=main
-0.0.1-SNAPSHOT
-[DIRTY, AHEAD, BEHIND, NOT_RELEASE_BRANCH]
+  -q, --quiet          Suppress welcome message
+  --format=text|json   Output format
 ```
 
-**Target behavior:**
+**Improved help text:**
 ```
-$ tagger -q calculate-version --release-branch=main
-0.0.1-SNAPSHOT
+  -q, --quiet          Suppress welcome message. Version goes to stdout,
+                       diagnostics to stderr (safe for: VERSION=$(tagger -q ...))
+  --format=text|json   Output format (default: text). Use json for structured data
+                       with version, snapshot status, and diagnostic flags.
 ```
-(Status flags go to stderr or are hidden entirely)
 
-**Implementation:**
-- In quiet mode, output exactly one line to stdout: the version
-- Move status flags to stderr or suppress them entirely in quiet mode
-- Keep "Welcome to Tagger CLI." suppressed (already working)
-- Ensure all diagnostic messages go to stderr, not stdout
-- Consider: should quiet mode strip `-SNAPSHOT`? (Probably not, but add flag for it)
+**Additional help section to add:**
 
-### 2. Document -SNAPSHOT semantics (Issue #310 item #8)
+```
+Output:
+  Text format writes version to stdout, diagnostics to stderr.
+  Command substitution captures only stdout: VERSION=$(tagger -q calculate-version ...)
+  
+  Snapshot reasons (DIRTY, AHEAD, etc.) on stderr explain why -SNAPSHOT was added.
+  Use --strip-snapshot to remove -SNAPSHOT suffix for release version numbers.
+```
 
-**Current behavior:**
-`-SNAPSHOT` appears in output but when/why is unclear.
+### Strip Snapshot Flag
+**Target:** Add `--strip-snapshot` for clean CI extraction of release versions
 
-**Findings from experimentation:**
-- Local with untracked files: `0.0.1-SNAPSHOT [DIRTY, NO_NEW_VERSION]`
-- Local on release branch, clean: `0.0.1-SNAPSHOT` (still snapshot)
-- Detached HEAD: `0.0.1-SNAPSHOT [AHEAD, BEHIND, NOT_RELEASE_BRANCH]`
-- After tagging: `0.0.1` (no snapshot)
+**Use case:** CI needs `1.2.3` not `1.2.3-SNAPSHOT` for tagging, but users still want to see diagnostic reasons on stderr.
 
-**Meaning:**
-`-SNAPSHOT` means "this version doesn't have an annotated tag at HEAD yet"
-
-**Documentation needed:**
-- README section explaining when `-SNAPSHOT` is appended
-- Explanation: "appended whenever current HEAD is not yet tagged with calculated version"
-- Note: "after `tagger tag` runs, subsequent `calculate-version` returns bare version"
-- Add to help text for `calculate-version` command
-
-### 3. Document status flags (Issue #310 item #8)
-
-**Status flags observed:**
-- `DIRTY` - working directory has uncommitted changes
-- `AHEAD` - local branch ahead of remote
-- `BEHIND` - local branch behind remote
-- `NOT_RELEASE_BRANCH` - not on configured release branch
-- `NO_NEW_VERSION` - no new commits since last tag
-
-**Documentation needed:**
-- Document each flag: what triggers it, whether it blocks tagging, how to clear it
-- Add to README with examples
-- Consider adding `--explain-flags` option that describes each flag in detail
-- Update help text to mention flag meanings
-
-### 4. Add --strip-snapshot flag (Issue #310 item #8)
-
-**Use case:**
-CI flows often want just the bare release version without `-SNAPSHOT`.
-
-**Current workaround:**
+Current workaround:
 ```bash
 VERSION=$(tagger -q calculate-version ... | sed 's/-SNAPSHOT$//')
 ```
 
-**Target behavior:**
+Expected:
 ```bash
 VERSION=$(tagger -q calculate-version --strip-snapshot ...)
-# Returns: 0.0.1 (no SNAPSHOT suffix)
+# Returns: 1.2.3 (even if would normally be 1.2.3-SNAPSHOT)
+# Diagnostics still on stderr
 ```
 
-**Implementation:**
-- Add `--strip-snapshot` flag to `calculate-version` command
-- When enabled, remove `-SNAPSHOT` suffix from output
-- Works orthogonally with `-q` flag
-- Document as the recommended CI pattern
+### Document -SNAPSHOT and Status Flags
+**Target:** Add help text / README section explaining version output
 
-### 5. Consider structured output format (Issue #310 item #7)
+**-SNAPSHOT semantics:**
+- Appended when HEAD is not yet tagged with the calculated version
+- After `tagger tag`: subsequent `calculate-version` returns bare version
+- `--strip-snapshot` removes suffix for CI use cases that need release version
 
-**Optional enhancement:**
-Add `--format` option for stable machine-readable output.
+**Status flags (on stderr):**
+- `DIRTY` - uncommitted changes in working directory
+- `AHEAD` - local branch ahead of remote
+- `BEHIND` - local branch behind remote  
+- `NOT_RELEASE_BRANCH` - not on configured release branch
+- `NO_NEW_VERSION` - no new commits since last tag
+- `FORCED` - `--force-snapshot=true` was used
 
-**Options:**
-- `--format=plain` (default) - current text output
-- `--format=version-only` - just the version string
-- `--format=json` - structured JSON
-
-**JSON example:**
-```json
-{
-  "version": "0.0.1",
-  "snapshot": true,
-  "flags": ["DIRTY", "AHEAD"]
-}
-```
-
-**Implementation:**
-- Add `--format` flag to `calculate-version`
-- Implement format handlers
-- JSON output should be valid, parseable
-- Document JSON schema in README
-
-### 6. Ensure stdout/stderr separation
-
-**Requirement:**
-- Data (versions) → stdout
-- Diagnostics (errors, warnings, status flags) → stderr
-
-**Rationale:**
-Allows CI users to safely redirect stderr to filter npm warnings without losing real errors:
-```bash
-VERSION=$(npx tagger -q calculate-version ... 2>/dev/null)
-```
-
-**Implementation:**
-- Audit all output calls in tagger-cli
-- Ensure errors always use stderr
-- Ensure version data always uses stdout
-- Test with redirections: `2>/dev/null`, `1>/dev/null`, etc.
+Document what triggers each flag and how to resolve it.
 
 ## Checklist
+- [x] Review this work card for compliance with template and update to conform
+- [ ] Improve --quiet and --format help text to document stdout/stderr split
+  - Agent cycle: test → implement → refactor-light → verify pushable
+  - Update plan if guidelines revealed new constraints
+- [ ] Add --strip-snapshot flag for CI extraction
+  - Agent cycle: test → implement → refactor-light → verify pushable
+  - Update plan if guidelines revealed new constraints
+- [ ] Add Output section to help text explaining stdout/stderr usage patterns
+  - Agent cycle: test → implement → refactor-light → verify pushable
+  - Update plan if guidelines revealed new constraints
+- [ ] Document -SNAPSHOT semantics and status flags in help/README
+  - Agent cycle: test → implement → refactor-light → verify pushable
+  - Update plan if guidelines revealed new constraints
+- [ ] Final refactor pass (code style, patterns, efficiency)
+- [ ] Review changes against applicable playbooks and verify compliance
+- [ ] Move to agents.d/work_completed/
 
-### Code changes
-- [ ] Fix quiet mode to output exactly one line to stdout
-- [ ] Move status flags to stderr or suppress in quiet mode
-- [ ] Add `--strip-snapshot` flag to `calculate-version`
-- [ ] Implement snapshot stripping logic
-- [ ] Add `--format` flag (optional, consider separately)
-- [ ] Implement JSON/version-only formats (optional)
-- [ ] Audit all output calls for stdout/stderr separation
-- [ ] Fix any stdout/stderr violations
+## Implementation Notes
 
-### Testing
-- [ ] Test quiet mode outputs one line only
-- [ ] Test status flags don't appear on stdout in quiet mode
-- [ ] Test `--strip-snapshot` removes suffix correctly
-- [ ] Test `--strip-snapshot` with non-snapshot versions (no-op)
-- [ ] Test output redirection: `2>/dev/null`, `1>/dev/null`
-- [ ] Test quiet + strip-snapshot combination
-- [ ] Test format options (if implemented)
-- [ ] Run `./gradlew check` and verify all tests pass
+**Design decision:** After reviewing Issue #310 and existing behavior, determined that:
+- Current behavior is correct: version on stdout, diagnostics on stderr
+- Tests confirm snapshot reasons already go to stderr with `err = true`
+- Problem is discoverability: agents/users don't know about the stdout/stderr split
+- Solution: improve help text so agents notice the pattern, add `--strip-snapshot` for CI use case
+- No behavior changes needed, only documentation improvements
 
-### Documentation
-- [ ] Add README section: "Output Format"
-- [ ] Document when `-SNAPSHOT` is appended
-- [ ] Document each status flag with examples
-- [ ] Document `--strip-snapshot` flag
-- [ ] Document recommended CI extraction pattern
-- [ ] Document `--format` options (if implemented)
-- [ ] Document JSON schema (if implemented)
-- [ ] Update help text for modified commands
+**Background context from Issue #310:**
+- AI agent using tagger in PowerShell didn't understand stdout/stderr separation
+- Used `2>/dev/null` to suppress npm warnings, which also hid real tagger errors
+- Ended up with fragile regex parsing instead of simple command substitution
+- Root cause: help text doesn't explain that `VERSION=$(tagger -q ...)` safely captures stdout
+- `-SNAPSHOT` suffix semantics are undocumented
+- Status flags meanings are undocumented
 
-### Validation
-- [ ] Test CI extraction patterns (bash, PowerShell, etc.)
-- [ ] Verify quiet mode is parseable with simple scripts
-- [ ] Verify stderr redirection doesn't lose errors
-- [ ] Test with npm warnings present (real-world scenario)
-- [ ] Move this file to `agents.d/work_completed/`
+**Current behavior (confirmed correct):**
+- Version goes to stdout: `echo "0.0.1-SNAPSHOT"`
+- Snapshot reasons go to stderr: `echo "[DIRTY, NO_NEW_VERSION]" >&2`
+- Command substitution captures stdout only: `VERSION=$(tagger -q calculate-version ...)`
+- Existing tests verify this with `result.stdout` vs `result.stderr`
 
-## Definition of done
-- Quiet mode outputs exactly the version to stdout, nothing else
-- `-SNAPSHOT` semantics are clearly documented
-- All status flags are documented with meanings
-- `--strip-snapshot` provides clean CI extraction
-- stdout contains only data, stderr contains only diagnostics
-- Documentation includes recommended CI patterns
-- CI users can parse output reliably without fragile regex
+## Validation
+- Commands: [filled in as work progresses]
+- Results: [filled in before completion]

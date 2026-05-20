@@ -1,9 +1,9 @@
 # CLAUDE Instructions
 
 ## Read First
-- `agents.d/context/PERSONA.md`
-- `agents.d/context/WORK_CHECKLIST.md`
-- `.junie/guidelines.md` (project-specific testing and verification rules)
+- `agents.d/context/PERSONA.md` — working values, collaboration preferences, and decision heuristics
+- `agents.d/context/WORK_CHECKLIST.md` — work card template and implementation cycle (required when creating, assessing, or working on work cards)
+- `.junie/guidelines.md` — verification requirements, TestMints patterns, and test structure rules
 
 ## Conditional Reads
 Load the relevant playbook based on your task type:
