@@ -29,33 +29,43 @@ class Tag : CliktCommand() {
     private val userName: String? by option()
     private val userEmail: String? by option()
     private val allowDetachedHead by option("--allow-detached-head").boolean().default(false)
+    private val dryRun by option("--dry-run").boolean().default(false)
     private val warningsAsErrors by option().boolean().default(false)
     private val format by option("--format", help = "Output format: text (default) or json")
         .enum<OutputFormat> { it.name.lowercase() }
         .default(OutputFormat.TEXT)
     override fun run() {
-        TaggerCore(GitAdapter(workingDirectory))
-            .tag(version, releaseBranch, userName, userEmail, allowDetachedHead)
-            .let {
-                when (it) {
-                    TagResult.Success -> when (format) {
-                        OutputFormat.JSON -> echo(tagSuccessResponse(TagData(tag = version)))
-                        OutputFormat.TEXT -> echo("Success!")
-                    }
-
-                    is TagResult.Error -> when (format) {
-                        OutputFormat.JSON -> {
-                            echo(errorResponse(it.message, "TAG_ERROR"))
-                            throw CliktError("", printError = false, statusCode = if (warningsAsErrors) 1 else 0)
+        val gitAdapter = GitAdapter(workingDirectory)
+        if (dryRun) {
+            val headCommit = gitAdapter.headCommitId()
+            val headBranch = gitAdapter.status().head
+            echo("Would create annotated tag '$version' at $headCommit on branch '$headBranch'.")
+            echo("Would push to remote 'origin'.")
+            echo("(no changes made)")
+        } else {
+            TaggerCore(gitAdapter)
+                .tag(version, releaseBranch, userName, userEmail, allowDetachedHead)
+                .let {
+                    when (it) {
+                        TagResult.Success -> when (format) {
+                            OutputFormat.JSON -> echo(tagSuccessResponse(TagData(tag = version)))
+                            OutputFormat.TEXT -> echo("Success!")
                         }
 
-                        OutputFormat.TEXT -> if (warningsAsErrors) {
-                            throw CliktError(it.message)
-                        } else {
-                            echo(it.message, err = true)
+                        is TagResult.Error -> when (format) {
+                            OutputFormat.JSON -> {
+                                echo(errorResponse(it.message, "TAG_ERROR"))
+                                throw CliktError("", printError = false, statusCode = if (warningsAsErrors) 1 else 0)
+                            }
+
+                            OutputFormat.TEXT -> if (warningsAsErrors) {
+                                throw CliktError(it.message)
+                            } else {
+                                echo(it.message, err = true)
+                            }
                         }
                     }
                 }
-            }
+        }
     }
 }

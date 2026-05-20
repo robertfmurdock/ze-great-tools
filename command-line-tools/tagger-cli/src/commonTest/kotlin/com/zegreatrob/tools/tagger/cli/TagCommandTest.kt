@@ -125,4 +125,50 @@ class TagCommandTest : TagTestSpec {
             ?.name
             .assertIsEqualTo(expectedVersion)
     }
+
+    @Test
+    fun dryRunShowsWhatWouldHappenWithoutTagging() = setup(object {
+        val commits = listOf("init", "[patch] commit 1")
+        val initialTag = "1.2.3"
+        val expectedVersion = "1.2.4"
+    }) {
+        val originDirectory = com.zegreatrob.tools.test.git.createTempDirectory()
+        val originGitAdapter = com.zegreatrob.tools.adapter.git.GitAdapter(originDirectory)
+        originGitAdapter.init()
+        originGitAdapter.config("receive.denyCurrentBranch", "ignore")
+        originGitAdapter.config("commit.gpgsign", "false")
+        originGitAdapter.addCommitWithMessage("init")
+
+        val gitAdapter = initializeGitRepo(commits = commits, initialTag = initialTag, remoteUrl = originDirectory)
+        gitAdapter.push()
+
+        com.zegreatrob.tools.adapter.git.runProcess(listOf("git", "config", "user.email", "test@zegreatrob.com"), projectDir)
+        com.zegreatrob.tools.adapter.git.runProcess(listOf("git", "config", "user.name", "RoB as Test"), projectDir)
+
+        baseArguments = listOf(
+            "tag",
+            "--release-branch=master",
+            "--version=$expectedVersion",
+            "--dry-run=true",
+            projectDir,
+        )
+    } exercise {
+        cli().test(baseArguments)
+    } verify { result ->
+        result.statusCode
+            .assertIsEqualTo(0, "Command failed. Stdout: ${result.stdout}\nStderr: ${result.stderr}\nOutput: ${result.output}")
+        result.stdout
+            .contains("Would create annotated tag")
+            .assertIsEqualTo(true, "Output should indicate what would happen. Output: ${result.stdout}")
+        result.stdout
+            .contains(expectedVersion)
+            .assertIsEqualTo(true, "Output should mention version. Output: ${result.stdout}")
+        result.stdout
+            .contains("no changes made")
+            .assertIsEqualTo(true, "Output should clarify no changes were made. Output: ${result.stdout}")
+
+        val gitAdapter = com.zegreatrob.tools.adapter.git.GitAdapter(projectDir)
+        gitAdapter.showTag("HEAD")
+            .assertIsEqualTo(null, "Should not create tag in dry-run mode")
+    }
 }
