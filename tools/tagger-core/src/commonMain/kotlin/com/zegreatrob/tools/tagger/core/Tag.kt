@@ -2,12 +2,18 @@ package com.zegreatrob.tools.tagger.core
 
 private fun String.isSnapshot() = contains("SNAPSHOT")
 
-fun TaggerCore.tag(version: String, releaseBranch: String?, userName: String?, userEmail: String?): TagResult {
+fun TaggerCore.tag(
+    version: String,
+    releaseBranch: String?,
+    userName: String?,
+    userEmail: String?,
+    allowDetachedHead: Boolean = false,
+): TagResult {
     val isSnapshot = version.isSnapshot()
     val headTag = adapter.showTag("HEAD")
     val alreadyTagged = headTag != null
     val headBranch = adapter.status().head
-    val isNotOnReleaseBranch = headBranch != releaseBranch
+    val isNotOnReleaseBranch = !allowDetachedHead && headBranch != releaseBranch
     return if (isSnapshot || alreadyTagged || isNotOnReleaseBranch) {
         TagResult.Error(
             TagErrors.wrapper(

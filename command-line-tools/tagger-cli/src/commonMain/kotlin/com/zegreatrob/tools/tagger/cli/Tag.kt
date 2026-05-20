@@ -28,13 +28,14 @@ class Tag : CliktCommand() {
     private val version: String by option("--version", help = "Version to tag (required)").required()
     private val userName: String? by option()
     private val userEmail: String? by option()
+    private val allowDetachedHead by option("--allow-detached-head").boolean().default(false)
     private val warningsAsErrors by option().boolean().default(false)
     private val format by option("--format", help = "Output format: text (default) or json")
         .enum<OutputFormat> { it.name.lowercase() }
         .default(OutputFormat.TEXT)
     override fun run() {
         TaggerCore(GitAdapter(workingDirectory))
-            .tag(version, releaseBranch, userName, userEmail)
+            .tag(version, releaseBranch, userName, userEmail, allowDetachedHead)
             .let {
                 when (it) {
                     TagResult.Success -> when (format) {
