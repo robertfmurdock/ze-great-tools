@@ -65,6 +65,11 @@ Each broad checklist item follows a test-driven cycle that repeats until the fea
 2. **Implement**: Do the simplest thing that could possibly work to make the test pass.
 3. **Refactor-light**: Clean up as you go — apply code style, remove duplication, improve naming. Keep pressure light; major refactoring comes later.
 4. **Verify pushable**: Run validation (smallest sufficient task set) to ensure the repository is in a safe, check-in-ready state.
+5. **Commit**: When all tests pass, commit with semver annotation:
+   - `[major]` — breaking change
+   - `[minor]` — new backward-compatible functionality
+   - `[patch]` — bug fix, refactor, anything affecting build output (e.g., `[patch] adding tagger error message link to help resolve common issue`)
+   - `[none]` — no build output impact: docs, work cards, build config (e.g., `updating a card`, `work item update`)
 
 **Subagent pattern**: Orchestrator spawns specialized subagents for each phase (testing subagent → implementation subagent → refactor subagent). Orchestrator coordinates the cycle, updates the work card, and adapts the plan as constraints are discovered.
 
