@@ -25,7 +25,7 @@ class Tag : CliktCommand() {
     private val gitRepoOption by option("--git-repo", envvar = "PWD")
     private val workingDirectory get() = gitRepoArgument ?: gitRepoOption ?: throw CliktError("No target directory")
     private val releaseBranch by option().required()
-    private val version: String by option().required()
+    private val version: String by option("--version", help = "Version to tag (required)").required()
     private val userName: String? by option()
     private val userEmail: String? by option()
     private val warningsAsErrors by option().boolean().default(false)
