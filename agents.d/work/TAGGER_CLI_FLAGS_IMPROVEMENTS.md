@@ -11,8 +11,8 @@ Make tagger flags more intuitive and support common CI workflows by addressing I
 - Changes must comply with TestMints patterns and verification requirements from `.junie/guidelines.md`
 
 ## Checklist
-- [ ] Review this work card for compliance with template and update to conform
-- [ ] Make --version flag clearer (required marker or auto-calculate)
+- [x] Review this work card for compliance with template and update to conform
+- [x] Make --version flag clearer (required marker or auto-calculate)
   - Agent cycle: test → implement → refactor-light → verify pushable
   - Update plan if guidelines revealed new constraints
 - [ ] Rename --disable-detached to --allow-detached-head with clear semantics
@@ -74,7 +74,8 @@ Would push to remote 'origin'.
 ```
 
 ### Discoveries and Adaptations
-[Agents log discoveries, deviations, or learned constraints here as they work]
+- Implemented Option A (mark as required) instead of Option B. Auto-calculation with -SNAPSHOT stripping would bypass important safety checks that signal when the repo state isn't ready for tagging.
+- Also improved snapshot error message to guide users to `calculate-version` for understanding why -SNAPSHOT was added.
 
 ## Validation
 - Commands: [filled in as work progresses]
