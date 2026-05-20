@@ -305,4 +305,30 @@ class CalculateVersionCommandTest : CalculateVersionTestSpec {
         result.output.contains("default: text").assertIsEqualTo(true, "Help should mention default format")
         result.output.contains("structured data").assertIsEqualTo(true, "Help should explain json format purpose")
     }
+
+    @Test
+    fun allowDetachedHeadTrueAllowsNoRemote() = setup(object {
+    }) {
+        com.zegreatrob.tools.test.git.initializeGitRepo(
+            directory = projectDir,
+            remoteUrl = null,
+            addFileNames = emptySet(),
+            commits = listOf("init", "commit 1"),
+            initialTag = "1.2.3",
+        )
+        baseArguments = listOf(
+            "calculate-version",
+            "--release-branch=master",
+            "--allow-detached-head=true",
+            projectDir,
+        )
+    } exercise {
+        cli().test(baseArguments)
+    } verify { result ->
+        result.statusCode
+            .assertIsEqualTo(0, "Command failed. Stdout: ${result.stdout}\nStderr: ${result.stderr}")
+        result.stdout
+            .trim()
+            .assertIsEqualTo("1.2.4-SNAPSHOT")
+    }
 }
