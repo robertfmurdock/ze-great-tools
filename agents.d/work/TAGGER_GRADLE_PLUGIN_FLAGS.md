@@ -17,7 +17,7 @@ Propagate CLI flag improvements (--allow-detached-head) to tagger-plugin and dig
 - [x] Update CalculateVersion task to support both old and new flags with proper fallback logic
   - Agent cycle: test → implement → refactor-light → verify pushable
   - Update plan if guidelines revealed new constraints
-- [ ] Update TagVersion task to add allowDetachedHead parameter
+- [x] Update TagVersion task to add allowDetachedHead parameter
   - Agent cycle: test → implement → refactor-light → verify pushable
   - Update plan if guidelines revealed new constraints
 - [ ] Wire tasks properly in TaggerPlugin to handle optional properties correctly

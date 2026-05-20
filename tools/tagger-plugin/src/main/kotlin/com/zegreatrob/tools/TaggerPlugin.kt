@@ -35,6 +35,7 @@ class TaggerPlugin : Plugin<Project> {
             task.releaseBranch.set(tagger.releaseBranchProperty)
             task.implicitPatch.set(tagger.implicitPatch)
             task.disableDetached.set(tagger.disableDetached)
+            tagger.allowDetachedHeadProperty.orNull?.let { task.allowDetachedHead.set(it) }
             task.forceSnapshot.set(tagger.forceSnapshot)
             task.versionRegex.set(tagger.versionRegex)
             task.noneRegex.set(tagger.noneRegex)
@@ -51,6 +52,7 @@ class TaggerPlugin : Plugin<Project> {
             task.userName.set(tagger.userNameProperty)
             task.userEmail.set(tagger.userEmailProperty)
             task.warningsAsErrors.set(tagger.warningsAsErrors)
+            tagger.allowDetachedHeadProperty.orNull?.let { task.allowDetachedHead.set(it) }
             task.version = "${project.version}"
             task.mustRunAfter(project.tasks.named("check"))
             task.mustRunAfter(project.provider { project.getTasksByName("check", true).toList() })
