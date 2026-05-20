@@ -35,4 +35,15 @@ class TaggerTest {
     } verify { result ->
         result.output.trim().assertIsEqualTo("tagger version $expectedVersion")
     }
+
+    @Test
+    fun helpTextExplainsQuietOption() = setup(object {
+        val command = cli()
+    }) exercise {
+        command.test("--help")
+    } verify { result ->
+        result.output.contains("--quiet").assertIsEqualTo(true)
+        result.output.contains("stdout").assertIsEqualTo(true, "Help should explain stdout/stderr split")
+        result.output.contains("stderr").assertIsEqualTo(true, "Help should explain stdout/stderr split")
+    }
 }

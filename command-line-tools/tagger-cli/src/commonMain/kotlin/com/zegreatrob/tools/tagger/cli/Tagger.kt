@@ -11,8 +11,12 @@ class Tagger : CliktCommand() {
         versionOption(Versions.taggerVersion)
     }
 
-    private val quiet by option("--quiet", "-q")
-        .flag(default = false)
+    private val quiet by option(
+        "--quiet",
+        "-q",
+        help = "Suppress welcome message. Version goes to stdout, diagnostics to stderr " +
+            "(safe for: VERSION=\$(tagger -q ...))",
+    ).flag(default = false)
 
     override fun run() {
         if (!quiet && currentContext.invokedSubcommand == null) {

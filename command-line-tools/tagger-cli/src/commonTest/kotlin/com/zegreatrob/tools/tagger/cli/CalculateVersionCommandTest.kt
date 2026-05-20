@@ -294,4 +294,15 @@ class CalculateVersionCommandTest : CalculateVersionTestSpec {
         result.stdout.contains("\"status\"").assertIsEqualTo(true, "JSON error should be in stdout")
         result.stdout.contains("\"error\"").assertIsEqualTo(true, "JSON error should be in stdout")
     }
+
+    @Test
+    fun helpTextExplainsFormatOption() = setup(object {
+        val cli = cli()
+    }) exercise {
+        cli.test("calculate-version --help")
+    } verify { result ->
+        result.output.contains("--format").assertIsEqualTo(true)
+        result.output.contains("default: text").assertIsEqualTo(true, "Help should mention default format")
+        result.output.contains("structured data").assertIsEqualTo(true, "Help should explain json format purpose")
+    }
 }

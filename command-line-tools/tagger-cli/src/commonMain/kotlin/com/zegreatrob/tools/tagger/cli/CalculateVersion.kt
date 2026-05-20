@@ -35,8 +35,10 @@ class CalculateVersion : CliktCommand() {
     private val disableDetached by option().boolean().default(true)
     private val forceSnapshot by option().boolean().default(false)
     private val releaseBranch by option()
-    private val format by option("--format", help = "Output format: text (default) or json")
-        .enum<OutputFormat> { it.name.lowercase() }
+    private val format by option(
+        "--format",
+        help = "Output format (default: text). Use json for structured data with version, snapshot status, and diagnostic flags.",
+    ).enum<OutputFormat> { it.name.lowercase() }
         .default(OutputFormat.TEXT)
     private val majorRegex by option().default(VersionRegex.Defaults.major.pattern)
     private val minorRegex by option().default(VersionRegex.Defaults.minor.pattern)
