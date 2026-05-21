@@ -189,17 +189,12 @@ interface CalculateVersionTestSpec {
     } exercise {
         execute()
     } verify { result ->
-        when (result) {
-            is TestResult.Success -> {
-                result.warnings.size
-                    .assertIsEqualTo(1, "Expected one warning. Warnings: ${result.warnings}")
-                result.warnings.first()
-                    .contains("release branch")
-                    .assertIsEqualTo(true, "Expected release branch warning. Warning: ${result.warnings.first()}")
-            }
-
-            is TestResult.Failure -> fail("Expected success but got ${result.reason}")
-        }
+        val success = result as? TestResult.Success ?: fail("Expected success but got $result")
+        success.warnings.size
+            .assertIsEqualTo(1, "Expected one warning. Warnings: ${success.warnings}")
+        success.warnings.first()
+            .contains("release branch")
+            .assertIsEqualTo(true, "Expected release branch warning. Warning: ${success.warnings.first()}")
     }
 
     @Test
