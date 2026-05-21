@@ -1,8 +1,5 @@
 package com.zegreatrob.tools.tagger.core
 
-/**
- * Builds a terse but urgent error message for the "no upstream tracking branch" condition.
- */
 fun buildNoUpstreamError(): String = """
 ⚠️  HEAD has no upstream tracking branch (detached HEAD).
 
