@@ -14,7 +14,7 @@ Eliminate multi-iteration CI setup friction by providing context-aware error mes
 
 ## Checklist
 - [x] Review this work card for compliance with template and update to conform
-- [ ] Escalate "no upstream" error message intensity
+- [x] Escalate "no upstream" error message intensity
   - Agent cycle: test → implement → refactor-light → verify pushable
   - Add warning symbols and "RISK:" section to error output
   - Explain actual consequences (unintended production releases on release branches)
@@ -60,5 +60,8 @@ Eliminate multi-iteration CI setup friction by providing context-aware error mes
 **Decision:** Focus on escalating error intensity and enhancing documentation rather than auto-detection that changes behavior. The check exists for good reasons - make those reasons visible and compelling.
 
 ## Validation
-- Commands: [filled in as work progresses]
-- Results: [filled in before completion]
+- Commands:
+  - `./gradlew :tools-tests:tagger-core-test:check` - Passed
+  - `./gradlew :tools-tests:tagger-test:check` - Passed
+  - `./gradlew check` - Passed
+- Results: All tests passing, error message properly enhanced with CI detection and risk communication

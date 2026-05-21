@@ -103,12 +103,12 @@ interface CalculateVersionTestSpec {
     } verify { result ->
         when (result) {
             is TestResult.Failure -> {
-                result.reason.contains("CRITICAL CONFIGURATION ERROR")
-                    .assertIsEqualTo(true, "Expected enhanced error. Output:\n${result.reason}")
+                result.reason.contains("⚠️")
+                    .assertIsEqualTo(true, "Expected warning symbol. Output:\n${result.reason}")
                 result.reason.contains("RISK:")
                     .assertIsEqualTo(true, "Expected risk section. Output:\n${result.reason}")
-                result.reason.contains("allowDetachedHead = true")
-                    .assertIsEqualTo(true, "Expected bypass option. Output:\n${result.reason}")
+                result.reason.contains("production releases")
+                    .assertIsEqualTo(true, "Expected consequence explanation. Output:\n${result.reason}")
             }
 
             is TestResult.Success -> fail("Should not have succeeded.")
