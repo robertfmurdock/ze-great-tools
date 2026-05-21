@@ -14,6 +14,7 @@ data class VersionData(
     val version: String,
     val snapshot: Boolean,
     val snapshotReasons: List<String> = emptyList(),
+    val warnings: List<String> = emptyList(),
 )
 
 @Serializable

@@ -43,9 +43,16 @@ fun TaggerCore.calculateNextVersion(
 
     val shouldSnapshot = reasonsToUseSnapshot.isNotEmpty()
 
+    val warnings = buildList {
+        if (!disableDetached && gitStatus.upstream.isEmpty() && gitStatus.head == releaseBranch) {
+            add("⚠️  Running with allowDetachedHead on release branch. Without upstream tracking, stable version may trigger unintended releases.")
+        }
+    }
+
     return VersionResult.Success(
         if (!shouldSnapshot) currentVersionNumber else "$currentVersionNumber-SNAPSHOT",
         reasonsToUseSnapshot,
+        warnings,
     )
 }
 

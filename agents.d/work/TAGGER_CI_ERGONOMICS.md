@@ -21,7 +21,7 @@ Eliminate multi-iteration CI setup friction by providing context-aware error mes
   - Detect CI environment and provide platform-specific fix first
   - Show bypass option second with explicit warnings about release branch danger
   - Update plan if guidelines revealed new constraints
-- [ ] Enhance docs/tagger-detached-head.md with risk analysis
+- [x] Enhance docs/tagger-detached-head.md with risk analysis
   - Add "Understanding the Risk" section (why release branches are dangerous)
   - Add "When Safe / When Dangerous" sections with concrete scenarios
   - Add decision matrix table (branch type × command × safety)

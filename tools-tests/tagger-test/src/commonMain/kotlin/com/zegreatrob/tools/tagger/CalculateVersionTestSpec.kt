@@ -176,6 +176,33 @@ interface CalculateVersionTestSpec {
     }
 
     @Test
+    fun whenAllowDetachedHeadOnReleaseBranchEmitWarning() = setup(object {
+    }) {
+        configureWithOverrides(allowDetachedHead = true)
+        initializeGitRepo(
+            directory = projectDir,
+            remoteUrl = null,
+            addFileNames = addFileNames,
+            commits = listOf("init", "commit (master) 1"),
+            initialTag = "1.0.0",
+        )
+    } exercise {
+        execute()
+    } verify { result ->
+        when (result) {
+            is TestResult.Success -> {
+                result.warnings.size
+                    .assertIsEqualTo(1, "Expected one warning. Warnings: ${result.warnings}")
+                result.warnings.first()
+                    .contains("release branch")
+                    .assertIsEqualTo(true, "Expected release branch warning. Warning: ${result.warnings.first()}")
+            }
+
+            is TestResult.Failure -> fail("Expected success but got ${result.reason}")
+        }
+    }
+
+    @Test
     fun whenCurrentCommitAlreadyHasTagWillUseTag() = setup(object {
         val gitAdapter = GitAdapter(
             projectDir,

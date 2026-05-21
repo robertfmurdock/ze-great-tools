@@ -99,6 +99,7 @@ abstract class CalculateVersion : DefaultTask() {
         if (snapshotReasons.isNotEmpty()) {
             System.err.println(snapshotReasons.joinToString(","))
         }
+        warnings.forEach { System.err.println(it) }
         val githubEnvFile = System.getenv("GITHUB_ENV")
         if (exportToGithubEnv.get() && githubEnvFile != null) {
             FileOutputStream(githubEnvFile, true).write("TAGGER_VERSION=$version".toByteArray())

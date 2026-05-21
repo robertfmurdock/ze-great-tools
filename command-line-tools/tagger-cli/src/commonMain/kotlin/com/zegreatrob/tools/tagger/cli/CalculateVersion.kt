@@ -63,8 +63,8 @@ class CalculateVersion : CliktCommand() {
             .run {
                 when (this) {
                     is VersionResult.Success -> when (format) {
-                        OutputFormat.JSON -> outputJson(version = version, snapshotReasons = snapshotReasons)
-                        OutputFormat.TEXT -> output(message = version, errorMessage = snapshotReasons)
+                        OutputFormat.JSON -> outputJson(version = version, snapshotReasons = snapshotReasons, warnings = warnings)
+                        OutputFormat.TEXT -> output(message = version, errorMessage = snapshotReasons, warnings = warnings)
                     }
 
                     is VersionResult.Failure -> when (format) {
@@ -82,16 +82,19 @@ class CalculateVersion : CliktCommand() {
     private fun output(
         message: String,
         errorMessage: List<SnapshotReason>,
+        warnings: List<String>,
     ) {
         echo(message)
         if (errorMessage.isNotEmpty()) {
             echo(errorMessage, err = true)
         }
+        warnings.forEach { echo(it, err = true) }
     }
 
     private fun outputJson(
         version: String,
         snapshotReasons: List<SnapshotReason>,
+        warnings: List<String>,
     ) {
         val isSnapshot = version.endsWith("-SNAPSHOT")
         val jsonOutput = versionSuccessResponse(
@@ -99,6 +102,7 @@ class CalculateVersion : CliktCommand() {
                 version = version,
                 snapshot = isSnapshot,
                 snapshotReasons = snapshotReasons.map { it.toString() },
+                warnings = warnings,
             ),
         )
         echo(jsonOutput)

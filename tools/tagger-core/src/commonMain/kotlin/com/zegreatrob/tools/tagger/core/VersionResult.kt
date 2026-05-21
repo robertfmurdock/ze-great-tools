@@ -5,6 +5,7 @@ sealed interface VersionResult {
     data class Success(
         val version: String,
         val snapshotReasons: List<SnapshotReason> = emptyList(),
+        val warnings: List<String> = emptyList(),
     ) : VersionResult
 
     data class Failure(

@@ -89,9 +89,10 @@ class CalculateVersionFunctionalTest : CalculateVersionTestSpec {
                 .toList()
 
             val version = lines.firstOrNull().orEmpty()
-            val details = lines.drop(1).joinToString("\n")
+            val remainingLines = lines.drop(1)
+            val (warningLines, detailLines) = remainingLines.partition { it.startsWith("⚠️") }
 
-            TestResult.Success(version, details)
+            TestResult.Success(version, detailLines.joinToString("\n"), warningLines)
         } catch (e: Exception) {
             TestResult.Failure(e.message!!)
         }

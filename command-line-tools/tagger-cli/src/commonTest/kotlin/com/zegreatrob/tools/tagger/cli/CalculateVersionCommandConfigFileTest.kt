@@ -52,9 +52,13 @@ class CalculateVersionCommandConfigFileTest : CalculateVersionTestSpec {
         val test = cli()
             .test(baseArguments, envvars = mapOf("PWD" to projectDir))
         return if (test.statusCode == 0) {
+            val stderr = test.stderr.trim()
+            val lines = stderr.lines().filter { it.isNotBlank() }
+            val (snapshotLines, warningLines) = lines.partition { !it.startsWith("⚠️") }
             TestResult.Success(
                 message = test.stdout.trim(),
-                details = test.stderr.trim(),
+                details = snapshotLines.joinToString("\n"),
+                warnings = warningLines,
             )
         } else {
             TestResult.Failure(test.output.trim())
