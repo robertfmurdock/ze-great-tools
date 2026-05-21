@@ -58,12 +58,18 @@ One-sentence outcome.
 - The second-to-last item must always be `- [ ] Review changes against applicable playbooks and verify compliance`.
 - The final item must always be `- [ ] Move this file to agents.d/work_completed/`.
 
+### Refactoring
+
+**Light refactor** (during feature slices): Clean up what you just wrote - names, duplication, structure.
+
+**Final refactor**: Re-read every file you modified. Apply code style doc to all changes, run check.
+
 ### Agent Cycle Within Each Feature Slice
 Each broad checklist item follows a test-driven cycle that repeats until the feature slice is complete:
 
 1. **Test**: Write a single test that advances the feature. Confirm it fails for the intended reason or passes for the intended reason if verifying existing behavior.
 2. **Implement**: Do the simplest thing that could possibly work to make the test pass.
-3. **Refactor-light**: Clean up as you go — apply code style, remove duplication, improve naming. Keep pressure light; major refactoring comes later.
+3. **Refactor-light**: Clean up what you just wrote - names, duplication, structure.
 4. **Verify pushable**: Run validation (smallest sufficient task set) to ensure the repository is in a safe, check-in-ready state.
    - For [minor] or [patch] changes that introduce alternatives to existing APIs, explicitly verify backward compatibility — test that both old and new APIs work as expected.
 5. **Commit**: When all tests pass, commit with semver annotation:
