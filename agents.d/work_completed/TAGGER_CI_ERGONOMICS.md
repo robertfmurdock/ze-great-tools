@@ -27,18 +27,18 @@ Eliminate multi-iteration CI setup friction by providing context-aware error mes
   - Add decision matrix table (branch type × command × safety)
   - Emphasize that on release branches, calculate-version is as risky as tag
   - Keep existing content (GitHub Actions fix, ADO guidance)
-- [ ] Optional: Add context-aware warning when flag is used on release branch
+- [x] Optional: Add context-aware warning when flag is used on release branch
   - Detect if on release branch when --allow-detached-head is set
   - Emit warning about risk of stable version triggering releases
   - Keep warning concise, reference docs for details
-- [ ] Optional: Add `tagger init --ci=<platform>` command for guided setup
+- [ ] Optional: Add `tagger init --ci=<platform>` command for guided setup (SKIPPED - will handle via web documentation)
   - Detect repository state and ask workflow questions
   - Generate .tagger config with risk-appropriate settings
   - Suggest CI checkout configuration changes
   - Make choices explicit and durable
-- [ ] Final refactor pass (code style, patterns, efficiency)
-- [ ] Review changes against applicable playbooks and verify compliance
-- [ ] Move this file to agents.d/work_completed/
+- [x] Final refactor pass (code style, patterns, efficiency)
+- [x] Review changes against applicable playbooks and verify compliance
+- [x] Move this file to agents.d/work_completed/
 
 ## Implementation Notes
 
