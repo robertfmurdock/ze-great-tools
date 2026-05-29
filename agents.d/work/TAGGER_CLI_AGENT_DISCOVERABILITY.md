@@ -24,7 +24,7 @@ Current CLI outputs explain *what* happens but don't clearly communicate *why* o
 - [x] Review this work card for compliance with template and update to conform
 - [x] Enhance CLI help text for agent discoverability
 - [x] Improve snapshot diagnostic output with actionable guidance
-- [ ] Enhance context-sensitive help (subcommand and options)
+- [x] Enhance context-sensitive help (subcommand and options)
 - [ ] Update README to defer to CLI as documentation source
 - [ ] Final refactor pass (code style, patterns, efficiency)
 - [ ] Review changes against applicable playbooks and verify compliance
@@ -78,6 +78,33 @@ Consolidated duplicate Implementation Notes sections and restructured checklist 
 
 **Validation**: `./gradlew :command-line-tools:tagger-cli:check` passed (all 95 tests including new behavioral test)
 
+### Checklist Item 4 Complete - Context-Sensitive Help Enhanced
+**Files changed**:
+- `CalculateVersion.kt:34-40` - Added help text for `--implicit-patch` option explaining automatic patch bumping behavior
+- `CalculateVersion.kt:36-39` - Added help text for `--allow-detached-head` option explaining detached HEAD blocking
+- `CalculateVersion.kt:38-40` - Added help text for `--force-snapshot` option explaining snapshot forcing behavior
+- `CalculateVersion.kt:41-43` - Added help text for `--release-branch` option explaining branch-based versioning
+- `CalculateVersionCommandTest.kt:315-323` - Added test `helpTextExplainsForceSnapshotOption()`
+- `CalculateVersionCommandTest.kt:326-334` - Added test `helpTextExplainsReleaseBranchOption()`
+- `CalculateVersionCommandTest.kt:337-345` - Added test `helpTextExplainsAllowDetachedHeadOption()`
+- `CalculateVersionCommandTest.kt:348-356` - Added test `helpTextExplainsImplicitPatchOption()`
+
+**Help text added for four priority options**:
+1. `--implicit-patch` - Explains automatic patch bumping (default: true)
+2. `--allow-detached-head` - Explains detached HEAD blocking and why
+3. `--force-snapshot` - Explains snapshot forcing for testing/CI workflows
+4. `--release-branch` - Explains branch-based release vs snapshot logic
+
+**TDD approach**: Each option followed test-first cycle - write failing test, add help text, verify pass, commit.
+
+**Validation**: `./gradlew :command-line-tools:tagger-cli:check` passed (all 99 tests)
+
+**Commits**:
+- fec7bb5 `[patch] add help text for --force-snapshot option`
+- 438b59c `[patch] add help text for --release-branch option`
+- 997aa8c `[patch] add help text for --allow-detached-head option`
+- 156f0a7 `[patch] add help text for --implicit-patch option`
+
 ### Key Files
 - `command-line-tools/tagger-cli/src/commonMain/kotlin/com/zegreatrob/tools/tagger/cli/Tagger.kt` (main help)
 - `command-line-tools/tagger-cli/src/commonMain/kotlin/com/zegreatrob/tools/tagger/cli/CalculateVersion.kt` (command implementation)
@@ -104,4 +131,4 @@ All changes are `[patch]` - improving messaging without changing behavior or API
 
 ## Validation
 - Commands: `./gradlew :command-line-tools:tagger-cli:check`
-- Results: BUILD SUCCESSFUL - 155 tasks (24 executed, 131 up-to-date), 94 tests passed including new `helpTextGuidesAutomationToJsonFormat` test
+- Results: BUILD SUCCESSFUL - 117 tasks (22 executed, 95 up-to-date), 99 tests passed including 4 new help text tests
