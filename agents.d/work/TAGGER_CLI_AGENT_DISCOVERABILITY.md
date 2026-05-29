@@ -21,8 +21,8 @@ AI agents using tagger via npm are:
 Current CLI outputs explain *what* happens but don't clearly communicate *why* or *what to do*.
 
 ## Checklist
-- [ ] Review this work card for compliance with template and update to conform
-- [ ] Enhance main help text (Tagger.kt) to clarify snapshot semantics and recommend JSON for automation
+- [x] Review this work card for compliance with template and update to conform
+- [x] Enhance main help text (Tagger.kt) to clarify snapshot semantics and recommend JSON for automation
   - Test: Help output includes clear guidance about snapshot suffix as condition indicator
   - Test: Help prominently recommends --format=json for automation/agents
 - [ ] Improve text-format snapshot reason output with actionable context
@@ -39,6 +39,20 @@ Current CLI outputs explain *what* happens but don't clearly communicate *why* o
 - [ ] Final refactor pass (code style, patterns, efficiency)
 - [ ] Review changes against applicable playbooks and verify compliance
 - [ ] Move to agents.d/work_completed/
+
+## Implementation Notes
+
+### Checklist Item 2 Complete - Main Help Text Enhanced
+**Files changed**:
+- `Tagger.kt:11-37` - Enhanced help() method with:
+  - Clarified -SNAPSHOT as "unmet conditions for tagging (not decorative text)"
+  - Added explicit statement: "The version is ready to tag only when -SNAPSHOT is absent"
+  - Changed "explain why" → "describe conditions that must be resolved"
+  - Added new "Automation & AI Agents:" section recommending --format=json
+  - Listed key JSON fields (snapshot boolean, snapshotReasons array, version string)
+- `TaggerTest.kt:65-75` - Added test `helpTextGuidesAutomationToJsonFormat()` verifying automation guidance
+
+**Validation**: `./gradlew :command-line-tools:tagger-cli:check` passed (all 94 tests, including new test)
 
 ## Implementation Notes
 

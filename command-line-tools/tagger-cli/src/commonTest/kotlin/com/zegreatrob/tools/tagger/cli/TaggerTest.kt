@@ -61,4 +61,16 @@ class TaggerTest {
                 .assertIsEqualTo(true, "Help should document ${reason.name} status flag")
         }
     }
+
+    @Test
+    fun helpTextGuidesAutomationToJsonFormat() = setup(object {
+        val command = cli()
+    }) exercise {
+        command.test("--help")
+    } verify { result ->
+        result.output.contains("Automation").assertIsEqualTo(true)
+        result.output.contains("--format=json").assertIsEqualTo(true)
+        result.output.contains("unmet conditions").assertIsEqualTo(true)
+        result.output.contains("not decorative").assertIsEqualTo(true)
+    }
 }

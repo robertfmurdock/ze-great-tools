@@ -13,16 +13,27 @@ class Tagger : CliktCommand() {
           Text format writes version to stdout, diagnostics to stderr.
           Command substitution captures only stdout: VERSION=${'$'}(tagger -q calculate-version ...)
 
-          -SNAPSHOT is appended when HEAD is not yet tagged with the calculated version.
-          After 'tagger tag', subsequent calculate-version returns bare version.
+          -SNAPSHOT suffix indicates unmet conditions for tagging (not decorative text).
+          The version is ready to tag only when -SNAPSHOT is absent.
+          After 'tagger tag', subsequent calculate-version returns the bare version.
 
-          Snapshot reasons (on stderr) explain why -SNAPSHOT was added:
+          Snapshot reasons (on stderr) describe conditions that must be resolved:
             DIRTY               - uncommitted changes in working directory
             AHEAD               - local branch ahead of remote
             BEHIND              - local branch behind remote
             NOT_RELEASE_BRANCH  - not on configured release branch
             NO_NEW_VERSION      - no new commits since last tag
             FORCED              - --force-snapshot=true was used
+
+        Automation & AI Agents:
+          Use --format=json for structured data with machine-readable fields:
+            - 'snapshot' boolean indicating tagging readiness
+            - 'snapshotReasons' array listing specific conditions
+            - 'version' string for consistent parsing
+
+          Example: tagger calculate-version --format=json
+
+          See subcommand help for details: tagger calculate-version --help
     """.trimIndent()
 
     init {
