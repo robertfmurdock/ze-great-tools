@@ -324,6 +324,17 @@ class CalculateVersionCommandTest : CalculateVersionTestSpec {
     }
 
     @Test
+    fun helpTextExplainsReleaseBranchOption() = setup(object {
+        val cli = cli()
+    }) exercise {
+        cli.test("calculate-version --help")
+    } verify { result ->
+        result.output.contains("--release-branch").assertIsEqualTo(true)
+        result.output.contains("release branch name").assertIsEqualTo(true, "Help should explain purpose")
+        result.output.contains("SNAPSHOT").assertIsEqualTo(true, "Help should explain snapshot behavior")
+    }
+
+    @Test
     fun allowDetachedHeadTrueAllowsNoRemote() = setup(object {
     }) {
         com.zegreatrob.tools.test.git.initializeGitRepo(

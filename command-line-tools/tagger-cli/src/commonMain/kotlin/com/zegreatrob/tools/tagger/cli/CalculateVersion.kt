@@ -38,7 +38,9 @@ class CalculateVersion : CliktCommand() {
     private val forceSnapshot by option(
         help = "Force -SNAPSHOT suffix on version, overriding normal release conditions. Use for testing or CI workflows that require snapshot versions.",
     ).boolean().default(false)
-    private val releaseBranch by option()
+    private val releaseBranch by option(
+        help = "Specify release branch name. Versions are release versions only on this branch; other branches produce -SNAPSHOT versions.",
+    )
     private val format by option(
         "--format",
         help = "Output format (default: text). Use json for structured data with version, snapshot status, and diagnostic flags.",
