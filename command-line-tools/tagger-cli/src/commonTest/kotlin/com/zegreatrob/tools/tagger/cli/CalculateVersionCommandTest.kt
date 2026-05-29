@@ -346,6 +346,17 @@ class CalculateVersionCommandTest : CalculateVersionTestSpec {
     }
 
     @Test
+    fun helpTextExplainsImplicitPatchOption() = setup(object {
+        val cli = cli()
+    }) exercise {
+        cli.test("calculate-version --help")
+    } verify { result ->
+        result.output.contains("--implicit-patch").assertIsEqualTo(true)
+        result.output.contains("patch version").assertIsEqualTo(true, "Help should mention patch bumping")
+        result.output.contains("default: true").assertIsEqualTo(true, "Help should show default value")
+    }
+
+    @Test
     fun allowDetachedHeadTrueAllowsNoRemote() = setup(object {
     }) {
         com.zegreatrob.tools.test.git.initializeGitRepo(
