@@ -71,6 +71,6 @@ class TaggerTest {
         result.output.contains("Automation").assertIsEqualTo(true)
         result.output.contains("--format=json").assertIsEqualTo(true)
         result.output.contains("unmet conditions").assertIsEqualTo(true)
-        result.output.contains("not decorative").assertIsEqualTo(true)
+        result.output.contains("should not be used in releases or tags").assertIsEqualTo(true)
     }
 }
