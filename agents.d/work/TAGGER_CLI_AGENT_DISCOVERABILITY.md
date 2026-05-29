@@ -81,5 +81,5 @@ From ChangeType.kt:131-153:
 All changes are `[patch]` - improving messaging without changing behavior or API.
 
 ## Validation
-- Commands: [to be filled during implementation]
-- Results: [to be filled before completion]
+- Commands: `./gradlew :command-line-tools:tagger-cli:check`
+- Results: BUILD SUCCESSFUL - 155 tasks (24 executed, 131 up-to-date), 94 tests passed including new `helpTextGuidesAutomationToJsonFormat` test
