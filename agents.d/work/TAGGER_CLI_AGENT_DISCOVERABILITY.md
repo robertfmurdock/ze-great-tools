@@ -45,12 +45,15 @@ Current CLI outputs explain *what* happens but don't clearly communicate *why* o
 ### Checklist Item 2 Complete - Main Help Text Enhanced
 **Files changed**:
 - `Tagger.kt:11-37` - Enhanced help() method with:
-  - Clarified -SNAPSHOT as "unmet conditions for tagging (not decorative text)"
-  - Added explicit statement: "The version is ready to tag only when -SNAPSHOT is absent"
+  - Clarified -SNAPSHOT as "unmet conditions for tagging"
+  - Added explicit directive: "Snapshot versions should not be used in releases or tags"
   - Changed "explain why" → "describe conditions that must be resolved"
   - Added new "Automation & AI Agents:" section recommending --format=json
   - Listed key JSON fields (snapshot boolean, snapshotReasons array, version string)
+  - Provided example command and reference to subcommand help
 - `TaggerTest.kt:65-75` - Added test `helpTextGuidesAutomationToJsonFormat()` verifying automation guidance
+
+**Refinement applied**: Removed "decorative text" concept to avoid negative framing in agent context
 
 **Validation**: `./gradlew :command-line-tools:tagger-cli:check` passed (all 94 tests, including new test)
 
