@@ -77,6 +77,8 @@ Each broad checklist item follows a test-driven cycle that repeats until the fea
    - `[minor]` — new backward-compatible functionality
    - `[patch]` — bug fix, refactor, anything affecting build output (e.g., `[patch] adding tagger error message link to help resolve common issue`)
    - `[none]` — no build output impact: docs, work cards, build config (e.g., `updating a card`, `work item update`)
+   
+   **For CLI tools**: stdout is first-class API (parseable contract); stderr is diagnostic (flexible). Changing stdout format is `[major]`, improving stderr clarity is `[patch]`. Structured output formats (JSON, etc.) are API; text formats for humans are diagnostic.
 
 **Subagent pattern**: Orchestrator spawns specialized subagents for each phase (testing subagent → implementation subagent → refactor subagent). Orchestrator coordinates the cycle, updates the work card, and adapts the plan as constraints are discovered.
 
