@@ -13,7 +13,7 @@ class Tagger : CliktCommand() {
           Text format writes version to stdout, diagnostics to stderr.
           Command substitution captures only stdout: VERSION=${'$'}(tagger -q calculate-version ...)
 
-          -SNAPSHOT suffix indicates unmet conditions for tagging.
+          -SNAPSHOT suffix indicates unmet conditions for release.
           Snapshot versions should not be used in releases or tags.
           After 'tagger tag', subsequent calculate-version returns the bare version.
 
