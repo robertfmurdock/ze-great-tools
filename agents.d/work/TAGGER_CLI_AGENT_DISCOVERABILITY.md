@@ -22,27 +22,20 @@ Current CLI outputs explain *what* happens but don't clearly communicate *why* o
 
 ## Checklist
 - [x] Review this work card for compliance with template and update to conform
-- [x] Enhance main help text (Tagger.kt) to clarify snapshot semantics and recommend JSON for automation
-  - Test: Help output includes clear guidance about snapshot suffix as condition indicator
-  - Test: Help prominently recommends --format=json for automation/agents
-- [ ] Improve text-format snapshot reason output with actionable context
-  - Test: Snapshot reasons include action hints (e.g., DIRTY → "commit or stash changes")
-  - Test: Output includes footer recommending JSON format for structured data
-- [ ] Add calculate-version subcommand help explaining purpose and workflow
-  - Test: Subcommand help clearly explains snapshot semantics
-  - Test: Help links snapshot reasons to tagging workflow
-- [ ] Enhance --format option help to emphasize automation use case
-  - Test: Option help explicitly mentions AI agents and CI/CD
-- [ ] Update README to reference CLI help as source of truth, remove duplication
-  - Test: README points to `tagger --help` and `tagger calculate-version --help` for detailed usage
-  - Test: README maintains examples but defers to CLI for canonical guidance
+- [x] Enhance CLI help text for agent discoverability
+- [ ] Improve snapshot diagnostic output with actionable guidance
+- [ ] Enhance context-sensitive help (subcommand and options)
+- [ ] Update README to defer to CLI as documentation source
 - [ ] Final refactor pass (code style, patterns, efficiency)
 - [ ] Review changes against applicable playbooks and verify compliance
 - [ ] Move to agents.d/work_completed/
 
 ## Implementation Notes
 
-### Checklist Item 2 Complete - Main Help Text Enhanced
+### Checklist Item 1 Complete - Work Card Restructured
+Consolidated duplicate Implementation Notes sections and restructured checklist items from micro-tasks to broad feature slices following WORK_CHECKLIST.md template guidelines.
+
+### Checklist Item 2 Complete - CLI Help Text Enhanced
 **Files changed**:
 - `Tagger.kt:11-37` - Enhanced help() method with:
   - Clarified -SNAPSHOT as "unmet conditions for tagging"
@@ -56,8 +49,6 @@ Current CLI outputs explain *what* happens but don't clearly communicate *why* o
 **Refinement applied**: Removed "decorative text" concept to avoid negative framing in agent context
 
 **Validation**: `./gradlew :command-line-tools:tagger-cli:check` passed (all 94 tests, including new test)
-
-## Implementation Notes
 
 ### Key Files
 - `command-line-tools/tagger-cli/src/commonMain/kotlin/com/zegreatrob/tools/tagger/cli/Tagger.kt` (main help)
