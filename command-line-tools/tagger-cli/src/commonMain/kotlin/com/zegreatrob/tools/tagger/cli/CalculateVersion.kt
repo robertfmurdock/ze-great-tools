@@ -35,7 +35,9 @@ class CalculateVersion : CliktCommand() {
     private val disableDetachedDeprecated by option("--disable-detached", hidden = true).boolean()
     private val allowDetachedHead by option("--allow-detached-head").boolean()
     private val disableDetached get() = allowDetachedHead?.let { !it } ?: disableDetachedDeprecated ?: true
-    private val forceSnapshot by option().boolean().default(false)
+    private val forceSnapshot by option(
+        help = "Force -SNAPSHOT suffix on version, overriding normal release conditions. Use for testing or CI workflows that require snapshot versions.",
+    ).boolean().default(false)
     private val releaseBranch by option()
     private val format by option(
         "--format",

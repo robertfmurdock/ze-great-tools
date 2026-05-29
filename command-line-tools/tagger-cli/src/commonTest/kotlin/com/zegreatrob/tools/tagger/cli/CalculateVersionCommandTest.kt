@@ -313,6 +313,17 @@ class CalculateVersionCommandTest : CalculateVersionTestSpec {
     }
 
     @Test
+    fun helpTextExplainsForceSnapshotOption() = setup(object {
+        val cli = cli()
+    }) exercise {
+        cli.test("calculate-version --help")
+    } verify { result ->
+        result.output.contains("--force-snapshot").assertIsEqualTo(true)
+        result.output.contains("force").assertIsEqualTo(true, "Help should mention forcing behavior")
+        result.output.contains("SNAPSHOT").assertIsEqualTo(true, "Help should mention SNAPSHOT suffix")
+    }
+
+    @Test
     fun allowDetachedHeadTrueAllowsNoRemote() = setup(object {
     }) {
         com.zegreatrob.tools.test.git.initializeGitRepo(
