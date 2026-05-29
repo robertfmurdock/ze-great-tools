@@ -23,7 +23,7 @@ Current CLI outputs explain *what* happens but don't clearly communicate *why* o
 ## Checklist
 - [x] Review this work card for compliance with template and update to conform
 - [x] Enhance CLI help text for agent discoverability
-- [ ] Improve snapshot diagnostic output with actionable guidance
+- [x] Improve snapshot diagnostic output with actionable guidance
 - [ ] Enhance context-sensitive help (subcommand and options)
 - [ ] Update README to defer to CLI as documentation source
 - [ ] Final refactor pass (code style, patterns, efficiency)
@@ -31,6 +31,11 @@ Current CLI outputs explain *what* happens but don't clearly communicate *why* o
 - [ ] Move to agents.d/work_completed/
 
 ## Implementation Notes
+
+### Process Improvement Needed
+**Issue**: Agent violated TDD cycle by implementing before writing behavioral test. Root cause: plan specified unit test at wrong level (testing `SnapshotReason.message` property) instead of behavioral test at CLI boundary. Need to improve planning process to emphasize behavioral testing at highest meaningful level per TestMints principles.
+
+**Corrective action**: Writing CLI-level test first that verifies stderr output format with actionable guidance.
 
 ### Checklist Item 1 Complete - Work Card Restructured
 Consolidated duplicate Implementation Notes sections and restructured checklist items from micro-tasks to broad feature slices following WORK_CHECKLIST.md template guidelines.
@@ -49,6 +54,29 @@ Consolidated duplicate Implementation Notes sections and restructured checklist 
 **Refinement applied**: Removed "decorative text" concept to avoid negative framing in agent context
 
 **Validation**: `./gradlew :command-line-tools:tagger-cli:check` passed (all 94 tests, including new test)
+
+### Checklist Item 3 Complete - Snapshot Diagnostic Output Enhanced
+**Files changed**:
+- `ChangeType.kt:131-153` - Added `message: String` property to SnapshotReason enum with actionable guidance for each reason
+- `CalculateVersion.kt:82-92` - Updated output() to format reasons as `"ENUM_NAME - message"` on separate lines to stderr
+- `CalculateVersionCommandTest.kt:343-372` - Added test `snapshotReasonsIncludeActionableGuidance()` verifying format
+
+**Output format**:
+- Before: `[DIRTY, AHEAD]` (single line, brackets, comma-separated)
+- After: Multi-line with enum name and guidance:
+  ```
+  DIRTY - Uncommitted changes in working directory. Commit or stash before tagging.
+  AHEAD - Local branch ahead of remote. Push changes before tagging.
+  ```
+
+**Design decisions**:
+- TDD at CLI boundary (not unit testing enum property)
+- Enum names preserved at line start for parseability
+- No emoji prefix (keeps separation from warnings clean per existing partition logic)
+- Follows FailureVersionReasons pattern for message property
+- JSON format unchanged (still outputs enum names as strings)
+
+**Validation**: `./gradlew :command-line-tools:tagger-cli:check` passed (all 95 tests including new behavioral test)
 
 ### Key Files
 - `command-line-tools/tagger-cli/src/commonMain/kotlin/com/zegreatrob/tools/tagger/cli/Tagger.kt` (main help)

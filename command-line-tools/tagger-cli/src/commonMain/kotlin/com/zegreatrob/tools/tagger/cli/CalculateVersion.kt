@@ -86,7 +86,9 @@ class CalculateVersion : CliktCommand() {
     ) {
         echo(message)
         if (errorMessage.isNotEmpty()) {
-            echo(errorMessage, err = true)
+            errorMessage.forEach { reason ->
+                echo("${reason.name} - ${reason.message}", err = true)
+            }
         }
         warnings.forEach { echo(it, err = true) }
     }

@@ -337,4 +337,38 @@ class CalculateVersionCommandTest : CalculateVersionTestSpec {
             .trim()
             .assertIsEqualTo("1.2.4-SNAPSHOT")
     }
+
+    @Test
+    fun snapshotReasonsIncludeActionableGuidance() = setup(object {
+        val commits = listOf("init", "[patch] commit 1")
+        val initialTag = "1.2.3"
+    }) {
+        initializeGitRepo(commits = commits, initialTag = initialTag)
+        baseArguments = listOf(
+            "calculate-version",
+            "--release-branch=master",
+            "--force-snapshot=true",
+            projectDir,
+        )
+    } exercise {
+        cli().test(baseArguments)
+    } verify { result ->
+        result.statusCode.assertIsEqualTo(0, "Command failed. Output: ${result.output}")
+        result.stdout.trim().assertIsEqualTo("1.2.4-SNAPSHOT")
+
+        // Verify stderr contains enum name and actionable message
+        val stderr = result.stderr
+        stderr.contains("FORCED").assertIsEqualTo(
+            true,
+            "Expected FORCED reason in stderr. Stderr: $stderr",
+        )
+        stderr.contains(" - ").assertIsEqualTo(
+            true,
+            "Expected 'ENUM - message' format. Stderr: $stderr",
+        )
+        stderr.contains("Snapshot forced via --force-snapshot flag").assertIsEqualTo(
+            true,
+            "Expected actionable message in stderr. Stderr: $stderr",
+        )
+    }
 }

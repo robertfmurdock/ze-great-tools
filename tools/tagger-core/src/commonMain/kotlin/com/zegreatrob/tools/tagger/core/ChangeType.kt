@@ -128,23 +128,23 @@ data class StatusCheck(
     val forceSnapshot: Boolean,
 )
 
-enum class SnapshotReason {
-    FORCED {
+enum class SnapshotReason(val message: String) {
+    FORCED("Snapshot forced via --force-snapshot flag.") {
         override fun StatusCheck.exists() = forceSnapshot
     },
-    DIRTY {
+    DIRTY("Uncommitted changes in working directory. Commit or stash before tagging.") {
         override fun StatusCheck.exists() = !gitStatus.isClean
     },
-    AHEAD {
+    AHEAD("Local branch ahead of remote. Push changes before tagging.") {
         override fun StatusCheck.exists() = gitStatus.ahead != 0
     },
-    BEHIND {
+    BEHIND("Local branch behind remote. Pull changes before tagging.") {
         override fun StatusCheck.exists() = gitStatus.behind != 0
     },
-    NOT_RELEASE_BRANCH {
+    NOT_RELEASE_BRANCH("Not on configured release branch. Switch to release branch before tagging.") {
         override fun StatusCheck.exists() = gitStatus.head != releaseBranch
     },
-    NO_NEW_VERSION {
+    NO_NEW_VERSION("No new commits since last tag. Version unchanged.") {
         override fun StatusCheck.exists() = currentVersionNumber == previousVersionNumber
     }, ;
 
