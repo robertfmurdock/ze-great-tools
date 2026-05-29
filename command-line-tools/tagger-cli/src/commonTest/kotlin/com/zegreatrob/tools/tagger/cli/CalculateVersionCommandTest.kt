@@ -335,6 +335,17 @@ class CalculateVersionCommandTest : CalculateVersionTestSpec {
     }
 
     @Test
+    fun helpTextExplainsAllowDetachedHeadOption() = setup(object {
+        val cli = cli()
+    }) exercise {
+        cli.test("calculate-version --help")
+    } verify { result ->
+        result.output.contains("--allow-detached-head").assertIsEqualTo(true)
+        result.output.contains("detached HEAD").assertIsEqualTo(true, "Help should explain what detached HEAD means")
+        result.output.contains("blocked by default").assertIsEqualTo(true, "Help should explain default behavior")
+    }
+
+    @Test
     fun allowDetachedHeadTrueAllowsNoRemote() = setup(object {
     }) {
         com.zegreatrob.tools.test.git.initializeGitRepo(
