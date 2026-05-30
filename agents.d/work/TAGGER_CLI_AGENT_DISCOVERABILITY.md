@@ -25,7 +25,7 @@ Current CLI outputs explain *what* happens but don't clearly communicate *why* o
 - [x] Enhance CLI help text for agent discoverability
 - [x] Improve snapshot diagnostic output with actionable guidance
 - [x] Enhance context-sensitive help (subcommand and options)
-- [ ] Update README to defer to CLI as documentation source
+- [x] Update README to defer to CLI as documentation source
 - [ ] Final refactor pass (code style, patterns, efficiency)
 - [ ] Review changes against applicable playbooks and verify compliance
 - [ ] Move to agents.d/work_completed/
@@ -105,6 +105,29 @@ Consolidated duplicate Implementation Notes sections and restructured checklist 
 - 997aa8c `[patch] add help text for --allow-detached-head option`
 - 156f0a7 `[patch] add help text for --implicit-patch option`
 
+### Checklist Item 5 Complete - README Updated to Defer to CLI Help
+**Files changed**:
+- `command-line-tools/tagger-cli/README.md` - Restructured to defer to CLI help as documentation source:
+  - Added early reference to `--help` commands after basic command examples
+  - Removed detailed field documentation (data.snapshot, data.version, snapshotReasons) that duplicates CLI help
+  - Removed error code documentation (CONFIGURATION_ERROR, TAG_ERROR) that duplicates CLI help
+  - Strengthened help section at end to explicitly reference all help commands
+  - Kept high-value content: installation, basic examples, CI integration patterns, troubleshooting
+- `command-line-tools/tagger-cli/src/jvmTest/kotlin/com/zegreatrob/tools/tagger/cli/ReadmeTest.kt` - Added behavioral test enforcing DRY principle:
+  - Verifies README exists and is readable
+  - Verifies README references `tagger --help` and `calculate-version --help`
+  - Verifies README does NOT duplicate field documentation
+
+**Design decisions**:
+- Test placed in jvmTest (not commonTest) since it requires file I/O
+- Test enforces ongoing compliance with DRY constraint
+- Kept CI integration examples (they show usage patterns, not field definitions)
+- Kept Common Errors section (troubleshooting, not feature documentation duplication)
+
+**Validation**: `./gradlew :command-line-tools:tagger-cli:check` passed (118 tasks, all 103 tests including 4 new README tests)
+
+**Commit**: c815658 `[none] update README to defer to CLI help as documentation source`
+
 ### Key Files
 - `command-line-tools/tagger-cli/src/commonMain/kotlin/com/zegreatrob/tools/tagger/cli/Tagger.kt` (main help)
 - `command-line-tools/tagger-cli/src/commonMain/kotlin/com/zegreatrob/tools/tagger/cli/CalculateVersion.kt` (command implementation)
@@ -131,4 +154,4 @@ All changes are `[patch]` - improving messaging without changing behavior or API
 
 ## Validation
 - Commands: `./gradlew :command-line-tools:tagger-cli:check`
-- Results: BUILD SUCCESSFUL - 117 tasks (22 executed, 95 up-to-date), 99 tests passed including 4 new help text tests
+- Results: BUILD SUCCESSFUL - 118 tasks (14 executed, 104 up-to-date), 103 tests passed including 4 help text tests and 4 README tests
