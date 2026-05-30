@@ -9,56 +9,50 @@ import kotlin.test.Test
 class ReadmeTest {
     @Test
     fun readmeExistsAndIsReadable() = setup(object {
-        val readmeContent = readReadme()
     }) exercise {
-        readmeContent.isNotEmpty()
-    } verify { result ->
-        result.assertIsEqualTo(true)
+        readReadme()
+    } verify { readme ->
+        readme.isNotEmpty().assertIsEqualTo(true)
     }
 
     @Test
     fun readmeReferencesMainHelp() = setup(object {
-        val readmeContent = readReadme()
     }) exercise {
-        readmeContent.contains("tagger --help")
-    } verify { result ->
-        result.assertIsEqualTo(true)
+        readReadme()
+    } verify { readme ->
+        readme.contains("tagger --help").assertIsEqualTo(true)
     }
 
     @Test
     fun readmeReferencesCalculateVersionHelp() = setup(object {
-        val readmeContent = readReadme()
     }) exercise {
-        readmeContent.contains("calculate-version --help")
-    } verify { result ->
-        result.assertIsEqualTo(true)
+        readReadme()
+    } verify { readme ->
+        readme.contains("calculate-version --help").assertIsEqualTo(true)
     }
 
     @Test
     fun readmeDoesNotDuplicateFieldDocumentation() = setup(object {
-        val readmeContent = readReadme()
     }) exercise {
-        containsFieldDocumentation(readmeContent)
-    } verify { result ->
-        result.assertIsEqualTo(false)
+        readReadme()
+    } verify { readme ->
+        containsFieldDocumentation(readme).assertIsEqualTo(false)
     }
 
     @Test
     fun readmeDoesNotDuplicateErrorCodeDocumentation() = setup(object {
-        val readmeContent = readReadme()
     }) exercise {
-        containsErrorCodeDocumentation(readmeContent)
-    } verify { result ->
-        result.assertIsEqualTo(false)
+        readReadme()
+    } verify { readme ->
+        containsErrorCodeDocumentation(readme).assertIsEqualTo(false)
     }
 
     @Test
     fun readmeDoesNotDuplicateSnapshotReasonDocumentation() = setup(object {
-        val readmeContent = readReadme()
     }) exercise {
-        containsSnapshotReasonDocumentation(readmeContent)
-    } verify { result ->
-        result.assertIsEqualTo(false)
+        readReadme()
+    } verify { readme ->
+        containsSnapshotReasonDocumentation(readme).assertIsEqualTo(false)
     }
 }
 
