@@ -46,6 +46,22 @@ class ReadmeTest {
     } verify { readme ->
         containsSemverTypeDocumentation(readme).assertIsEqualTo(false)
     }
+
+    @Test
+    fun readmeReferencesCurrentContributionDataHelp() = setup(object {
+    }) exercise {
+        readReadme()
+    } verify { readme ->
+        readme.contains("current-contribution-data --help").assertIsEqualTo(true)
+    }
+
+    @Test
+    fun readmeReferencesAllContributionDataHelp() = setup(object {
+    }) exercise {
+        readReadme()
+    } verify { readme ->
+        readme.contains("all-contribution-data --help").assertIsEqualTo(true)
+    }
 }
 
 private fun readReadme(): String {
