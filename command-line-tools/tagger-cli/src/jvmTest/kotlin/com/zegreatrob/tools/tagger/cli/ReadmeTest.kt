@@ -2,21 +2,11 @@ package com.zegreatrob.tools.tagger.cli
 
 import com.zegreatrob.minassert.assertIsEqualTo
 import com.zegreatrob.testmints.setup
+import com.zegreatrob.tools.tagger.core.SnapshotReason
 import java.io.File
 import kotlin.test.Test
 
 class ReadmeTest {
-    private fun readReadme(): String {
-        val readmePath = "command-line-tools/tagger-cli/README.md"
-        val projectRoot = System.getProperty("user.dir")
-        val readmeFile = File(projectRoot).parentFile.parentFile.resolve(readmePath)
-        return if (readmeFile.exists()) {
-            readmeFile.readText()
-        } else {
-            File(readmePath).readText()
-        }
-    }
-
     @Test
     fun readmeExistsAndIsReadable() = setup(object {
         val readmeContent = readReadme()
@@ -48,10 +38,7 @@ class ReadmeTest {
     fun readmeDoesNotDuplicateFieldDocumentation() = setup(object {
         val readmeContent = readReadme()
     }) exercise {
-        val hasFieldDocPattern = Regex("""^\s*-\s+`data\.\w+`:\s+\w""", RegexOption.MULTILINE)
-            .containsMatchIn(readmeContent)
-        val hasFieldsHeader = readmeContent.contains("**Fields:**")
-        hasFieldDocPattern || hasFieldsHeader
+        containsFieldDocumentation(readmeContent)
     } verify { result ->
         result.assertIsEqualTo(false)
     }
@@ -60,10 +47,7 @@ class ReadmeTest {
     fun readmeDoesNotDuplicateErrorCodeDocumentation() = setup(object {
         val readmeContent = readReadme()
     }) exercise {
-        val hasErrorCodesSection = readmeContent.contains("### Error Codes")
-        val hasErrorCodePattern = Regex("""^\s*-\s+`[A-Z_]+_ERROR`:\s+\w""", RegexOption.MULTILINE)
-            .containsMatchIn(readmeContent)
-        hasErrorCodesSection || hasErrorCodePattern
+        containsErrorCodeDocumentation(readmeContent)
     } verify { result ->
         result.assertIsEqualTo(false)
     }
@@ -72,19 +56,39 @@ class ReadmeTest {
     fun readmeDoesNotDuplicateSnapshotReasonDocumentation() = setup(object {
         val readmeContent = readReadme()
     }) exercise {
-        // Check for pattern like "- `DIRTY`: explanation text" or "- DIRTY - explanation"
-        // but exclude the JSON example which shows enum values in an array
-        val lines = readmeContent.lines()
-        val hasSnapshotReasonDocs = lines.any { line ->
-            val trimmed = line.trim()
-            // Match documentation pattern but not JSON array content
-            (
-                trimmed.matches(Regex("""^-\s+`?(DIRTY|AHEAD|BEHIND|FORCED|NOT_RELEASE_BRANCH|NO_NEW_VERSION)`?[:\-]\s+\w.*""")) &&
-                    !line.contains("\"DIRTY\"") && !line.contains("\"AHEAD\"")
-                )
-        }
-        hasSnapshotReasonDocs
+        containsSnapshotReasonDocumentation(readmeContent)
     } verify { result ->
         result.assertIsEqualTo(false)
+    }
+}
+
+private fun readReadme(): String {
+    val readmePath = "command-line-tools/tagger-cli/README.md"
+    val projectRoot = System.getProperty("user.dir")
+    val readmeFile = File(projectRoot).parentFile.parentFile.resolve(readmePath)
+    return if (readmeFile.exists()) {
+        readmeFile.readText()
+    } else {
+        File(readmePath).readText()
+    }
+}
+
+private fun containsFieldDocumentation(content: String): Boolean {
+    val fieldDocPattern = Regex("""^\s*-\s+`data\.\w+`:\s+\w""", RegexOption.MULTILINE)
+    return fieldDocPattern.containsMatchIn(content) || content.contains("**Fields:**")
+}
+
+private fun containsErrorCodeDocumentation(content: String): Boolean {
+    val errorCodePattern = Regex("""^\s*-\s+`[A-Z_]+_ERROR`:\s+\w""", RegexOption.MULTILINE)
+    return content.contains("### Error Codes") || errorCodePattern.containsMatchIn(content)
+}
+
+private fun containsSnapshotReasonDocumentation(content: String): Boolean {
+    val reasonNames = SnapshotReason.entries.joinToString("|") { it.name }
+    val docPattern = Regex("""^\s*-\s+`?($reasonNames)`?[:\-]\s+\w""", RegexOption.MULTILINE)
+
+    return content.lines().any { line ->
+        val trimmed = line.trim()
+        docPattern.matches(trimmed) && !trimmed.startsWith("\"") && !line.contains("\"DIRTY\"")
     }
 }
