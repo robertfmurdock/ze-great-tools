@@ -1,5 +1,19 @@
 # Task: Add Azure DevOps pipeline documentation
 
+**STATUS: SUPERSEDED — Goal achieved through different approach**
+
+This work card was superseded on 2026-05-20 by `TAGGER_CI_ERGONOMICS.md` (commit 92ba3f3).
+
+**Decision:** Instead of creating platform-specific documentation to work around confusing errors and setup friction, we improved the tool's error messages to be context-aware and actionable. The CI setup friction described in issue #310 was eliminated through better UX rather than compensatory documentation.
+
+**Why this approach:** Fix the product, not the manual. Better error messages that detect CI environments and explain actual risk are more maintainable and effective than external setup guides.
+
+**Outcome:** Issue #310's multi-iteration setup problems were resolved. `docs/tagger-detached-head.md` was enhanced with risk analysis. Platform-specific guides were deemed unnecessary.
+
+**Reference value:** The detailed ADO pipeline examples and troubleshooting guidance below remain as reference material for future consideration if platform-specific documentation becomes warranted.
+
+---
+
 ## Goal
 Create comprehensive Azure DevOps pipeline documentation for tagger, eliminating the multi-iteration setup friction reported in issue #310.
 
