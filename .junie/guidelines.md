@@ -18,6 +18,7 @@ All AI agents working on this repository must follow these rules:
    - In verify, prefer assert-style checks; reserve `error(...)` for setup-only pre-reqs.
    - Expectation data in `verify` is fine; if used once, inline it inside the assertion with reasonable line breaks.
    - If the expectation is used more than once, define a variable in `verify`.
+   - **CLI Output Testing**: When testing help text or formatted CLI output that may wrap across lines, use regex patterns instead of exact string matching. Example: `result.output.contains(Regex("\\(default:\\s*text\\)"))` handles both `"(default: text)"` and `"(default:\n                               text)"`. This prevents false failures from formatter line-wrapping changes.
 5. **Test Behavior, Not Structure**:
    - Tests must verify outcomes and effects, not just presence or structure.
    - Example: if adding a Gradle configuration property to enable functionality, test the functionality itself — the property's existence is a side effect of meeting the spec.
