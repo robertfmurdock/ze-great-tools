@@ -60,7 +60,9 @@ open class TaggerExtension(
      * @deprecated Use allowDetachedHead instead (inverted logic).
      */
     @Deprecated("Use allowDetachedHead instead (inverted logic)")
-    val disableDetached = objectFactory.property(Boolean::class.java).convention(true)
+    val disableDetached = objectFactory.property(Boolean::class.java).apply {
+        convention(fileConfig.map { it.disableDetached ?: true })
+    }
 
     /**
      * When true, versioning allows detached HEAD (no upstream tracking branch).
