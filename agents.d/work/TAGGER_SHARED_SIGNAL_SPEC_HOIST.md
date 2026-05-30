@@ -11,7 +11,7 @@ Hoist user-facing parity assertions for “signal exists + migration guidance ex
 - Semver intent (initial): `[none]` (test architecture/coverage changes only). Escalate and confirm if production behavior changes become necessary.
 
 ## Checklist
-- [ ] Review this work card for compliance with template and update to conform
+- [x] Review this work card for compliance with template and update to conform
 - [ ] If this card plans subagent delegation, ask user to explicitly authorize subagents for this card and record the response in Implementation Notes
 - [ ] Build inventory of currently implementation-specific “user signal” tests and classify each as `hoist`, `stay-exclusive`, or `blocked`
   - Agent cycle: test → implement → refactor-light → verify pushable
