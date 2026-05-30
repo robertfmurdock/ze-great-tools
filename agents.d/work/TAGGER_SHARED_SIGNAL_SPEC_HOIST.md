@@ -12,7 +12,7 @@ Hoist user-facing parity assertions for “signal exists + migration guidance ex
 
 ## Checklist
 - [x] Review this work card for compliance with template and update to conform
-- [ ] If this card plans subagent delegation, ask user to explicitly authorize subagents for this card and record the response in Implementation Notes
+- [x] If this card plans subagent delegation, ask user to explicitly authorize subagents for this card and record the response in Implementation Notes
 - [ ] Build inventory of currently implementation-specific “user signal” tests and classify each as `hoist`, `stay-exclusive`, or `blocked`
   - Agent cycle: test → implement → refactor-light → verify pushable
   - Update plan if guidelines revealed new constraints
@@ -30,6 +30,10 @@ Hoist user-facing parity assertions for “signal exists + migration guidance ex
 - [ ] Move this file to agents.d/work_completed/
 
 ## Implementation Notes
+
+### Subagent Authorization
+- **Date**: 2026-05-30
+- **Response**: Yes — subagent delegation authorized for this card
 
 ### Semver intent (initial)
 - Expected scope: `[none]` (shared-spec and test-placement refactor).
