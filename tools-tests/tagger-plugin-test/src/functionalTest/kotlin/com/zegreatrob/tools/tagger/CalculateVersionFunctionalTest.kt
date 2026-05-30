@@ -1,5 +1,6 @@
 package com.zegreatrob.tools.tagger
 
+import com.zegreatrob.minassert.assertIsEqualTo
 import org.gradle.testkit.runner.GradleRunner
 import java.io.File
 
@@ -98,5 +99,21 @@ class CalculateVersionFunctionalTest : CalculateVersionTestSpec {
         } catch (e: Exception) {
             TestResult.Failure(e.message!!)
         }
+    }
+
+    override fun TestResult.Success.assertHasDeprecationWarning(
+        deprecatedFeature: String,
+        replacement: String,
+    ) {
+        warnings.any { it.contains(deprecatedFeature) && it.contains("deprecated") }
+            .assertIsEqualTo(
+                true,
+                "Expected deprecation warning for $deprecatedFeature. Warnings: $warnings",
+            )
+        warnings.any { it.contains(replacement) }
+            .assertIsEqualTo(
+                true,
+                "Expected migration guidance to $replacement. Warnings: $warnings",
+            )
     }
 }

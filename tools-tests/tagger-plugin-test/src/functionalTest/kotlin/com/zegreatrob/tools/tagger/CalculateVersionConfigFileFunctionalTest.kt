@@ -1,6 +1,10 @@
 package com.zegreatrob.tools.tagger
 
-class CalculateVersionConfigFileFunctionalTest : CalculateVersionConfigFileParseFailureTestSpec {
+import com.zegreatrob.minassert.assertIsEqualTo
+
+class CalculateVersionConfigFileFunctionalTest :
+    CalculateVersionTestSpec,
+    CalculateVersionConfigFileParseFailureTestSpec {
     override lateinit var projectDir: String
 
     override val addFileNames: Set<String>
@@ -53,5 +57,21 @@ class CalculateVersionConfigFileFunctionalTest : CalculateVersionConfigFileParse
             onSuccess = ConfigFileFunctionalTestSupport::parseCalculateVersion,
             onFailure = { TestResult.Failure(it.message!!) },
         )
+    }
+
+    override fun TestResult.Success.assertHasDeprecationWarning(
+        deprecatedFeature: String,
+        replacement: String,
+    ) {
+        warnings.any { it.contains(deprecatedFeature) && it.contains("deprecated") }
+            .assertIsEqualTo(
+                true,
+                "Expected deprecation warning for $deprecatedFeature. Warnings: $warnings",
+            )
+        warnings.any { it.contains(replacement) }
+            .assertIsEqualTo(
+                true,
+                "Expected migration guidance to $replacement. Warnings: $warnings",
+            )
     }
 }

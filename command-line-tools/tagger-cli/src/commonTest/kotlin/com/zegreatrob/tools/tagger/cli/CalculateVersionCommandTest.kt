@@ -75,6 +75,25 @@ class CalculateVersionCommandTest : CalculateVersionTestSpec {
         }
     }
 
+    override fun TestResult.Success.assertHasDeprecationWarning(
+        deprecatedFeature: String,
+        replacement: String,
+    ) {
+        val deprecatedCli = deprecatedFeature.replace(Regex("([A-Z])")) { "-${it.value.lowercase()}" }
+        val replacementCli = replacement.replace(Regex("([A-Z])")) { "-${it.value.lowercase()}" }
+
+        warnings.any { it.contains("--$deprecatedCli") && it.contains("deprecated") }
+            .assertIsEqualTo(
+                true,
+                "Expected deprecation warning for --$deprecatedCli. Warnings: $warnings",
+            )
+        warnings.any { it.contains("--$replacementCli") }
+            .assertIsEqualTo(
+                true,
+                "Expected migration guidance to --$replacementCli. Warnings: $warnings",
+            )
+    }
+
     @Test
     fun withFormatJsonOutputsValidJson() = setup(object {
         val commits = listOf("init", "[patch] commit 1", "[patch] commit 2")

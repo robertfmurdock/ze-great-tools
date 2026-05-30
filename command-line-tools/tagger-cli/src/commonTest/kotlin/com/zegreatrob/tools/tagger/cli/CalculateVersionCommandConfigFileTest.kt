@@ -1,15 +1,19 @@
 package com.zegreatrob.tools.tagger.cli
 
 import com.github.ajalt.clikt.testing.test
+import com.zegreatrob.minassert.assertIsEqualTo
 import com.zegreatrob.tools.cli.writeToFile
 import com.zegreatrob.tools.tagger.CalculateVersionConfigFileParseFailureTestSpec
+import com.zegreatrob.tools.tagger.CalculateVersionTestSpec
 import com.zegreatrob.tools.tagger.TestResult
 import com.zegreatrob.tools.tagger.json.TaggerConfig
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 
 @ExperimentalSerializationApi
-class CalculateVersionCommandConfigFileTest : CalculateVersionConfigFileParseFailureTestSpec {
+class CalculateVersionCommandConfigFileTest :
+    CalculateVersionTestSpec,
+    CalculateVersionConfigFileParseFailureTestSpec {
 
     override lateinit var projectDir: String
 
@@ -71,5 +75,21 @@ class CalculateVersionCommandConfigFileTest : CalculateVersionConfigFileParseFai
         } else {
             TestResult.Failure(test.output.trim())
         }
+    }
+
+    override fun TestResult.Success.assertHasDeprecationWarning(
+        deprecatedFeature: String,
+        replacement: String,
+    ) {
+        warnings.any { it.contains(deprecatedFeature) && it.contains("deprecated") }
+            .assertIsEqualTo(
+                true,
+                "Expected deprecation warning for $deprecatedFeature. Warnings: $warnings",
+            )
+        warnings.any { it.contains(replacement) }
+            .assertIsEqualTo(
+                true,
+                "Expected migration guidance to $replacement. Warnings: $warnings",
+            )
     }
 }

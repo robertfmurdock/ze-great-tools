@@ -69,6 +69,11 @@ interface CalculateVersionTestSpec {
 
     fun execute(): TestResult
 
+    fun TestResult.Success.assertHasDeprecationWarning(
+        deprecatedFeature: String,
+        replacement: String,
+    )
+
     @Test
     fun withNoTagsProducesError() = setup(object {
     }) {
@@ -728,16 +733,10 @@ interface CalculateVersionTestSpec {
     } verify { result ->
         when (result) {
             is TestResult.Success -> {
-                result.warnings.any { it.contains("disableDetached") && it.contains("deprecated") }
-                    .assertIsEqualTo(
-                        true,
-                        "Expected deprecation warning for disableDetached config property. Warnings: ${result.warnings}",
-                    )
-                result.warnings.any { it.contains("allowDetachedHead") }
-                    .assertIsEqualTo(
-                        true,
-                        "Expected migration guidance to allowDetachedHead. Warnings: ${result.warnings}",
-                    )
+                result.assertHasDeprecationWarning(
+                    deprecatedFeature = "disableDetached",
+                    replacement = "allowDetachedHead",
+                )
             }
 
             is TestResult.Failure -> fail("Expected success but got ${result.reason}")
