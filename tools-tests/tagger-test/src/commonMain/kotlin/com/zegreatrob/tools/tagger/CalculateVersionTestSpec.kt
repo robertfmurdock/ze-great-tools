@@ -69,10 +69,45 @@ interface CalculateVersionTestSpec {
 
     fun execute(): TestResult
 
+    fun warningFeatureToken(feature: String): String = feature
+
     fun TestResult.Success.assertHasDeprecationWarning(
         deprecatedFeature: String,
         replacement: String,
-    )
+    ) {
+        val deprecatedToken = warningFeatureToken(deprecatedFeature)
+        val replacementToken = warningFeatureToken(replacement)
+        warnings.any { it.contains(deprecatedToken) && it.contains("deprecated") }
+            .assertIsEqualTo(
+                true,
+                "Expected deprecation warning for $deprecatedToken. Warnings: $warnings",
+            )
+        warnings.any { it.contains(replacementToken) }
+            .assertIsEqualTo(
+                true,
+                "Expected migration guidance to $replacementToken. Warnings: $warnings",
+            )
+    }
+
+    fun TestResult.Failure.assertHasDeprecationWarningEscalationError(
+        deprecatedFeature: String,
+        replacement: String,
+    ) {
+        val deprecatedToken = warningFeatureToken(deprecatedFeature)
+        val replacementToken = warningFeatureToken(replacement)
+        reason.contains("deprecated", ignoreCase = true).assertIsEqualTo(
+            true,
+            "Expected deprecation context in failure output. Output:\n$reason",
+        )
+        reason.contains(deprecatedToken).assertIsEqualTo(
+            true,
+            "Expected deprecated setting in failure output. Output:\n$reason",
+        )
+        reason.contains(replacementToken).assertIsEqualTo(
+            true,
+            "Expected migration guidance in failure output. Output:\n$reason",
+        )
+    }
 
     @Test
     fun withNoTagsProducesError() = setup(object {
@@ -740,6 +775,32 @@ interface CalculateVersionTestSpec {
             }
 
             is TestResult.Failure -> fail("Expected success but got ${result.reason}")
+        }
+    }
+
+    @Test
+    fun warningsAsErrorsCausesNonZeroExitWhenDeprecationWarningPresent() = setup(object {
+        val commits = listOf("init", "commit 1")
+        val initialTag = "1.2.3"
+    }) {
+        configureWithOverrides(
+            disableDetached = false,
+            warningsAsErrors = true,
+        )
+        initializeGitRepo(
+            commits = commits,
+            initialTag = initialTag,
+        )
+    } exercise {
+        execute()
+    } verify { result ->
+        when (result) {
+            is TestResult.Failure -> result.assertHasDeprecationWarningEscalationError(
+                deprecatedFeature = "disableDetached",
+                replacement = "allowDetachedHead",
+            )
+
+            is TestResult.Success -> fail("Should exit with failure when warningsAsErrors=true and deprecation warning exists")
         }
     }
 }

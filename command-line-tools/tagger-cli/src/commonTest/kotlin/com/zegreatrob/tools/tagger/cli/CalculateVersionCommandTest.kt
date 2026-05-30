@@ -75,23 +75,9 @@ class CalculateVersionCommandTest : CalculateVersionTestSpec {
         }
     }
 
-    override fun TestResult.Success.assertHasDeprecationWarning(
-        deprecatedFeature: String,
-        replacement: String,
-    ) {
-        val deprecatedCli = deprecatedFeature.replace(Regex("([A-Z])")) { "-${it.value.lowercase()}" }
-        val replacementCli = replacement.replace(Regex("([A-Z])")) { "-${it.value.lowercase()}" }
-
-        warnings.any { it.contains("--$deprecatedCli") && it.contains("deprecated") }
-            .assertIsEqualTo(
-                true,
-                "Expected deprecation warning for --$deprecatedCli. Warnings: $warnings",
-            )
-        warnings.any { it.contains("--$replacementCli") }
-            .assertIsEqualTo(
-                true,
-                "Expected migration guidance to --$replacementCli. Warnings: $warnings",
-            )
+    override fun warningFeatureToken(feature: String): String {
+        val kebabFeature = feature.replace(Regex("([A-Z])")) { "-${it.value.lowercase()}" }
+        return "--$kebabFeature"
     }
 
     @Test
@@ -236,7 +222,6 @@ class CalculateVersionCommandTest : CalculateVersionTestSpec {
     } verify { result ->
         result.statusCode.assertIsEqualTo(0, "Command failed. Output: ${result.output}")
         result.stdout.trim().assertIsEqualTo("1.2.4", "Text format should output version only")
-        // Verify it's NOT JSON
         result.stdout.contains("{").assertIsEqualTo(false, "Text format should not contain JSON")
     }
 
@@ -275,7 +260,6 @@ class CalculateVersionCommandTest : CalculateVersionTestSpec {
         cli().test(baseArguments)
     } verify { result ->
         result.statusCode.assertIsEqualTo(0)
-        // Verify JSON is in stdout, not stderr
         result.stdout.contains("\"status\"").assertIsEqualTo(true, "JSON should be in stdout")
         result.stderr.isEmpty().assertIsEqualTo(true, "JSON mode should not write to stderr for success")
     }
@@ -317,7 +301,6 @@ class CalculateVersionCommandTest : CalculateVersionTestSpec {
         cli().test(baseArguments)
     } verify { result ->
         result.statusCode.assertIsEqualTo(1)
-        // Error JSON should still be in stdout, not stderr
         result.stdout.contains("\"status\"").assertIsEqualTo(true, "JSON error should be in stdout")
         result.stdout.contains("\"error\"").assertIsEqualTo(true, "JSON error should be in stdout")
     }
@@ -431,7 +414,6 @@ class CalculateVersionCommandTest : CalculateVersionTestSpec {
         result.statusCode.assertIsEqualTo(0, "Command failed. Output: ${result.output}")
         result.stdout.trim().assertIsEqualTo("1.2.4-SNAPSHOT")
 
-        // Verify stderr contains enum name and actionable message
         val stderr = result.stderr
         stderr.contains("FORCED").assertIsEqualTo(
             true,
@@ -444,98 +426,6 @@ class CalculateVersionCommandTest : CalculateVersionTestSpec {
         stderr.contains("Snapshot forced via --force-snapshot flag").assertIsEqualTo(
             true,
             "Expected actionable message in stderr. Stderr: $stderr",
-        )
-    }
-
-    @Test
-    fun disableDetachedFlagEmitsDeprecationWarning() = setup(object {
-        val commits = listOf("init", "commit 1")
-        val initialTag = "1.2.3"
-    }) {
-        com.zegreatrob.tools.test.git.initializeGitRepo(
-            directory = projectDir,
-            commits = commits,
-            initialTag = initialTag,
-            remoteUrl = null,
-            addFileNames = addFileNames,
-        )
-        baseArguments = listOf(
-            "-q",
-            "calculate-version",
-            "--release-branch=master",
-            "--disable-detached=false",
-            projectDir,
-        )
-    } exercise {
-        cli().test(baseArguments)
-    } verify { result ->
-        result.statusCode.assertIsEqualTo(0, "Command failed. Output: ${result.output}")
-        result.stderr.contains("--disable-detached is deprecated").assertIsEqualTo(
-            true,
-            "Expected deprecation warning in stderr. Stderr: ${result.stderr}",
-        )
-        result.stderr.contains("--allow-detached-head").assertIsEqualTo(
-            true,
-            "Expected migration guidance in stderr. Stderr: ${result.stderr}",
-        )
-    }
-
-    @Test
-    fun warningsAsErrorsCausesNonZeroExitWhenDeprecationWarningPresent() = setup(object {
-        val commits = listOf("init", "commit 1")
-        val initialTag = "1.2.3"
-    }) {
-        com.zegreatrob.tools.test.git.initializeGitRepo(
-            directory = projectDir,
-            commits = commits,
-            initialTag = initialTag,
-            remoteUrl = null,
-            addFileNames = addFileNames,
-        )
-        baseArguments = listOf(
-            "-q",
-            "calculate-version",
-            "--release-branch=master",
-            "--disable-detached=false",
-            "--warnings-as-errors=true",
-            projectDir,
-        )
-    } exercise {
-        cli().test(baseArguments)
-    } verify { result ->
-        result.statusCode.assertIsEqualTo(1, "Should exit with code 1 when warnings present and warningsAsErrors enabled")
-        result.stderr.contains("--disable-detached is deprecated").assertIsEqualTo(
-            true,
-            "Expected deprecation warning in stderr. Stderr: ${result.stderr}",
-        )
-    }
-
-    @Test
-    fun withoutWarningsAsErrorsDeprecationWarningsDoNotCauseNonZeroExit() = setup(object {
-        val commits = listOf("init", "commit 1")
-        val initialTag = "1.2.3"
-    }) {
-        com.zegreatrob.tools.test.git.initializeGitRepo(
-            directory = projectDir,
-            commits = commits,
-            initialTag = initialTag,
-            remoteUrl = null,
-            addFileNames = addFileNames,
-        )
-        baseArguments = listOf(
-            "-q",
-            "calculate-version",
-            "--release-branch=master",
-            "--disable-detached=false",
-            projectDir,
-        )
-    } exercise {
-        cli().test(baseArguments)
-    } verify { result ->
-        result.statusCode.assertIsEqualTo(0, "Should exit with code 0 when warnings present but warningsAsErrors disabled")
-        result.stderr.contains("--disable-detached is deprecated").assertIsEqualTo(
-            true,
-            "Expected deprecation warning in stderr. Stderr: ${result.stderr}",
         )
     }
 

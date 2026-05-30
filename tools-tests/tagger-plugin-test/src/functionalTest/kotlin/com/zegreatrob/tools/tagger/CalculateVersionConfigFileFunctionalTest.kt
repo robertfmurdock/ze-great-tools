@@ -1,7 +1,5 @@
 package com.zegreatrob.tools.tagger
 
-import com.zegreatrob.minassert.assertIsEqualTo
-
 class CalculateVersionConfigFileFunctionalTest :
     CalculateVersionTestSpec,
     CalculateVersionConfigFileParseFailureTestSpec {
@@ -57,21 +55,5 @@ class CalculateVersionConfigFileFunctionalTest :
             onSuccess = ConfigFileFunctionalTestSupport::parseCalculateVersion,
             onFailure = { TestResult.Failure(it.message!!) },
         )
-    }
-
-    override fun TestResult.Success.assertHasDeprecationWarning(
-        deprecatedFeature: String,
-        replacement: String,
-    ) {
-        warnings.any { it.contains(deprecatedFeature) && it.contains("deprecated") }
-            .assertIsEqualTo(
-                true,
-                "Expected deprecation warning for $deprecatedFeature. Warnings: $warnings",
-            )
-        warnings.any { it.contains(replacement) }
-            .assertIsEqualTo(
-                true,
-                "Expected migration guidance to $replacement. Warnings: $warnings",
-            )
     }
 }

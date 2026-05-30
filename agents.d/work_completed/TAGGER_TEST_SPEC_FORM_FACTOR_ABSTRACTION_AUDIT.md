@@ -11,29 +11,39 @@ Review all CLI and plugin test implementations to identify opportunities to impr
 - Semver intent (initial): `[none]` (test refactor only, no production behavior changes)
 
 ## Checklist
-- [ ] Review this work card for compliance with template and update to conform
-- [ ] If this card plans subagent delegation, ask user to explicitly authorize subagents for this card and record the response in Implementation Notes
-- [ ] Build inventory of implementation-specific tests in tagger CLI and plugin suites
+- [x] Review this work card for compliance with template and update to conform
+- [x] If this card plans subagent delegation, ask user to explicitly authorize subagents for this card and record the response in Implementation Notes
+- [x] Build inventory of implementation-specific tests in tagger CLI and plugin suites
   - Agent cycle: test → implement → refactor-light → verify pushable
   - Update plan if guidelines revealed new constraints
-- [ ] Classify each test as: `already-shared`, `should-hoist`, `correctly-implementation-specific`, or `needs-micro-api`
+- [x] Classify each test as: `already-shared`, `should-hoist`, `correctly-implementation-specific`, or `needs-micro-api`
   - Agent cycle: test → implement → refactor-light → verify pushable
   - Update plan if guidelines revealed new constraints
-- [ ] For tests needing micro-APIs: design reusable assertion helpers that abstract form-factor differences
+- [x] For tests needing micro-APIs: design reusable assertion helpers that abstract form-factor differences
   - Agent cycle: test → implement → refactor-light → verify pushable
   - Update plan if guidelines revealed new constraints
-- [ ] Hoist appropriate tests to shared specs with micro-API abstractions
+- [x] Hoist appropriate tests to shared specs with micro-API abstractions
   - Agent cycle: test → implement → refactor-light → verify pushable
   - Update plan if guidelines revealed new constraints
-- [ ] Final refactor pass via subagent (MANDATORY - see REFACTOR_AGENT.md)
-- [ ] Review changes against applicable playbooks and verify compliance
-- [ ] Move this file to agents.d/work_completed/
+- [x] Final refactor pass via subagent (MANDATORY - see REFACTOR_AGENT.md)
+- [x] Review changes against applicable playbooks and verify compliance
+- [x] Move this file to agents.d/work_completed/
 
 ## Implementation Notes
 
 ### Semver intent (initial)
 - Expected scope: `[none]` (test organization and abstraction refactor only)
 - If changes require production code modifications to support better abstractions, escalate and confirm
+
+### Progress Log
+- 2026-05-30: Reviewed work card template compliance; checklist ordering and required terminal items conform to `WORK_CHECKLIST.md`.
+- 2026-05-30: User authorized subagent delegation for this card (`yes`).
+- 2026-05-30: Inventory complete across `tagger-cli` tests, `tagger-plugin-test` functional tests, and shared `tagger-test` specs.
+- 2026-05-30: Classification complete. `CalculateVersionTestSpec` and `TagTestSpec` already host most cross-form-factor behavior; CLI help/format JSON tests and plugin task wiring/config precedence tests remain implementation-specific.
+- 2026-05-30: Introduced new micro-API assertion `TestResult.Failure.assertHasDeprecationWarningEscalationError(...)` for cross-form-factor failure checks when warnings escalate to errors.
+- 2026-05-30: Hoisted deprecation warnings-as-errors behavior to `CalculateVersionTestSpec` and removed overlapping CLI-only tests.
+- 2026-05-30: Final refactor pass completed via subagent (`019e7a51-e7d2-7181-b7d2-d07836e0efb6`), including full-file review and cleanup that centralized duplicate assertion logic in shared spec defaults.
+- 2026-05-30: Reviewed changes against `PLAYBOOK_CODE_STYLE.md`; assertions and test structure remain aligned with local style/TDD expectations.
 
 ### Scope
 Focus areas:
@@ -54,5 +64,9 @@ Look for:
 - **Needs work**: Implementation-specific test for behavior that should be universal
 
 ## Validation
-- Commands: [filled in as work progresses]
-- Results: [filled in before completion]
+- Commands:
+  - `./gradlew :command-line-tools:tagger-cli:check :tools-tests:tagger-test:check :tools-tests:tagger-plugin-test:check --console=plain`
+  - `./gradlew check --console=plain`
+- Results:
+  - PASS (after refactor adjustments for failure-output assertions)
+  - PASS
