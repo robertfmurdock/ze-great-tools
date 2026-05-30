@@ -533,6 +533,28 @@ interface CalculateVersionTestSpec {
     }
 
     @Test
+    fun versionTagsInCommitBodyAreIgnored() = setup(object {
+        val commits = listOf(
+            "init",
+            "[patch] document versioning\n\nChanging stdout format is [major], improving stderr is [patch].",
+        )
+        val initialTag = "1.2.3"
+    }) {
+        configureWithDefaults()
+        initializeGitRepo(
+            commits = commits,
+            initialTag = initialTag,
+        )
+    } exercise {
+        execute()
+    } verify { result ->
+        when (result) {
+            is TestResult.Success -> result.message.assertIsEqualTo("1.2.4")
+            is TestResult.Failure -> fail("Expected success but got ${result.reason}")
+        }
+    }
+
+    @Test
     fun unifiedGroupWillReportErrorsWhenMissingGroupsWithCorrectNames() = setup(object {
         val versionRegex = ".*"
         val commits = listOf("init", "commit (no) 1")

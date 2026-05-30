@@ -89,7 +89,9 @@ private fun highestPriority(
     else -> right
 }
 
-private fun CommitRef.changeType(versionRegex: VersionRegex) = versionRegex.changeType(fullMessage.trim())
+private fun CommitRef.changeType(versionRegex: VersionRegex) = versionRegex.changeType(subject())
+
+private fun CommitRef.subject(): String = fullMessage.lineSequence().firstOrNull()?.trim() ?: ""
 
 enum class ChangeType(val priority: Int) {
     Major(3) {
