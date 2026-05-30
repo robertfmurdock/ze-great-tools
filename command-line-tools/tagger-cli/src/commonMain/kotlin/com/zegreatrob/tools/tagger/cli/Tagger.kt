@@ -39,7 +39,7 @@ class Tagger : CliktCommand() {
     private fun outputSection() = """
         Output:
           Text format writes version to stdout, diagnostics to stderr.
-          Command substitution captures only stdout: VERSION=${'$'}(tagger -q calculate-version ...)
+          Command substitution captures only stdout: VERSION=$$(tagger -q calculate-version ...)
 
           -SNAPSHOT suffix indicates unmet conditions for release.
           Snapshot versions should not be used in releases or tags.
@@ -70,7 +70,7 @@ class Tagger : CliktCommand() {
         "--quiet",
         "-q",
         help = "Suppress welcome message. Version goes to stdout, diagnostics to stderr " +
-            "(safe for: VERSION=\$(tagger -q ...))",
+            "(safe for: VERSION=$$(tagger -q ...))",
     ).flag(default = false)
 
     override fun run() {

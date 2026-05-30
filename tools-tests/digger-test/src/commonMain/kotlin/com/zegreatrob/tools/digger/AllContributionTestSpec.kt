@@ -18,6 +18,7 @@ import kotlinx.coroutines.delay
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
+import kotlin.time.Duration.Companion.seconds
 
 interface AllContributionTestSpec : SetupWithOverrides {
     data class AllContributionDataResult(
@@ -133,12 +134,12 @@ interface AllContributionTestSpec : SetupWithOverrides {
 
         firstCommit = gitAdapter.show("HEAD")!!
         firstRelease = gitAdapter.addTag("release1")
-        delay(1100)
+        delay(1.1.seconds)
         gitAdapter.switchToNewBranch("branch")
 
         secondCommit = gitAdapter.addCommitWithMessage("second")
         midRelease = gitAdapter.addTag("release1-5")
-        delay(1100)
+        delay(1.1.seconds)
         gitAdapter.checkout("master")
 
         thirdCommit = gitAdapter.addCommitWithMessage("third")
@@ -203,7 +204,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
         gitAdapter.checkout("master")
 
         mergeToMainCommit = gitAdapter.mergeInBranch("branch", "merge-to-main")
-        delay(1100)
+        delay(1.1.seconds)
         release2 = gitAdapter.addTag("release-2")
     } exercise {
         runAllContributionData()
@@ -250,7 +251,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
 
         gitAdapter.checkout("master")
         thirdCommit = gitAdapter.addCommitWithMessage("third")
-        delay(1100)
+        delay(1.1.seconds)
         secondRelease = gitAdapter.addTag("release-2")
 
         gitAdapter.checkout("branch")
@@ -260,7 +261,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
         gitAdapter.checkout("master")
 
         gitAdapter.ffOnlyInBranch("branch")
-        delay(1100)
+        delay(1.1.seconds)
         thirdRelease = gitAdapter.addTag("release-3")
     } exercise {
         runAllContributionData()
@@ -315,13 +316,13 @@ interface AllContributionTestSpec : SetupWithOverrides {
         gitAdapter.checkout("master")
         thirdCommit = gitAdapter.addCommitWithMessage("third")
 
-        delay(1100)
+        delay(1.1.seconds)
         secondRelease = gitAdapter.addTag("release2")
         gitAdapter.checkout("branch1")
         gitAdapter.addCommitWithMessage("fourth")
         gitAdapter.checkout("master")
         mergeCommit = gitAdapter.mergeInBranch("branch1", "merge")
-        delay(1100)
+        delay(1.1.seconds)
         thirdRelease = gitAdapter.addTag("release3")
     } exercise {
         runAllContributionData()
@@ -374,13 +375,13 @@ interface AllContributionTestSpec : SetupWithOverrides {
         gitAdapter.checkout("master")
         gitAdapter.addCommitWithMessage("third")
 
-        delay(1100)
+        delay(1.1.seconds)
         gitAdapter.addTag("unrelated-tag")
         gitAdapter.checkout("branch1")
         gitAdapter.addCommitWithMessage("fourth")
         gitAdapter.checkout("master")
         mergeCommit = gitAdapter.mergeInBranch("branch1", "merge")
-        delay(1100)
+        delay(1.1.seconds)
         thirdRelease = gitAdapter.addTag("v20.176.37")
     } exercise {
         runAllContributionData()
@@ -437,7 +438,7 @@ interface AllContributionTestSpec : SetupWithOverrides {
         gitAdapter.addCommitWithMessage("sixth")
 
         merge2Commit = gitAdapter.mergeInBranch("branch1", "merge2")
-        delay(1100)
+        delay(1.1.seconds)
         thirdRelease = gitAdapter.addTag("release3")
     } exercise {
         runAllContributionData()
@@ -486,14 +487,14 @@ interface AllContributionTestSpec : SetupWithOverrides {
         gitAdapter.checkout("master")
         gitAdapter.addCommitWithMessage("third")
         merge1Commit = gitAdapter.mergeInBranch("branch1", "merge1")
-        delay(1100)
+        delay(1.1.seconds)
         secondRelease = gitAdapter.addTag("release2")
 
         gitAdapter.checkout("branch1")
         fourthCommit = gitAdapter.addCommitWithMessage("fourth")
         gitAdapter.checkout("master")
         merge2Commit = gitAdapter.mergeInBranch("branch1", "merge2")
-        delay(1100)
+        delay(1.1.seconds)
         thirdRelease = gitAdapter.addTag("release3")
     } exercise {
         runAllContributionData()

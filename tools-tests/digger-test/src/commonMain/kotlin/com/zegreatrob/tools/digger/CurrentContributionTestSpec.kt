@@ -19,6 +19,7 @@ import kotlinx.coroutines.delay
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
+import kotlin.time.Duration.Companion.seconds
 
 interface CurrentContributionTestSpec : SetupWithOverrides {
     data class CurrentContributionDataResult(
@@ -310,7 +311,7 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
                 |Co-authored-by: 4th Guy <fourth@guy.edu>
             """.trimMargin(),
         )
-        delay(1000)
+        delay(1.seconds)
         nowTag = gitAdapter.addTag("now")
     } exercise {
         runCurrentContributionData()
@@ -490,7 +491,7 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
         gitAdapter.addCommitWithMessage("sixth")
 
         merge2Commit = gitAdapter.mergeInBranch("branch1", "merge2")
-        delay(1100)
+        delay(1.1.seconds)
         secondRelease = gitAdapter.addTag("release2")
     } exercise {
         runCurrentContributionData()
@@ -537,7 +538,7 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
         gitAdapter.addCommitWithMessage("sixth")
 
         merge2Commit = gitAdapter.mergeInBranch("branch1", "merge2")
-        delay(1100)
+        delay(1.1.seconds)
         gitAdapter.addTag("ignore-me")
     } exercise {
         runCurrentContributionData()
@@ -569,7 +570,7 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
         secondCommit = gitAdapter.addCommitWithMessage("second")
         gitAdapter.checkout("master")
         gitAdapter.addCommitWithMessage("third")
-        delay(1100)
+        delay(1.1.seconds)
         gitAdapter.addTag("release2")
         gitAdapter.checkout("branch")
         gitAdapter.addCommitWithMessage("fourth")
@@ -577,7 +578,7 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
         gitAdapter.checkout("master")
         gitAdapter.mergeInBranch("branch", "merge")
         lastCommit = gitAdapter.addCommitWithMessage("sixth")
-        delay(1100)
+        delay(1.1.seconds)
         thirdRelease = gitAdapter.addTag("release3")
     } exercise {
         runCurrentContributionData()
