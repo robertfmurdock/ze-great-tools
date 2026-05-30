@@ -73,4 +73,15 @@ class TaggerTest {
         result.output.contains("unmet conditions").assertIsEqualTo(true)
         result.output.contains("should not be used in releases or tags").assertIsEqualTo(true)
     }
+
+    @Test
+    fun helpTextIncludesConfigurationSection() = setup(object {
+        val command = cli()
+    }) exercise {
+        command.test("--help")
+    } verify { result ->
+        result.output.contains("Configuration:").assertIsEqualTo(true, "Help should include Configuration section")
+        result.output.contains(".tagger").assertIsEqualTo(true, "Help should mention .tagger file")
+        result.output.contains("generate-settings-file").assertIsEqualTo(true, "Help should reference settings generation")
+    }
 }

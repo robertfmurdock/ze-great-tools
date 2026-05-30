@@ -18,9 +18,22 @@ class Tagger : CliktCommand() {
     }
 
     override fun help(context: Context) = """
+        ${configurationSection()}
+
         ${outputSection()}
 
         ${automationSection()}
+    """.trimIndent()
+
+    private fun configurationSection() = """
+        Configuration:
+          Settings can be stored in a .tagger JSON file at the repository root.
+          This eliminates the need to pass common options on every invocation.
+
+          Generate a template: tagger generate-settings-file
+          Edit the file to set defaults for options like release-branch, regex patterns, etc.
+
+          Command-line options override .tagger file settings.
     """.trimIndent()
 
     private fun outputSection() = """
