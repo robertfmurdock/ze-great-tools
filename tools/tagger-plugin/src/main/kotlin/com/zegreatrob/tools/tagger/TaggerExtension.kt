@@ -5,13 +5,24 @@ import com.zegreatrob.tools.tagger.core.TaggerCore
 import com.zegreatrob.tools.tagger.core.VersionRegex
 import com.zegreatrob.tools.tagger.core.calculateNextVersion
 import com.zegreatrob.tools.tagger.core.lastVersionAndTag
+import com.zegreatrob.tools.tagger.json.TaggerConfig
+import kotlinx.serialization.json.Json
 import org.gradle.api.GradleException
 import org.gradle.api.model.ObjectFactory
+import java.io.File
 
 open class TaggerExtension(
     objectFactory: ObjectFactory,
 ) {
-    internal val releaseBranchProperty = objectFactory.property(String::class.java)
+    val workingDirectory = objectFactory.directoryProperty()
+
+    internal val releaseBranchProperty = objectFactory.property(String::class.java).apply {
+        convention(
+            workingDirectory.map { dir ->
+                readTaggerFileFrom(dir.asFile)?.releaseBranch
+            },
+        )
+    }
     var releaseBranch: String?
         get() = releaseBranchProperty.orNull
         set(value) {
@@ -33,8 +44,6 @@ open class TaggerExtension(
         }
 
     val warningsAsErrors = objectFactory.property(Boolean::class.java).convention(false)
-
-    val workingDirectory = objectFactory.directoryProperty()
 
     val implicitPatch = objectFactory.property(Boolean::class.java).convention(true)
 
@@ -97,6 +106,19 @@ open class TaggerExtension(
         major = majorRegex.get(),
         unified = versionRegex.orNull?.also { it.validateVersionRegex() },
     )
+
+    private fun readTaggerFileFrom(directory: File): TaggerConfig? {
+        val taggerFile = File(directory, ".tagger")
+        return if (taggerFile.exists()) {
+            try {
+                Json.decodeFromString<TaggerConfig>(taggerFile.readText())
+            } catch (e: Exception) {
+                throw GradleException("Failed to parse .tagger file: ${e.message}", e)
+            }
+        } else {
+            null
+        }
+    }
 }
 
 internal fun Regex.validateVersionRegex() {

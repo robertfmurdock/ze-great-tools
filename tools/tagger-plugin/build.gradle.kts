@@ -9,6 +9,7 @@ plugins {
     `java-gradle-plugin`
     alias(libs.plugins.com.gradle.plugin.publish)
     id("com.zegreatrob.tools.plugins.jvm")
+    id("org.jetbrains.kotlin.plugin.serialization") version embeddedKotlinVersion
 }
 
 repositories {
@@ -16,7 +17,10 @@ repositories {
 }
 
 dependencies {
+    implementation(platform(project(":dependency-bom")))
     implementation(project(":tagger-gradle"))
+    implementation(project(":tagger-json"))
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json")
     testImplementation(kotlin("test-junit5", embeddedKotlinVersion))
 }
 
