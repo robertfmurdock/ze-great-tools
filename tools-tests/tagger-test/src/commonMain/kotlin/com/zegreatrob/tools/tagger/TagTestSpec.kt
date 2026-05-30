@@ -129,6 +129,7 @@ interface TagTestSpec {
     @Test
     fun tagWillFailWhenUserEmailAndNameAreNotConfigured() = setup(object {
         val version = "1.0.0"
+        val expectedError = "Committer identity unknown"
         lateinit var gitAdapter: GitAdapter
     }) {
         configureWithOverrides(releaseBranch = "master", warningsAsErrors = true)
@@ -154,7 +155,6 @@ interface TagTestSpec {
     } exercise {
         execute(version)
     } verify { result ->
-        val expectedError = "Committer identity unknown"
         result.assertIsOfType<TestResult.Failure>().run {
             reason.contains(expectedError).assertIsEqualTo(
                 true,
@@ -167,6 +167,7 @@ interface TagTestSpec {
     @Test
     fun whenNotOnCorrectBranchAndWarningsAsErrorsTagWillNotDoAnythingAndError() = setup(object {
         val version = "1.0.0"
+        val expectedError = TagErrors.wrapper(TagErrors.skipMessageNotOnReleaseBranch("trunk", "master"))
         lateinit var gitAdapter: GitAdapter
     }) {
         configureWithOverrides(releaseBranch = "trunk", warningsAsErrors = true)
@@ -188,7 +189,6 @@ interface TagTestSpec {
     } exercise {
         execute(version)
     } verify { result ->
-        val expectedError = TagErrors.wrapper(TagErrors.skipMessageNotOnReleaseBranch("trunk", "master"))
         result.assertIsOfType<TestResult.Failure>().run {
             reason.contains(expectedError).assertIsEqualTo(
                 true,
@@ -201,6 +201,7 @@ interface TagTestSpec {
     @Test
     fun whenNotOnCorrectBranchTagWillNotDoAnythingAndError() = setup(object {
         val version = "1.0.0"
+        val expectedMessage = TagErrors.wrapper(TagErrors.skipMessageNotOnReleaseBranch("trunk", "master"))
         lateinit var gitAdapter: GitAdapter
     }) {
         configureWithOverrides(releaseBranch = "trunk", warningsAsErrors = false)
@@ -222,7 +223,6 @@ interface TagTestSpec {
     } exercise {
         execute(version)
     } verify { result ->
-        val expectedMessage = TagErrors.wrapper(TagErrors.skipMessageNotOnReleaseBranch("trunk", "master"))
         result.assertIsOfType<TestResult.Success>().run {
             message.contains(expectedMessage).assertIsEqualTo(
                 true,
@@ -235,6 +235,7 @@ interface TagTestSpec {
     @Test
     fun whenAllowDetachedHeadTrueButNotDetachedAndNotOnReleaseBranchWillError() = setup(object {
         val version = "1.0.0"
+        val expectedError = TagErrors.wrapper(TagErrors.skipMessageNotOnReleaseBranch("trunk", "master"))
         lateinit var gitAdapter: GitAdapter
     }) {
         configureWithOverrides(
@@ -260,7 +261,6 @@ interface TagTestSpec {
     } exercise {
         execute(version)
     } verify { result ->
-        val expectedError = TagErrors.wrapper(TagErrors.skipMessageNotOnReleaseBranch("trunk", "master"))
         result.assertIsOfType<TestResult.Failure>().run {
             reason.contains(expectedError).assertIsEqualTo(
                 true,
