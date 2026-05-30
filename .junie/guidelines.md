@@ -31,6 +31,12 @@ All AI agents working on this repository must follow these rules:
      - Go straight to spec level if the feature seems simple and straightforward.
      - Start with an implementation-level test for quick iteration when complexity is anticipated, then refactor to spec level once the feature stabilizes.
    - Example: `CalculateVersionTestSpec` defines shared behavior for `calculate-version` across CLI and config implementations; both `CalculateVersionCommandTest` and `CalculateVersionCommandConfigFileTest` implement the spec to ensure parity.
+   - **Form-Factor Abstraction**: When shared tests need to verify behavior that manifests differently across form factors:
+     - **Keep the behavior assertion in the shared spec** — the test should assert WHAT to verify (e.g., "deprecation warning exists")
+     - **Push verification strategy to adapters** — create micro-API methods that each adapter implements to handle HOW to verify in their context
+     - Example: `assertHasDeprecationWarning(feature, replacement)` in the spec; CLI adapter checks for `--kebab-case`, config/DSL adapters check for `camelCase`
+     - **Design for reuse** — assertion helpers should work for multiple cases, not just one specific scenario
+     - The spec defines intent, adapters translate semantic concepts to their form-factor-specific representations
 7. **Test Names**: Keep names unique, brief, and scenario-focused.
 7. **Java Toolchain**: This project uses Java Toolchain 21. Ensure any new modules or environment checks respect this version.
 8. **Efficient Verification**: For multi-test refactors, batch edits per file or logical cluster, then run targeted compile tasks (e.g., `:module:compileKotlinJvm` / `:compileKotlinJs`) after each batch. Run `./gradlew :tools-tests:check` once per file or at the end for full confidence. Prefer quieter Gradle output (`--quiet` or `--console=plain`) when possible.
