@@ -11,8 +11,9 @@ Make `warningsAsErrors` consistently enforce non-zero exits for real warning con
 - Declare semver intent up front and revise it if implementation discoveries show a different impact level.
 
 ## Checklist
-- [ ] Review this work card for compliance with template and update to conform
-- [ ] Define and lock expected warnings policy surface for each command
+- [x] Review this work card for compliance with template and update to conform
+- [x] If this card plans subagent delegation, ask user to explicitly authorize subagents for this card and record the response in Implementation Notes
+- [x] Define and lock expected warnings policy surface for each command
   - Agent cycle: test → implement → refactor-light → verify pushable
   - Update plan if guidelines revealed new constraints
 - [ ] Implement `calculate-version` warnings escalation behind `warningsAsErrors`
@@ -33,6 +34,9 @@ Make `warningsAsErrors` consistently enforce non-zero exits for real warning con
 
 ## Implementation Notes
 
+### Subagent delegation
+- Not using subagents for this work card (single-agent mode for time-boxed slice, 2026-05-30).
+
 ### Semver intent (initial)
 - Expected scope: `[patch]` (behavior-alignment bug fix under existing `warningsAsErrors` policy).
 - Re-evaluate during implementation if changes expand beyond alignment (for example, new flags or stdout contract changes).
@@ -42,9 +46,18 @@ Make `warningsAsErrors` consistently enforce non-zero exits for real warning con
 - Current `warningsAsErrors` behavior is asymmetric: it influences `tag` handling but does not currently escalate warning emissions from `calculate-version`.
 - This creates a policy mismatch: users can enable strict mode and still get warning-only success exits from version calculation paths.
 
-### Candidate warnings to include under strict mode
-- `calculate-version` deprecation warning when `--disable-detached` is used.
-- `calculate-version` release-risk warning when running `--allow-detached-head` on release branch without upstream tracking.
+### Current warning inventory (2026-05-30)
+
+**calculate-version command**:
+1. Deprecation warning: `⚠️  --disable-detached is deprecated...` (line 116, CalculateVersion.kt)
+2. Detached HEAD release-risk warning: `⚠️  Running with allowDetachedHead on release branch...` (line 48, ChangeType.kt)
+
+**tag command**:
+- Returns `TagResult.Error` for policy violations (not on release branch, etc.)
+- Current behavior: `warningsAsErrors` flag controls exit code (1 if true, 0 if false) but NOT whether warnings are emitted
+- Exit code path: Tag.kt lines 63-70
+
+**Policy decision locked**: Both warnings above should escalate to non-zero exits when `warningsAsErrors=true` is set.
 
 ### Design guardrails
 - Do not reclassify existing hard failures as warnings.
