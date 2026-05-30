@@ -51,6 +51,93 @@ tagger tag --version 1.2.3 --release-branch main
 
 For complete option documentation and automation guidance, run `tagger calculate-version --help` or `tagger tag --help`.
 
+## Configuration File
+
+Tagger supports a `.tagger` JSON configuration file at your repository root to eliminate repetitive command-line options.
+
+### Creating a Configuration File
+
+Generate a template with default values:
+```bash
+tagger generate-settings-file --file=''
+```
+
+This creates `.tagger` in the current directory. Edit it to customize behavior.
+
+**Print to stdout without creating file:**
+```bash
+tagger generate-settings-file
+```
+
+**Merge new defaults into existing file:**
+```bash
+tagger generate-settings-file --file='' --merge=true
+```
+
+### Configuration Options
+
+The `.tagger` file supports these fields:
+
+```json
+{
+  "releaseBranch": "main",
+  "implicitPatch": true,
+  "disableDetached": true,
+  "allowDetachedHead": false,
+  "forceSnapshot": false,
+  "majorRegex": "\\[major\\]",
+  "minorRegex": "\\[minor\\]|\\[feature\\]",
+  "patchRegex": "\\[patch\\]|\\[fix\\]|\\[bug\\]",
+  "noneRegex": "\\[none\\]",
+  "versionRegex": null,
+  "userName": null,
+  "userEmail": null,
+  "warningsAsErrors": false
+}
+```
+
+**Field descriptions:**
+
+- `releaseBranch`: Branch name for release versions (other branches get -SNAPSHOT)
+- `implicitPatch`: Auto-bump patch version when no version-tagged commits exist (default: true)
+- `allowDetachedHead`: Allow version calculation in detached HEAD state (default: false)
+- `forceSnapshot`: Always add -SNAPSHOT suffix regardless of conditions (default: false)
+- `majorRegex`: Pattern to detect major version bumps in commit messages
+- `minorRegex`: Pattern to detect minor version bumps
+- `patchRegex`: Pattern to detect patch version bumps
+- `noneRegex`: Pattern to detect commits that don't affect version
+- `versionRegex`: Unified regex with named groups (major, minor, patch, none). Overrides individual regex patterns if set.
+- `userName`: Git user name for creating tags (defaults to git config)
+- `userEmail`: Git user email for creating tags (defaults to git config)
+- `warningsAsErrors`: Treat warnings as errors (exit non-zero) (default: false)
+
+**Note:** Command-line options always override `.tagger` file settings.
+
+### Example Workflows
+
+**Minimal config for standard workflow:**
+```json
+{
+  "releaseBranch": "main"
+}
+```
+
+Then use simplified commands:
+```bash
+tagger calculate-version  # no --release-branch needed
+tagger tag --version 1.2.3  # no --release-branch needed
+```
+
+**Custom regex patterns for your commit convention:**
+```json
+{
+  "releaseBranch": "production",
+  "majorRegex": "\\bBREAKING[: ]",
+  "minorRegex": "\\bfeat[:(]",
+  "patchRegex": "\\bfix[:(]"
+}
+```
+
 ## Structured Output
 
 Both commands support machine-readable JSON output for CI/CD pipelines and automation scripts via the `--format` flag.
