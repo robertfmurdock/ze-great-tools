@@ -171,4 +171,14 @@ class TagCommandTest : TagTestSpec {
         gitAdapter.showTag("HEAD")
             .assertIsEqualTo(null, "Should not create tag in dry-run mode")
     }
+
+    @Test
+    fun helpTextMentionsConfigFile() = setup(object {
+        val cli = cli()
+    }) exercise {
+        cli.test("tag --help")
+    } verify { result ->
+        result.output.contains(".tagger").assertIsEqualTo(true, "Help should mention .tagger config file")
+        result.output.contains(Regex("configuration|config file|settings")).assertIsEqualTo(true)
+    }
 }

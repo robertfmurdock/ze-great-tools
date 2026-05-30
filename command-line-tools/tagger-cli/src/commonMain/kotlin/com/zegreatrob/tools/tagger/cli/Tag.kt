@@ -2,6 +2,7 @@ package com.zegreatrob.tools.tagger.cli
 
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.CliktError
+import com.github.ajalt.clikt.core.Context
 import com.github.ajalt.clikt.core.context
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.arguments.optional
@@ -20,6 +21,12 @@ class Tag : CliktCommand() {
     init {
         context { valueSources(ConfigFileSource(readEnvvar)) }
     }
+
+    override fun help(context: Context) = """
+        ${super.help(context)}
+
+        Options can be configured in a .tagger file. See: tagger generate-settings-file --help
+    """.trimIndent()
 
     private val gitRepoArgument by argument("git-repo").optional()
     private val gitRepoOption by option("--git-repo", envvar = "PWD")
