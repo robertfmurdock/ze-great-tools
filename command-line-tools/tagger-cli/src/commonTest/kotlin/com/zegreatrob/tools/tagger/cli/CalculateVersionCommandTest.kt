@@ -308,7 +308,8 @@ class CalculateVersionCommandTest : CalculateVersionTestSpec {
         cli.test("calculate-version --help")
     } verify { result ->
         result.output.contains("--format").assertIsEqualTo(true)
-        result.output.contains("default: text").assertIsEqualTo(true, "Help should mention default format")
+        result.output.contains("default:").assertIsEqualTo(true, "Help should show default label")
+        result.output.contains("text)").assertIsEqualTo(true, "Help should show text as default value")
         result.output.contains("structured data").assertIsEqualTo(true, "Help should explain json format purpose")
     }
 
@@ -353,7 +354,7 @@ class CalculateVersionCommandTest : CalculateVersionTestSpec {
     } verify { result ->
         result.output.contains("--implicit-patch").assertIsEqualTo(true)
         result.output.contains("patch version").assertIsEqualTo(true, "Help should mention patch bumping")
-        result.output.contains("default: true").assertIsEqualTo(true, "Help should show default value")
+        result.output.contains("default: true").assertIsEqualTo(true, "Help should show default value automatically")
     }
 
     @Test

@@ -31,9 +31,9 @@ class Tag : CliktCommand() {
     private val allowDetachedHead by option("--allow-detached-head").boolean().default(false)
     private val dryRun by option("--dry-run").boolean().default(false)
     private val warningsAsErrors by option().boolean().default(false)
-    private val format by option("--format", help = "Output format: text (default) or json")
+    private val format by option("--format", help = "Output format for result")
         .enum<OutputFormat> { it.name.lowercase() }
-        .default(OutputFormat.TEXT)
+        .default(OutputFormat.TEXT, defaultForHelp = "text")
     override fun run() {
         val gitAdapter = GitAdapter(workingDirectory)
         if (dryRun) {

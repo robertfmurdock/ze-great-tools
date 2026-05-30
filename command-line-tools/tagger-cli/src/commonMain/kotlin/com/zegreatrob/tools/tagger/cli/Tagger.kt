@@ -2,11 +2,20 @@ package com.zegreatrob.tools.tagger.cli
 
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.Context
+import com.github.ajalt.clikt.core.context
+import com.github.ajalt.clikt.output.MordantHelpFormatter
 import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.versionOption
 
 class Tagger : CliktCommand() {
+
+    init {
+        context {
+            helpFormatter = { MordantHelpFormatter(it, showDefaultValues = true) }
+        }
+        versionOption(Versions.taggerVersion)
+    }
 
     override fun help(context: Context) = """
         Output:
@@ -35,10 +44,6 @@ class Tagger : CliktCommand() {
 
           See subcommand help for details: tagger calculate-version --help
     """.trimIndent()
-
-    init {
-        versionOption(Versions.taggerVersion)
-    }
 
     private val quiet by option(
         "--quiet",

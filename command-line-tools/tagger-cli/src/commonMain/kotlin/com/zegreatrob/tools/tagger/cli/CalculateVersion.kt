@@ -32,7 +32,7 @@ class CalculateVersion : CliktCommand() {
     private val gitRepoOption by option("--git-repo", envvar = "PWD")
     private val workingDirectory get() = gitRepoArgument ?: gitRepoOption ?: throw CliktError("No target directory")
     private val implicitPatch by option(
-        help = "Automatically bump patch version when no version-tagged commits exist since last release (default: true).",
+        help = "Automatically bump patch version when no version-tagged commits exist since last release.",
     ).boolean().default(true)
     private val disableDetachedDeprecated by option("--disable-detached", hidden = true).boolean()
     private val allowDetachedHead by option(
@@ -48,9 +48,9 @@ class CalculateVersion : CliktCommand() {
     )
     private val format by option(
         "--format",
-        help = "Output format (default: text). Use json for structured data with version, snapshot status, and diagnostic flags.",
+        help = "Use json for structured data with version, snapshot status, and diagnostic flags.",
     ).enum<OutputFormat> { it.name.lowercase() }
-        .default(OutputFormat.TEXT)
+        .default(OutputFormat.TEXT, defaultForHelp = "text")
     private val majorRegex by option().default(VersionRegex.Defaults.major.pattern)
     private val minorRegex by option().default(VersionRegex.Defaults.minor.pattern)
     private val patchRegex by option().default(VersionRegex.Defaults.patch.pattern)
