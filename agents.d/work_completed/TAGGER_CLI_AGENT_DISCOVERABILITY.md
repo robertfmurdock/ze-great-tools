@@ -28,7 +28,7 @@ Current CLI outputs explain *what* happens but don't clearly communicate *why* o
 - [x] Update README to defer to CLI as documentation source
 - [x] Final refactor pass (code style, patterns, efficiency)
 - [x] Review changes against applicable playbooks and verify compliance
-- [ ] Move to agents.d/work_completed/
+- [x] Move to agents.d/work_completed/
 
 ## Implementation Notes
 
