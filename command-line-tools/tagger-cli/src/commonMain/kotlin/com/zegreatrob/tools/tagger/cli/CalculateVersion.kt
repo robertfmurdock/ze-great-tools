@@ -80,12 +80,26 @@ class CalculateVersion : CliktCommand() {
                 when (this) {
                     is VersionResult.Success -> {
                         val allWarnings = warnings + deprecationWarnings
+                        val hasWarnings = allWarnings.isNotEmpty()
+                        val shouldEscalate = warningsAsErrors && hasWarnings
+
                         when (format) {
-                            OutputFormat.JSON -> outputJson(
-                                version = version,
-                                snapshotReasons = snapshotReasons,
-                                warnings = allWarnings,
-                            )
+                            OutputFormat.JSON -> {
+                                if (shouldEscalate) {
+                                    echo(
+                                        errorResponse(
+                                            "Warnings escalated to errors: ${allWarnings.joinToString("; ")}",
+                                            "WARNINGS_AS_ERRORS",
+                                        ),
+                                    )
+                                } else {
+                                    outputJson(
+                                        version = version,
+                                        snapshotReasons = snapshotReasons,
+                                        warnings = allWarnings,
+                                    )
+                                }
+                            }
 
                             OutputFormat.TEXT -> output(
                                 message = version,
@@ -93,7 +107,7 @@ class CalculateVersion : CliktCommand() {
                                 warnings = allWarnings,
                             )
                         }
-                        if (warningsAsErrors && allWarnings.isNotEmpty()) {
+                        if (shouldEscalate) {
                             throw CliktError("", printError = false, statusCode = 1)
                         }
                     }
