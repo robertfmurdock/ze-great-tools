@@ -72,9 +72,8 @@ abstract class CalculateVersion : DefaultTask() {
     }
 
     @Suppress("DEPRECATION")
-    private fun resolveDisableDetached(): Boolean = allowDetachedHead.orNull
-        ?.let { !it }
-        ?: disableDetached.get()
+    private fun resolveAllowDetachedHead(): Boolean =
+        allowDetachedHead.orNull ?: disableDetached.get().let { !it }
 
     private fun calculateVersion(): VersionResult {
         val core = TaggerCore(GitAdapter(workingDirectory.get().asFile.absolutePath))
@@ -87,7 +86,7 @@ abstract class CalculateVersion : DefaultTask() {
                 major = majorRegex.get(),
                 unified = versionRegex.orNull?.also { it.validateVersionRegex() },
             ),
-            disableDetached = resolveDisableDetached(),
+            allowDetachedHead = resolveAllowDetachedHead(),
             forceSnapshot = forceSnapshot.get(),
             releaseBranch = releaseBranch.orNull
                 ?: throw GradleException("Please configure the tagger release branch."),

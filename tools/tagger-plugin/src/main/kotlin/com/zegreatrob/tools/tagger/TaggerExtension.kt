@@ -79,14 +79,13 @@ open class TaggerExtension(
     fun lastVersionAndTag() = core.lastVersionAndTag()
 
     @Suppress("DEPRECATION")
-    private fun resolveDisableDetached(): Boolean = allowDetachedHeadProperty.orNull
-        ?.let { !it }
-        ?: disableDetached.get()
+    private fun resolveAllowDetachedHead(): Boolean =
+        allowDetachedHeadProperty.orNull ?: disableDetached.get().let { !it }
 
     fun calculateVersion() = core.calculateNextVersion(
         implicitPatch = implicitPatch.get(),
         versionRegex = versionRegex(),
-        disableDetached = resolveDisableDetached(),
+        allowDetachedHead = resolveAllowDetachedHead(),
         forceSnapshot = forceSnapshot.get(),
         releaseBranch = releaseBranchProperty.orNull
             ?: throw GradleException("Please configure the tagger release branch."),

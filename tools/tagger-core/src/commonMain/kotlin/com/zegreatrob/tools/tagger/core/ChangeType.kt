@@ -9,13 +9,13 @@ import kotlinx.datetime.toLocalDateTime
 
 fun TaggerCore.calculateNextVersion(
     implicitPatch: Boolean,
-    disableDetached: Boolean,
+    allowDetachedHead: Boolean,
     versionRegex: VersionRegex,
     forceSnapshot: Boolean,
     releaseBranch: String,
 ): VersionResult {
     val gitStatus = this.adapter.status()
-    if (disableDetached && gitStatus.upstream.isEmpty()) {
+    if (!allowDetachedHead && gitStatus.upstream.isEmpty()) {
         return VersionResult.Failure(listOf(FailureVersionReasons.NoRemote))
     }
     val (previousVersionNumber, lastTagDescription) = lastVersionAndTag()
@@ -44,7 +44,7 @@ fun TaggerCore.calculateNextVersion(
     val shouldSnapshot = reasonsToUseSnapshot.isNotEmpty()
 
     val warnings = buildList {
-        if (!disableDetached && gitStatus.upstream.isEmpty() && gitStatus.head == releaseBranch) {
+        if (allowDetachedHead && gitStatus.upstream.isEmpty() && gitStatus.head == releaseBranch) {
             add("⚠️  Running with allowDetachedHead on release branch. Without upstream tracking, stable version may trigger unintended releases.")
         }
     }
