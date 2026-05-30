@@ -57,6 +57,7 @@ One-sentence outcome.
 - Checklist items should be broad feature slices, not micro-tasks.
 - The second-to-last item must always be `- [ ] Review changes against applicable playbooks and verify compliance`.
 - The final item must always be `- [ ] Move this file to agents.d/work_completed/`.
+- **Red flags during review**: If a work card suggests "tests may fail initially" or "test failures document baseline" or similar language implying incomplete TDD cycles, this violates the agent cycle requirement. Either adjust the work card to complete the full cycle (fix issues to make tests pass) or clarify that tests should be observation-only (not assertions that fail).
 
 ### Refactoring
 
@@ -81,6 +82,7 @@ Each broad checklist item follows a test-driven cycle that repeats until the fea
 3. **Refactor-light**: Clean up what you just wrote - names, duplication, structure.
 4. **Verify pushable**: Run validation (smallest sufficient task set) to ensure the repository is in a safe, check-in-ready state.
    - For [minor] or [patch] changes that introduce alternatives to existing APIs, explicitly verify backward compatibility — test that both old and new APIs work as expected.
+   - **All tests must pass.** Do not commit failing tests. If a test fails, fix the issue to make it pass within the same cycle.
 5. **Commit**: When all tests pass, commit with semver annotation:
    - `[major]` — breaking change
    - `[minor]` — new backward-compatible functionality

@@ -155,17 +155,7 @@ digger current-contribution-data $(pwd) --format=json
 }
 ```
 
-**Fields:**
-- `status`: Always `"success"` for valid operations
-- `data`: The contribution data object (see [ContributionDataJson.kt](../digger-json/src/commonMain/kotlin/com/zegreatrob/tools/digger/json/ContributionDataJson.kt) for full schema)
-- `data.storyId`: Story identifier parsed from commit messages
-- `data.contributors`: Array of contributor objects with email and name
-- `data.commits`: Array of commit objects
-- `data.semver`: Semantic version type (`"Major"`, `"Minor"`, `"Patch"`, `"None"`)
-- `data.label`: Repository or project label
-- `data.firstCommitDateTime`: ISO 8601 timestamp of first commit
-- `data.lastCommitDateTime`: ISO 8601 timestamp of last commit
-- `data.ease`: Joy/ease score (1-5) parsed from commit messages
+The `data` field contains the contribution data object. See [ContributionDataJson.kt](../digger-json/src/commonMain/kotlin/com/zegreatrob/tools/digger/json/ContributionDataJson.kt) for the complete schema, or use `current-contribution-data --help` for field descriptions.
 
 ### AllContributionData JSON Mode
 
@@ -197,7 +187,7 @@ digger all-contribution-data $(pwd) --format=json
 }
 ```
 
-The `data` field contains an array of contribution data objects, one for each contribution period.
+The `data` field contains an array of contribution data objects, one for each contribution period. Use `all-contribution-data --help` for more details.
 
 ### CI Integration Examples
 
