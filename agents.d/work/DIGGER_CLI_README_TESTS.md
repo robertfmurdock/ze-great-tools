@@ -28,8 +28,8 @@ Establish README testing for digger-cli to prevent documentation drift, followin
 - [x] Add subcommand help reference tests
   - Agent cycle: test → implement → refactor-light → verify pushable
   - Tests: readmeReferencesCurrentContributionDataHelp, readmeReferencesAllContributionDataHelp
-- [ ] Final refactor pass (code style, patterns, efficiency)
-- [ ] Review changes against applicable playbooks and verify compliance
+- [x] Final refactor pass (code style, patterns, efficiency)
+- [x] Review changes against applicable playbooks and verify compliance
 - [ ] Move to agents.d/work_completed/
 
 ## Implementation Notes
@@ -82,8 +82,12 @@ Test failures document current state and establish guardrails. Follow-up work ca
   - Phase 2: `./gradlew :command-line-tools:digger-cli:jvmTest --tests ReadmeTest`
   - Phase 3: `./gradlew :command-line-tools:digger-cli:jvmTest --tests ReadmeTest`
   - Phase 4: `./gradlew :command-line-tools:digger-cli:jvmTest --tests ReadmeTest`
+  - Phase 5 (refactor): `./gradlew :command-line-tools:digger-cli:formatKotlin`
+  - Phase 5 (final): `./gradlew check -x :command-line-tools:digger-cli:jvmTest`
 - Results:
   - Phase 1: 2 tests, 2 passing ✓
   - Phase 2: 3 tests, 2 passing, 1 failing (field documentation detected as expected)
   - Phase 3: 5 tests, 4 passing, 1 failing (error code & SemverType tests pass as expected)
   - Phase 4: 7 tests, 4 passing, 3 failing (subcommand help tests fail as expected, documenting baseline)
+  - Phase 5 (refactor): No formatting changes needed for ReadmeTest.kt ✓
+  - Phase 5 (final): All checks pass (excluding digger-cli jvmTest which has intentional failures)
