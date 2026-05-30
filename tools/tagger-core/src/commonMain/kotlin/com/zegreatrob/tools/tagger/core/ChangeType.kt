@@ -75,9 +75,14 @@ private fun findAppropriateIncrement(
     previousTag: String,
     implicitPatch: Boolean,
     minorRegex: VersionRegex,
-): ChangeType? = gitAdapter.logWithRange("HEAD", "^$previousTag").also { if (it.isEmpty()) return null }
-    .map { it.changeType(minorRegex) ?: if (implicitPatch) ChangeType.Patch else null }.fold(null, ::highestPriority)
-    ?: if (implicitPatch) ChangeType.Patch else ChangeType.None
+): ChangeType? {
+    val commits = gitAdapter.logWithRange("HEAD", "^$previousTag")
+    if (commits.isEmpty()) return null
+
+    val changeTypes = commits.map { it.changeType(minorRegex) ?: if (implicitPatch) ChangeType.Patch else null }
+    val highest = changeTypes.fold(null, ::highestPriority)
+    return highest ?: if (implicitPatch) ChangeType.Patch else ChangeType.None
+}
 
 private fun highestPriority(
     left: ChangeType?,
@@ -160,13 +165,11 @@ fun TaggerCore.tagReport() = adapter.listTags().groupBy { tag ->
     "$key has ${value.size} tags [${value.joinToString { tag -> tag.name }}]"
 }
 
-private fun TagRef.weekNumber() = "${dateTime.toLocalDateTime(TimeZone.currentSystemDefault()).dayOfYear / 7}".let {
-    if (it.length == 1) {
-        "0$it"
-    } else {
-        it
-    }
-}
+private fun TagRef.weekNumber() = (dateTime.toLocalDateTime(TimeZone.currentSystemDefault()).dayOfYear / 7)
+    .toString()
+    .padWeekNumber()
+
+private fun String.padWeekNumber() = if (length == 1) "0$this" else this
 
 fun VersionRegex.changeType(message: String): ChangeType? = when {
     unified?.containsMatchIn(message) == true -> findMatchType(message, unified)

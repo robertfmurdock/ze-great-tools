@@ -65,7 +65,7 @@ class CalculateVersion : CliktCommand() {
             .calculateNextVersion(
                 implicitPatch = implicitPatch,
                 disableDetached = disableDetached,
-                versionRegex = versionRegex(),
+                versionRegex = buildVersionRegex(),
                 forceSnapshot = forceSnapshot,
                 releaseBranch = releaseBranch ?: "",
             )
@@ -95,12 +95,12 @@ class CalculateVersion : CliktCommand() {
     ) {
         echo(message)
         if (errorMessage.isNotEmpty()) {
-            errorMessage.forEach { reason ->
-                echo("${reason.name} - ${reason.message}", err = true)
-            }
+            errorMessage.forEach { echo(formatSnapshotReason(it), err = true) }
         }
         warnings.forEach { echo(it, err = true) }
     }
+
+    private fun formatSnapshotReason(reason: SnapshotReason) = "${reason.name} - ${reason.message}"
 
     private fun outputJson(
         version: String,
@@ -119,7 +119,7 @@ class CalculateVersion : CliktCommand() {
         echo(jsonOutput)
     }
 
-    private fun versionRegex() = VersionRegex(
+    private fun buildVersionRegex() = VersionRegex(
         none = Regex(noneRegex, RegexOption.IGNORE_CASE),
         patch = Regex(patchRegex, RegexOption.IGNORE_CASE),
         minor = Regex(minorRegex, RegexOption.IGNORE_CASE),
