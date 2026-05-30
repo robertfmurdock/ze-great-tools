@@ -72,8 +72,7 @@ abstract class CalculateVersion : DefaultTask() {
     }
 
     @Suppress("DEPRECATION")
-    private fun resolveAllowDetachedHead(): Boolean =
-        allowDetachedHead.orNull ?: disableDetached.get().let { shouldDisable -> !shouldDisable }
+    private fun resolveAllowDetachedHead(): Boolean = allowDetachedHead.orNull ?: disableDetached.get().let { shouldDisable -> !shouldDisable }
 
     private fun calculateVersion(): VersionResult {
         val core = TaggerCore(GitAdapter(workingDirectory.get().asFile.absolutePath))

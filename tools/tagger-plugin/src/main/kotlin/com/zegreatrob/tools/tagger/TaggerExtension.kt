@@ -79,8 +79,7 @@ open class TaggerExtension(
     fun lastVersionAndTag() = core.lastVersionAndTag()
 
     @Suppress("DEPRECATION")
-    private fun resolveAllowDetachedHead(): Boolean =
-        allowDetachedHeadProperty.orNull ?: disableDetached.get().let { shouldDisable -> !shouldDisable }
+    private fun resolveAllowDetachedHead(): Boolean = allowDetachedHeadProperty.orNull ?: disableDetached.get().let { shouldDisable -> !shouldDisable }
 
     fun calculateVersion() = core.calculateNextVersion(
         implicitPatch = implicitPatch.get(),
