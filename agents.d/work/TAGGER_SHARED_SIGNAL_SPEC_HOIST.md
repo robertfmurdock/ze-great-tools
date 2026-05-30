@@ -16,7 +16,7 @@ Hoist user-facing parity assertions for “signal exists + migration guidance ex
 - [x] Build inventory of currently implementation-specific “user signal” tests and classify each as `hoist`, `stay-exclusive`, or `blocked`
   - Agent cycle: test → implement → refactor-light → verify pushable
   - Update plan if guidelines revealed new constraints
-- [ ] Introduce shared signal-spec pattern for deprecation guidance (signal presence + replacement guidance) with implementation-specific evidence adapters
+- [x] Introduce shared signal-spec pattern for deprecation guidance (signal presence + replacement guidance) with implementation-specific evidence adapters
   - Agent cycle: test → implement → refactor-light → verify pushable
   - Update plan if guidelines revealed new constraints
 - [ ] Migrate selected existing tests to the shared signal-spec pattern and remove redundant implementation-only assertions
@@ -70,6 +70,13 @@ All user-facing signal tests are already in shared specs. The work card goal app
 - Config impl: `CalculateVersionConfigFileFunctionalTest.execute()` uses shared helper → same result structure
 
 The evidence adapter pattern is working: specs assert UX intent, implementations surface evidence through their transport (Gradle output, CLI stderr).
+
+**Shared Signal-Spec Pattern (Already Exists):**
+- `TestResult.Success(message, details, warnings)` — warnings field collects signal strings
+- `TestResult.Failure(reason)` — reason field contains error messages with migration guidance
+- Spec tests assert against these fields: `result.reason.contains("⚠️")`, `result.warnings.contains("release branch")`
+- Implementation adapters (`execute()` methods) parse their transport and populate TestResult fields
+- Pattern supports both deprecation warnings (Success.warnings) and error guidance (Failure.reason)
 
 ## Validation
 - Commands: [filled in as work progresses]
