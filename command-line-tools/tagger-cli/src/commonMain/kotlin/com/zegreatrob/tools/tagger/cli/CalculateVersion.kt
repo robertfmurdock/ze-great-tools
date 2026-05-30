@@ -55,6 +55,7 @@ class CalculateVersion : CliktCommand() {
         help = "Use json for structured data with version, snapshot status, and diagnostic flags.",
     ).enum<OutputFormat> { it.name.lowercase() }
         .default(OutputFormat.TEXT, defaultForHelp = "text")
+    private val warningsAsErrors by option().boolean().default(false)
     private val majorRegex by option().default(VersionRegex.Defaults.major.pattern)
     private val minorRegex by option().default(VersionRegex.Defaults.minor.pattern)
     private val patchRegex by option().default(VersionRegex.Defaults.patch.pattern)
@@ -91,6 +92,9 @@ class CalculateVersion : CliktCommand() {
                                 errorMessage = snapshotReasons,
                                 warnings = allWarnings,
                             )
+                        }
+                        if (warningsAsErrors && allWarnings.isNotEmpty()) {
+                            throw CliktError("", printError = false, statusCode = 1)
                         }
                     }
 
