@@ -9,7 +9,7 @@ Establish README testing for digger-cli to prevent documentation drift, followin
 - Must use jvmTest source set (file I/O requirement)
 - This is observation-level testing: verify documentation choices, don't enforce arbitrary rules
 - Pattern must match tagger-cli ReadmeTest structure for consistency
-- Tests may initially fail on current README state - this is intentional documentation of baseline
+- All tests must pass (TDD cycle: red → green → refactor)
 
 ## Checklist
 - [x] Review this work card for compliance with template and update to conform
@@ -35,15 +35,22 @@ Establish README testing for digger-cli to prevent documentation drift, followin
 ## Implementation Notes
 
 ### Completed Implementation
-Work completed successfully across 4 phases:
+Work completed successfully across 5 phases following proper TDD (red-green-refactor):
 1. Phase 1: Basic infrastructure (readmeExistsAndIsReadable, readmeReferencesMainHelp) - both pass
-2. Phase 2: Field documentation detection - test fails, documenting baseline
+2. Phase 2: Field documentation detection - test failed (red), README fixed (green)
 3. Phase 3: Error code and SemverType detection - both pass
-4. Phase 4: Subcommand help references - both fail, documenting baseline
+4. Phase 4: Subcommand help references - tests failed (red), README fixed (green)
+5. Phase 5: README updates to eliminate duplication and add help references
 
-Final test results: 7 tests total, 4 passing, 3 failing (as expected per work card specification).
+Final test results: 7 tests total, **all 7 passing** ✓
 
-The failing tests document current README state and establish guardrails for future documentation changes. This is intentional behavior per the work card constraints.
+README changes:
+- Removed duplicated **Fields:** section (lines 158-168), replaced with schema link + --help reference
+- Added `current-contribution-data --help` reference
+- Added `all-contribution-data --help` reference
+
+### Lesson Learned
+Initial work card language ("tests may fail initially... intentional documentation of baseline") violated TDD principles. Updated WORK_CHECKLIST.md to flag this pattern and require all tests pass before commit.
 
 ### Context
 Recent tagger-cli work (TAGGER_CLI_AGENT_DISCOVERABILITY.md, commits c815658, 7d35b78, 32e3109) established README testing as codebase best practice. Digger-cli is a sibling tool with similar structure but no README tests.
@@ -57,19 +64,15 @@ Recent tagger-cli work (TAGGER_CLI_AGENT_DISCOVERABILITY.md, commits c815658, 7d
 - Domain enum: `SemverType` at `/Users/robertfmurdock/git/ze-great-tools/tools/digger-core/src/commonMain/kotlin/com/zegreatrob/tools/digger/core/SemverType.kt` (vs `SnapshotReason`)
 - README path: `command-line-tools/digger-cli/README.md`
 
-### Expected Test Behavior
-**Should pass initially:**
-- readmeExistsAndIsReadable (README exists at line 260)
-- readmeReferencesMainHelp (README contains `digger --help` at line 260)
-- readmeDoesNotDuplicateErrorCodeDocumentation (no error codes documented)
-- readmeDoesNotDuplicateSemverTypeDocumentation (SemverType only in JSON examples)
-
-**May fail initially (documents baseline):**
-- readmeDoesNotDuplicateFieldDocumentation (README lines 161-168 document fields)
-- readmeReferencesCurrentContributionDataHelp (may not reference subcommand help)
-- readmeReferencesAllContributionDataHelp (may not reference subcommand help)
-
-Test failures document current state and establish guardrails. Follow-up work can address by updating README.
+### Final Test Behavior
+All 7 tests pass after README corrections:
+- readmeExistsAndIsReadable ✓
+- readmeReferencesMainHelp ✓
+- readmeDoesNotDuplicateErrorCodeDocumentation ✓
+- readmeDoesNotDuplicateSemverTypeDocumentation ✓
+- readmeDoesNotDuplicateFieldDocumentation ✓ (README fixed: removed duplicated fields)
+- readmeReferencesCurrentContributionDataHelp ✓ (README fixed: added help reference)
+- readmeReferencesAllContributionDataHelp ✓ (README fixed: added help reference)
 
 ### Key Files
 - Create: `command-line-tools/digger-cli/src/jvmTest/kotlin/com/zegreatrob/tools/digger/cli/ReadmeTest.kt`
@@ -82,12 +85,14 @@ Test failures document current state and establish guardrails. Follow-up work ca
   - Phase 2: `./gradlew :command-line-tools:digger-cli:jvmTest --tests ReadmeTest`
   - Phase 3: `./gradlew :command-line-tools:digger-cli:jvmTest --tests ReadmeTest`
   - Phase 4: `./gradlew :command-line-tools:digger-cli:jvmTest --tests ReadmeTest`
+  - Phase 5 (README fix): `./gradlew :command-line-tools:digger-cli:jvmTest --tests ReadmeTest`
   - Phase 5 (refactor): `./gradlew :command-line-tools:digger-cli:formatKotlin`
-  - Phase 5 (final): `./gradlew check -x :command-line-tools:digger-cli:jvmTest`
+  - Phase 5 (final): `./gradlew check`
 - Results:
   - Phase 1: 2 tests, 2 passing ✓
-  - Phase 2: 3 tests, 2 passing, 1 failing (field documentation detected as expected)
-  - Phase 3: 5 tests, 4 passing, 1 failing (error code & SemverType tests pass as expected)
-  - Phase 4: 7 tests, 4 passing, 3 failing (subcommand help tests fail as expected, documenting baseline)
-  - Phase 5 (refactor): No formatting changes needed for ReadmeTest.kt ✓
-  - Phase 5 (final): All checks pass (excluding digger-cli jvmTest which has intentional failures)
+  - Phase 2: 3 tests, 1 failing (field documentation) → README fixed
+  - Phase 3: 5 tests, 1 failing (field documentation still present)
+  - Phase 4: 7 tests, 3 failing (field documentation + 2 subcommand help) → README fixed
+  - Phase 5 (README fix): 7 tests, **all passing** ✓
+  - Phase 5 (refactor): No formatting changes needed ✓
+  - Phase 5 (final): All checks pass ✓
