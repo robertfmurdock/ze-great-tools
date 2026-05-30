@@ -13,7 +13,8 @@ fun TaggerCore.tag(
     val headTag = adapter.showTag("HEAD")
     val alreadyTagged = headTag != null
     val headBranch = adapter.status().head
-    val isNotOnReleaseBranch = !allowDetachedHead && headBranch != releaseBranch
+    val isDetachedHead = headBranch == "HEAD" || headBranch.startsWith("(detached")
+    val isNotOnReleaseBranch = headBranch != releaseBranch && !(allowDetachedHead && isDetachedHead)
     return if (isSnapshot || alreadyTagged || isNotOnReleaseBranch) {
         TagResult.Warning(
             TagErrors.wrapper(

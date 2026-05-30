@@ -17,6 +17,7 @@ class TagConfigFileFunctionalTest : TagTestSpec {
         userName: String?,
         userEmail: String?,
         warningsAsErrors: Boolean?,
+        allowDetachedHead: Boolean?,
     ) {
         ConfigFileFunctionalTestSupport.setupConfigFileBuild(projectDir)
         ConfigFileFunctionalTestSupport.writeTaggerFile(
@@ -26,6 +27,7 @@ class TagConfigFileFunctionalTest : TagTestSpec {
                 ConfigFileFunctionalTestSupport.quoted("userName", userName),
                 ConfigFileFunctionalTestSupport.quoted("userEmail", userEmail),
                 ConfigFileFunctionalTestSupport.bool("warningsAsErrors", warningsAsErrors),
+                ConfigFileFunctionalTestSupport.bool("allowDetachedHead", allowDetachedHead),
             ),
         )
     }

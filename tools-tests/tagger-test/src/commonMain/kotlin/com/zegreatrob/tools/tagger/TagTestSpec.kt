@@ -59,6 +59,7 @@ interface TagTestSpec {
         userName: String? = null,
         userEmail: String? = null,
         warningsAsErrors: Boolean? = null,
+        allowDetachedHead: Boolean? = null,
     )
 
     fun execute(version: String): TestResult
@@ -227,6 +228,44 @@ interface TagTestSpec {
         success?.message?.contains(expectedMessage).assertIsEqualTo(
             true,
             "Expected message to include: $expectedMessage\nActual:\n${success?.message}",
+        )
+        gitAdapter.showTag("HEAD")?.name.assertIsNotEqualTo(version)
+    }
+
+    @Test
+    fun whenAllowDetachedHeadTrueButNotDetachedAndNotOnReleaseBranchWillError() = setup(object {
+        val version = "1.0.0"
+        lateinit var gitAdapter: GitAdapter
+    }) {
+        configureWithOverrides(
+            releaseBranch = "trunk",
+            warningsAsErrors = true,
+            allowDetachedHead = true,
+        )
+
+        val originDirectory = createTempDirectory()
+        val originGitAdapter = GitAdapter(originDirectory)
+        originGitAdapter.init()
+        originGitAdapter.config("receive.denyCurrentBranch", "ignore")
+        originGitAdapter.disableGpgSign()
+        originGitAdapter.addCommitWithMessage("init")
+        gitAdapter = initializeGitRepo(
+            listOf("init", "[patch] commit 1", "[patch] commit 2"),
+            remoteUrl = originDirectory,
+        )
+        gitAdapter.push()
+
+        runProcess(listOf("git", "config", "user.email", "test@zegreatrob.com"), projectDir)
+        runProcess(listOf("git", "config", "user.name", "RoB as Test"), projectDir)
+    } exercise {
+        execute(version)
+    } verify { result ->
+        val failure = result as? TestResult.Failure
+        val expectedError = TagErrors.wrapper(TagErrors.skipMessageNotOnReleaseBranch("trunk", "master"))
+        failure.assertIsNotEqualTo(null, "Expected failure result.")
+        failure?.reason?.contains(expectedError).assertIsEqualTo(
+            true,
+            "Expected error to include: $expectedError\nActual:\n${failure?.reason}",
         )
         gitAdapter.showTag("HEAD")?.name.assertIsNotEqualTo(version)
     }

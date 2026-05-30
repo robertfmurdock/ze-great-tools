@@ -37,6 +37,7 @@ class TagFunctionalTest : TagTestSpec {
         userName: String?,
         userEmail: String?,
         warningsAsErrors: Boolean?,
+        allowDetachedHead: Boolean?,
     ) {
         setup()
         File(buildFile).writeText(
@@ -49,6 +50,7 @@ class TagFunctionalTest : TagTestSpec {
                 ${if (userName != null) "userName = \"$userName\"" else ""}
                 ${if (userEmail != null) "userEmail = \"$userEmail\"" else ""}
                 ${if (warningsAsErrors != null) "warningsAsErrors.set($warningsAsErrors)" else ""}
+                ${if (allowDetachedHead != null) "allowDetachedHead = $allowDetachedHead" else ""}
             }
             """.trimIndent(),
         )

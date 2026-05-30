@@ -26,12 +26,15 @@ class TagCommandConfigFileTest : TagTestSpec {
         userName: String?,
         userEmail: String?,
         warningsAsErrors: Boolean?,
+        allowDetachedHead: Boolean?,
     ) {
-        var config = TaggerConfig()
-        releaseBranch?.let { config = config.copy(releaseBranch = releaseBranch) }
-        userName?.let { config = config.copy(userName = userName) }
-        userEmail?.let { config = config.copy(userEmail = userEmail) }
-        warningsAsErrors?.let { config = config.copy(warningsAsErrors = warningsAsErrors) }
+        val config = TaggerConfig(
+            releaseBranch = releaseBranch,
+            userName = userName,
+            userEmail = userEmail,
+            warningsAsErrors = warningsAsErrors,
+            allowDetachedHead = allowDetachedHead,
+        )
         Json.encodeToString(config)
             .writeToFile(taggerFile)
     }

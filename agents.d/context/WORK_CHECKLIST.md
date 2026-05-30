@@ -105,6 +105,8 @@ Each broad checklist item follows a test-driven cycle that repeats until the fea
    ```
    
    **For CLI tools**: stdout is first-class API (parseable contract); stderr is diagnostic (flexible). Changing stdout format is `[major]`, improving stderr clarity is `[patch]`. Structured output formats (JSON, etc.) are API; text formats for humans are diagnostic.
+   
+   **Warning parity rule**: Warnings produced by shared/core tool functionality should be supported consistently across CLI and plugin implementations. Any warning behavior divergence must be documented as intentional with owner approval in the active work card before implementation continues.
 
 **Subagent pattern**: Orchestrator spawns specialized subagents for each phase (testing subagent → implementation subagent → refactor subagent). Orchestrator coordinates the cycle, updates the work card, and adapts the plan as constraints are discovered.
 

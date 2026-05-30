@@ -10,7 +10,6 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlin.test.Test
-import kotlin.test.assertNotNull
 
 class TagCommandTest : TagTestSpec {
 
@@ -33,6 +32,7 @@ class TagCommandTest : TagTestSpec {
         userName: String?,
         userEmail: String?,
         warningsAsErrors: Boolean?,
+        allowDetachedHead: Boolean?,
     ) {
         baseArguments = listOf("-q", "tag") +
             listOfNotNull(
@@ -40,6 +40,7 @@ class TagCommandTest : TagTestSpec {
                 userName?.let { "--user-name=$it" },
                 userEmail?.let { "--user-email=$it" },
                 warningsAsErrors?.let { "--warnings-as-errors=$it" },
+                allowDetachedHead?.let { "--allow-detached-head=$it" },
             ) +
             listOf(projectDir)
     }
