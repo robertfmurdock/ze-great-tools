@@ -27,7 +27,9 @@ All AI agents working on this repository must follow these rules:
    - **Prefer spec-level tests** for feature behavior that should work consistently across implementations (CLI flags, config files, plugin DSL, etc.).
    - Spec-level tests ensure feature parity and prevent implementation-specific drift.
    - **Implementation-specific tests** are appropriate for format/output details, help text, or mechanics unique to that layer.
-   - **Acceptable workflow**: Start with an implementation-level test for quick iteration, then refactor to spec level once the feature stabilizes.
+   - **Acceptable workflows**:
+     - Go straight to spec level if the feature seems simple and straightforward.
+     - Start with an implementation-level test for quick iteration when complexity is anticipated, then refactor to spec level once the feature stabilizes.
    - Example: `CalculateVersionTestSpec` defines shared behavior for `calculate-version` across CLI and config implementations; both `CalculateVersionCommandTest` and `CalculateVersionCommandConfigFileTest` implement the spec to ensure parity.
 7. **Test Names**: Keep names unique, brief, and scenario-focused.
 7. **Java Toolchain**: This project uses Java Toolchain 21. Ensure any new modules or environment checks respect this version.
