@@ -4,6 +4,7 @@ import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.CliktError
 import com.github.ajalt.clikt.core.Context
 import com.github.ajalt.clikt.parameters.options.option
+import com.github.ajalt.clikt.parameters.options.optionalValue
 import com.github.ajalt.clikt.parameters.types.boolean
 import com.zegreatrob.tools.cli.readFromFile
 import com.zegreatrob.tools.cli.writeToFile
@@ -21,8 +22,8 @@ class GenerateSettingsFile : CliktCommand() {
     override fun help(context: Context) = "Generate a .tagger configuration file with default settings. Without --file, prints to stdout."
 
     private val file by option(
-        help = "Save configuration to specified file. Use --file='' to save to .tagger in current directory.",
-    )
+        help = "Save configuration to specified file. Use --file to save to .tagger in current directory. --file='' is also supported.",
+    ).optionalValue(".tagger")
     private val merge by option(
         help = "Merge with existing file, preserving current values and adding missing defaults.",
     ).boolean()
@@ -33,6 +34,7 @@ class GenerateSettingsFile : CliktCommand() {
             encodeDefaults = true
         }
         val defaultConfig = prettyJsonFormatter.encodeToJsonElement(runtimeDefaultConfig)
+        val writeToFile = file != null
         val fileName = file.orEmpty().ifBlank { ".tagger" }
         val pwd = currentContext.readEnvvar("PWD")
         val settingsFile = "$pwd/$fileName"
@@ -48,7 +50,7 @@ class GenerateSettingsFile : CliktCommand() {
             defaultConfig
         }
 
-        if (file == null) {
+        if (!writeToFile) {
             echo(prettyJsonFormatter.encodeToString(outputConfig))
         } else {
             prettyJsonFormatter.encodeToString(outputConfig).writeToFile(settingsFile)

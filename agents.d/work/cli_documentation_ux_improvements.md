@@ -7,14 +7,14 @@ Fix counterintuitive CLI documentation patterns and usage examples to make tools
 - Maintain backward compatibility (especially `--file=''` pattern must still work)
 - Follow TestMints patterns for test structure
 - Each checklist item must result in a pushable state
-- Use semver annotations: `[patch]` for docs/warnings, `[minor]` for new optional behaviors, `[none]` for work card updates
+- Use semver annotations aligned with WORK_CHECKLIST: `[none]` for docs/work-card-only changes, `[patch]` for code changes (including runtime warning behavior), `[minor]` for new optional behaviors
 
 ## Checklist
-- [ ] Review this work card for compliance with template and update to conform
+- [x] Review this work card for compliance with template and update to conform
 - [ ] Fix documentation-only issues (Digger naming, boolean syntax, required flags, format behavior)
   - Agent cycle: test → implement → refactor-light → verify pushable
   - Update plan if guidelines revealed new constraints
-- [ ] Improve empty string flag pattern in Tagger `--file` option
+- [x] Improve empty string flag pattern in Tagger `--file` option
   - Agent cycle: test → implement → refactor-light → verify pushable
   - Update plan if guidelines revealed new constraints
 - [ ] Add deprecation warning for `--disable-detached` flag
@@ -22,7 +22,7 @@ Fix counterintuitive CLI documentation patterns and usage examples to make tools
   - Update plan if guidelines revealed new constraints
 - [ ] Final refactor pass (code style, patterns, efficiency)
 - [ ] Review changes against applicable playbooks and verify compliance
-- [ ] Move to agents.d/work_completed/
+- [ ] Move this file to agents.d/work_completed/
 
 ## Implementation Notes
 
@@ -33,7 +33,7 @@ Fix counterintuitive CLI documentation patterns and usage examples to make tools
 - Pattern: `tagger generate-settings-file --file=''`
 - Problem: Empty strings typically mean "no value"; this is backwards from CLI norms
 - Current logic: `file.orEmpty().ifBlank { ".tagger" }`
-- Solution: Support `--file` without value to mean "use default", keep `--file=''` for backward compat
+- Solution: Support bare `--file` to mean "use default file"; keep explicit `--file=<path>` behavior and maintain `--file=''` backward compatibility
 
 **Issue 2: Inconsistent Command Naming (Digger CLI)**
 - File: `command-line-tools/digger-cli/README.md`
@@ -61,6 +61,18 @@ Fix counterintuitive CLI documentation patterns and usage examples to make tools
 - Problem: `--format=text` writes to file, `--format=json` writes to stdout - not obvious
 - Solution: Make this explicit in documentation
 
+### Work Log
+
+- 2026-05-30: Reviewed work card structure against `WORK_CHECKLIST.md`; template and checklist ordering already conformed.
+- 2026-05-30: Implemented bare `--file` support in `GenerateSettingsFile` via Clikt `optionalValue(".tagger")` while preserving legacy `--file=''` behavior.
+- 2026-05-30: Added CLI test coverage for `tagger generate-settings-file --file` and updated README examples to prefer bare `--file`.
+- 2026-05-30: Validation note: one failed `./gradlew check` run was caused by two Gradle builds running in parallel and colliding on test result files; reran sequentially and passed.
+
 ## Validation
-- Commands: [filled in as work progresses]
-- Results: [filled in before completion]
+- Commands:
+  - `./gradlew :command-line-tools:tagger-cli:jvmTest --tests com.zegreatrob.tools.tagger.cli.GenerateSettingsFileCommandTest --console=plain`
+  - `./gradlew check --console=plain`
+- Results:
+  - First targeted jvmTest run failed due a regression in merge behavior; fixed by keeping default `.tagger` resolution when `--file` is omitted.
+  - Targeted jvmTest rerun passed.
+  - One `./gradlew check` run failed due parallel Gradle invocation collisions (`NoSuchFileException` / `EOFException` in test result binaries); sequential rerun passed.

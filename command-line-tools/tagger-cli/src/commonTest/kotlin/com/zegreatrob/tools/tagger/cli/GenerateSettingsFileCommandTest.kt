@@ -3,9 +3,13 @@ package com.zegreatrob.tools.tagger.cli
 import com.github.ajalt.clikt.testing.test
 import com.zegreatrob.minassert.assertIsEqualTo
 import com.zegreatrob.testmints.setup
+import com.zegreatrob.tools.cli.readFromFile
 import com.zegreatrob.tools.tagger.GenerateSettingsFileTestSpec
 import com.zegreatrob.tools.tagger.TestResult
+import com.zegreatrob.tools.tagger.json.TaggerConfig
+import com.zegreatrob.tools.tagger.json.runtimeDefaultConfig
 import kotlin.test.Test
+
 class GenerateSettingsFileCommandTest : GenerateSettingsFileTestSpec {
 
     override lateinit var projectDir: String
@@ -62,5 +66,18 @@ class GenerateSettingsFileCommandTest : GenerateSettingsFileTestSpec {
     } verify { result ->
         result.output.contains("--merge").assertIsEqualTo(true)
         result.output.contains(Regex("existing|preserve|Merge|merge")).assertIsEqualTo(true, "Help should explain merge behavior")
+    }
+
+    @Test
+    fun fileOptionWithoutValueUsesDefaultTaggerFile() = setup(object {
+        val command = cli()
+    }) exercise {
+        command.test(listOf("-q", "generate-settings-file", "--file"), envvars = mapOf("PWD" to projectDir))
+    } verify { result ->
+        result.statusCode.assertIsEqualTo(0)
+        result.output.trim().assertIsEqualTo("Saved to .tagger")
+        readFromFile("$projectDir/.tagger")
+            ?.let { prettyJson.decodeFromString<TaggerConfig>(it) }
+            .assertIsEqualTo(runtimeDefaultConfig)
     }
 }

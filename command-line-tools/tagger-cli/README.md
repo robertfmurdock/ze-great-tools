@@ -59,10 +59,11 @@ Tagger supports a `.tagger` JSON configuration file at your repository root to e
 
 Generate a template with default values:
 ```bash
-tagger generate-settings-file --file=''
+tagger generate-settings-file --file
 ```
 
 This creates `.tagger` in the current directory. Edit it to customize behavior.
+(`--file=''` is also supported for backward compatibility.)
 
 **Print to stdout without creating file:**
 ```bash
@@ -71,7 +72,7 @@ tagger generate-settings-file
 
 **Merge new defaults into existing file:**
 ```bash
-tagger generate-settings-file --file='' --merge=true
+tagger generate-settings-file --file --merge=true
 ```
 
 ### Configuration Options
