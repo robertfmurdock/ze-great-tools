@@ -22,11 +22,7 @@ class Tag : CliktCommand() {
         context { valueSources(ConfigFileSource(readEnvvar)) }
     }
 
-    override fun help(context: Context) = """
-        ${super.help(context)}
-
-        Options can be configured in a .tagger file. See: tagger generate-settings-file --help
-    """.trimIndent()
+    override fun help(context: Context) = "${super.help(context)}\n\n${configFileHelpSuffix()}"
 
     private val gitRepoArgument by argument("git-repo").optional()
     private val gitRepoOption by option("--git-repo", envvar = "PWD")

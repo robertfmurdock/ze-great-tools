@@ -40,3 +40,7 @@ fun versionSuccessResponse(data: VersionData): String = Json.encodeToString(Vers
 fun tagSuccessResponse(data: TagData): String = Json.encodeToString(TagSuccessResponse.serializer(), TagSuccessResponse(status = "success", data = data))
 
 fun errorResponse(message: String, code: String): String = Json.encodeToString(ErrorResponse.serializer(), ErrorResponse(status = "error", error = message, code = code))
+
+fun configFileHelpSuffix() = """
+    Options can be configured in a .tagger file. See: tagger generate-settings-file --help
+""".trimIndent()
