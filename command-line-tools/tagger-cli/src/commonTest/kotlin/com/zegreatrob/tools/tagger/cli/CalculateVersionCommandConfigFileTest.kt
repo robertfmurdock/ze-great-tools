@@ -2,13 +2,14 @@ package com.zegreatrob.tools.tagger.cli
 
 import com.github.ajalt.clikt.testing.test
 import com.zegreatrob.tools.cli.writeToFile
-import com.zegreatrob.tools.tagger.CalculateVersionTestSpec
+import com.zegreatrob.tools.tagger.CalculateVersionConfigFileParseFailureTestSpec
 import com.zegreatrob.tools.tagger.TestResult
 import com.zegreatrob.tools.tagger.json.TaggerConfig
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
+
 @ExperimentalSerializationApi
-class CalculateVersionCommandConfigFileTest : CalculateVersionTestSpec {
+class CalculateVersionCommandConfigFileTest : CalculateVersionConfigFileParseFailureTestSpec {
 
     override lateinit var projectDir: String
 
@@ -20,6 +21,10 @@ class CalculateVersionCommandConfigFileTest : CalculateVersionTestSpec {
         val config = TaggerConfig(releaseBranch = "master")
         Json.encodeToString(config)
             .writeToFile(taggerFile)
+    }
+
+    override fun configureWithRawTaggerConfig(contents: String) {
+        contents.writeToFile(taggerFile)
     }
 
     override fun configureWithOverrides(
@@ -34,18 +39,19 @@ class CalculateVersionCommandConfigFileTest : CalculateVersionTestSpec {
         forceSnapshot: Boolean?,
         warningsAsErrors: Boolean?,
     ) {
-        var config = TaggerConfig()
-        implicitPatch?.let { config = config.copy(implicitPatch = implicitPatch) }
-        disableDetached?.let { config = config.copy(disableDetached = disableDetached) }
-        allowDetachedHead?.let { config = config.copy(allowDetachedHead = allowDetachedHead) }
-        versionRegex?.let { config = config.copy(versionRegex = versionRegex) }
-        majorRegex?.let { config = config.copy(majorRegex = majorRegex) }
-        minorRegex?.let { config = config.copy(minorRegex = minorRegex) }
-        patchRegex?.let { config = config.copy(patchRegex = patchRegex) }
-        noneRegex?.let { config = config.copy(noneRegex = noneRegex) }
-        forceSnapshot?.let { config = config.copy(forceSnapshot = forceSnapshot) }
-        warningsAsErrors?.let { config = config.copy(warningsAsErrors = warningsAsErrors) }
-        config = config.copy(releaseBranch = "master")
+        val config = TaggerConfig(
+            releaseBranch = "master",
+            implicitPatch = implicitPatch,
+            disableDetached = disableDetached,
+            allowDetachedHead = allowDetachedHead,
+            majorRegex = majorRegex,
+            minorRegex = minorRegex,
+            patchRegex = patchRegex,
+            noneRegex = noneRegex,
+            versionRegex = versionRegex,
+            forceSnapshot = forceSnapshot,
+            warningsAsErrors = warningsAsErrors,
+        )
         Json.encodeToString(config)
             .writeToFile(taggerFile)
     }

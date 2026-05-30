@@ -1,5 +1,6 @@
 package com.zegreatrob.tools.tagger.cli
 
+import com.github.ajalt.clikt.core.CliktError
 import com.github.ajalt.clikt.core.Context
 import com.github.ajalt.clikt.parameters.options.Option
 import com.github.ajalt.clikt.sources.ValueSource
@@ -23,24 +24,22 @@ class ConfigFileSource(val envvarReader: (key: String) -> String?) : ValueSource
         configAsElement: JsonElement,
         option: Option,
     ): List<ValueSource.Invocation> {
-        var cursor: JsonElement? = configAsElement
-        val parts = option.parts()
-        for (part in parts) {
-            if (cursor !is JsonObject) return emptyList()
-            cursor = cursor[part]
-        }
-        if (cursor == null) return emptyList()
+        val cursor = option.parts()
+            .fold(configAsElement as JsonElement?) { element, part ->
+                (element as? JsonObject)?.get(part)
+            } ?: return emptyList()
 
-        try {
-            if (cursor is JsonArray) {
-                return cursor.map {
-                    ValueSource.Invocation.value(it.jsonPrimitive.content)
-                }
-            }
-            return ValueSource.Invocation.just(cursor.jsonPrimitive.content)
-        } catch (_: IllegalArgumentException) {
-            return emptyList()
+        return invocationsFrom(cursor)
+    }
+
+    private fun invocationsFrom(cursor: JsonElement): List<ValueSource.Invocation> = try {
+        if (cursor is JsonArray) {
+            cursor.map { ValueSource.Invocation.value(it.jsonPrimitive.content) }
+        } else {
+            ValueSource.Invocation.just(cursor.jsonPrimitive.content)
         }
+    } catch (_: IllegalArgumentException) {
+        emptyList()
     }
 
     private fun Option.parts(): List<String> = valueSourceKey?.split(".")
@@ -56,7 +55,11 @@ class ConfigFileSource(val envvarReader: (key: String) -> String?) : ValueSource
         val fileContents = readFromFile("$pwd/.tagger")
             ?: return null
 
-        val config = Json.decodeFromString<TaggerConfig>(fileContents)
+        val config = try {
+            Json.decodeFromString<TaggerConfig>(fileContents)
+        } catch (e: Exception) {
+            throw CliktError("Failed to parse .tagger file: ${e.message}")
+        }
         val configAsElement = Json.encodeToJsonElement(config)
         return configAsElement
     }

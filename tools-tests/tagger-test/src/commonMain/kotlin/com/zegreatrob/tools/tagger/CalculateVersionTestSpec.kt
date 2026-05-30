@@ -3,6 +3,7 @@ package com.zegreatrob.tools.tagger
 import com.zegreatrob.minassert.assertIsEqualTo
 import com.zegreatrob.testmints.setup
 import com.zegreatrob.tools.adapter.git.GitAdapter
+import com.zegreatrob.tools.adapter.git.runProcess
 import com.zegreatrob.tools.test.git.addCommitWithMessage
 import com.zegreatrob.tools.test.git.createTempDirectory
 import com.zegreatrob.tools.test.git.getEnvironmentVariable
@@ -647,6 +648,68 @@ interface CalculateVersionTestSpec {
             )
 
             is TestResult.Success -> fail("Should exit with failure when detached HEAD warning present and warningsAsErrors enabled")
+        }
+    }
+
+    @Test
+    fun withLightweightTagShowsActionableErrorMessage() = setup(object {
+        val lightweightTagName = "1.0.0"
+    }) {
+        configureWithDefaults()
+        initializeGitRepo(
+            commits = listOf("initial commit"),
+            initialTag = null,
+        )
+        runProcess(listOf("git", "tag", lightweightTagName), projectDir)
+    } exercise {
+        execute()
+    } verify { result ->
+        when (result) {
+            is TestResult.Failure -> {
+                result.reason.contains("lightweight")
+                    .assertIsEqualTo(true, "Expected lightweight tag guidance. Output:\n${result.reason}")
+                result.reason.contains(lightweightTagName)
+                    .assertIsEqualTo(true, "Expected tag name in failure output. Output:\n${result.reason}")
+                result.reason.contains("git tag -d $lightweightTagName")
+                    .assertIsEqualTo(true, "Expected delete guidance. Output:\n${result.reason}")
+                result.reason.contains("git tag -a $lightweightTagName")
+                    .assertIsEqualTo(true, "Expected annotate guidance. Output:\n${result.reason}")
+                result.reason.contains("git push --force origin $lightweightTagName")
+                    .assertIsEqualTo(true, "Expected push guidance. Output:\n${result.reason}")
+            }
+
+            is TestResult.Success -> fail("Should fail when lightweight tags are present")
+        }
+    }
+
+    @Test
+    fun withMultipleLightweightTagsShowsAllTagsInErrorMessage() = setup(object {
+        val tag1 = "1.0.0"
+        val tag2 = "1.1.0"
+    }) {
+        configureWithDefaults()
+        initializeGitRepo(
+            commits = listOf("initial commit"),
+            initialTag = null,
+        )
+        runProcess(listOf("git", "tag", tag1), projectDir)
+        runProcess(listOf("git", "tag", tag2), projectDir)
+    } exercise {
+        execute()
+    } verify { result ->
+        when (result) {
+            is TestResult.Failure -> {
+                result.reason.contains("2 tags")
+                    .assertIsEqualTo(true, "Expected tag count in error output. Output:\n${result.reason}")
+                result.reason.contains(tag1)
+                    .assertIsEqualTo(true, "Expected first tag in error output. Output:\n${result.reason}")
+                result.reason.contains(tag2)
+                    .assertIsEqualTo(true, "Expected second tag in error output. Output:\n${result.reason}")
+                result.reason.contains("they are lightweight")
+                    .assertIsEqualTo(true, "Expected plural lightweight guidance. Output:\n${result.reason}")
+            }
+
+            is TestResult.Success -> fail("Should fail when lightweight tags are present")
         }
     }
 }

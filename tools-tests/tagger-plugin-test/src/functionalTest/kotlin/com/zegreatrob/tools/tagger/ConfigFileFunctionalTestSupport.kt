@@ -30,6 +30,10 @@ internal object ConfigFileFunctionalTestSupport {
         )
     }
 
+    fun writeRawTaggerFile(projectDir: String, contents: String) {
+        file(projectDir, ".tagger").writeText(contents)
+    }
+
     fun gradleOutput(projectDir: String, vararg arguments: String): Result<String> = runCatching {
         GradleRunner.create()
             .forwardOutput()

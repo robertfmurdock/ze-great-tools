@@ -1,6 +1,6 @@
 package com.zegreatrob.tools.tagger
 
-class CalculateVersionConfigFileFunctionalTest : CalculateVersionTestSpec {
+class CalculateVersionConfigFileFunctionalTest : CalculateVersionConfigFileParseFailureTestSpec {
     override lateinit var projectDir: String
 
     override val addFileNames: Set<String>
@@ -9,6 +9,11 @@ class CalculateVersionConfigFileFunctionalTest : CalculateVersionTestSpec {
     override fun configureWithDefaults() {
         ConfigFileFunctionalTestSupport.setupConfigFileBuild(projectDir)
         ConfigFileFunctionalTestSupport.writeTaggerFile(projectDir, listOf("\"releaseBranch\": \"master\""))
+    }
+
+    override fun configureWithRawTaggerConfig(contents: String) {
+        ConfigFileFunctionalTestSupport.setupConfigFileBuild(projectDir)
+        ConfigFileFunctionalTestSupport.writeRawTaggerFile(projectDir, contents)
     }
 
     override fun configureWithOverrides(

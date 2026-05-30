@@ -269,4 +269,44 @@ interface TagTestSpec {
         )
         gitAdapter.showTag("HEAD")?.name.assertIsNotEqualTo(version)
     }
+
+    @Test
+    fun allowDetachedHeadPermitsTaggingDetachedHead() = setup(object {
+        val commits = listOf("init", "[patch] commit 1")
+        val initialTag = "1.2.3"
+        val expectedVersion = "1.2.4"
+    }) {
+        configureWithOverrides(
+            releaseBranch = "master",
+            allowDetachedHead = true,
+        )
+
+        val originDirectory = createTempDirectory()
+        val originGitAdapter = GitAdapter(originDirectory)
+        originGitAdapter.init()
+        originGitAdapter.config("receive.denyCurrentBranch", "ignore")
+        originGitAdapter.disableGpgSign()
+        originGitAdapter.addCommitWithMessage("init")
+
+        val gitAdapter = initializeGitRepo(
+            commits = commits,
+            initialTag = initialTag,
+            remoteUrl = originDirectory,
+        )
+        gitAdapter.push()
+
+        runProcess(listOf("git", "checkout", "--detach"), projectDir)
+        runProcess(listOf("git", "config", "user.email", "test@zegreatrob.com"), projectDir)
+        runProcess(listOf("git", "config", "user.name", "RoB as Test"), projectDir)
+    } exercise {
+        execute(expectedVersion)
+    } verify { result ->
+        (result is TestResult.Failure)
+            .assertIsEqualTo(false, "Expected success while detached with allowDetachedHead=true, got: $result")
+
+        val gitAdapter = GitAdapter(projectDir)
+        gitAdapter.showTag("HEAD")
+            ?.name
+            .assertIsEqualTo(expectedVersion)
+    }
 }

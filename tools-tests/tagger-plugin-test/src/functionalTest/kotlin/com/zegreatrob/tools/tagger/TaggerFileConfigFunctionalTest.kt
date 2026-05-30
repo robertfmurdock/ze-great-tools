@@ -67,26 +67,11 @@ class TaggerFileConfigFunctionalTest {
     }
 
     private fun execute(): TestResult {
-        val runner = GradleRunner.create()
-        runner.forwardOutput()
-        runner.withArguments("calculateVersion", "-q")
-        runner.withProjectDir(File(projectDir))
-        return try {
-            val result = runner.build()
-            val lines = result.output
-                .lineSequence()
-                .map { it.trim() }
-                .filter { it.isNotBlank() }
-                .toList()
-
-            val version = lines.firstOrNull().orEmpty()
-            val remainingLines = lines.drop(1)
-            val (warningLines, detailLines) = remainingLines.partition { it.startsWith("⚠️") }
-
-            TestResult.Success(version, detailLines.joinToString("\n"), warningLines)
-        } catch (e: Exception) {
-            TestResult.Failure(e.message!!)
-        }
+        val output = ConfigFileFunctionalTestSupport.gradleOutput(projectDir, "calculateVersion", "-q")
+        return output.fold(
+            onSuccess = ConfigFileFunctionalTestSupport::parseCalculateVersion,
+            onFailure = { TestResult.Failure(it.message!!) },
+        )
     }
 
     @Test
@@ -158,37 +143,6 @@ class TaggerFileConfigFunctionalTest {
         when (result) {
             is TestResult.Success -> result.message.assertIsEqualTo("1.0.1-SNAPSHOT")
             is TestResult.Failure -> fail("Expected success but got ${result.reason}")
-        }
-    }
-
-    @Test
-    fun reportsErrorForInvalidJson() = setup(object {
-        val invalidJson = """
-            {
-              "releaseBranch": "master",
-              invalid
-            }
-        """.trimIndent()
-    }) {
-        setupBuildFiles(includeDslConfig = false)
-        File(taggerFile).writeText(invalidJson)
-        initializeGitRepo(
-            directory = projectDir,
-            remoteUrl = projectDir,
-            addFileNames = addFileNames,
-            commits = listOf("init", "[patch] commit 1"),
-            initialTag = "1.0.0",
-        )
-    } exercise {
-        execute()
-    } verify { result ->
-        when (result) {
-            is TestResult.Success -> fail("Expected failure but got success: ${result.message}")
-
-            is TestResult.Failure -> {
-                result.reason.contains("Failed to parse .tagger file")
-                    .assertIsEqualTo(true, "Expected parse error. Output:\n${result.reason}")
-            }
         }
     }
 
