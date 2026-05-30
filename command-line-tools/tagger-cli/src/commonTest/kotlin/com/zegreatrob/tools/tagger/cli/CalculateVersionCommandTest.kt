@@ -357,6 +357,16 @@ class CalculateVersionCommandTest : CalculateVersionTestSpec {
     }
 
     @Test
+    fun helpTextMentionsConfigFile() = setup(object {
+        val cli = cli()
+    }) exercise {
+        cli.test("calculate-version --help")
+    } verify { result ->
+        result.output.contains(".tagger").assertIsEqualTo(true, "Help should mention .tagger config file")
+        result.output.contains(Regex("configuration|config file|settings")).assertIsEqualTo(true)
+    }
+
+    @Test
     fun allowDetachedHeadTrueAllowsNoRemote() = setup(object {
     }) {
         com.zegreatrob.tools.test.git.initializeGitRepo(
