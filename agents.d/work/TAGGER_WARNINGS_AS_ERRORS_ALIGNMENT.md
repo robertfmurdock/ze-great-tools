@@ -16,7 +16,7 @@ Make `warningsAsErrors` consistently enforce non-zero exits for real warning con
 - [x] Define and lock expected warnings policy surface for each command
   - Agent cycle: test → implement → refactor-light → verify pushable
   - Update plan if guidelines revealed new constraints
-- [ ] Implement `calculate-version` warnings escalation behind `warningsAsErrors`
+- [x] Implement `calculate-version` warnings escalation behind `warningsAsErrors`
   - Agent cycle: test → implement → refactor-light → verify pushable
   - Update plan if guidelines revealed new constraints
 - [ ] Align `tag` command semantics and naming so warning/error behavior is explicit and unsurprising
@@ -64,10 +64,19 @@ Make `warningsAsErrors` consistently enforce non-zero exits for real warning con
 - Keep warning detection source-of-truth close to core result models (avoid fragile text parsing where possible).
 - Preserve current JSON schema; strictness should be represented via process exit status, not response shape changes.
 
+### Implementation notes (2026-05-30, 3:55 min elapsed)
+- Added `--warnings-as-errors` flag to `calculate-version` command.
+- Implemented escalation logic after success output (both TEXT and JSON formats).
+- All warnings (deprecation + detached HEAD) now escalate to exit code 1 when flag is enabled.
+- Three tests added: escalation with deprecation warning, escalation with detached HEAD warning, backward compatibility verification.
+- ConfigFileSource automatically supports the new flag via TaggerConfig (field already existed).
+- Commit: a9b25a7
+
 ### Optional follow-ups under same theme
 - Consider a small internal result type rename in `tag` path (`TagResult.Warning` vs `TagResult.Error`) if semantics remain warning-like for non-strict mode.
 - Add a focused matrix test for `(command x format x warningsAsErrors x warning-present)` to prevent regressions.
 
 ## Validation
-- Commands: [filled in as work progresses]
-- Results: [filled in before completion]
+- Commands:
+  - `./gradlew :command-line-tools:tagger-cli:check`
+- Results: All tests pass, module check successful
