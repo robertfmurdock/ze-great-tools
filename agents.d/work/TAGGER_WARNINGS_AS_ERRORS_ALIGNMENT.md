@@ -64,13 +64,14 @@ Make `warningsAsErrors` consistently enforce non-zero exits for real warning con
 - Keep warning detection source-of-truth close to core result models (avoid fragile text parsing where possible).
 - Preserve current JSON schema; strictness should be represented via process exit status, not response shape changes.
 
-### Implementation notes (2026-05-30, 3:55 min elapsed)
+### Implementation notes (2026-05-30, 8.3 min elapsed)
 - Added `--warnings-as-errors` flag to `calculate-version` command.
 - Implemented escalation logic after success output (both TEXT and JSON formats).
 - All warnings (deprecation + detached HEAD) now escalate to exit code 1 when flag is enabled.
-- Three tests added: escalation with deprecation warning, escalation with detached HEAD warning, backward compatibility verification.
+- Three tests added at spec level: escalation with deprecation warning, escalation with detached HEAD warning, backward compatibility verification.
 - ConfigFileSource automatically supports the new flag via TaggerConfig (field already existed).
-- Commit: a9b25a7
+- Refactored tests to CalculateVersionTestSpec so both CLI and config file implementations are tested.
+- Commits: a9b25a7, cd47345, 122d5b3
 
 ### Optional follow-ups under same theme
 - Consider a small internal result type rename in `tag` path (`TagResult.Warning` vs `TagResult.Error`) if semantics remain warning-like for non-strict mode.
