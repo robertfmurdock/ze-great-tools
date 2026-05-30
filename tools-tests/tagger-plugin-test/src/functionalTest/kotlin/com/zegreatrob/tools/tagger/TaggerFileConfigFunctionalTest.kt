@@ -11,7 +11,6 @@ import java.io.File
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
-import kotlin.test.fail
 
 class TaggerFileConfigFunctionalTest {
     private lateinit var projectDir: String
@@ -94,10 +93,7 @@ class TaggerFileConfigFunctionalTest {
     } exercise {
         execute()
     } verify { result ->
-        when (result) {
-            is TestResult.Success -> result.message.assertIsEqualTo("1.0.1")
-            is TestResult.Failure -> fail("Expected success but got ${result.reason}")
-        }
+        result.assertIsOfType<TestResult.Success>().message.assertIsEqualTo("1.0.1")
     }
 
     @Test
@@ -120,10 +116,7 @@ class TaggerFileConfigFunctionalTest {
     } exercise {
         execute()
     } verify { result ->
-        when (result) {
-            is TestResult.Success -> result.message.assertIsEqualTo("1.0.1-SNAPSHOT")
-            is TestResult.Failure -> fail("Expected success but got ${result.reason}")
-        }
+        result.assertIsOfType<TestResult.Success>().message.assertIsEqualTo("1.0.1-SNAPSHOT")
     }
 
     @Test
@@ -140,10 +133,7 @@ class TaggerFileConfigFunctionalTest {
     } exercise {
         execute()
     } verify { result ->
-        when (result) {
-            is TestResult.Success -> result.message.assertIsEqualTo("1.0.1-SNAPSHOT")
-            is TestResult.Failure -> fail("Expected success but got ${result.reason}")
-        }
+        result.assertIsOfType<TestResult.Success>().message.assertIsEqualTo("1.0.1-SNAPSHOT")
     }
 
     @Test
@@ -167,13 +157,9 @@ class TaggerFileConfigFunctionalTest {
     } exercise {
         execute()
     } verify { result ->
-        when (result) {
-            is TestResult.Success -> {
-                result.message.contains("1.0.0")
-                    .assertIsEqualTo(true, "Expected version 1.0.0 with implicitPatch=false, got ${result.message}")
-            }
-
-            is TestResult.Failure -> fail("Expected success but got ${result.reason}")
+        result.assertIsOfType<TestResult.Success>().run {
+            message.contains("1.0.0")
+                .assertIsEqualTo(true, "Expected version 1.0.0 with implicitPatch=false, got $message")
         }
     }
 }

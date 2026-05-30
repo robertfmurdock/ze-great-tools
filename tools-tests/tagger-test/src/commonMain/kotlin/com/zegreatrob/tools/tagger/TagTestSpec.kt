@@ -88,7 +88,7 @@ interface TagTestSpec {
     } exercise {
         execute(expectedVersion)
     } verify { result ->
-        (result is TestResult.Failure).assertIsEqualTo(false, "$result")
+        result.assertIsOfType<TestResult.Success>()
         gitAdapter.showTag("HEAD")?.name.assertIsEqualTo(expectedVersion)
     }
 
@@ -122,7 +122,7 @@ interface TagTestSpec {
     } exercise {
         execute(expectedVersion)
     } verify { result ->
-        (result is TestResult.Failure).assertIsEqualTo(false, "$result")
+        result.assertIsOfType<TestResult.Success>()
         gitAdapter.showTag("HEAD")?.name.assertIsEqualTo(expectedVersion)
     }
 
@@ -154,13 +154,13 @@ interface TagTestSpec {
     } exercise {
         execute(version)
     } verify { result ->
-        val failure = result as? TestResult.Failure
         val expectedError = "Committer identity unknown"
-        failure.assertIsNotEqualTo(null, "Expected failure result.")
-        failure?.reason?.contains(expectedError).assertIsEqualTo(
-            true,
-            "Expected error to include: $expectedError\nActual:\n${failure?.reason}",
-        )
+        result.assertIsOfType<TestResult.Failure>().run {
+            reason.contains(expectedError).assertIsEqualTo(
+                true,
+                "Expected error to include: $expectedError\nActual:\n$reason",
+            )
+        }
         gitAdapter.showTag("HEAD")?.name.assertIsNotEqualTo(version)
     }
 
@@ -188,13 +188,13 @@ interface TagTestSpec {
     } exercise {
         execute(version)
     } verify { result ->
-        val failure = result as? TestResult.Failure
         val expectedError = TagErrors.wrapper(TagErrors.skipMessageNotOnReleaseBranch("trunk", "master"))
-        failure.assertIsNotEqualTo(null, "Expected failure result.")
-        failure?.reason?.contains(expectedError).assertIsEqualTo(
-            true,
-            "Expected error to include: $expectedError\nActual:\n${failure?.reason}",
-        )
+        result.assertIsOfType<TestResult.Failure>().run {
+            reason.contains(expectedError).assertIsEqualTo(
+                true,
+                "Expected error to include: $expectedError\nActual:\n$reason",
+            )
+        }
         gitAdapter.showTag("HEAD")?.name.assertIsNotEqualTo(version)
     }
 
@@ -222,13 +222,13 @@ interface TagTestSpec {
     } exercise {
         execute(version)
     } verify { result ->
-        val success = result as? TestResult.Success
         val expectedMessage = TagErrors.wrapper(TagErrors.skipMessageNotOnReleaseBranch("trunk", "master"))
-        success.assertIsNotEqualTo(null, "Expected success result.")
-        success?.message?.contains(expectedMessage).assertIsEqualTo(
-            true,
-            "Expected message to include: $expectedMessage\nActual:\n${success?.message}",
-        )
+        result.assertIsOfType<TestResult.Success>().run {
+            message.contains(expectedMessage).assertIsEqualTo(
+                true,
+                "Expected message to include: $expectedMessage\nActual:\n$message",
+            )
+        }
         gitAdapter.showTag("HEAD")?.name.assertIsNotEqualTo(version)
     }
 
@@ -260,13 +260,13 @@ interface TagTestSpec {
     } exercise {
         execute(version)
     } verify { result ->
-        val failure = result as? TestResult.Failure
         val expectedError = TagErrors.wrapper(TagErrors.skipMessageNotOnReleaseBranch("trunk", "master"))
-        failure.assertIsNotEqualTo(null, "Expected failure result.")
-        failure?.reason?.contains(expectedError).assertIsEqualTo(
-            true,
-            "Expected error to include: $expectedError\nActual:\n${failure?.reason}",
-        )
+        result.assertIsOfType<TestResult.Failure>().run {
+            reason.contains(expectedError).assertIsEqualTo(
+                true,
+                "Expected error to include: $expectedError\nActual:\n$reason",
+            )
+        }
         gitAdapter.showTag("HEAD")?.name.assertIsNotEqualTo(version)
     }
 
@@ -301,8 +301,7 @@ interface TagTestSpec {
     } exercise {
         execute(expectedVersion)
     } verify { result ->
-        (result is TestResult.Failure)
-            .assertIsEqualTo(false, "Expected success while detached with allowDetachedHead=true, got: $result")
+        result.assertIsOfType<TestResult.Success>()
 
         val gitAdapter = GitAdapter(projectDir)
         gitAdapter.showTag("HEAD")

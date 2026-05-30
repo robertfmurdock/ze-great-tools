@@ -12,7 +12,6 @@ import com.zegreatrob.tools.test.git.removeDirectory
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
-import kotlin.test.fail
 
 interface CalculateVersionTestSpec {
     var projectDir: String
@@ -117,16 +116,13 @@ interface CalculateVersionTestSpec {
     } exercise {
         execute()
     } verify { result ->
-        when (result) {
-            is TestResult.Failure ->
-                result.reason.contains(
-                    Regex("Inappropriate configuration: repository has no tags.\\s*\n\\s*If this is a new repository, use `tag` to set the initial version."),
-                ).assertIsEqualTo(
-                    true,
-                    "Expected missing tags error. Output:\n${result.reason}",
-                )
-
-            is TestResult.Success -> fail("Should not have succeeded.")
+        result.assertIsOfType<TestResult.Failure>().run {
+            reason.contains(
+                Regex("Inappropriate configuration: repository has no tags.\\s*\n\\s*If this is a new repository, use `tag` to set the initial version."),
+            ).assertIsEqualTo(
+                true,
+                "Expected missing tags error. Output:\n$reason",
+            )
         }
     }
 
@@ -143,17 +139,13 @@ interface CalculateVersionTestSpec {
     } exercise {
         execute()
     } verify { result ->
-        when (result) {
-            is TestResult.Failure -> {
-                result.reason.contains("⚠️")
-                    .assertIsEqualTo(true, "Expected warning symbol. Output:\n${result.reason}")
-                result.reason.contains("RISK:")
-                    .assertIsEqualTo(true, "Expected risk section. Output:\n${result.reason}")
-                result.reason.contains("production releases")
-                    .assertIsEqualTo(true, "Expected consequence explanation. Output:\n${result.reason}")
-            }
-
-            is TestResult.Success -> fail("Should not have succeeded.")
+        result.assertIsOfType<TestResult.Failure>().run {
+            reason.contains("⚠️")
+                .assertIsEqualTo(true, "Expected warning symbol. Output:\n$reason")
+            reason.contains("RISK:")
+                .assertIsEqualTo(true, "Expected risk section. Output:\n$reason")
+            reason.contains("production releases")
+                .assertIsEqualTo(true, "Expected consequence explanation. Output:\n$reason")
         }
     }
 
@@ -171,10 +163,7 @@ interface CalculateVersionTestSpec {
     } exercise {
         execute()
     } verify { result ->
-        when (result) {
-            is TestResult.Success -> result.message.assertIsEqualTo("1.2.4-SNAPSHOT")
-            is TestResult.Failure -> fail("Expected success but got ${result.reason}")
-        }
+        result.assertIsOfType<TestResult.Success>().message.assertIsEqualTo("1.2.4-SNAPSHOT")
     }
 
     @Test
@@ -191,10 +180,7 @@ interface CalculateVersionTestSpec {
     } exercise {
         execute()
     } verify { result ->
-        when (result) {
-            is TestResult.Success -> result.message.assertIsEqualTo("1.2.4-SNAPSHOT")
-            is TestResult.Failure -> fail("Expected success but got ${result.reason}")
-        }
+        result.assertIsOfType<TestResult.Success>().message.assertIsEqualTo("1.2.4-SNAPSHOT")
     }
 
     @Test
@@ -211,10 +197,7 @@ interface CalculateVersionTestSpec {
     } exercise {
         execute()
     } verify { result ->
-        when (result) {
-            is TestResult.Success -> result.message.assertIsEqualTo("1.2.4-SNAPSHOT")
-            is TestResult.Failure -> fail("Expected success but got ${result.reason}")
-        }
+        result.assertIsOfType<TestResult.Success>().message.assertIsEqualTo("1.2.4-SNAPSHOT")
     }
 
     @Test
@@ -231,12 +214,13 @@ interface CalculateVersionTestSpec {
     } exercise {
         execute()
     } verify { result ->
-        val success = result as? TestResult.Success ?: fail("Expected success but got $result")
-        success.warnings.size
-            .assertIsEqualTo(1, "Expected one warning. Warnings: ${success.warnings}")
-        success.warnings.first()
-            .contains("release branch")
-            .assertIsEqualTo(true, "Expected release branch warning. Warning: ${success.warnings.first()}")
+        result.assertIsOfType<TestResult.Success>().run {
+            warnings.size
+                .assertIsEqualTo(1, "Expected one warning. Warnings: $warnings")
+            warnings.first()
+                .contains("release branch")
+                .assertIsEqualTo(true, "Expected release branch warning. Warning: ${warnings.first()}")
+        }
     }
 
     @Test
@@ -268,10 +252,7 @@ interface CalculateVersionTestSpec {
     } exercise {
         execute()
     } verify { result ->
-        when (result) {
-            is TestResult.Success -> result.message.assertIsEqualTo("1.0.23-SNAPSHOT")
-            is TestResult.Failure -> fail("Expected success but got ${result.reason}")
-        }
+        result.assertIsOfType<TestResult.Success>().message.assertIsEqualTo("1.0.23-SNAPSHOT")
     }
 
     @Test
@@ -282,16 +263,13 @@ interface CalculateVersionTestSpec {
     } exercise {
         execute()
     } verify { result ->
-        when (result) {
-            is TestResult.Failure ->
-                result.reason.contains(
-                    "Inappropriate configuration: the most recent tag did not have all three semver components.",
-                ).assertIsEqualTo(
-                    true,
-                    "Expected malformed tag error. Output:\n${result.reason}",
-                )
-
-            is TestResult.Success -> fail("Should not have succeeded.")
+        result.assertIsOfType<TestResult.Failure>().run {
+            reason.contains(
+                "Inappropriate configuration: the most recent tag did not have all three semver components.",
+            ).assertIsEqualTo(
+                true,
+                "Expected malformed tag error. Output:\n$reason",
+            )
         }
     }
 
@@ -303,10 +281,7 @@ interface CalculateVersionTestSpec {
     } exercise {
         execute()
     } verify { result ->
-        when (result) {
-            is TestResult.Success -> result.message.assertIsEqualTo("1.2.4")
-            is TestResult.Failure -> fail("Expected success but got ${result.reason}")
-        }
+        result.assertIsOfType<TestResult.Success>().message.assertIsEqualTo("1.2.4")
     }
 
     @Test
@@ -317,10 +292,7 @@ interface CalculateVersionTestSpec {
     } exercise {
         execute()
     } verify { result ->
-        when (result) {
-            is TestResult.Success -> result.message.assertIsEqualTo("1.2.3-SNAPSHOT")
-            is TestResult.Failure -> fail("Expected success but got ${result.reason}")
-        }
+        result.assertIsOfType<TestResult.Success>().message.assertIsEqualTo("1.2.3-SNAPSHOT")
     }
 
     @Test
@@ -331,10 +303,7 @@ interface CalculateVersionTestSpec {
     } exercise {
         execute()
     } verify { result ->
-        when (result) {
-            is TestResult.Success -> result.message.assertIsEqualTo("1.2.3-SNAPSHOT")
-            is TestResult.Failure -> fail("Expected success but got ${result.reason}")
-        }
+        result.assertIsOfType<TestResult.Success>().message.assertIsEqualTo("1.2.3-SNAPSHOT")
     }
 
     @Test
@@ -345,10 +314,7 @@ interface CalculateVersionTestSpec {
     } exercise {
         execute()
     } verify { result ->
-        when (result) {
-            is TestResult.Success -> result.message.assertIsEqualTo("1.2.4")
-            is TestResult.Failure -> fail("Expected success but got ${result.reason}")
-        }
+        result.assertIsOfType<TestResult.Success>().message.assertIsEqualTo("1.2.4")
     }
 
     @Test
@@ -359,10 +325,7 @@ interface CalculateVersionTestSpec {
     } exercise {
         execute()
     } verify { result ->
-        when (result) {
-            is TestResult.Success -> result.message.assertIsEqualTo("1.2.4")
-            is TestResult.Failure -> fail("Expected success but got ${result.reason}")
-        }
+        result.assertIsOfType<TestResult.Success>().message.assertIsEqualTo("1.2.4")
     }
 
     @Test
@@ -373,10 +336,7 @@ interface CalculateVersionTestSpec {
     } exercise {
         execute()
     } verify { result ->
-        when (result) {
-            is TestResult.Success -> result.message.assertIsEqualTo("1.2.3-SNAPSHOT")
-            is TestResult.Failure -> fail("Expected success but got ${result.reason}")
-        }
+        result.assertIsOfType<TestResult.Success>().message.assertIsEqualTo("1.2.3-SNAPSHOT")
     }
 
     @Test
@@ -389,10 +349,7 @@ interface CalculateVersionTestSpec {
     } exercise {
         execute()
     } verify { result ->
-        when (result) {
-            is TestResult.Success -> result.message.assertIsEqualTo("1.3.0")
-            is TestResult.Failure -> fail("Expected success but got ${result.reason}")
-        }
+        result.assertIsOfType<TestResult.Success>().message.assertIsEqualTo("1.3.0")
     }
 
     @Test
@@ -406,10 +363,7 @@ interface CalculateVersionTestSpec {
     } exercise {
         execute()
     } verify { result ->
-        when (result) {
-            is TestResult.Success -> result.message.assertIsEqualTo("2.0.0")
-            is TestResult.Failure -> fail("Expected success but got ${result.reason}")
-        }
+        result.assertIsOfType<TestResult.Success>().message.assertIsEqualTo("2.0.0")
     }
 
     @Test
@@ -429,10 +383,7 @@ interface CalculateVersionTestSpec {
     } exercise {
         execute()
     } verify { result ->
-        when (result) {
-            is TestResult.Success -> result.message.assertIsEqualTo("2.0.0")
-            is TestResult.Failure -> fail("Expected success but got ${result.reason}")
-        }
+        result.assertIsOfType<TestResult.Success>().message.assertIsEqualTo("2.0.0")
     }
 
     @Test
@@ -452,10 +403,7 @@ interface CalculateVersionTestSpec {
     } exercise {
         execute()
     } verify { result ->
-        when (result) {
-            is TestResult.Success -> result.message.assertIsEqualTo("1.3.0")
-            is TestResult.Failure -> fail("Expected success but got ${result.reason}")
-        }
+        result.assertIsOfType<TestResult.Success>().message.assertIsEqualTo("1.3.0")
     }
 
     @Test
@@ -472,10 +420,7 @@ interface CalculateVersionTestSpec {
     } exercise {
         execute()
     } verify { result ->
-        when (result) {
-            is TestResult.Success -> result.message.assertIsEqualTo("1.3.0")
-            is TestResult.Failure -> fail("Expected success but got ${result.reason}")
-        }
+        result.assertIsOfType<TestResult.Success>().message.assertIsEqualTo("1.3.0")
     }
 
     @Test
@@ -489,10 +434,7 @@ interface CalculateVersionTestSpec {
     } exercise {
         execute()
     } verify { result ->
-        when (result) {
-            is TestResult.Success -> result.message.assertIsEqualTo("1.2.4")
-            is TestResult.Failure -> fail("Expected success but got ${result.reason}")
-        }
+        result.assertIsOfType<TestResult.Success>().message.assertIsEqualTo("1.2.4")
     }
 
     @Test
@@ -509,10 +451,7 @@ interface CalculateVersionTestSpec {
     } exercise {
         execute()
     } verify { result ->
-        when (result) {
-            is TestResult.Success -> result.message.assertIsEqualTo("1.2.4")
-            is TestResult.Failure -> fail("Expected success but got ${result.reason}")
-        }
+        result.assertIsOfType<TestResult.Success>().message.assertIsEqualTo("1.2.4")
     }
 
     @Test
@@ -529,10 +468,7 @@ interface CalculateVersionTestSpec {
     } exercise {
         execute()
     } verify { result ->
-        when (result) {
-            is TestResult.Success -> result.message.assertIsEqualTo("1.2.3-SNAPSHOT")
-            is TestResult.Failure -> fail("Expected success but got ${result.reason}")
-        }
+        result.assertIsOfType<TestResult.Success>().message.assertIsEqualTo("1.2.3-SNAPSHOT")
     }
 
     @Test
@@ -549,10 +485,7 @@ interface CalculateVersionTestSpec {
     } exercise {
         execute()
     } verify { result ->
-        when (result) {
-            is TestResult.Success -> result.message.assertIsEqualTo("1.2.3-SNAPSHOT")
-            is TestResult.Failure -> fail("Expected success but got ${result.reason}")
-        }
+        result.assertIsOfType<TestResult.Success>().message.assertIsEqualTo("1.2.3-SNAPSHOT")
     }
 
     @Test
@@ -568,10 +501,7 @@ interface CalculateVersionTestSpec {
     } exercise {
         execute()
     } verify { result ->
-        when (result) {
-            is TestResult.Success -> result.message.assertIsEqualTo("2.0.0")
-            is TestResult.Failure -> fail("Expected success but got ${result.reason}")
-        }
+        result.assertIsOfType<TestResult.Success>().message.assertIsEqualTo("2.0.0")
     }
 
     @Test
@@ -590,10 +520,7 @@ interface CalculateVersionTestSpec {
     } exercise {
         execute()
     } verify { result ->
-        when (result) {
-            is TestResult.Success -> result.message.assertIsEqualTo("1.2.4")
-            is TestResult.Failure -> fail("Expected success but got ${result.reason}")
-        }
+        result.assertIsOfType<TestResult.Success>().message.assertIsEqualTo("1.2.4")
     }
 
     @Test
@@ -607,16 +534,13 @@ interface CalculateVersionTestSpec {
     } exercise {
         execute()
     } verify { result ->
-        when (result) {
-            is TestResult.Failure ->
-                result.reason.contains(
-                    "version regex must include groups named 'major', 'minor', 'patch', and 'none'.",
-                ).assertIsEqualTo(
-                    true,
-                    "Expected version regex groups error. Output:\n${result.reason}",
-                )
-
-            is TestResult.Success -> fail("Should not have succeeded.")
+        result.assertIsOfType<TestResult.Failure>().run {
+            reason.contains(
+                "version regex must include groups named 'major', 'minor', 'patch', and 'none'.",
+            ).assertIsEqualTo(
+                true,
+                "Expected version regex groups error. Output:\n$reason",
+            )
         }
     }
 
@@ -633,10 +557,7 @@ interface CalculateVersionTestSpec {
     } exercise {
         execute()
     } verify { result ->
-        when (result) {
-            is TestResult.Success -> result.message.assertIsEqualTo("1.2.4-SNAPSHOT")
-            is TestResult.Failure -> fail("Expected success but got ${result.reason}")
-        }
+        result.assertIsOfType<TestResult.Success>().message.assertIsEqualTo("1.2.4-SNAPSHOT")
     }
 
     @Test
@@ -652,16 +573,12 @@ interface CalculateVersionTestSpec {
     } exercise {
         execute()
     } verify { result ->
-        when (result) {
-            is TestResult.Success -> {
-                result.message.assertIsEqualTo("1.2.4-SNAPSHOT")
-                result.details.contains("FORCED").assertIsEqualTo(
-                    true,
-                    "Expected snapshot reason output to include FORCED. Details:\n${result.details}",
-                )
-            }
-
-            is TestResult.Failure -> fail("Expected success but got ${result.reason}")
+        result.assertIsOfType<TestResult.Success>().run {
+            message.assertIsEqualTo("1.2.4-SNAPSHOT")
+            details.contains("FORCED").assertIsEqualTo(
+                true,
+                "Expected snapshot reason output to include FORCED. Details:\n$details",
+            )
         }
     }
 
@@ -681,13 +598,11 @@ interface CalculateVersionTestSpec {
     } exercise {
         execute()
     } verify { result ->
-        when (result) {
-            is TestResult.Failure -> result.reason.contains("Running with allowDetachedHead on release branch").assertIsEqualTo(
+        result.assertIsOfType<TestResult.Failure>().run {
+            reason.contains("Running with allowDetachedHead on release branch").assertIsEqualTo(
                 true,
-                "Expected detached HEAD warning in failure output. Output:\n${result.reason}",
+                "Expected detached HEAD warning in failure output. Output:\n$reason",
             )
-
-            is TestResult.Success -> fail("Should exit with failure when detached HEAD warning present and warningsAsErrors enabled")
         }
     }
 
@@ -704,21 +619,17 @@ interface CalculateVersionTestSpec {
     } exercise {
         execute()
     } verify { result ->
-        when (result) {
-            is TestResult.Failure -> {
-                result.reason.contains("lightweight")
-                    .assertIsEqualTo(true, "Expected lightweight tag guidance. Output:\n${result.reason}")
-                result.reason.contains(lightweightTagName)
-                    .assertIsEqualTo(true, "Expected tag name in failure output. Output:\n${result.reason}")
-                result.reason.contains("git tag -d $lightweightTagName")
-                    .assertIsEqualTo(true, "Expected delete guidance. Output:\n${result.reason}")
-                result.reason.contains("git tag -a $lightweightTagName")
-                    .assertIsEqualTo(true, "Expected annotate guidance. Output:\n${result.reason}")
-                result.reason.contains("git push --force origin $lightweightTagName")
-                    .assertIsEqualTo(true, "Expected push guidance. Output:\n${result.reason}")
-            }
-
-            is TestResult.Success -> fail("Should fail when lightweight tags are present")
+        result.assertIsOfType<TestResult.Failure>().run {
+            reason.contains("lightweight")
+                .assertIsEqualTo(true, "Expected lightweight tag guidance. Output:\n$reason")
+            reason.contains(lightweightTagName)
+                .assertIsEqualTo(true, "Expected tag name in failure output. Output:\n$reason")
+            reason.contains("git tag -d $lightweightTagName")
+                .assertIsEqualTo(true, "Expected delete guidance. Output:\n$reason")
+            reason.contains("git tag -a $lightweightTagName")
+                .assertIsEqualTo(true, "Expected annotate guidance. Output:\n$reason")
+            reason.contains("git push --force origin $lightweightTagName")
+                .assertIsEqualTo(true, "Expected push guidance. Output:\n$reason")
         }
     }
 
@@ -737,19 +648,15 @@ interface CalculateVersionTestSpec {
     } exercise {
         execute()
     } verify { result ->
-        when (result) {
-            is TestResult.Failure -> {
-                result.reason.contains("2 tags")
-                    .assertIsEqualTo(true, "Expected tag count in error output. Output:\n${result.reason}")
-                result.reason.contains(tag1)
-                    .assertIsEqualTo(true, "Expected first tag in error output. Output:\n${result.reason}")
-                result.reason.contains(tag2)
-                    .assertIsEqualTo(true, "Expected second tag in error output. Output:\n${result.reason}")
-                result.reason.contains("they are lightweight")
-                    .assertIsEqualTo(true, "Expected plural lightweight guidance. Output:\n${result.reason}")
-            }
-
-            is TestResult.Success -> fail("Should fail when lightweight tags are present")
+        result.assertIsOfType<TestResult.Failure>().run {
+            reason.contains("2 tags")
+                .assertIsEqualTo(true, "Expected tag count in error output. Output:\n$reason")
+            reason.contains(tag1)
+                .assertIsEqualTo(true, "Expected first tag in error output. Output:\n$reason")
+            reason.contains(tag2)
+                .assertIsEqualTo(true, "Expected second tag in error output. Output:\n$reason")
+            reason.contains("they are lightweight")
+                .assertIsEqualTo(true, "Expected plural lightweight guidance. Output:\n$reason")
         }
     }
 
@@ -766,16 +673,10 @@ interface CalculateVersionTestSpec {
     } exercise {
         execute()
     } verify { result ->
-        when (result) {
-            is TestResult.Success -> {
-                result.assertHasDeprecationWarning(
-                    deprecatedFeature = "disableDetached",
-                    replacement = "allowDetachedHead",
-                )
-            }
-
-            is TestResult.Failure -> fail("Expected success but got ${result.reason}")
-        }
+        result.assertIsOfType<TestResult.Success>().assertHasDeprecationWarning(
+            deprecatedFeature = "disableDetached",
+            replacement = "allowDetachedHead",
+        )
     }
 
     @Test
@@ -794,13 +695,9 @@ interface CalculateVersionTestSpec {
     } exercise {
         execute()
     } verify { result ->
-        when (result) {
-            is TestResult.Failure -> result.assertHasDeprecationWarningEscalationError(
-                deprecatedFeature = "disableDetached",
-                replacement = "allowDetachedHead",
-            )
-
-            is TestResult.Success -> fail("Should exit with failure when warningsAsErrors=true and deprecation warning exists")
-        }
+        result.assertIsOfType<TestResult.Failure>().assertHasDeprecationWarningEscalationError(
+            deprecatedFeature = "disableDetached",
+            replacement = "allowDetachedHead",
+        )
     }
 }

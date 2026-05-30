@@ -90,7 +90,7 @@ interface GenerateSettingsFileTestSpec {
         execute(merge = true)
         execute(file = "")
     } verify { result ->
-        (result is TestResult.Success).assertIsEqualTo(true, "$result")
+        result.assertIsOfType<TestResult.Success>()
         readFromFile(taggerFile)
             ?.let { Json.decodeFromString<TaggerConfig>(it) }
             .assertIsEqualTo(

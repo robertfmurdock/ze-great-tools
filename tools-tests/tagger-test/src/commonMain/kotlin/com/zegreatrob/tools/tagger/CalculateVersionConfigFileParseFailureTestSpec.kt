@@ -3,7 +3,6 @@ package com.zegreatrob.tools.tagger
 import com.zegreatrob.minassert.assertIsEqualTo
 import com.zegreatrob.testmints.setup
 import kotlin.test.Test
-import kotlin.test.fail
 
 interface CalculateVersionConfigFileParseFailureTestSpec : CalculateVersionTestSpec {
     fun configureWithRawTaggerConfig(contents: String)
@@ -25,12 +24,9 @@ interface CalculateVersionConfigFileParseFailureTestSpec : CalculateVersionTestS
     } exercise {
         execute()
     } verify { result ->
-        when (result) {
-            is TestResult.Failure ->
-                result.reason.contains("Failed to parse .tagger file")
-                    .assertIsEqualTo(true, "Expected parse error. Output:\n${result.reason}")
-
-            is TestResult.Success -> fail("Expected parse failure but got success: ${result.message}")
+        result.assertIsOfType<TestResult.Failure>().run {
+            reason.contains("Failed to parse .tagger file")
+                .assertIsEqualTo(true, "Expected parse error. Output:\n$reason")
         }
     }
 }
