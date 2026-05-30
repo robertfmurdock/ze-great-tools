@@ -65,6 +65,8 @@ class CalculateVersion : CliktCommand() {
     )
 
     override fun run() {
+        val deprecationWarnings = disableDetachedDeprecationWarning()
+        fun outputDeprecationWarnings() = deprecationWarnings.forEach { echo(it, err = true) }
         TaggerCore(GitAdapter(workingDirectory))
             .calculateNextVersion(
                 implicitPatch = implicitPatch,
@@ -75,22 +77,46 @@ class CalculateVersion : CliktCommand() {
             )
             .run {
                 when (this) {
-                    is VersionResult.Success -> when (format) {
-                        OutputFormat.JSON -> outputJson(version = version, snapshotReasons = snapshotReasons, warnings = warnings)
-                        OutputFormat.TEXT -> output(message = version, errorMessage = snapshotReasons, warnings = warnings)
+                    is VersionResult.Success -> {
+                        val allWarnings = warnings + deprecationWarnings
+                        when (format) {
+                            OutputFormat.JSON -> outputJson(
+                                version = version,
+                                snapshotReasons = snapshotReasons,
+                                warnings = allWarnings,
+                            )
+
+                            OutputFormat.TEXT -> output(
+                                message = version,
+                                errorMessage = snapshotReasons,
+                                warnings = allWarnings,
+                            )
+                        }
                     }
 
                     is VersionResult.Failure -> when (format) {
                         OutputFormat.JSON -> {
+                            outputDeprecationWarnings()
                             echo(errorResponse(message, "CONFIGURATION_ERROR"))
                             throw CliktError("", printError = false, statusCode = 1)
                         }
 
-                        OutputFormat.TEXT -> throw CliktError(message)
+                        OutputFormat.TEXT -> {
+                            outputDeprecationWarnings()
+                            throw CliktError(message)
+                        }
                     }
                 }
             }
     }
+
+    private fun disableDetachedDeprecationWarning(): List<String> = disableDetachedDeprecated
+        ?.let {
+            listOf(
+                "⚠️  --disable-detached is deprecated and may be removed in the next major version. Use --allow-detached-head instead.",
+            )
+        }
+        ?: emptyList()
 
     private fun output(
         message: String,

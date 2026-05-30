@@ -54,6 +54,15 @@ class ReadmeTest {
     } verify { readme ->
         containsSnapshotReasonDocumentation(readme).assertIsEqualTo(false)
     }
+
+    @Test
+    fun readmeUsesBooleanFlagExampleForMerge() = setup(object {
+    }) exercise {
+        readReadme()
+    } verify { readme ->
+        readme.contains("tagger generate-settings-file --file --merge").assertIsEqualTo(true)
+        readme.contains("tagger generate-settings-file --file --merge=true").assertIsEqualTo(false)
+    }
 }
 
 private fun readReadme(): String {

@@ -27,9 +27,9 @@ digger current-contribution-data $(pwd) # Now it should be available via NPM's p
 
 ## Commands
 
-### CurrentContributionData
+### Current Contribution Data
 
-The `currentContributionData` task will collect the most recent contribution to the repository.
+The `current-contribution-data` command will collect the most recent contribution to the repository.
 
 The most recent contribution is calculated by looking for the most recent, non-HEAD tag, and then including every commit after that until the current HEAD.
 
@@ -41,9 +41,9 @@ It will include all fields listed [here](../digger-json/src/commonMain/kotlin/co
 
 Any "Instant" in the specification is an ISO 8601 date-time. Any Duration is an ISO 8601 duration.
 
-### AllContributionData
+### All Contribution Data
 
-The `allContributionData` task will collect all the contributions in the git repository.
+The `all-contribution-data` command will collect all the contributions in the git repository.
 
 This is calculated by subdividing the repository by its tags, and each section becomes a contribution.
 
@@ -84,7 +84,7 @@ All contributions from one repository will share the same label. By default, thi
 This can be overridden by argument:
 
 ```bash
-digger currentContributionData --label SomethingMoreExciting ${pwd}
+digger current-contribution-data --label SomethingMoreExciting $(pwd)
 ```
 
 ### Ease

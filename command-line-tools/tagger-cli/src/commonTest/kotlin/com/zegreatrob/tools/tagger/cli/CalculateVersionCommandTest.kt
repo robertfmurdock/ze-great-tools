@@ -425,4 +425,37 @@ class CalculateVersionCommandTest : CalculateVersionTestSpec {
             "Expected actionable message in stderr. Stderr: $stderr",
         )
     }
+
+    @Test
+    fun disableDetachedFlagEmitsDeprecationWarning() = setup(object {
+        val commits = listOf("init", "commit 1")
+        val initialTag = "1.2.3"
+    }) {
+        com.zegreatrob.tools.test.git.initializeGitRepo(
+            directory = projectDir,
+            commits = commits,
+            initialTag = initialTag,
+            remoteUrl = null,
+            addFileNames = addFileNames,
+        )
+        baseArguments = listOf(
+            "-q",
+            "calculate-version",
+            "--release-branch=master",
+            "--disable-detached=false",
+            projectDir,
+        )
+    } exercise {
+        cli().test(baseArguments)
+    } verify { result ->
+        result.statusCode.assertIsEqualTo(0, "Command failed. Output: ${result.output}")
+        result.stderr.contains("--disable-detached is deprecated").assertIsEqualTo(
+            true,
+            "Expected deprecation warning in stderr. Stderr: ${result.stderr}",
+        )
+        result.stderr.contains("--allow-detached-head").assertIsEqualTo(
+            true,
+            "Expected migration guidance in stderr. Stderr: ${result.stderr}",
+        )
+    }
 }

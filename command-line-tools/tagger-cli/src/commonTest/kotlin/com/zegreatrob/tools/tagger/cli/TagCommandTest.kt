@@ -181,4 +181,14 @@ class TagCommandTest : TagTestSpec {
         result.output.contains(".tagger").assertIsEqualTo(true, "Help should mention .tagger config file")
         result.output.contains(Regex("configuration|config file|settings")).assertIsEqualTo(true)
     }
+
+    @Test
+    fun helpTextExplainsReleaseBranchCanComeFromConfig() = setup(object {
+        val cli = cli()
+    }) exercise {
+        cli.test("tag --help")
+    } verify { result ->
+        result.output.contains("--release-branch").assertIsEqualTo(true)
+        result.output.contains(Regex("Required\\s+unless\\s+provided\\s+in\\s+\\.tagger")).assertIsEqualTo(true)
+    }
 }

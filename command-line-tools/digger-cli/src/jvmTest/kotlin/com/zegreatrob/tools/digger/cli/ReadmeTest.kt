@@ -62,6 +62,17 @@ class ReadmeTest {
     } verify { readme ->
         readme.contains("all-contribution-data --help").assertIsEqualTo(true)
     }
+
+    @Test
+    fun readmeUsesKebabCaseCommandNames() = setup(object {
+    }) exercise {
+        readReadme()
+    } verify { readme ->
+        readme.contains("digger currentContributionData").assertIsEqualTo(false)
+        readme.contains("digger allContributionData").assertIsEqualTo(false)
+        readme.contains("current-contribution-data").assertIsEqualTo(true)
+        readme.contains("all-contribution-data").assertIsEqualTo(true)
+    }
 }
 
 private fun readReadme(): String {

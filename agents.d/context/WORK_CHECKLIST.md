@@ -19,6 +19,7 @@ One-sentence outcome.
 
 ## Checklist
 - [ ] Review this work card for compliance with template and update to conform
+- [ ] If this card plans subagent delegation, ask user to explicitly authorize subagents for this card and record the response in Implementation Notes
 - [ ] [Broad feature slice 1]
   - Agent cycle: test → implement → refactor-light → verify pushable
   - Update plan if guidelines revealed new constraints
@@ -54,10 +55,12 @@ One-sentence outcome.
 
 ### Work Card Structure
 - The first checklist item must always be: `Review this work card for compliance with template and update to conform`.
+- If a card intends to use subagents at any point, the second checklist item must be: `If this card plans subagent delegation, ask user to explicitly authorize subagents for this card and record the response in Implementation Notes`.
 - Checklist items should be broad feature slices, not micro-tasks.
 - The second-to-last item must always be `- [ ] Review changes against applicable playbooks and verify compliance`.
 - The final item must always be `- [ ] Move this file to agents.d/work_completed/`.
 - **Red flags during review**: If a work card suggests "tests may fail initially" or "test failures document baseline" or similar language implying incomplete TDD cycles, this violates the agent cycle requirement. Either adjust the work card to complete the full cycle (fix issues to make tests pass) or clarify that tests should be observation-only (not assertions that fail).
+- **Red flags during review**: If a work card references subagents/delegation but does not include an explicit user-authorization prompt item, the card is non-compliant and must be updated before execution.
 
 ### Refactoring
 
@@ -99,6 +102,12 @@ Each broad checklist item follows a test-driven cycle that repeats until the fea
    **For CLI tools**: stdout is first-class API (parseable contract); stderr is diagnostic (flexible). Changing stdout format is `[major]`, improving stderr clarity is `[patch]`. Structured output formats (JSON, etc.) are API; text formats for humans are diagnostic.
 
 **Subagent pattern**: Orchestrator spawns specialized subagents for each phase (testing subagent → implementation subagent → refactor subagent). Orchestrator coordinates the cycle, updates the work card, and adapts the plan as constraints are discovered.
+
+**Subagent authorization gate (required)**:
+1. Before spawning any subagent, ask the user explicitly in-thread: `Authorize subagent delegation for this card? (yes/no)`.
+2. Record the user's answer in the card's Implementation Notes (with date).
+3. If the user does not explicitly answer yes, continue in single-agent mode.
+4. If work resumes in a new chat/thread, ask again before any new subagent spawn, even when prior authorization is recorded in the card.
 
 ### Deprecation Workflow
 When replacing existing functionality:

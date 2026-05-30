@@ -72,7 +72,7 @@ tagger generate-settings-file
 
 **Merge new defaults into existing file:**
 ```bash
-tagger generate-settings-file --file --merge=true
+tagger generate-settings-file --file --merge
 ```
 
 ### Configuration Options

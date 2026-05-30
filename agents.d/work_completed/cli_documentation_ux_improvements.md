@@ -11,18 +11,18 @@ Fix counterintuitive CLI documentation patterns and usage examples to make tools
 
 ## Checklist
 - [x] Review this work card for compliance with template and update to conform
-- [ ] Fix documentation-only issues (Digger naming, boolean syntax, required flags, format behavior)
+- [x] Fix documentation-only issues (Digger naming, boolean syntax, required flags, format behavior)
   - Agent cycle: test → implement → refactor-light → verify pushable
   - Update plan if guidelines revealed new constraints
 - [x] Improve empty string flag pattern in Tagger `--file` option
   - Agent cycle: test → implement → refactor-light → verify pushable
   - Update plan if guidelines revealed new constraints
-- [ ] Add deprecation warning for `--disable-detached` flag
+- [x] Add deprecation warning for `--disable-detached` flag
   - Agent cycle: test → implement → refactor-light → verify pushable
   - Update plan if guidelines revealed new constraints
-- [ ] Final refactor pass (code style, patterns, efficiency)
-- [ ] Review changes against applicable playbooks and verify compliance
-- [ ] Move this file to agents.d/work_completed/
+- [x] Final refactor pass (code style, patterns, efficiency)
+- [x] Review changes against applicable playbooks and verify compliance
+- [x] Move this file to agents.d/work_completed/
 
 ## Implementation Notes
 
@@ -67,12 +67,28 @@ Fix counterintuitive CLI documentation patterns and usage examples to make tools
 - 2026-05-30: Implemented bare `--file` support in `GenerateSettingsFile` via Clikt `optionalValue(".tagger")` while preserving legacy `--file=''` behavior.
 - 2026-05-30: Added CLI test coverage for `tagger generate-settings-file --file` and updated README examples to prefer bare `--file`.
 - 2026-05-30: Validation note: one failed `./gradlew check` run was caused by two Gradle builds running in parallel and colliding on test result files; reran sequentially and passed.
+- 2026-05-30: Updated Digger README command naming/documentation examples to kebab-case and added a README guard test for command usage strings.
+- 2026-05-30: Updated Tagger README merge example to `--merge`, added README guard test, and clarified `tag --release-branch` help text to indicate `.tagger` satisfies the requirement.
+- 2026-05-30: Added runtime deprecation warning for `--disable-detached` with migration guidance to `--allow-detached-head`; added command test coverage.
+- 2026-05-30: Final refactor pass reviewed full work-card scope (`227705c` through current changes), including docs/tests/CLI option handling; only lint-driven formatting adjustment was needed.
+- 2026-05-30: Reviewed against `PERSONA.md` and `PLAYBOOK_CODE_STYLE.md` for TDD cadence, assertion style, scope, and compatibility requirements.
+- 2026-05-30: User explicitly authorized subagent delegation in-thread for a second final-refactor pass; spawned worker and reviewed output before integration.
+- 2026-05-30: Second final-refactor pass kept scope tight and reduced duplication in `CalculateVersion.run()` by centralizing deprecation warning emission.
 
 ## Validation
 - Commands:
   - `./gradlew :command-line-tools:tagger-cli:jvmTest --tests com.zegreatrob.tools.tagger.cli.GenerateSettingsFileCommandTest --console=plain`
+  - `./gradlew :command-line-tools:digger-cli:jvmTest --tests com.zegreatrob.tools.digger.cli.ReadmeTest --console=plain`
+  - `./gradlew :command-line-tools:tagger-cli:jvmTest --tests com.zegreatrob.tools.tagger.cli.ReadmeTest --tests com.zegreatrob.tools.tagger.cli.TagCommandTest --tests com.zegreatrob.tools.tagger.cli.CalculateVersionCommandTest --console=plain`
+  - `./gradlew check --console=plain`
+  - `./gradlew :command-line-tools:tagger-cli:jvmTest --tests com.zegreatrob.tools.tagger.cli.CalculateVersionCommandTest --console=plain`
   - `./gradlew check --console=plain`
 - Results:
   - First targeted jvmTest run failed due a regression in merge behavior; fixed by keeping default `.tagger` resolution when `--file` is omitted.
   - Targeted jvmTest rerun passed.
   - One `./gradlew check` run failed due parallel Gradle invocation collisions (`NoSuchFileException` / `EOFException` in test result binaries); sequential rerun passed.
+  - Digger README jvmTest initially failed due overly broad camelCase assertion matching output filenames; narrowed assertion to command usage strings and rerun passed.
+  - Tagger focused jvmTest run failed once due nullable `remoteUrl` helper mismatch in test setup; switched to direct git test helper and rerun passed.
+  - Full `./gradlew check` failed once on `lintKotlinCommonMain` (`blank-line-between-when-conditions`) in `CalculateVersion.kt`; fixed and reran successfully.
+  - Subagent-driven second final-refactor targeted run for `CalculateVersionCommandTest` passed.
+  - Final `./gradlew check` rerun after second refactor passed.
