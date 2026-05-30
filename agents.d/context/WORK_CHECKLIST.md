@@ -63,7 +63,10 @@ One-sentence outcome.
 
 **Light refactor** (during feature slices): Clean up what you just wrote - names, duplication, structure.
 
-**Final refactor**: Review ALL code changes made throughout the entire work card, not just the final iteration:
+**Final refactor**: Review ALL code changes made throughout the entire work card, not just the final iteration.
+See `agents.d/context/REFACTOR_AGENT.md` for the complete mandatory checklist and reporting requirements.
+
+The final refactor agent must:
 1. **Identify all commits** in the work card scope using git log
 2. **List all modified files** across the full commit range (not just current state)
 3. **Review each file completely** - read entire files, not just changed sections
@@ -71,6 +74,10 @@ One-sentence outcome.
 5. **Apply code style guidelines** - function length, naming, data flow, comment removal
 6. **Verify no cruft** - intermediate refactorings may have left technical debt
 7. **Run full check** to verify no cross-module impact
+
+**Delegation pattern**: The orchestrator should spawn a specialized refactor agent by passing
+the commit range and referencing REFACTOR_AGENT.md in the prompt. The agent must provide
+a structured report with evidence for each check.
 
 The final refactor must be comprehensive - incomplete review leaves quality issues that accumulate over time.
 
