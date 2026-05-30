@@ -76,6 +76,18 @@ tagger {
 }
 ```
 
+### Strict Mode (warningsAsErrors)
+
+By default, tagger warnings (like using deprecated options or risky configurations) don't fail the build. Enable strict mode to treat warnings as build failures:
+
+```kotlin
+tagger {
+    warningsAsErrors.set(true)
+}
+```
+
+This is useful in CI/CD pipelines where you want to enforce clean configuration and catch issues early. When enabled, the `calculateVersion` task will fail if any warnings are detected.
+
 #### Keep in mind!
 
 In order to correctly generate the version number, the local git repository must be able to see the last relevant tag. This means a shallow git clone that only includes new commits will not be able to generate the correct version numbers.

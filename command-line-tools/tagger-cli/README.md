@@ -110,7 +110,7 @@ The `.tagger` file supports these fields:
 - `versionRegex`: Unified regex with named groups (major, minor, patch, none). Overrides individual regex patterns if set.
 - `userName`: Git user name for creating tags (defaults to git config)
 - `userEmail`: Git user email for creating tags (defaults to git config)
-- `warningsAsErrors`: Treat warnings as errors (exit non-zero) (default: false)
+- `warningsAsErrors`: Enable strict mode - treat warnings as errors (exit non-zero) (default: false). See [Warnings and Strict Mode](#warnings-and-strict-mode) for details.
 
 **Note:** Command-line options always override `.tagger` file settings.
 
@@ -246,6 +246,100 @@ if [ "$STATUS" = "error" ]; then
   exit 1
 fi
 ```
+
+## Warnings and Strict Mode
+
+Tagger emits warnings to stderr when it detects potentially risky conditions. By default, warnings don't fail the build (exit 0), but you can enable strict mode to treat warnings as errors.
+
+### Warning Classes
+
+#### Deprecation Warnings
+Issued when using deprecated flags or options:
+
+```
+⚠️  --disable-detached is deprecated and will be removed in a future version. Use --allow-detached-head=false instead.
+```
+
+**Cause:** Using old CLI syntax that's scheduled for removal.
+
+**Action:** Update your commands or config files to use the replacement option.
+
+#### Release Risk Warnings
+Issued when potentially unsafe operations are explicitly allowed:
+
+```
+⚠️  Running with allowDetachedHead on release branch. This may produce inconsistent versions if tags are not synchronized.
+```
+
+**Cause:** Using `--allow-detached-head` on a release branch in detached HEAD state.
+
+**Action:** Consider whether detached HEAD is appropriate for your workflow. For CI builds on release branches, this usually indicates a configuration issue.
+
+#### Policy Violation Warnings (tag command)
+The `tag` command issues warnings (not errors) when it cannot create a tag due to policy constraints:
+
+```
+⚠️  Cannot create tag: not on release branch 'main' (current branch: feature/xyz)
+```
+
+**Cause:** Attempting to create a release tag from a non-release branch, a commit that's already tagged, or a snapshot version.
+
+**Action:** Switch to the release branch, use `--release-branch` with the correct branch name, or adjust your tagging workflow.
+
+### Strict Mode (warningsAsErrors)
+
+Enable strict mode to fail builds when warnings are present. This is useful for CI/CD pipelines where you want to enforce clean execution.
+
+**Command-line flag:**
+```bash
+tagger calculate-version --warnings-as-errors
+tagger tag --version 1.2.3 --warnings-as-errors
+```
+
+**Configuration file:**
+```json
+{
+  "warningsAsErrors": true
+}
+```
+
+**Behavior changes with strict mode enabled:**
+
+1. **Exit code**: Changes from 0 to 1 when warnings are present
+2. **JSON output**: `calculate-version` returns error status instead of success when warnings escalate:
+   ```json
+   {
+     "status": "error",
+     "error": "Warnings treated as errors",
+     "code": "WARNINGS_AS_ERRORS",
+     "warnings": [
+       "Running with allowDetachedHead on release branch..."
+     ]
+   }
+   ```
+3. **Stderr diagnostics**: Warnings remain visible for troubleshooting
+
+**CI integration example:**
+```bash
+# Strict mode catches deprecation warnings before they become breaking changes
+tagger calculate-version --warnings-as-errors --format=json > version.json
+
+if [ $? -ne 0 ]; then
+  echo "Version calculation failed or warnings present:"
+  cat version.json | jq -r '.error, .warnings[]?'
+  exit 1
+fi
+```
+
+**When to use strict mode:**
+- Production CI/CD pipelines where warnings indicate configuration drift
+- During migration from deprecated options (fail fast on old syntax)
+- When enforcing "clean build" policies across teams
+
+**When NOT to use strict mode:**
+- Local development workflows where warnings are informational
+- Gradual rollout of new configuration options
+- When using `allowDetachedHead` intentionally and warnings are expected
 
 ## Common Errors and Troubleshooting
 
