@@ -8,7 +8,8 @@ Hoist user-facing parity assertions for “signal exists + migration guidance ex
 - Preserve intentional divergence where transport differs (for example, CLI stderr warning text vs Gradle/Kotlin deprecation annotations).
 - Keep wiring/help/format-specific checks implementation-local unless they represent shared behavior.
 - Do not broaden scope into unrelated warning or output refactors.
-- Semver intent (initial): `[none]` (test architecture/coverage changes only). Escalate and confirm if production behavior changes become necessary.
+- Follow Gradle plugin warning guidance when implementing plugin deprecation warnings.
+- Semver intent (updated): `[minor]` (adding deprecation warning emission to plugin/config paths).
 
 ## Checklist
 - [x] Review this work card for compliance with template and update to conform
@@ -25,10 +26,14 @@ Hoist user-facing parity assertions for “signal exists + migration guidance ex
 - [x] Confirm warning/deprecation parity decisions remain explicit and documented where behavior intentionally diverges
   - Agent cycle: test → implement → refactor-light → verify pushable
   - Update plan if guidelines revealed new constraints
-- [x] Final refactor pass via subagent (MANDATORY - see REFACTOR_AGENT.md)
-  - N/A: No production code or test changes made; work card was audit/documentation only
-- [x] Review changes against applicable playbooks and verify compliance
-  - N/A: No code changes; work card was audit/documentation only
+- [ ] Implement deprecation warning emission for .tagger file `disableDetached` usage (both CLI and plugin config paths)
+  - Agent cycle: test → implement → refactor-light → verify pushable
+  - Update plan if guidelines revealed new constraints
+- [ ] Implement deprecation warning emission for plugin DSL `disableDetached` usage following Gradle plugin warning patterns
+  - Agent cycle: test → implement → refactor-light → verify pushable
+  - Update plan if guidelines revealed new constraints
+- [ ] Final refactor pass via subagent (MANDATORY - see REFACTOR_AGENT.md)
+- [ ] Review changes against applicable playbooks and verify compliance
 - [ ] Move this file to agents.d/work_completed/
 
 ## Implementation Notes
@@ -40,6 +45,17 @@ Hoist user-facing parity assertions for “signal exists + migration guidance ex
 ### Semver intent (initial)
 - Expected scope: `[none]` (shared-spec and test-placement refactor).
 - If implementation changes are required to make parity assertions meaningful, pause for semver confirmation before proceeding.
+
+### Parity Gap Identified (2026-05-30)
+User pushed back on "nothing to do" conclusion. Investigation revealed deprecation warning parity gap:
+- **CLI flag `--disable-detached`**: ✅ Runtime warning with migration guidance
+- **Config file `.tagger` property `disableDetached`**: ❌ No warning (silent usage)
+- **Plugin DSL property `disableDetached`**: ❌ No runtime warning (only `@Deprecated` annotation)
+
+**User Decision**: "yes for both, in a way that follows gradle warning guidance for plugins"
+
+**Semver Escalation**: `[none]` → `[minor]`
+- **Rationale**: Adding new warning emission is additive behavior (not breaking), improves migration UX
 
 ### Framing
 - Shared assertion target: user receives deprecation/migration signal.
