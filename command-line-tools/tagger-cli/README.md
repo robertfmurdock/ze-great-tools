@@ -49,6 +49,8 @@ We recommend this command only is run after the build is validated. Use discernm
 tagger tag --version 1.2.3 --release-branch main
 ```
 
+For complete option documentation and automation guidance, run `tagger calculate-version --help` or `tagger tag --help`.
+
 ## Structured Output
 
 Both commands support machine-readable JSON output for CI/CD pipelines and automation scripts via the `--format` flag.
@@ -89,13 +91,6 @@ tagger calculate-version --format=json
 }
 ```
 
-**Fields:**
-- `status`: `"success"` or `"error"`
-- `data.version`: Calculated semantic version string
-- `data.snapshot`: Boolean indicating if this is a snapshot version
-- `data.snapshotReasons`: Array of reasons why this is a snapshot (e.g., `"DIRTY"`, `"AHEAD"`)
-- `error`: Human-readable error message (only in error responses)
-- `code`: Machine-readable error code (only in error responses)
 
 ### Tag JSON Output
 
@@ -123,16 +118,6 @@ tagger tag --version 1.2.3 --release-branch main --format=json
 }
 ```
 
-**Fields:**
-- `status`: `"success"` or `"error"`
-- `data.tag`: The tag name that was created
-- `error`: Human-readable error message (only in error responses)
-- `code`: Machine-readable error code (only in error responses)
-
-### Error Codes
-
-- `CONFIGURATION_ERROR`: Invalid configuration or repository state (e.g., detached HEAD)
-- `TAG_ERROR`: Failed to create or push tag
 
 ### CI Integration Examples
 
@@ -249,8 +234,10 @@ After this, tagger can calculate subsequent versions automatically.
 
 ### Help
 
-For a full listing of the available options in the program, please use the built-in help command.
+For detailed option documentation, snapshot reason explanations, and structured output field definitions, use the built-in help:
 
 ```bash
 tagger --help
+tagger calculate-version --help
+tagger tag --help
 ```
