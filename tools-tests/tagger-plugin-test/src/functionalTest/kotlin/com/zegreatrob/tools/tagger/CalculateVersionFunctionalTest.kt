@@ -41,6 +41,7 @@ class CalculateVersionFunctionalTest : CalculateVersionTestSpec {
         versionRegex: String?,
         noneRegex: String?,
         forceSnapshot: Boolean?,
+        warningsAsErrors: Boolean?,
     ) {
         setup()
         File(buildFile).writeText(
@@ -70,6 +71,7 @@ class CalculateVersionFunctionalTest : CalculateVersionTestSpec {
                 }
             }
                 ${if (forceSnapshot != null) "forceSnapshot.set($forceSnapshot)" else ""}
+                ${if (warningsAsErrors != null) "warningsAsErrors.set($warningsAsErrors)" else ""}
             }
             """.trimIndent(),
         )

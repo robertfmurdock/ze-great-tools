@@ -460,4 +460,63 @@ class CalculateVersionCommandTest : CalculateVersionTestSpec {
             "Expected migration guidance in stderr. Stderr: ${result.stderr}",
         )
     }
+
+    @Test
+    fun warningsAsErrorsCausesNonZeroExitWhenDeprecationWarningPresent() = setup(object {
+        val commits = listOf("init", "commit 1")
+        val initialTag = "1.2.3"
+    }) {
+        com.zegreatrob.tools.test.git.initializeGitRepo(
+            directory = projectDir,
+            commits = commits,
+            initialTag = initialTag,
+            remoteUrl = null,
+            addFileNames = addFileNames,
+        )
+        baseArguments = listOf(
+            "-q",
+            "calculate-version",
+            "--release-branch=master",
+            "--disable-detached=false",
+            "--warnings-as-errors=true",
+            projectDir,
+        )
+    } exercise {
+        cli().test(baseArguments)
+    } verify { result ->
+        result.statusCode.assertIsEqualTo(1, "Should exit with code 1 when warnings present and warningsAsErrors enabled")
+        result.stderr.contains("--disable-detached is deprecated").assertIsEqualTo(
+            true,
+            "Expected deprecation warning in stderr. Stderr: ${result.stderr}",
+        )
+    }
+
+    @Test
+    fun withoutWarningsAsErrorsDeprecationWarningsDoNotCauseNonZeroExit() = setup(object {
+        val commits = listOf("init", "commit 1")
+        val initialTag = "1.2.3"
+    }) {
+        com.zegreatrob.tools.test.git.initializeGitRepo(
+            directory = projectDir,
+            commits = commits,
+            initialTag = initialTag,
+            remoteUrl = null,
+            addFileNames = addFileNames,
+        )
+        baseArguments = listOf(
+            "-q",
+            "calculate-version",
+            "--release-branch=master",
+            "--disable-detached=false",
+            projectDir,
+        )
+    } exercise {
+        cli().test(baseArguments)
+    } verify { result ->
+        result.statusCode.assertIsEqualTo(0, "Should exit with code 0 when warnings present but warningsAsErrors disabled")
+        result.stderr.contains("--disable-detached is deprecated").assertIsEqualTo(
+            true,
+            "Expected deprecation warning in stderr. Stderr: ${result.stderr}",
+        )
+    }
 }

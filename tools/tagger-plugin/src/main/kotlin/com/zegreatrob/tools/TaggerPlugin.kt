@@ -43,6 +43,7 @@ class TaggerPlugin : Plugin<Project> {
             task.minorRegex.set(tagger.minorRegex)
             task.majorRegex.set(tagger.majorRegex)
             task.exportToGithubEnv.set(exportToGithub != null)
+            task.warningsAsErrors.set(tagger.warningsAsErrors)
         }
 
         val tag = project.tasks.register("tag", TagVersion::class.java) { task ->

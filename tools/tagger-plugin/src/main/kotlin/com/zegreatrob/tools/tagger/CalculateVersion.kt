@@ -65,6 +65,9 @@ abstract class CalculateVersion : DefaultTask() {
     @get:Input
     abstract val exportToGithubEnv: Property<Boolean>
 
+    @get:Input
+    abstract val warningsAsErrors: Property<Boolean>
+
     @TaskAction
     fun execute() = when (val result = calculateVersion()) {
         is VersionResult.Success -> result.outputSuccess()
@@ -101,6 +104,9 @@ abstract class CalculateVersion : DefaultTask() {
         val githubEnvFile = System.getenv("GITHUB_ENV")
         if (exportToGithubEnv.get() && githubEnvFile != null) {
             FileOutputStream(githubEnvFile, true).write("TAGGER_VERSION=$version".toByteArray())
+        }
+        if (warningsAsErrors.get() && warnings.isNotEmpty()) {
+            throw GradleException("Warnings present with warningsAsErrors enabled")
         }
     }
 }
