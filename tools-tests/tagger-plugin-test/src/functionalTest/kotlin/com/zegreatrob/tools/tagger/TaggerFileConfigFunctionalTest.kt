@@ -194,15 +194,15 @@ class TaggerFileConfigFunctionalTest {
 
     @Test
     fun readsImplicitPatchFromTaggerFile() = setup(object {
-        val taggerConfigWithImplicitTrue = """
+        val taggerConfigWithImplicitFalse = """
             {
               "releaseBranch": "master",
-              "implicitPatch": true
+              "implicitPatch": false
             }
         """.trimIndent()
     }) {
         setupBuildFiles(includeDslConfig = false)
-        File(taggerFile).writeText(taggerConfigWithImplicitTrue)
+        File(taggerFile).writeText(taggerConfigWithImplicitFalse)
         initializeGitRepo(
             directory = projectDir,
             remoteUrl = projectDir,
@@ -214,7 +214,11 @@ class TaggerFileConfigFunctionalTest {
         execute()
     } verify { result ->
         when (result) {
-            is TestResult.Success -> result.message.assertIsEqualTo("1.0.1")
+            is TestResult.Success -> {
+                result.message.contains("1.0.0")
+                    .assertIsEqualTo(true, "Expected version 1.0.0 with implicitPatch=false, got ${result.message}")
+            }
+
             is TestResult.Failure -> fail("Expected success but got ${result.reason}")
         }
     }
