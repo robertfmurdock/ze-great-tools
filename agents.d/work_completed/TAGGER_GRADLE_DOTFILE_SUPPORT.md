@@ -21,21 +21,29 @@ Enable the tagger Gradle plugin to read configuration from a `.tagger` JSON file
   - Apply .tagger values as defaults before DSL block overrides
   - Handle missing file gracefully (not an error)
   - Update plan if guidelines revealed new constraints
-  - COMPLETED: Basic file reading for releaseBranch works, DSL override verified, tests pass
-- [ ] Add functional tests for .tagger file integration
+  - COMPLETED: All properties read from .tagger file with cached file config provider
+- [x] Add functional tests for .tagger file integration
   - Agent cycle: test → implement → refactor-light → verify pushable
   - Test .tagger file is read and applied correctly
   - Test DSL block overrides .tagger values (priority verification)
   - Test plugin works without .tagger file (backward compatibility)
   - Test invalid JSON handling (error reporting)
   - Update plan if guidelines revealed new constraints
-- [ ] Final refactor pass (code style, patterns, efficiency)
-- [ ] Review changes against applicable playbooks and verify compliance
-- [ ] Move to agents.d/work_completed/
+  - COMPLETED: 5 tests covering all scenarios, all passing
+- [x] Final refactor pass (code style, patterns, efficiency)
+- [x] Review changes against applicable playbooks and verify compliance
+- [x] Move to agents.d/work_completed/
 
 ## Implementation Notes
-[Agents log discoveries, deviations, or learned constraints here as they work]
+- Used Gradle Property conventions to read .tagger file lazily
+- Cached file config in single provider to avoid redundant I/O
+- All properties now support file-based defaults with DSL override
+- File reading returns empty TaggerConfig when file missing (backward compatible)
+- Regex properties convert from string patterns to Regex objects via map
 
 ## Validation
-- Commands: [filled in as work progresses]
-- Results: [filled in before completion]
+- Commands: 
+  - `./gradlew :tools:tagger-plugin:check`
+  - `./gradlew :tools-tests:tagger-plugin-test:functionalTest`
+  - `./gradlew check`
+- Results: All checks pass, 5 new functional tests all passing
