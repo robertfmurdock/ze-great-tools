@@ -18,6 +18,12 @@ class Tagger : CliktCommand() {
     }
 
     override fun help(context: Context) = """
+        ${outputSection()}
+
+        ${automationSection()}
+    """.trimIndent()
+
+    private fun outputSection() = """
         Output:
           Text format writes version to stdout, diagnostics to stderr.
           Command substitution captures only stdout: VERSION=${'$'}(tagger -q calculate-version ...)
@@ -33,7 +39,9 @@ class Tagger : CliktCommand() {
             NOT_RELEASE_BRANCH  - not on configured release branch
             NO_NEW_VERSION      - no new commits since last tag
             FORCED              - --force-snapshot=true was used
+    """.trimIndent()
 
+    private fun automationSection() = """
         Automation & AI Agents:
           Use --format=json for structured data with machine-readable fields:
             - 'snapshot' boolean indicating tagging readiness

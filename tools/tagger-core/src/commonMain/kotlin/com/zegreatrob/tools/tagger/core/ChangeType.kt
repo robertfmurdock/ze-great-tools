@@ -136,27 +136,36 @@ data class StatusCheck(
 )
 
 enum class SnapshotReason(val message: String) {
-    FORCED("Snapshot forced via --force-snapshot flag.") {
+    FORCED(Messages.FORCED) {
         override fun StatusCheck.exists() = forceSnapshot
     },
-    DIRTY("Uncommitted changes in working directory. Commit or stash before tagging.") {
+    DIRTY(Messages.DIRTY) {
         override fun StatusCheck.exists() = !gitStatus.isClean
     },
-    AHEAD("Local branch ahead of remote. Push changes before tagging.") {
+    AHEAD(Messages.AHEAD) {
         override fun StatusCheck.exists() = gitStatus.ahead != 0
     },
-    BEHIND("Local branch behind remote. Pull changes before tagging.") {
+    BEHIND(Messages.BEHIND) {
         override fun StatusCheck.exists() = gitStatus.behind != 0
     },
-    NOT_RELEASE_BRANCH("Not on configured release branch. Switch to release branch before tagging.") {
+    NOT_RELEASE_BRANCH(Messages.NOT_RELEASE_BRANCH) {
         override fun StatusCheck.exists() = gitStatus.head != releaseBranch
     },
-    NO_NEW_VERSION("No new commits since last tag. Version unchanged.") {
+    NO_NEW_VERSION(Messages.NO_NEW_VERSION) {
         override fun StatusCheck.exists() = currentVersionNumber == previousVersionNumber
     }, ;
 
     abstract fun StatusCheck.exists(): Boolean
     fun reasonIsValid(check: StatusCheck): Boolean = check.exists()
+
+    private object Messages {
+        const val FORCED = "Snapshot forced via --force-snapshot flag."
+        const val DIRTY = "Uncommitted changes in working directory. Commit or stash before tagging."
+        const val AHEAD = "Local branch ahead of remote. Push changes before tagging."
+        const val BEHIND = "Local branch behind remote. Pull changes before tagging."
+        const val NOT_RELEASE_BRANCH = "Not on configured release branch. Switch to release branch before tagging."
+        const val NO_NEW_VERSION = "No new commits since last tag. Version unchanged."
+    }
 }
 
 fun TaggerCore.tagReport() = adapter.listTags().groupBy { tag ->

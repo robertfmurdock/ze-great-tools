@@ -62,7 +62,16 @@ One-sentence outcome.
 
 **Light refactor** (during feature slices): Clean up what you just wrote - names, duplication, structure.
 
-**Final refactor**: Re-read every file you modified. Apply code style doc to all changes, run check.
+**Final refactor**: Review ALL code changes made throughout the entire work card, not just the final iteration:
+1. **Identify all commits** in the work card scope using git log
+2. **List all modified files** across the full commit range (not just current state)
+3. **Review each file completely** - read entire files, not just changed sections
+4. **Check function evolution** - functions modified multiple times may have accumulated complexity
+5. **Apply code style guidelines** - function length, naming, data flow, comment removal
+6. **Verify no cruft** - intermediate refactorings may have left technical debt
+7. **Run full check** to verify no cross-module impact
+
+The final refactor must be comprehensive - incomplete review leaves quality issues that accumulate over time.
 
 ### Agent Cycle Within Each Feature Slice
 Each broad checklist item follows a test-driven cycle that repeats until the feature slice is complete:

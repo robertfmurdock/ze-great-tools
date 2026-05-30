@@ -39,7 +39,11 @@ class CalculateVersion : CliktCommand() {
         "--allow-detached-head",
         help = "Allow version calculation in detached HEAD state. Detached HEAD is blocked by default as it can produce unreliable version calculations.",
     ).boolean()
-    private val disableDetached get() = allowDetachedHead?.let { !it } ?: disableDetachedDeprecated ?: true
+    private val disableDetached: Boolean
+        get() {
+            if (allowDetachedHead != null) return !allowDetachedHead!!
+            return disableDetachedDeprecated ?: true
+        }
     private val forceSnapshot by option(
         help = "Force -SNAPSHOT suffix on version, overriding normal release conditions. Use for testing or CI workflows that require snapshot versions.",
     ).boolean().default(false)
