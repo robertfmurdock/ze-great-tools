@@ -19,7 +19,7 @@ Make `warningsAsErrors` consistently enforce non-zero exits for real warning con
 - [x] Implement `calculate-version` warnings escalation behind `warningsAsErrors`
   - Agent cycle: test → implement → refactor-light → verify pushable
   - Update plan if guidelines revealed new constraints
-- [ ] Align `tag` command semantics and naming so warning/error behavior is explicit and unsurprising
+- [x] Align `tag` command semantics and naming so warning/error behavior is explicit and unsurprising
   - Agent cycle: test → implement → refactor-light → verify pushable
   - Update plan if guidelines revealed new constraints
 - [ ] Improve operator ergonomics for CI diagnosis under strict mode (clear stderr + stable JSON + predictable exit codes)
@@ -72,6 +72,13 @@ Make `warningsAsErrors` consistently enforce non-zero exits for real warning con
 - ConfigFileSource automatically supports the new flag via TaggerConfig (field already existed).
 - Refactored tests to CalculateVersionTestSpec so both CLI and config file implementations are tested.
 - Commits: a9b25a7, cd47345, 122d5b3
+
+### Implementation notes (2026-05-30, continued)
+- Renamed `TagResult.Error` to `TagResult.Warning` for semantic clarity.
+- Policy violations (not on release branch, already tagged, snapshot version) return warnings, not errors.
+- These conditions exit 0 by default, only exit 1 when `warningsAsErrors=true`.
+- Updated all references in core, CLI, and Gradle plugin.
+- Commit: 7f957a7
 
 ### Optional follow-ups under same theme
 - Consider a small internal result type rename in `tag` path (`TagResult.Warning` vs `TagResult.Error`) if semantics remain warning-like for non-strict mode.
