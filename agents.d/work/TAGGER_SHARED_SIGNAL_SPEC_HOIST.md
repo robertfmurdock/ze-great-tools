@@ -26,7 +26,7 @@ Hoist user-facing parity assertions for “signal exists + migration guidance ex
 - [x] Confirm warning/deprecation parity decisions remain explicit and documented where behavior intentionally diverges
   - Agent cycle: test → implement → refactor-light → verify pushable
   - Update plan if guidelines revealed new constraints
-- [ ] Implement deprecation warning emission for .tagger file `disableDetached` usage (both CLI and plugin config paths)
+- [x] Implement deprecation warning emission for .tagger file `disableDetached` usage (both CLI and plugin config paths)
   - Agent cycle: test → implement → refactor-light → verify pushable
   - Update plan if guidelines revealed new constraints
 - [ ] Implement deprecation warning emission for plugin DSL `disableDetached` usage following Gradle plugin warning patterns
