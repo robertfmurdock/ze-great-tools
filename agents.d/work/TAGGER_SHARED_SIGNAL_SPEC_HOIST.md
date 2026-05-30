@@ -19,7 +19,7 @@ Hoist user-facing parity assertions for “signal exists + migration guidance ex
 - [x] Introduce shared signal-spec pattern for deprecation guidance (signal presence + replacement guidance) with implementation-specific evidence adapters
   - Agent cycle: test → implement → refactor-light → verify pushable
   - Update plan if guidelines revealed new constraints
-- [ ] Migrate selected existing tests to the shared signal-spec pattern and remove redundant implementation-only assertions
+- [x] Migrate selected existing tests to the shared signal-spec pattern and remove redundant implementation-only assertions
   - Agent cycle: test → implement → refactor-light → verify pushable
   - Update plan if guidelines revealed new constraints
 - [ ] Confirm warning/deprecation parity decisions remain explicit and documented where behavior intentionally diverges
@@ -77,6 +77,12 @@ The evidence adapter pattern is working: specs assert UX intent, implementations
 - Spec tests assert against these fields: `result.reason.contains("⚠️")`, `result.warnings.contains("release branch")`
 - Implementation adapters (`execute()` methods) parse their transport and populate TestResult fields
 - Pattern supports both deprecation warnings (Success.warnings) and error guidance (Failure.reason)
+
+**Redundancy Analysis:**
+Checked implementation-specific tests for redundant signal assertions:
+- `AdditionalTasksFunctionalTest.releaseDryRunAvoidsImplicitGitHeadDependency` — UNIQUE (Gradle build isolation concern)
+- `TaggerForceSnapshotPropertyFunctionalTest` — NOT REDUNDANT (tests `-PtaggerForceSnapshot` project property, spec tests DSL/config `forceSnapshot`)
+- No redundant implementation-only signal assertions found to remove
 
 ## Validation
 - Commands: [filled in as work progresses]
