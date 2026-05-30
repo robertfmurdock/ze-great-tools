@@ -15,7 +15,7 @@ fun TaggerCore.tag(
     val headBranch = adapter.status().head
     val isNotOnReleaseBranch = !allowDetachedHead && headBranch != releaseBranch
     return if (isSnapshot || alreadyTagged || isNotOnReleaseBranch) {
-        TagResult.Error(
+        TagResult.Warning(
             TagErrors.wrapper(
                 mapOf(
                     isSnapshot to TagErrors.BEING_SNAPSHOT,
@@ -30,7 +30,7 @@ fun TaggerCore.tag(
                 adapter.pushTags()
                 TagResult.Success
             }.getOrElse { error ->
-                TagResult.Error(
+                TagResult.Warning(
                     when (error) {
                         is com.zegreatrob.tools.adapter.git.ProcessError -> error.toUserMessage()
                         else -> error.message ?: "Unknown error during tagging"

@@ -57,7 +57,7 @@ class Tag : CliktCommand() {
                             OutputFormat.TEXT -> echo("Success!")
                         }
 
-                        is TagResult.Error -> when (format) {
+                        is TagResult.Warning -> when (format) {
                             OutputFormat.JSON -> {
                                 echo(errorResponse(it.message, "TAG_ERROR"))
                                 throw CliktError("", printError = false, statusCode = if (warningsAsErrors) 1 else 0)

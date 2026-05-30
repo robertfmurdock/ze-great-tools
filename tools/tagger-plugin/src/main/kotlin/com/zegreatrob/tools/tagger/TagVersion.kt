@@ -66,7 +66,7 @@ abstract class TagVersion : DefaultTask() {
         ) {
             TagResult.Success -> {}
 
-            is TagResult.Error -> if (warningsAsErrors.get()) {
+            is TagResult.Warning -> if (warningsAsErrors.get()) {
                 throw GradleException(result.message)
             } else {
                 logger.warn(result.message)
