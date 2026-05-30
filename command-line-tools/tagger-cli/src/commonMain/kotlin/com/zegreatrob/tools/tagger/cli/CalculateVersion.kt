@@ -35,12 +35,12 @@ class CalculateVersion : CliktCommand() {
         help = "Automatically bump patch version when no version-tagged commits exist since last release.",
     ).boolean().default(true)
     private val disableDetachedDeprecated by option("--disable-detached", hidden = true).boolean()
-    private val allowDetachedHead by option(
+    private val allowDetachedHeadOption by option(
         "--allow-detached-head",
         help = "Allow version calculation in detached HEAD state. Detached HEAD is blocked by default as it can produce unreliable version calculations.",
     ).boolean()
-    private val allowDetached get() =
-        allowDetachedHead ?: disableDetachedDeprecated?.let { !it } ?: false
+    private val allowDetachedHead get() =
+        allowDetachedHeadOption ?: disableDetachedDeprecated?.let { shouldDisable -> !shouldDisable } ?: false
     private val forceSnapshot by option(
         help = "Force -SNAPSHOT suffix on version, overriding normal release conditions. Use for testing or CI workflows that require snapshot versions.",
     ).boolean().default(false)
@@ -65,7 +65,7 @@ class CalculateVersion : CliktCommand() {
         TaggerCore(GitAdapter(workingDirectory))
             .calculateNextVersion(
                 implicitPatch = implicitPatch,
-                allowDetachedHead = allowDetached,
+                allowDetachedHead = allowDetachedHead,
                 versionRegex = buildVersionRegex(),
                 forceSnapshot = forceSnapshot,
                 releaseBranch = releaseBranch ?: "",
