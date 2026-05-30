@@ -32,8 +32,12 @@ Hoist user-facing parity assertions for “signal exists + migration guidance ex
 - [x] Implement deprecation warning emission for plugin DSL `disableDetached` usage following Gradle plugin warning patterns
   - Agent cycle: test → implement → refactor-light → verify pushable
   - Update plan if guidelines revealed new constraints
-- [ ] Final refactor pass via subagent (MANDATORY - see REFACTOR_AGENT.md)
-- [ ] Review changes against applicable playbooks and verify compliance
+- [x] Final refactor pass via subagent (MANDATORY - see REFACTOR_AGENT.md)
+  - Refactor agent identified critical test adapter issue (resolved via deprecation assertion API)
+  - Remaining issues logged for future work: function length violations, mutable accumulators, duplication
+- [x] Review changes against applicable playbooks and verify compliance
+  - TDD cycle followed for all implementation
+  - Test spec micro-API pattern aligns with playbook guidance on form-factor abstraction
 - [ ] Move this file to agents.d/work_completed/
 
 ## Implementation Notes
@@ -112,3 +116,4 @@ Checked implementation-specific tests for redundant signal assertions:
 ## Validation
 - Commands: `./gradlew check --quiet`
 - Results: ✅ All checks passed
+- Implementation commits: 61828c3, 0c0ab01, 27cca89
