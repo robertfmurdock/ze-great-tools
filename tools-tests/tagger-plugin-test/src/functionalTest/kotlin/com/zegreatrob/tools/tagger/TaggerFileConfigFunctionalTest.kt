@@ -191,4 +191,31 @@ class TaggerFileConfigFunctionalTest {
             }
         }
     }
+
+    @Test
+    fun readsImplicitPatchFromTaggerFile() = setup(object {
+        val taggerConfigWithImplicitTrue = """
+            {
+              "releaseBranch": "master",
+              "implicitPatch": true
+            }
+        """.trimIndent()
+    }) {
+        setupBuildFiles(includeDslConfig = false)
+        File(taggerFile).writeText(taggerConfigWithImplicitTrue)
+        initializeGitRepo(
+            directory = projectDir,
+            remoteUrl = projectDir,
+            addFileNames = addFileNames,
+            commits = listOf("init", "commit without semver tag"),
+            initialTag = "1.0.0",
+        )
+    } exercise {
+        execute()
+    } verify { result ->
+        when (result) {
+            is TestResult.Success -> result.message.assertIsEqualTo("1.0.1")
+            is TestResult.Failure -> fail("Expected success but got ${result.reason}")
+        }
+    }
 }

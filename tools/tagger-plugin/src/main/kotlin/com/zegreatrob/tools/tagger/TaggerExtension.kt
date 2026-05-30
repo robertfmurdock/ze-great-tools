@@ -16,12 +16,10 @@ open class TaggerExtension(
 ) {
     val workingDirectory = objectFactory.directoryProperty()
 
+    private val fileConfig = workingDirectory.map { dir -> readTaggerFileFrom(dir.asFile) ?: TaggerConfig() }
+
     internal val releaseBranchProperty = objectFactory.property(String::class.java).apply {
-        convention(
-            workingDirectory.map { dir ->
-                readTaggerFileFrom(dir.asFile)?.releaseBranch
-            },
-        )
+        convention(fileConfig.map { it.releaseBranch })
     }
     var releaseBranch: String?
         get() = releaseBranchProperty.orNull
@@ -29,23 +27,31 @@ open class TaggerExtension(
             value?.let { releaseBranchProperty.set(it) }
         }
 
-    internal val userNameProperty = objectFactory.property(String::class.java)
+    internal val userNameProperty = objectFactory.property(String::class.java).apply {
+        convention(fileConfig.map { it.userName })
+    }
     var userName: String?
         get() = userNameProperty.orNull
         set(value) {
             value?.let { userNameProperty.set(it) }
         }
 
-    internal val userEmailProperty = objectFactory.property(String::class.java)
+    internal val userEmailProperty = objectFactory.property(String::class.java).apply {
+        convention(fileConfig.map { it.userEmail })
+    }
     var userEmail: String?
         get() = userEmailProperty.orNull
         set(value) {
             value?.let { userEmailProperty.set(it) }
         }
 
-    val warningsAsErrors = objectFactory.property(Boolean::class.java).convention(false)
+    val warningsAsErrors = objectFactory.property(Boolean::class.java).apply {
+        convention(fileConfig.map { it.warningsAsErrors ?: false })
+    }
 
-    val implicitPatch = objectFactory.property(Boolean::class.java).convention(true)
+    val implicitPatch = objectFactory.property(Boolean::class.java).apply {
+        convention(fileConfig.map { it.implicitPatch ?: true })
+    }
 
     /**
      * When true (default), versioning fails if HEAD has no upstream tracking branch (detached HEAD).
@@ -62,26 +68,40 @@ open class TaggerExtension(
      * Fix the CI checkout step instead of allowing detached HEAD.
      * See: https://github.com/robertfmurdock/ze-great-tools/blob/main/docs/tagger-detached-head.md
      */
-    internal val allowDetachedHeadProperty = objectFactory.property(Boolean::class.java)
+    internal val allowDetachedHeadProperty = objectFactory.property(Boolean::class.java).apply {
+        convention(fileConfig.map { it.allowDetachedHead })
+    }
     var allowDetachedHead: Boolean?
         get() = allowDetachedHeadProperty.orNull
         set(value) {
             value?.let { allowDetachedHeadProperty.set(it) }
         }
 
-    val forceSnapshot = objectFactory.property(Boolean::class.java).convention(false)
+    val forceSnapshot = objectFactory.property(Boolean::class.java).apply {
+        convention(fileConfig.map { it.forceSnapshot ?: false })
+    }
 
     val githubReleaseEnabled = objectFactory.property(Boolean::class.java).convention(false)
 
-    val versionRegex = objectFactory.property(Regex::class.java).convention(null)
+    val versionRegex = objectFactory.property(Regex::class.java).apply {
+        convention(fileConfig.map { it.versionRegex?.let { pattern -> Regex(pattern) } })
+    }
 
-    val noneRegex = objectFactory.property(Regex::class.java).convention(VersionRegex.Defaults.none)
+    val noneRegex = objectFactory.property(Regex::class.java).apply {
+        convention(fileConfig.map { it.noneRegex?.let { pattern -> Regex(pattern) } ?: VersionRegex.Defaults.none })
+    }
 
-    val patchRegex = objectFactory.property(Regex::class.java).convention(VersionRegex.Defaults.patch)
+    val patchRegex = objectFactory.property(Regex::class.java).apply {
+        convention(fileConfig.map { it.patchRegex?.let { pattern -> Regex(pattern) } ?: VersionRegex.Defaults.patch })
+    }
 
-    val minorRegex = objectFactory.property(Regex::class.java).convention(VersionRegex.Defaults.minor)
+    val minorRegex = objectFactory.property(Regex::class.java).apply {
+        convention(fileConfig.map { it.minorRegex?.let { pattern -> Regex(pattern) } ?: VersionRegex.Defaults.minor })
+    }
 
-    val majorRegex = objectFactory.property(Regex::class.java).convention(VersionRegex.Defaults.major)
+    val majorRegex = objectFactory.property(Regex::class.java).apply {
+        convention(fileConfig.map { it.majorRegex?.let { pattern -> Regex(pattern) } ?: VersionRegex.Defaults.major })
+    }
 
     val core get() = TaggerCore(GitAdapter(workingDirectory.get().asFile.absolutePath))
 
