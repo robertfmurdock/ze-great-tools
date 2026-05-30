@@ -17,7 +17,7 @@ Establish README testing for digger-cli to prevent documentation drift, followin
   - Agent cycle: test → implement → refactor-light → verify pushable
   - Tests: readmeExistsAndIsReadable, readmeReferencesMainHelp
   - Helper: readReadme() with path resolution
-- [ ] Add field documentation duplication detection
+- [x] Add field documentation duplication detection
   - Agent cycle: test → implement → refactor-light → verify pushable
   - Test: readmeDoesNotDuplicateFieldDocumentation
   - Helper: containsFieldDocumentation() with regex pattern
@@ -68,5 +68,7 @@ Test failures document current state and establish guardrails. Follow-up work ca
 ## Validation
 - Commands:
   - Phase 1: `./gradlew :command-line-tools:digger-cli:jvmTest --tests ReadmeTest`
+  - Phase 2: `./gradlew :command-line-tools:digger-cli:jvmTest --tests ReadmeTest`
 - Results:
   - Phase 1: 2 tests, 2 passing ✓
+  - Phase 2: 3 tests, 2 passing, 1 failing (field documentation detected as expected)

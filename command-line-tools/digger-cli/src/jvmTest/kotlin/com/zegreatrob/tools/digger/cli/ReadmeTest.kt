@@ -21,6 +21,14 @@ class ReadmeTest {
     } verify { readme ->
         readme.contains("digger --help").assertIsEqualTo(true)
     }
+
+    @Test
+    fun readmeDoesNotDuplicateFieldDocumentation() = setup(object {
+    }) exercise {
+        readReadme()
+    } verify { readme ->
+        containsFieldDocumentation(readme).assertIsEqualTo(false)
+    }
 }
 
 private fun readReadme(): String {
@@ -32,4 +40,9 @@ private fun readReadme(): String {
     } else {
         File(readmePath).readText()
     }
+}
+
+private fun containsFieldDocumentation(content: String): Boolean {
+    val fieldDocPattern = Regex("""^\s*-\s+`data\.\w+`:\s+\w""", RegexOption.MULTILINE)
+    return fieldDocPattern.containsMatchIn(content) || content.contains("**Fields:**")
 }
