@@ -22,7 +22,7 @@ Make `warningsAsErrors` consistently enforce non-zero exits for real warning con
 - [x] Align `tag` command semantics and naming so warning/error behavior is explicit and unsurprising
   - Agent cycle: test → implement → refactor-light → verify pushable
   - Update plan if guidelines revealed new constraints
-- [ ] Improve operator ergonomics for CI diagnosis under strict mode (clear stderr + stable JSON + predictable exit codes)
+- [x] Improve operator ergonomics for CI diagnosis under strict mode (clear stderr + stable JSON + predictable exit codes)
   - Agent cycle: test → implement → refactor-light → verify pushable
   - Update plan if guidelines revealed new constraints
 - [ ] Update README and config docs to define warning classes and strict-mode behavior with examples
@@ -80,6 +80,14 @@ Make `warningsAsErrors` consistently enforce non-zero exits for real warning con
 - Updated all references in core, CLI, and Gradle plugin.
 - Commit: 7f957a7
 
+### Implementation notes (2026-05-30, CI ergonomics improvement)
+- Fixed JSON response inconsistency: when `warningsAsErrors=true` and warnings exist, calculate-version now returns JSON error status instead of success.
+- This aligns JSON stdout with exit code (1), making CI parsers' job easier.
+- Error response includes error code `WARNINGS_AS_ERRORS` and lists escalated warnings.
+- TEXT format unchanged (already had correct behavior).
+- Test added to verify JSON error status when warnings escalate.
+- Commit: 3b56428
+
 ### Optional follow-ups under same theme
 - Consider a small internal result type rename in `tag` path (`TagResult.Warning` vs `TagResult.Error`) if semantics remain warning-like for non-strict mode.
 - Add a focused matrix test for `(command x format x warningsAsErrors x warning-present)` to prevent regressions.
@@ -87,4 +95,4 @@ Make `warningsAsErrors` consistently enforce non-zero exits for real warning con
 ## Validation
 - Commands:
   - `./gradlew :command-line-tools:tagger-cli:check`
-- Results: All tests pass, module check successful
+- Results: All tests pass, module check successful (verified after CI ergonomics improvement)
