@@ -26,7 +26,7 @@ One-sentence outcome.
   - Update plan if guidelines revealed new constraints
 - [ ] [Broad feature slice 2]
   ...
-- [ ] Final refactor pass (code style, patterns, efficiency)
+- [ ] Final refactor pass via subagent (MANDATORY - see REFACTOR_AGENT.md)
 - [ ] Review changes against applicable playbooks and verify compliance
 - [ ] Move to agents.d/work_completed/
 
@@ -80,11 +80,9 @@ The final refactor agent must:
 6. **Verify no cruft** - intermediate refactorings may have left technical debt
 7. **Run full check** to verify no cross-module impact
 
-**Delegation pattern**: The orchestrator should spawn a specialized refactor agent by passing
-the commit range and referencing REFACTOR_AGENT.md in the prompt. The agent must provide
-a structured report with evidence for each check.
+**Delegation pattern (MANDATORY)**: Final refactor MUST use a subagent. Orchestrator spawns it with commit range and REFACTOR_AGENT.md reference. Agent returns structured report with evidence.
 
-The final refactor must be comprehensive - incomplete review leaves quality issues that accumulate over time.
+Why mandatory: Fresh eyes, explicit methodology, prevents shortcuts when context already loaded.
 
 ### Agent Cycle Within Each Feature Slice
 Each broad checklist item follows a test-driven cycle that repeats until the feature slice is complete:
