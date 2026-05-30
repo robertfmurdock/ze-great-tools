@@ -2,6 +2,7 @@ package com.zegreatrob.tools.tagger.cli
 
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.CliktError
+import com.github.ajalt.clikt.core.Context
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.boolean
 import com.zegreatrob.tools.cli.readFromFile
@@ -15,9 +16,16 @@ import kotlinx.serialization.json.encodeToJsonElement
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 
-class GenerateSettingsFile : CliktCommand(name = "generate-settings-file") {
-    private val file by option()
-    private val merge by option().boolean()
+class GenerateSettingsFile : CliktCommand() {
+
+    override fun help(context: Context) = "Generate a .tagger configuration file with default settings. Without --file, prints to stdout."
+
+    private val file by option(
+        help = "Save configuration to specified file. Use --file='' to save to .tagger in current directory.",
+    )
+    private val merge by option(
+        help = "Merge with existing file, preserving current values and adding missing defaults.",
+    ).boolean()
 
     override fun run() {
         val prettyJsonFormatter = kotlinx.serialization.json.Json {

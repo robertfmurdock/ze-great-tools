@@ -1,8 +1,11 @@
 package com.zegreatrob.tools.tagger.cli
 
 import com.github.ajalt.clikt.testing.test
+import com.zegreatrob.minassert.assertIsEqualTo
+import com.zegreatrob.testmints.setup
 import com.zegreatrob.tools.tagger.GenerateSettingsFileTestSpec
 import com.zegreatrob.tools.tagger.TestResult
+import kotlin.test.Test
 class GenerateSettingsFileCommandTest : GenerateSettingsFileTestSpec {
 
     override lateinit var projectDir: String
@@ -28,5 +31,36 @@ class GenerateSettingsFileCommandTest : GenerateSettingsFileTestSpec {
         } else {
             TestResult.Failure(test.output.trim())
         }
+    }
+
+    @Test
+    fun helpTextExplainsCommandPurpose() = setup(object {
+        val command = cli()
+    }) exercise {
+        command.test("generate-settings-file --help")
+    } verify { result ->
+        result.output.contains("generate-settings-file").assertIsEqualTo(true)
+        result.output.contains("configuration").assertIsEqualTo(true, "Help should explain config purpose")
+        result.output.contains(".tagger").assertIsEqualTo(true, "Help should mention .tagger filename")
+    }
+
+    @Test
+    fun helpTextExplainsFileOption() = setup(object {
+        val command = cli()
+    }) exercise {
+        command.test("generate-settings-file --help")
+    } verify { result ->
+        result.output.contains("--file").assertIsEqualTo(true)
+        result.output.contains(Regex("save|Save|write|output")).assertIsEqualTo(true, "Help should explain file writing")
+    }
+
+    @Test
+    fun helpTextExplainsMergeOption() = setup(object {
+        val command = cli()
+    }) exercise {
+        command.test("generate-settings-file --help")
+    } verify { result ->
+        result.output.contains("--merge").assertIsEqualTo(true)
+        result.output.contains(Regex("existing|preserve|Merge|merge")).assertIsEqualTo(true, "Help should explain merge behavior")
     }
 }
