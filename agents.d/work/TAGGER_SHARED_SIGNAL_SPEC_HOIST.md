@@ -13,7 +13,7 @@ Hoist user-facing parity assertions for “signal exists + migration guidance ex
 ## Checklist
 - [x] Review this work card for compliance with template and update to conform
 - [x] If this card plans subagent delegation, ask user to explicitly authorize subagents for this card and record the response in Implementation Notes
-- [ ] Build inventory of currently implementation-specific “user signal” tests and classify each as `hoist`, `stay-exclusive`, or `blocked`
+- [x] Build inventory of currently implementation-specific “user signal” tests and classify each as `hoist`, `stay-exclusive`, or `blocked`
   - Agent cycle: test → implement → refactor-light → verify pushable
   - Update plan if guidelines revealed new constraints
 - [ ] Introduce shared signal-spec pattern for deprecation guidance (signal presence + replacement guidance) with implementation-specific evidence adapters
@@ -44,6 +44,32 @@ Hoist user-facing parity assertions for “signal exists + migration guidance ex
 - Evidence adapter examples:
   - CLI: runtime warning output includes migration guidance.
   - Plugin: API/property carries `@Deprecated` guidance toward replacement.
+
+### Signal Test Inventory (2026-05-30)
+
+**Already Hoisted (in shared specs):**
+- `whenNoRemoteProduceError` - ⚠️ warning symbol + RISK section (CalculateVersionTestSpec:94)
+- `whenAllowDetachedHeadOnReleaseBranchEmitWarning` - release branch warning (CalculateVersionTestSpec:181)
+- `forceSnapshotReportsForcedReason` - FORCED label in output (CalculateVersionTestSpec:602)
+- `warningsAsErrorsCausesNonZeroExitWhenDetachedHeadWarningPresent` - warnings-as-errors behavior (CalculateVersionTestSpec:629)
+- `withLightweightTagShowsActionableErrorMessage` - migration guidance for lightweight tags (CalculateVersionTestSpec:654)
+- `withMultipleLightweightTagsShowsAllTagsInErrorMessage` - plural guidance (CalculateVersionTestSpec:686)
+- `reportsErrorForInvalidTaggerFile` - parse failure message (CalculateVersionConfigFileParseFailureTestSpec:12)
+- `whenNotOnCorrectBranchAndWarningsAsErrorsTagWillNotDoAnythingAndError` - branch error signal (TagTestSpec:168)
+- `whenNotOnCorrectBranchTagWillNotDoAnythingAndError` - branch warning signal (TagTestSpec:202)
+
+**Stay Implementation-Specific:**
+- `parseCalculateVersion()` helper (ConfigFileFunctionalTestSupport.kt:46) - CLI stderr parsing mechanics
+
+**Classification Result:**
+All user-facing signal tests are already in shared specs. The work card goal appears already achieved — parity assertions exist at the spec level, and implementations provide their evidence through the test result structures (Success.warnings, error messages, etc.).
+
+**Pattern Verification:**
+- Spec: `CalculateVersionTestSpec.whenNoRemoteProduceError()` asserts `result.reason.contains("⚠️")`
+- Plugin impl: `CalculateVersionFunctionalTest.execute()` parses Gradle output, splits by "⚠️" prefix → `TestResult.Success(warnings=...)`
+- Config impl: `CalculateVersionConfigFileFunctionalTest.execute()` uses shared helper → same result structure
+
+The evidence adapter pattern is working: specs assert UX intent, implementations surface evidence through their transport (Gradle output, CLI stderr).
 
 ## Validation
 - Commands: [filled in as work progresses]
