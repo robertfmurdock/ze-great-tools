@@ -22,7 +22,7 @@ Hoist user-facing parity assertions for “signal exists + migration guidance ex
 - [x] Migrate selected existing tests to the shared signal-spec pattern and remove redundant implementation-only assertions
   - Agent cycle: test → implement → refactor-light → verify pushable
   - Update plan if guidelines revealed new constraints
-- [ ] Confirm warning/deprecation parity decisions remain explicit and documented where behavior intentionally diverges
+- [x] Confirm warning/deprecation parity decisions remain explicit and documented where behavior intentionally diverges
   - Agent cycle: test → implement → refactor-light → verify pushable
   - Update plan if guidelines revealed new constraints
 - [ ] Final refactor pass via subagent (MANDATORY - see REFACTOR_AGENT.md)
@@ -83,6 +83,13 @@ Checked implementation-specific tests for redundant signal assertions:
 - `AdditionalTasksFunctionalTest.releaseDryRunAvoidsImplicitGitHeadDependency` — UNIQUE (Gradle build isolation concern)
 - `TaggerForceSnapshotPropertyFunctionalTest` — NOT REDUNDANT (tests `-PtaggerForceSnapshot` project property, spec tests DSL/config `forceSnapshot`)
 - No redundant implementation-only signal assertions found to remove
+
+**Intentional Parity Divergence (Documented in TAGGER_CLI_GRADLE_PLUGIN_PARITY):**
+- **Deprecated API signals**:
+  - Gradle plugin: Uses `@Deprecated("Use allowDetachedHead instead (inverted logic)")` on DSL properties — IDE surfaces warnings, no runtime output
+  - CLI/Config: Would emit runtime deprecation warnings when deprecated properties are used
+- **Rationale**: Runtime warnings pollute Gradle build logs; `@Deprecated` annotations provide IDE guidance without noise
+- **Status**: Divergence remains intentional and appropriate for each transport mechanism
 
 ## Validation
 - Commands: [filled in as work progresses]
