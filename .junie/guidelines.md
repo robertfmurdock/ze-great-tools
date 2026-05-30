@@ -23,6 +23,12 @@ All AI agents working on this repository must follow these rules:
    - Tests must verify outcomes and effects, not just presence or structure.
    - Example: if adding a Gradle configuration property to enable functionality, test the functionality itself — the property's existence is a side effect of meeting the spec.
    - Avoid symbolic tests that only check `assertNotNull`, type checks, or field presence without verifying the actual behavior those elements enable.
-6. **Test Names**: Keep names unique, brief, and scenario-focused.
-6. **Java Toolchain**: This project uses Java Toolchain 21. Ensure any new modules or environment checks respect this version.
-7. **Efficient Verification**: For multi-test refactors, batch edits per file or logical cluster, then run targeted compile tasks (e.g., `:module:compileKotlinJvm` / `:compileKotlinJs`) after each batch. Run `./gradlew :tools-tests:check` once per file or at the end for full confidence. Prefer quieter Gradle output (`--quiet` or `--console=plain`) when possible.
+6. **Test Spec Hierarchy** (for features with shared test specs):
+   - **Prefer spec-level tests** for feature behavior that should work consistently across implementations (CLI flags, config files, plugin DSL, etc.).
+   - Spec-level tests ensure feature parity and prevent implementation-specific drift.
+   - **Implementation-specific tests** are appropriate for format/output details, help text, or mechanics unique to that layer.
+   - **Acceptable workflow**: Start with an implementation-level test for quick iteration, then refactor to spec level once the feature stabilizes.
+   - Example: `CalculateVersionTestSpec` defines shared behavior for `calculate-version` across CLI and config implementations; both `CalculateVersionCommandTest` and `CalculateVersionCommandConfigFileTest` implement the spec to ensure parity.
+7. **Test Names**: Keep names unique, brief, and scenario-focused.
+7. **Java Toolchain**: This project uses Java Toolchain 21. Ensure any new modules or environment checks respect this version.
+8. **Efficient Verification**: For multi-test refactors, batch edits per file or logical cluster, then run targeted compile tasks (e.g., `:module:compileKotlinJvm` / `:compileKotlinJs`) after each batch. Run `./gradlew :tools-tests:check` once per file or at the end for full confidence. Prefer quieter Gradle output (`--quiet` or `--console=plain`) when possible.
