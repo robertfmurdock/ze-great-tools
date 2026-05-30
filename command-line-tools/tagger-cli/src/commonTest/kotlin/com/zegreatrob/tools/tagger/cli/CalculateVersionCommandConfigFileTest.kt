@@ -32,6 +32,7 @@ class CalculateVersionCommandConfigFileTest : CalculateVersionTestSpec {
         versionRegex: String?,
         noneRegex: String?,
         forceSnapshot: Boolean?,
+        warningsAsErrors: Boolean?,
     ) {
         var config = TaggerConfig()
         implicitPatch?.let { config = config.copy(implicitPatch = implicitPatch) }
@@ -43,6 +44,7 @@ class CalculateVersionCommandConfigFileTest : CalculateVersionTestSpec {
         patchRegex?.let { config = config.copy(patchRegex = patchRegex) }
         noneRegex?.let { config = config.copy(noneRegex = noneRegex) }
         forceSnapshot?.let { config = config.copy(forceSnapshot = forceSnapshot) }
+        warningsAsErrors?.let { config = config.copy(warningsAsErrors = warningsAsErrors) }
         config = config.copy(releaseBranch = "master")
         Json.encodeToString(config)
             .writeToFile(taggerFile)

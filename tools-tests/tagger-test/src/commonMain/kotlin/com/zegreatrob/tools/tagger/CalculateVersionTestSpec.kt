@@ -39,6 +39,7 @@ interface CalculateVersionTestSpec {
         versionRegex: String? = null,
         noneRegex: String? = null,
         forceSnapshot: Boolean? = null,
+        warningsAsErrors: Boolean? = null,
     )
 
     fun initializeGitRepo(
@@ -620,6 +621,82 @@ interface CalculateVersionTestSpec {
             }
 
             is TestResult.Failure -> fail("Expected success but got ${result.reason}")
+        }
+    }
+
+    @Test
+    fun warningsAsErrorsCausesNonZeroExitWhenDeprecationWarningPresent() = setup(object {
+        val commits = listOf("init", "commit 1")
+        val initialTag = "1.2.3"
+    }) {
+        configureWithOverrides(disableDetached = false, warningsAsErrors = true)
+        initializeGitRepo(
+            directory = projectDir,
+            remoteUrl = null,
+            addFileNames = addFileNames,
+            commits = commits,
+            initialTag = initialTag,
+        )
+    } exercise {
+        execute()
+    } verify { result ->
+        when (result) {
+            is TestResult.Failure -> result.reason.contains("--disable-detached is deprecated").assertIsEqualTo(
+                true,
+                "Expected deprecation warning in failure output. Output:\n${result.reason}",
+            )
+            is TestResult.Success -> fail("Should exit with failure when warnings present and warningsAsErrors enabled")
+        }
+    }
+
+    @Test
+    fun warningsAsErrorsCausesNonZeroExitWhenDetachedHeadWarningPresent() = setup(object {
+        val commits = listOf("init", "commit 1")
+        val initialTag = "1.2.3"
+    }) {
+        configureWithOverrides(allowDetachedHead = true, warningsAsErrors = true)
+        initializeGitRepo(
+            directory = projectDir,
+            remoteUrl = null,
+            addFileNames = addFileNames,
+            commits = commits,
+            initialTag = initialTag,
+        )
+    } exercise {
+        execute()
+    } verify { result ->
+        when (result) {
+            is TestResult.Failure -> result.reason.contains("Running with allowDetachedHead on release branch").assertIsEqualTo(
+                true,
+                "Expected detached HEAD warning in failure output. Output:\n${result.reason}",
+            )
+            is TestResult.Success -> fail("Should exit with failure when detached HEAD warning present and warningsAsErrors enabled")
+        }
+    }
+
+    @Test
+    fun withoutWarningsAsErrorsWarningsDoNotCauseNonZeroExit() = setup(object {
+        val commits = listOf("init", "commit 1")
+        val initialTag = "1.2.3"
+    }) {
+        configureWithOverrides(disableDetached = false)
+        initializeGitRepo(
+            directory = projectDir,
+            remoteUrl = null,
+            addFileNames = addFileNames,
+            commits = commits,
+            initialTag = initialTag,
+        )
+    } exercise {
+        execute()
+    } verify { result ->
+        when (result) {
+            is TestResult.Success -> {
+                result.message.assertIsEqualTo("1.2.4-SNAPSHOT")
+                result.warnings.any { it.contains("--disable-detached is deprecated") }
+                    .assertIsEqualTo(true, "Expected deprecation warning in success. Warnings: ${result.warnings}")
+            }
+            is TestResult.Failure -> fail("Should succeed when warnings present but warningsAsErrors disabled. Got: ${result.reason}")
         }
     }
 }
