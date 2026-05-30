@@ -40,6 +40,14 @@ repository automation behavior.
 - Run broader checks (`./gradlew check`, or `build`/`test` as needed) when change
   risk crosses module boundaries.
 
+## CLI Testing
+- For Kotlin/JS CLI tools (e.g., `tagger-cli`, `digger-cli`), use the `jsLink` task
+  to install the latest local build for testing: `./gradlew :command-line-tools:<cli>:jsLink`
+- After running `jsLink`, you can test the CLI via `npm exec <command>` and it will
+  use your local changes instead of the published npm package.
+- This is essential for verifying end-to-end CLI output (help text, stdout/stderr
+  formatting) before committing changes.
+
 ## Change Coupling Rules
 - Keep build logic updates and required consumer updates in one change set.
 - If conventions change, update canonical context docs in `agents.d/context/`
