@@ -12,11 +12,14 @@ import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.boolean
 import com.github.ajalt.clikt.parameters.types.enum
 import com.zegreatrob.tools.adapter.git.GitAdapter
+import com.zegreatrob.tools.cli.readFromFile
 import com.zegreatrob.tools.tagger.core.SnapshotReason
 import com.zegreatrob.tools.tagger.core.TaggerCore
 import com.zegreatrob.tools.tagger.core.VersionRegex
 import com.zegreatrob.tools.tagger.core.VersionResult
 import com.zegreatrob.tools.tagger.core.calculateNextVersion
+import com.zegreatrob.tools.tagger.json.TaggerConfig
+import kotlinx.serialization.json.Json
 
 enum class OutputFormat {
     TEXT,
@@ -128,13 +131,31 @@ class CalculateVersion : CliktCommand() {
             }
     }
 
-    private fun disableDetachedDeprecationWarning(): List<String> = disableDetachedDeprecated
-        ?.let {
-            listOf(
-                "⚠️  --disable-detached is deprecated and may be removed in the next major version. Use --allow-detached-head instead.",
-            )
+    private fun disableDetachedDeprecationWarning(): List<String> {
+        val warnings = mutableListOf<String>()
+
+        // Check CLI flag usage
+        if (disableDetachedDeprecated != null) {
+            warnings.add("⚠️  --disable-detached is deprecated and may be removed in the next major version. Use --allow-detached-head instead.")
         }
-        ?: emptyList()
+
+        // Check config file usage
+        if (hasDisableDetachedInConfigFile()) {
+            warnings.add("⚠️  The 'disableDetached' property in .tagger file is deprecated and may be removed in the next major version. Use 'allowDetachedHead' instead with inverted logic.")
+        }
+
+        return warnings
+    }
+
+    private fun hasDisableDetachedInConfigFile(): Boolean {
+        val configFile = readFromFile("$workingDirectory/.tagger") ?: return false
+        return try {
+            val config = Json.decodeFromString<TaggerConfig>(configFile)
+            config.disableDetached != null
+        } catch (e: Exception) {
+            false
+        }
+    }
 
     private fun output(
         message: String,

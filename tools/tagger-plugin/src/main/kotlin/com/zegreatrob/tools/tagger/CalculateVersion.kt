@@ -79,7 +79,8 @@ abstract class CalculateVersion : DefaultTask() {
 
     private fun calculateVersion(): VersionResult {
         val core = TaggerCore(GitAdapter(workingDirectory.get().asFile.absolutePath))
-        return core.calculateNextVersion(
+        val deprecationWarnings = buildDeprecationWarnings()
+        val result = core.calculateNextVersion(
             implicitPatch = implicitPatch.get(),
             versionRegex = VersionRegex(
                 none = noneRegex.get(),
@@ -93,6 +94,19 @@ abstract class CalculateVersion : DefaultTask() {
             releaseBranch = releaseBranch.orNull
                 ?: throw GradleException("Please configure the tagger release branch."),
         )
+        return when (result) {
+            is VersionResult.Success -> result.copy(warnings = result.warnings + deprecationWarnings)
+            is VersionResult.Failure -> result
+        }
+    }
+
+    @Suppress("DEPRECATION")
+    private fun buildDeprecationWarnings(): List<String> {
+        val warnings = mutableListOf<String>()
+        if (allowDetachedHead.orNull == null && disableDetached.isPresent) {
+            warnings.add("⚠️  The 'disableDetached' property is deprecated and may be removed in the next major version. Use 'allowDetachedHead' instead with inverted logic.")
+        }
+        return warnings
     }
 
     private fun VersionResult.Success.outputSuccess() {

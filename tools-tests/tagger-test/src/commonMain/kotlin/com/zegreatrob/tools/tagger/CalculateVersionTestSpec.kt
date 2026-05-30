@@ -712,4 +712,35 @@ interface CalculateVersionTestSpec {
             is TestResult.Success -> fail("Should fail when lightweight tags are present")
         }
     }
+
+    @Test
+    fun whenDisableDetachedConfigPropertyUsedEmitDeprecationWarning() = setup(object {
+        val commits = listOf("init", "commit 1")
+        val initialTag = "1.2.3"
+    }) {
+        configureWithOverrides(disableDetached = false)
+        initializeGitRepo(
+            commits = commits,
+            initialTag = initialTag,
+        )
+    } exercise {
+        execute()
+    } verify { result ->
+        when (result) {
+            is TestResult.Success -> {
+                result.warnings.any { it.contains("disableDetached") && it.contains("deprecated") }
+                    .assertIsEqualTo(
+                        true,
+                        "Expected deprecation warning for disableDetached config property. Warnings: ${result.warnings}",
+                    )
+                result.warnings.any { it.contains("allowDetachedHead") }
+                    .assertIsEqualTo(
+                        true,
+                        "Expected migration guidance to allowDetachedHead. Warnings: ${result.warnings}",
+                    )
+            }
+
+            is TestResult.Failure -> fail("Expected success but got ${result.reason}")
+        }
+    }
 }
