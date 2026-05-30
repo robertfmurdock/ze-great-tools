@@ -1,182 +1,181 @@
-# Why Tagger? (Q/A Draft)
+# Why Tagger?
 
-This FAQ captures current Tagger philosophy in probing-question form.
+This is a short FAQ about what Tagger is for, what it is not for, and how we use it in practice.
+
+## Scope Boundary
+
+### Q: What is Tagger responsible for?
+
+**A:** Computing versions from repo signals and applying tagging policy consistently.
+
+### Q: What is Tagger not responsible for?
+
+**A:** Product release strategy, deployment orchestration, feature rollout, incident response, or overall software
+delivery performance. Tagger helps with version/tag correctness; it is one part of release engineering, not all of it.
 
 ## 1) Problem Framing
 
-### Q: What concrete release pain are we solving that plain Git tags + manual discipline do not solve?
-**A:** Manual semver decisions are vulnerable to emotional pressure and inconsistency. Tagger exists to make versioning deterministic and neutral by deriving release signals from repository facts.
+### Q: What concrete pain are we solving?
 
-### Q: Which incidents or failure patterns justify introducing this tool?
-**A:** Common patterns are manual versioning drift, weak tag discipline, unclear build/version traceability, and recurring arguments about bump frequency/level. Highest-cost observed failures include duplicate/no version labels and missed manual version updates that block downstream consumers.
+**A:** Manual versioning and tagging can get inconsistent under pressure. Tagger makes semver and tagging decisions
+deterministic from repository facts.
 
-### Q: What is the cost of being wrong: bad version numbers, bad tags, broken automation, or all three?
-**A:** All three matter, but impact ranking is: (1) broken automation, (2) bad tags, (3) bad version numbers. Broken automation erodes trust in the whole delivery system fastest.
+### Q: If we removed Tagger tomorrow, what would change?
 
-### Q: If we removed Tagger tomorrow, what would actually break versus just become less convenient?
-**A:** Version calculation/tagging would fall back to manual or replacement automation. Release correctness pressure would weaken, and commit semver signaling discipline would likely degrade.
+**A:** Version/tag decisions revert to manual discipline or replacement automation. Teams lose this policy enforcement
+point, but the broader release system can still function.
 
 ## 2) Version Source of Truth
 
-### Q: Why should Git tags be the primary version source instead of build metadata, artifact repository state, or commit SHA?
-**A:** Tags keep content changes and version metadata separate, avoid commit/build/version loop thrash, and provide a stable VCS pointer. The intended chain is `code -> tag -> build -> artifact`.
+### Q: Why use Git tags as the version source?
 
-### Q: What guarantees do annotated tags provide that lightweight tags do not, and why do we care?
-**A:** Tagger currently depends on tag metadata and deterministic ordering (for example `taggerdate`). Lightweight tags do not provide the same metadata contract.
+**A:** Tags are durable VCS metadata and keep version identity separate from build mechanics. Intended flow:
+`code -> tag -> build -> artifact`.
 
-### Q: How do we prevent version drift when multiple branches or CI jobs race?
-**A:** Keep release evolution linear: one release truth, snapshot off non-release branches, and serialized release jobs on the release branch.
+### Q: Why prefer annotated tags?
 
-### Q: How do we handle historic tag mistakes without rewriting reality in dangerous ways?
-**A:** Distinguish artifact reality from repo metadata. Public artifact mistakes are forward-fix only. Unpublished tag-only mistakes can be corrected in git metadata.
+**A:** Tagger relies on tag metadata and ordering semantics (for example `taggerdate`) that lightweight tags do not
+provide.
+
+### Q: How do we handle tag mistakes?
+
+**A:** Public artifact mistakes are forward-fixed. Internal, unpublished metadata mistakes may be corrected in Git
+metadata.
 
 ## 3) Semver Signal Strategy
 
-### Q: Why are commit message tokens (`[major]`, `[minor]`, `[patch]`, `[none]`) the right mechanism?
-**A:** They are low-friction and force a semver-impact decision at commit time, preserving fast commit flow while keeping compatibility intent explicit.
+### Q: Why use commit tokens (`[major]`, `[minor]`, `[patch]`, `[none]`)?
 
-### Q: Why not Conventional Commits, PR labels, or explicit release manifests?
-**A:** They are not rejected in principle. Current default prefers minimal cognitive overhead. Future support is acceptable where it fits core assumptions.
+**A:** They are low-friction and make semver intent explicit at change time.
 
-### Q: How do we prove this approach is reliable across teams with inconsistent commit hygiene?
-**A:** Reliability comes from fast feedback, not perfection. Unexpected bumps surface quickly; teams adjust behavior through user feedback and review.
+### Q: Is this rejecting Conventional Commits or other models?
 
-### Q: What is the failure mode when commits are mislabeled or unlabeled?
-**A:** Unlabeled commits follow `implicitPatch` policy. Mislabeled commits produce wrong bump signals unless caught before publish, then corrected by follow-up release.
+**A:** No. The current default optimizes for low overhead. Other signaling models are compatible future options.
 
-### Q: Why is `implicitPatch=true` a sane default rather than a hidden risk amplifier?
-**A:** It is a deliberate bias-to-release. In many workflows, release stagnation is riskier than patch-overpublication, and semver consumers can stay on prior versions.
+### Q: What happens with missing or wrong labels?
 
-## 4) Snapshot and Safety Policy
+**A:** Missing labels follow `implicitPatch`. Wrong labels produce wrong bumps unless caught before publish; recovery is
+usually a follow-up release.
 
-### Q: Why should snapshot eligibility depend on repo state (`DIRTY`, `AHEAD`, `BEHIND`, `NOT_RELEASE_BRANCH`)?
-**A:** `-SNAPSHOT` is a releasability signal. Those repo checks are version-correctness and release-safety checks expressed in one mechanism.
+## 4) Safety Policy
 
-### Q: Which safety checks are mandatory versus policy choices?
-**A:** Mandatory boundary: tag-based version tracking plus safe-branch posture for stable releases. Outside that boundary (for example strictness toggles) is team policy with explicit risk ownership.
+### Q: Why gate behavior on repo state (`DIRTY`, `AHEAD`, `BEHIND`, `NOT_RELEASE_BRANCH`)?
 
-### Q: Why is detached HEAD blocked by default?
-**A:** Without known branch context, release policy application is ambiguous and stable-version decisions are riskier.
+**A:** These are version/tag safety signals, not full release-safety guarantees.
 
-### Q: Under what circumstances is `allowDetachedHead=true` acceptable, and who owns that risk?
-**A:** Only as an explicit escape hatch in controlled contexts with compensating safeguards. The enabling team owns the risk.
+### Q: Why block detached HEAD by default?
 
-### Q: Why is "warnings as errors" optional instead of always on in CI?
-**A:** Local development often benefits from non-blocking warnings, while CI can choose stricter enforcement. Tagger surfaces risk; team policy decides blocking behavior.
+**A:** Policy application is ambiguous without stable branch context.
 
-## 5) Release Branch Model
+### Q: Who owns risk when strictness is relaxed?
 
-### Q: Why assume a designated release branch model at all?
-**A:** Default is trunk-based with one release branch to prevent unexpected stable releases from arbitrary builds.
+**A:** The team enabling exceptions (`allowDetachedHead`, warning strictness, etc.) owns that risk.
 
-### Q: How does this design hold up for trunk-based development, release trains, or mono-repo multi-stream releases?
-**A:** Strong fit for trunk-based and release-train models. Independent multi-version monorepo streams are not first-class today; single shared version-line monorepos are workable.
+## 5) Branch Model
 
-### Q: What happens when organizations rename branches, use multiple release branches, or backport hotfixes?
-**A:** Branch rename is a config update. Multiple release branches are possible but add governance complexity. Hotfix branches from historical tags are valid when branch-local config is explicit.
+### Q: Why assume a designated release branch?
 
-### Q: Are we encoding workflow ideology as tooling constraints?
-**A:** Yes, intentionally. Delivery tooling formalizes workflow ideology into executable policy.
+**A:** It constrains where stable tags can be created and reduces accidental stable releases from arbitrary builds.
 
-## 6) Workflow Design (Two-Step vs One-Step)
+### Q: Does this fit every repo topology?
 
-### Q: Why split `calculateVersion` from `tag/release`?
-**A:** To separate read-only version computation from side effects, improving local build stability and operational clarity.
+**A:** Strong for single version-line repos (including many trunk-based setups). Multi-stream monorepo version lines are
+not a first-class target.
 
-### Q: What concrete engineering constraints justify this?
-**A:** Gradle configuration-cache behavior, side-effect isolation, CI step handoff needs, and the practical need to validate builds before tagging/publishing.
+## 6) Workflow Design
 
-### Q: What errors become less likely with two steps, and what new errors become more likely?
-**A:** Less likely: premature/unvalidated release actions. More likely: teams overriding/ignoring computed versions and creating drift.
+### Q: Why separate `calculateVersion` from `tag/release`?
 
-### Q: Why not one atomic command with dry-run and transactional behavior?
-**A:** Valid future direction, but it risks pulling Tagger into broader build-system orchestration scope. Any such move should preserve toolchain compatibility and scope discipline.
+**A:** It separates read-only version computation from side effects and keeps integration points clearer in CI.
 
-## 7) CI/CD and Operational Reality
+### Q: What tradeoff does that create?
 
-### Q: Why does Tagger depend on full history (`fetch-depth: 0`) and upstream tracking?
-**A:** Safe version computation needs sufficient tag/graph context and sync-state visibility.
+**A:** Lower risk of premature tagging, but higher risk of teams overriding computed results if process discipline is
+weak.
 
-### Q: Is that requirement practical for large repos and cost-sensitive pipelines?
-**A:** It has been practical at current scale; larger environments may need optimization, but not at the expense of version correctness.
+## 7) CI Operational Prerequisites
 
-### Q: How do we keep behavior stable across GitHub, GitLab, Azure, and local/dev environments?
-**A:** Tagger is platform-agnostic; stability comes from enforcing identical prerequisites and invocation policy across environments.
+### Q: Why require full history (`fetch-depth: 0`) and upstream context?
 
-### Q: Which assumptions about CI checkout behavior are fragile?
-**A:** Real branch ref presence, full history/tags, upstream tracking, and tag push permissions are all common fragility points and should be surfaced early.
+**A:** Version/tag decisions need enough graph and tag history to be correct.
 
-## 8) UX and Learnability
+### Q: What usually breaks in CI?
 
-### Q: Can a junior developer predict outcomes without reading source code?
-**A:** That is the target bar. If source reading is required to predict outcomes, that is a UX/docs defect.
+**A:** Shallow checkout, missing tags, missing branch refs, missing upstream tracking, or tag push permissions.
 
-### Q: Are error messages actionable enough to fix the issue on first attempt?
-**A:** Currently good enough for common failures, with ongoing room for clarity improvements.
+## 8) Governance and Change Risk
 
-### Q: Where are we forcing users to memorize policy instead of surfacing it in command output?
-**A:** Most runtime use is automated; main human memory burden is commit semver signaling.
+### Q: Where does policy actually live?
 
-### Q: Do docs explain why the guardrails exist, or just how to bypass them?
-**A:** This is still an improvement area; rationale coverage should be strengthened.
+**A:** In `.tagger`, build scripts, and CI invocation. Control of those surfaces is control of release-tag policy.
 
-## 9) Comparisons and Alternatives
+### Q: How should policy changes be treated?
 
-### Q: Why this tool over `semantic-release`, `release-please`, `Changesets`, plain Gradle/Maven version automation, or homegrown scripts?
-**A:** Comparative claim is scoped to direct experience: past `semantic-release` fit was unsatisfactory; Tagger has compared favorably to prior homegrown scripts used in practice.
+**A:** As high-impact changes: code review, ownership boundaries, and CI checks.
 
-### Q: What capability do we uniquely provide, and what ecosystem maturity are we giving up?
-**A:** Core value is focused, consistent version-signal behavior. Full maturity tradeoff mapping against all alternatives is still unknown.
+## 9) Failure Modes and Recovery
 
-### Q: Are we solving a general problem or optimizing for one team's habits?
-**A:** General problem. The same release/version signal failures recur across many projects.
+### Q: What failure is most clearly observed?
 
-## 10) Governance and Change Risk
+**A:** Incorrect semver signaling in commits.
 
-### Q: Who can change versioning rules, and how is that change reviewed?
-**A:** Whoever controls `.tagger`, build scripts, and CI invocation controls policy. Governance should protect those surfaces explicitly.
+### Q: What other failures are plausible?
 
-### Q: How do we prevent silent policy drift via regex/config changes?
-**A:** Treat config/invocation changes like high-impact code and apply normal team governance controls (review gates, ownership, protections, CI checks).
+**A:** CI history/tag incompleteness, branch policy misconfiguration, detached-HEAD usage, and inconsistent local vs CI
+invocation.
 
-### Q: What is our deprecation policy for flags/settings, and how painful are migrations?
-**A:** Strong backward-compatibility intent, currently indefinite deprecation support, and intentionally small config/API surface to reduce migration pain.
+### Q: What is the recovery posture?
 
-### Q: How do we validate backward compatibility of behavior that downstream release pipelines rely on?
-**A:** Functional coverage of core behavior across both CLI and Gradle plugin paths.
+**A:** Prefer forward fixes without rewriting shared history. Rewrite tags/history only for strictly internal,
+downstream-safe corrections.
 
-## 11) Failure Modes and Recovery
+## 10) Evidence and Exit Criteria
 
-### Q: What are the top 5 ways this tool can cause a bad release?
-**A:** The most clearly observed mode is incorrect semver signaling in commit messages. Other scenarios are currently more speculative than observed.
+### Q: How do we evaluate whether Tagger helps?
 
-### Q: How do we detect each failure early?
-**A:** Current primary loop is downstream/user feedback plus maintainer review and fast follow-up releases.
+**A:** Use a small set: release frequency, lead time to release, change failure rate, rollback/repair time, plus
+version/tag incident rate.
 
-### Q: What is the rollback story after an incorrect tag or version is published?
-**A:** Public artifact mistakes are forward-fixed with a newer release. Internal/unpublished tag mistakes can be corrected in repository metadata.
+### Q: What baseline should we use?
 
-### Q: Can we recover safely without force-pushing tags or rewriting shared history?
-**A:** Preferred posture is yes: avoid rewrites unless impact is strictly internal and downstream-safe.
+**A:** Pre-Tagger behavior in the same repository and workflow.
 
-## 12) Exit Strategy
+### Q: When should we simplify or remove it?
 
-### Q: If Tagger no longer fits, how do we migrate off it with minimal disruption?
-**A:** Replace/remove the two explicit pipeline steps (`calculate`, then `tag/release`) with the successor flow.
+**A:** If Tagger-specific policy churn stays high, incidents remain frequent, or outcomes are not better than a simpler
+alternative over a meaningful period.
 
-### Q: Can existing tags/history be interpreted consistently by replacement tooling?
-**A:** Unknown at present; this has not been broadly validated across alternative tools.
+## Further Reading
 
-### Q: What lock-in are we creating in commit conventions, CI config, and team process?
-**A:** Lock-in is considered lightweight. Convention changes should not require history rewrites.
+### Core Release/Version References
 
-## 13) Evidence We Should Demand
+- Semantic Versioning 2.0.0: https://semver.org/
+- Git documentation, `git-tag`: https://git-scm.com/docs/git-tag
+- Pro Git, *Tagging*: https://git-scm.com/book/en/v2/Git-Basics-Tagging
+- Google SRE Book, *Release Engineering*: https://sre.google/sre-book/release-engineering/
+- The Twelve-Factor App, *Build, release, run*: https://12factor.net/build-release-run
 
-### Q: What objective metrics would prove Tagger is net-positive?
-**A:** Increased release frequency.
+### CI and Branching
 
-### Q: Which baseline should we compare against?
-**A:** Pre-Tagger history in the same repository.
+- Martin Fowler, *Continuous Integration*: https://martinfowler.com/articles/continuousIntegration.html
+- Trunk Based Development, *Branch for release*: https://trunkbaseddevelopment.com/branch-for-release/
+- DORA, *Trunk-based development capability*: https://dora.dev/capabilities/trunk-based-development/
+- GitHub `actions/checkout` docs: https://github.com/actions/checkout
 
-### Q: What data would convince us to simplify or remove it?
-**A:** Configuration churn: if settings need changes more than once every six months, simplify or reconsider.
+### Alternatives and Governance
+
+- Conventional Commits 1.0.0: https://www.conventionalcommits.org/en/v1.0.0/
+- semantic-release docs: https://semantic-release.gitbook.io/semantic-release/
+- release-please docs: https://github.com/googleapis/release-please
+- Changesets docs: https://github.com/changesets/changesets
+- GitHub docs, protected
+  branches: https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches
+- Open Policy Agent docs: https://www.openpolicyagent.org/docs/latest/
+
+### Robert Murdock Writing
+
+- *Continuous Integration Metrics*: https://www.zegreatrob.com/ContinuousIntegrationMetrics.html
+- *Looking Back, Part 2: Continuous Integration
+  Metrics*: https://www.zegreatrob.com/2023/05/19/ContinuousMetricsRevisited.html
+- *Book Thoughts 2 (Escape Velocity)*: https://www.zegreatrob.com/2023/05/22/EscapeVelocityThoughts.html
+- *The Quality of Test*: https://www.zegreatrob.com/2020/04/24/TheQualityOfTest.html
