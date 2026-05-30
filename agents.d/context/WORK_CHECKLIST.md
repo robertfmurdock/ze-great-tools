@@ -16,6 +16,7 @@ One-sentence outcome.
 
 ## Constraints
 - Hard boundaries from PERSONA, playbooks, or architecture
+- Declare initial semver intent (`[none]`, `[patch]`, `[minor]`, `[major]`) and update it if implementation discoveries change impact.
 
 ## Checklist
 - [ ] Review this work card for compliance with template and update to conform
@@ -30,6 +31,7 @@ One-sentence outcome.
 - [ ] Move to agents.d/work_completed/
 
 ## Implementation Notes
+[Semver intent (initial): expected level + one-line rationale; update if it changes]
 [Agents log discoveries, deviations, or learned constraints here as they work]
 
 ## Validation
@@ -123,6 +125,7 @@ When replacing existing functionality:
 - **Project guidelines take precedence over initial work card plans.** If PERSONA, playbooks, or discovered architecture constraints conflict with the work card plan, update the plan.
 - Before marking a checklist item complete, review remaining items. If project guidelines revealed constraints not reflected in the plan, update the checklist and log the discovery in Implementation Notes.
 - Do not lock into the original spec — adapt as you learn.
+- If new findings suggest semver impact may increase (for example `[patch]` → `[minor]` or `[major]`), pause and ask the user to confirm direction before proceeding. Record the decision in Implementation Notes with date.
 
 ### General Practices
 - Keep changes focused on impacted modules.
