@@ -25,8 +25,10 @@ Hoist user-facing parity assertions for “signal exists + migration guidance ex
 - [x] Confirm warning/deprecation parity decisions remain explicit and documented where behavior intentionally diverges
   - Agent cycle: test → implement → refactor-light → verify pushable
   - Update plan if guidelines revealed new constraints
-- [ ] Final refactor pass via subagent (MANDATORY - see REFACTOR_AGENT.md)
-- [ ] Review changes against applicable playbooks and verify compliance
+- [x] Final refactor pass via subagent (MANDATORY - see REFACTOR_AGENT.md)
+  - N/A: No production code or test changes made; work card was audit/documentation only
+- [x] Review changes against applicable playbooks and verify compliance
+  - N/A: No code changes; work card was audit/documentation only
 - [ ] Move this file to agents.d/work_completed/
 
 ## Implementation Notes
@@ -92,5 +94,5 @@ Checked implementation-specific tests for redundant signal assertions:
 - **Status**: Divergence remains intentional and appropriate for each transport mechanism
 
 ## Validation
-- Commands: [filled in as work progresses]
-- Results: [filled in before completion]
+- Commands: `./gradlew check --quiet`
+- Results: ✅ All checks passed
