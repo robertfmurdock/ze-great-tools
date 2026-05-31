@@ -26,12 +26,12 @@ Improve digger fit-assessment guidance and create a high-quality `why-digger.md`
   - Agent cycle: test → implement → refactor-light → verify pushable
   - Include: principles, not-for-you cases, scope boundary, tradeoffs, failure modes, evaluation criteria, and alternatives framing
   - Ensure claims are tied to either code behavior or captured user context, not conjecture
-- [ ] Improve discoverability and regression protection
+- [x] Improve discoverability and regression protection
   - Agent cycle: test → implement → refactor-light → verify pushable
   - Add `digger guide` discoverability in CLI README help section
   - Strengthen guide tests to assert key quality phrases and link expectations
-- [ ] Final refactor pass via subagent (MANDATORY - see REFACTOR_AGENT.md)
-- [ ] Review changes against applicable playbooks and verify compliance
+- [x] Final refactor pass via subagent (MANDATORY - see REFACTOR_AGENT.md)
+- [x] Review changes against applicable playbooks and verify compliance
 - [ ] Move this file to agents.d/work_completed/
 
 ## Implementation Notes
@@ -58,5 +58,11 @@ Improve digger fit-assessment guidance and create a high-quality `why-digger.md`
 8. **Prerequisites**: Tags mark version boundaries consistently. Git history depth: full for all-contribution-data, at least back to last tag for current-contribution-data (CI shallow clones can break this). Commit message conventions if extracting metadata. Downstream consumption plan for the data.
 
 ## Validation
-- Commands: [filled in as work progresses]
-- Results: [filled in before completion]
+- Commands:
+  - `./gradlew :command-line-tools:digger-cli:jvmTest --tests "com.zegreatrob.tools.digger.cli.GuideTest"` - PASS
+  - `./gradlew :command-line-tools:digger-cli:jvmTest --tests "com.zegreatrob.tools.digger.cli.ReadmeTest"` - PASS
+  - `./gradlew :command-line-tools:digger-cli:check` - PASS (109 tasks, all tests passed)
+  - `./gradlew check` - PASS (259 tasks)
+  - `docs/why-digger-test.sh` - PASS (all required sections present)
+  - Final refactor subagent review: 0 issues found
+- Results: All tests pass, no linting errors, documentation quality verified, all playbook guidelines followed
