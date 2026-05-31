@@ -1,151 +1,141 @@
 # Why Tagger?
 
-This is a short FAQ about what Tagger is for, what it is not for, and how we use it in practice.
+Tagger is opinionated on purpose. This page is for deciding quickly whether those opinions fit your workflow.
+
+## Tagger Principles
+
+1. **Version Numbers live on annotated Git tags.**[^p1]
+2. **Commit content determines the next version.**[^p2]
+3. **Releases should be created on a release branch.**[^p3]
+4. **Version calculation happens separately from release.**[^p4]
+5. **Configuration lives in code and is governed the same way.**[^p5]
+
+If those sound wrong for your team, Tagger is likely a poor fit.
+
+## Not For You If...
+
+- You want version truth to come from an artifact repository or build metadata instead of Git tags.
+- You need multi-stream version lines as a first-class workflow.
+- You want a single atomic command to orchestrate the entire release lifecycle.
+- You are not willing to enforce Git/CI prerequisites (full history, tags, branch context).
 
 ## Scope Boundary
 
-### Q: What is Tagger responsible for?
+Tagger is responsible for version calculation and tagging policy enforcement.
 
-**A:** Computing versions from repo signals and applying tagging policy consistently.
+Tagger is not a full release platform. It does not solve deployment orchestration, rollout strategy, incident response,
+or product delivery management.
 
-### Q: What is Tagger not responsible for?
+## Fast "Should We Use It?" Questions
 
-**A:** Product release strategy, deployment orchestration, feature rollout, incident response, or overall software
-delivery performance. Tagger helps with version/tag correctness; it is one part of release engineering, not all of it.
+### Q: Who is Tagger a good fit for?
 
-## 1) Problem Framing
+**A:** Teams that want:
 
-### Q: What concrete pain are we solving?
+- deterministic versioning behavior
+- willingness to use Git tags
+- ability to enforce CI prerequisites consistently
 
-**A:** Manual versioning and tagging can get inconsistent under pressure. Tagger makes semver and tagging decisions
-deterministic from repository facts.
+### Q: Who is Tagger a poor fit for?
 
-### Q: If we removed Tagger tomorrow, what would change?
+**A:** Teams that want artifact-repo-first version truth, multi-stream version lines as a first-class requirement, or
+fully atomic "one command does everything" release orchestration.
 
-**A:** Version/tag decisions revert to manual discipline or replacement automation. Teams lose this policy enforcement
-point, but the broader release system can still function.
+### Q: What does Tagger reduce well?
 
-## 2) Version Source of Truth
+**A:** Manual version drift, inconsistent bump decisions, and weak tag discipline.
 
-### Q: Why use Git tags as the version source?
+### Q: What does Tagger not magically fix?
 
-**A:** Tags are durable VCS metadata and keep version identity separate from build mechanics. Intended flow:
-`code -> tag -> build -> artifact`.
+**A:** Broader release quality/process problems outside version/tag policy.
 
-### Q: Why prefer annotated tags?
+## Common Objections (And the Tagger Position)
 
-**A:** Tagger relies on tag metadata and ordering semantics (for example `taggerdate`) that lightweight tags do not
-provide.
+### "Why Git tags as source-of-truth?"
 
-### Q: How do we handle tag mistakes?
+Tagger treats tags as durable VCS release metadata and keeps version identity separate from build mechanics:
+`code -> tag -> build -> artifact`.[^o1]
 
-**A:** Public artifact mistakes are forward-fixed. Internal, unpublished metadata mistakes may be corrected in Git
-metadata.
+### "Why commit tokens instead of Conventional Commits / PR labels / manifests?"
 
-## 3) Semver Signal Strategy
+The default favors low-friction signaling – we want programmers to habitually think in semver when working on libraries.
+Alternative signaling schemes are valid; Tagger's core position is that bump intent should be explicit and
+machine-readable. Other schemes may be explicitly supported in the future.[^o2]
 
-### Q: Why use commit tokens (`[major]`, `[minor]`, `[patch]`, `[none]`)?
+### "Why split `calculate version` and `tag` into two steps?"
 
-**A:** They are low-friction and make semver intent explicit at change time.
+It isolates read-only computation from side effects. Tradeoff: it lowers the risk of premature tagging, but teams must
+avoid overriding computed versions casually.[^o3]
 
-### Q: Is this rejecting Conventional Commits or other models?
+### "Why enforce branch/snapshot/detached-HEAD rules?"
 
-**A:** No. The current default optimizes for low overhead. Other signaling models are compatible future options.
+These checks are policy guardrails for version/tag correctness. They are not claims that Tagger guarantees release
+safety end-to-end.[^o4]
 
-### Q: What happens with missing or wrong labels?
+### "Why require a full git history in CI?"
 
-**A:** Missing labels follow `implicitPatch`. Wrong labels produce wrong bumps unless caught before publish; recovery is
-usually a follow-up release.
+Version decisions depend on tag and graph context. Shallow or incomplete checkout is a common source of wrong
+outcomes.[^o5]
 
-## 4) Safety Policy
+## Important Tradeoffs
 
-### Q: Why gate behavior on repo state (`DIRTY`, `AHEAD`, `BEHIND`, `NOT_RELEASE_BRANCH`)?
+### Benefits you get
 
-**A:** These are version/tag safety signals, not full release-safety guarantees.
+- Deterministic version/tag behavior from repository facts
+- Lower semantic drift in versioning decisions
+- Clear policy surface (`.tagger` + CI invocation)
 
-### Q: Why block detached HEAD by default?
+### Costs you accept
 
-**A:** Policy application is ambiguous without stable branch context.
+- CI checkout and branch-context requirements
+- Opinionated branch/release posture by default
+- Need for governance around policy/config changes
 
-### Q: Who owns risk when strictness is relaxed?
+## Failure Modes and Recovery Posture
 
-**A:** The team enabling exceptions (`allowDetachedHead`, warning strictness, etc.) owns that risk.
+### Most observed failure
 
-## 5) Branch Model
+- Incorrect semver signaling in commits
 
-### Q: Why assume a designated release branch?
+### Other plausible failures
 
-**A:** It constrains where stable tags can be created and reduces accidental stable releases from arbitrary builds.
+- Missing tag/history context in CI
+- Branch policy misconfiguration
+- Detached-HEAD invocation in the wrong place
+- Local/CI invocation mismatch
 
-### Q: Does this fit every repo topology?
+### Recovery posture
 
-**A:** Strong for single version-line repos (including many trunk-based setups). Multi-stream monorepo version lines are
-not a first-class target.
+- Prefer forward-fix releases
+- Avoid rewriting shared history/tags except strictly internal, downstream-safe cases
 
-## 6) Workflow Design
+## Evidence and Exit Criteria
 
-### Q: Why separate `calculateVersion` from `tag/release`?
+### How to evaluate fit and value
 
-**A:** It separates read-only version computation from side effects and keeps integration points clearer in CI.
+Track Tagger-scoped indicators:
 
-### Q: What tradeoff does that create?
+- Version/tag incident rate (wrong bump, missing tag, duplicate/conflicting tag)
+- Manual version/tag overrides per release window
+- CI failures caused by missing tag/history/branch context
+- Frequency of policy/config churn in `.tagger` and invocation settings
+- Recovery rate for Tagger-caused mistakes using forward-fix only (no history rewrite)
 
-**A:** Lower risk of premature tagging, but higher risk of teams overriding computed results if process discipline is
-weak.
+Lead time, change failure rate, and rollback time are useful delivery metrics, but they primarily measure the whole
+software pipeline rather than Tagger itself.
 
-## 7) CI Operational Prerequisites
+### Baseline
 
-### Q: Why require full history (`fetch-depth: 0`) and upstream context?
+Compare against pre-Tagger behavior in the same repo and workflow.
 
-**A:** Version/tag decisions need enough graph and tag history to be correct.
+### When to simplify or remove Tagger
 
-### Q: What usually breaks in CI?
-
-**A:** Shallow checkout, missing tags, missing branch refs, missing upstream tracking, or tag push permissions.
-
-## 8) Governance and Change Risk
-
-### Q: Where does policy actually live?
-
-**A:** In `.tagger`, build scripts, and CI invocation. Control of those surfaces is control of release-tag policy.
-
-### Q: How should policy changes be treated?
-
-**A:** As high-impact changes: code review, ownership boundaries, and CI checks.
-
-## 9) Failure Modes and Recovery
-
-### Q: What failure is most clearly observed?
-
-**A:** Incorrect semver signaling in commits.
-
-### Q: What other failures are plausible?
-
-**A:** CI history/tag incompleteness, branch policy misconfiguration, detached-HEAD usage, and inconsistent local vs CI
-invocation.
-
-### Q: What is the recovery posture?
-
-**A:** Prefer forward fixes without rewriting shared history. Rewrite tags/history only for strictly internal,
-downstream-safe corrections.
-
-## 10) Evidence and Exit Criteria
-
-### Q: How do we evaluate whether Tagger helps?
-
-**A:** Use a small set: release frequency, lead time to release, change failure rate, rollback/repair time, plus
-version/tag incident rate.
-
-### Q: What baseline should we use?
-
-**A:** Pre-Tagger behavior in the same repository and workflow.
-
-### Q: When should we simplify or remove it?
-
-**A:** If Tagger-specific policy churn stays high, incidents remain frequent, or outcomes are not better than a simpler
-alternative over a meaningful period.
+If Tagger-specific churn stays high, incidents remain frequent, or outcomes are not better than a simpler alternative
+over a meaningful period.
 
 ## Further Reading
+
+<a id="support-core"></a>
 
 ### Core Release/Version References
 
@@ -155,12 +145,16 @@ alternative over a meaningful period.
 - Google SRE Book, *Release Engineering*: https://sre.google/sre-book/release-engineering/
 - The Twelve-Factor App, *Build, release, run*: https://12factor.net/build-release-run
 
+<a id="support-ci"></a>
+
 ### CI and Branching
 
 - Martin Fowler, *Continuous Integration*: https://martinfowler.com/articles/continuousIntegration.html
-- Trunk Based Development, *Branch for release*: https://trunkbaseddevelopment.com/branch-for-release/
+- Trunk-Based Development, *Branch for release*: https://trunkbaseddevelopment.com/branch-for-release/
 - DORA, *Trunk-based development capability*: https://dora.dev/capabilities/trunk-based-development/
 - GitHub `actions/checkout` docs: https://github.com/actions/checkout
+
+<a id="support-alt"></a>
 
 ### Alternatives and Governance
 
@@ -172,10 +166,23 @@ alternative over a meaningful period.
   branches: https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches
 - Open Policy Agent docs: https://www.openpolicyagent.org/docs/latest/
 
-### Robert Murdock Writing
+<a id="support-author"></a>
+
+### Writing by the Tagger Author
 
 - *Continuous Integration Metrics*: https://www.zegreatrob.com/ContinuousIntegrationMetrics.html
 - *Looking Back, Part 2: Continuous Integration
   Metrics*: https://www.zegreatrob.com/2023/05/19/ContinuousMetricsRevisited.html
 - *Book Thoughts 2 (Escape Velocity)*: https://www.zegreatrob.com/2023/05/22/EscapeVelocityThoughts.html
 - *The Quality of Test*: https://www.zegreatrob.com/2020/04/24/TheQualityOfTest.html
+
+[^p1]: See [Core Release/Version References](#support-core).
+[^p2]: See [Core Release/Version References](#support-core) and [Alternatives and Governance](#support-alt).
+[^p3]: See [CI and Branching](#support-ci).
+[^p4]: See [Core Release/Version References](#support-core).
+[^p5]: See [Alternatives and Governance](#support-alt).
+[^o1]: Related references: [Core Release/Version References](#support-core).
+[^o2]: Related references: [Alternatives and Governance](#support-alt).
+[^o3]: Related references: [Core Release/Version References](#support-core).
+[^o4]: Related references: [CI and Branching](#support-ci).
+[^o5]: Related references: [CI and Branching](#support-ci).
