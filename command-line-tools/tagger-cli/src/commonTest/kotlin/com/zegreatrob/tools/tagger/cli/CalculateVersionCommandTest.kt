@@ -5,6 +5,7 @@ import com.zegreatrob.minassert.assertIsEqualTo
 import com.zegreatrob.testmints.setup
 import com.zegreatrob.tools.tagger.CalculateVersionTestSpec
 import com.zegreatrob.tools.tagger.TestResult
+import com.zegreatrob.tools.tagger.core.SnapshotReason
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.boolean
 import kotlinx.serialization.json.jsonArray
@@ -15,6 +16,21 @@ import kotlin.test.assertNotNull
 import kotlin.test.fail
 
 class CalculateVersionCommandTest : CalculateVersionTestSpec {
+    @Test
+    fun helpTextDocumentsEverySnapshotReasonEnum() = setup(object {
+        val command = cli()
+    }) exercise {
+        command.test("calculate-version --help", width = 120)
+    } verify { result ->
+        val undocumentedReasons = SnapshotReason.entries.filterNot { reason ->
+            result.output.contains(reason.name)
+        }
+        undocumentedReasons.assertIsEqualTo(
+            emptyList(),
+            "Help must document every SnapshotReason enum name. Missing: $undocumentedReasons",
+        )
+    }
+
     @Test
     fun helpTextIncludesSnapshotRemediationGuidance() = setup(object {
         val command = cli()
@@ -326,6 +342,21 @@ class CalculateVersionCommandTest : CalculateVersionTestSpec {
         result.output.contains("--format").assertIsEqualTo(true)
         result.output.contains(Regex("\\(default:\\s*text\\)")).assertIsEqualTo(true, "Help should show default value automatically")
         result.output.contains("structured data").assertIsEqualTo(true, "Help should explain json format purpose")
+    }
+
+    @Test
+    fun helpTextDocumentsEveryOutputFormatEnumForCalculateVersion() = setup(object {
+        val command = cli()
+    }) exercise {
+        command.test("calculate-version --help", width = 120)
+    } verify { result ->
+        val undocumentedFormats = OutputFormat.entries.filterNot { format ->
+            result.output.contains(format.name.lowercase())
+        }
+        undocumentedFormats.assertIsEqualTo(
+            emptyList(),
+            "Help must document every OutputFormat enum value. Missing: $undocumentedFormats",
+        )
     }
 
     @Test

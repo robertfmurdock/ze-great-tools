@@ -141,4 +141,19 @@ class AllContributionDataTest : AllContributionTestSpec {
             "Help should describe output array structure in json mode",
         )
     }
+
+    @Test
+    fun helpTextDocumentsEveryOutputFormatEnumForAllContributionData() = setup(object {
+        val command = cli()
+    }) exercise {
+        command.test("all-contribution-data --help")
+    } verify { result ->
+        val undocumentedFormats = OutputFormat.entries.filterNot { format ->
+            result.output.contains(format.name.lowercase())
+        }
+        undocumentedFormats.assertIsEqualTo(
+            emptyList(),
+            "Help must document every OutputFormat enum value. Missing: $undocumentedFormats",
+        )
+    }
 }

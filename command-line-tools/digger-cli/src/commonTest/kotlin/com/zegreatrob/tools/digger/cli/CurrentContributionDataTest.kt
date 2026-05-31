@@ -5,6 +5,7 @@ import com.zegreatrob.minassert.assertIsEqualTo
 import com.zegreatrob.testmints.setup
 import com.zegreatrob.tools.cli.readFromFile
 import com.zegreatrob.tools.digger.CurrentContributionTestSpec
+import com.zegreatrob.tools.digger.core.SemverType
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
@@ -152,6 +153,36 @@ class CurrentContributionDataTest : CurrentContributionTestSpec {
         result.output.contains("STORY_ID=").assertIsEqualTo(
             true,
             "Help should include actionable CI/script example",
+        )
+    }
+
+    @Test
+    fun helpTextDocumentsEveryOutputFormatEnumForCurrentContributionData() = setup(object {
+        val command = cli()
+    }) exercise {
+        command.test("current-contribution-data --help")
+    } verify { result ->
+        val undocumentedFormats = OutputFormat.entries.filterNot { format ->
+            result.output.contains(format.name.lowercase())
+        }
+        undocumentedFormats.assertIsEqualTo(
+            emptyList(),
+            "Help must document every OutputFormat enum value. Missing: $undocumentedFormats",
+        )
+    }
+
+    @Test
+    fun helpTextDocumentsEverySemverTypeEnum() = setup(object {
+        val command = cli()
+    }) exercise {
+        command.test("current-contribution-data --help")
+    } verify { result ->
+        val undocumentedSemverTypes = SemverType.entries.filterNot { semverType ->
+            result.output.contains(semverType.name.lowercase())
+        }
+        undocumentedSemverTypes.assertIsEqualTo(
+            emptyList(),
+            "Help must document every SemverType enum value. Missing: $undocumentedSemverTypes",
         )
     }
 }

@@ -10,6 +10,7 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlin.test.Test
+import kotlin.test.fail
 
 class TagCommandTest : TagTestSpec {
     @Test
@@ -21,6 +22,21 @@ class TagCommandTest : TagTestSpec {
         result.output.contains("calculate-version").assertIsEqualTo(true, "Help should reference calculate-version")
         result.output.contains("two-step workflow").assertIsEqualTo(true, "Help should mention two-step workflow")
         result.output.contains("manually override").assertIsEqualTo(true, "Help should mention manual override")
+    }
+
+    @Test
+    fun helpTextDocumentsEveryOutputFormatEnumForTag() = setup(object {
+        val command = cli()
+    }) exercise {
+        command.test("tag --help")
+    } verify { result ->
+        val undocumentedFormats = OutputFormat.entries.filterNot { format ->
+            result.output.contains(format.name.lowercase())
+        }
+        undocumentedFormats.assertIsEqualTo(
+            emptyList(),
+            "Tag help must document every OutputFormat enum value. Missing: $undocumentedFormats",
+        )
     }
 
     override lateinit var projectDir: String
@@ -91,7 +107,7 @@ class TagCommandTest : TagTestSpec {
         val json = Json.parseToJsonElement(result.stdout)
         json.jsonObject["status"]?.jsonPrimitive?.content.assertIsEqualTo("success", "Full output: ${result.stdout}")
 
-        val data = json.jsonObject["data"]?.jsonObject ?: error("Expected data object in JSON. Output: ${result.stdout}")
+        val data = json.jsonObject["data"]?.jsonObject ?: fail("Expected data object in JSON. Output: ${result.stdout}")
         data["tag"]?.jsonPrimitive?.content.assertIsEqualTo("1.2.4")
     }
 
