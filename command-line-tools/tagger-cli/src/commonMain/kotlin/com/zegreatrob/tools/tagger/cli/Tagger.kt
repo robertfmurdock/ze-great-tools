@@ -79,23 +79,39 @@ class Tagger : CliktCommand() {
     """.trimIndent()
 
     private fun outputSection() = """
+        ${outputFormatGuidance()}
+
+        ${snapshotSemanticsGuidance()}
+
+        ${snapshotReasonsGuidance()}
+
+        ${remediationStepsGuidance()}
+    """.trimIndent()
+
+    private fun outputFormatGuidance() = """
         Output:
           Text format writes version to stdout, diagnostics to stderr.
           Command substitution captures only stdout: VERSION=$$(tagger -q calculate-version ...)
+    """.trimIndent()
 
-          -SNAPSHOT suffix indicates unmet conditions for release.
+    private fun snapshotSemanticsGuidance() = """
+        -SNAPSHOT suffix indicates unmet conditions for release.
           Snapshot versions should not be used in releases or tags.
           After 'tagger tag', subsequent calculate-version returns the bare version.
+    """.trimIndent()
 
-          Snapshot reasons (on stderr) describe conditions that must be resolved:
+    private fun snapshotReasonsGuidance() = """
+        Snapshot reasons (on stderr) describe conditions that must be resolved:
             DIRTY               - uncommitted changes in working directory
             AHEAD               - local branch ahead of remote
             BEHIND              - local branch behind remote
             NOT_RELEASE_BRANCH  - not on configured release branch
             NO_NEW_VERSION      - no new commits since last tag
             FORCED              - --force-snapshot=true was used
+    """.trimIndent()
 
-          Resolving snapshot reasons:
+    private fun remediationStepsGuidance() = """
+        Resolving snapshot reasons:
             DIRTY              → commit/stash changes
             AHEAD/BEHIND       → sync with remote (push/pull)
             NOT_RELEASE_BRANCH → switch to release branch or configure .tagger

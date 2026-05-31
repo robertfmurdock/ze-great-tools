@@ -30,6 +30,8 @@ class TaggerPlugin : Plugin<Project> {
             task.workingDirectory.set(tagger.workingDirectory)
             task.gitDirectory.set(tagger.workingDirectory.dir(".git"))
         }
+        // Suppress deprecation: disableDetached is deprecated in favor of allowDetachedHead (inverted logic),
+        // but we still configure both for backward compatibility with existing .tagger configs
         @Suppress("DEPRECATION")
         project.tasks.register("calculateVersion", CalculateVersion::class.java) { task ->
             task.group = "versioning"
