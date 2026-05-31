@@ -12,6 +12,16 @@ import kotlinx.serialization.json.jsonPrimitive
 import kotlin.test.Test
 
 class TagCommandTest : TagTestSpec {
+    @Test
+    fun helpTextEmphasizesCalculateVersionWorkflow() = setup(object {
+        val command = cli()
+    }) exercise {
+        command.test("tag --help")
+    } verify { result ->
+        result.output.contains("calculate-version").assertIsEqualTo(true, "Help should reference calculate-version")
+        result.output.contains("two-step workflow").assertIsEqualTo(true, "Help should mention two-step workflow")
+        result.output.contains("manually override").assertIsEqualTo(true, "Help should mention manual override")
+    }
 
     override lateinit var projectDir: String
 
