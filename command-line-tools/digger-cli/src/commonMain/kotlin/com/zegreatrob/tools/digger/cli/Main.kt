@@ -8,5 +8,8 @@ fun main(args: Array<String>) = cli()
     .main(platformArgCorrection(args))
 
 fun cli() = Digger()
-    .subcommands(CurrentContributionData())
-    .subcommands(AllContributionData())
+    .subcommands(
+        CurrentContributionData(),
+        AllContributionData(),
+        Guide(),
+    )
