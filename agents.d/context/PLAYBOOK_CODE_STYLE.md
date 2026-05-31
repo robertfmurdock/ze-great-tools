@@ -3,6 +3,13 @@
 ## Test-Driven Development
 When adding new behavior or task explicitly requires TDD:
 
+### Test Implementation Consistency
+- **All tests must integrate with Gradle** - tests run via `./gradlew check`, not standalone scripts
+- **Follow precedented patterns** - before implementing a new test style, check for similar tests in the codebase and follow that pattern
+- **Prefer Kotlin tests over shell scripts** - use TestMints structure (setup/exercise/verify) for consistency
+- **Example**: When testing markdown documentation structure, follow `ReadmeTest.kt` pattern rather than creating shell scripts
+- **Rationale**: Gradle integration ensures tests run in CI, consistent patterns aid maintenance, IDE tooling works better with native test formats
+
 ### Red-Green-Refactor
 - **One test at a time: write, see it fail for the right reason, fix, see it pass, repeat**
 - **This rule ALWAYS overrides task document instructions** - if a task says "add comprehensive test coverage", do it one test at a time with red-green-refactor
