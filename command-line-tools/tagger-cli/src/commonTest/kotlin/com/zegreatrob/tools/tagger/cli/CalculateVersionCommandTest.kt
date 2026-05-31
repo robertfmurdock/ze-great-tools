@@ -19,7 +19,7 @@ class CalculateVersionCommandTest : CalculateVersionTestSpec {
     fun helpTextIncludesSnapshotRemediationGuidance() = setup(object {
         val command = cli()
     }) exercise {
-        command.test("calculate-version --help")
+        command.test("calculate-version --help", width = 120)
     } verify { result ->
         result.output.contains("DIRTY").assertIsEqualTo(true, "Help should list DIRTY snapshot reason")
         result.output.contains("Uncommitted changes").assertIsEqualTo(true, "Help should explain DIRTY reason")
@@ -321,7 +321,7 @@ class CalculateVersionCommandTest : CalculateVersionTestSpec {
     fun helpTextExplainsFormatOption() = setup(object {
         val cli = cli()
     }) exercise {
-        cli.test("calculate-version --help")
+        cli.test("calculate-version --help", width = 120)
     } verify { result ->
         result.output.contains("--format").assertIsEqualTo(true)
         result.output.contains(Regex("\\(default:\\s*text\\)")).assertIsEqualTo(true, "Help should show default value automatically")
@@ -332,7 +332,7 @@ class CalculateVersionCommandTest : CalculateVersionTestSpec {
     fun helpTextExplainsForceSnapshotOption() = setup(object {
         val cli = cli()
     }) exercise {
-        cli.test("calculate-version --help")
+        cli.test("calculate-version --help", width = 120)
     } verify { result ->
         result.output.contains("--force-snapshot").assertIsEqualTo(true)
         result.output.contains("force").assertIsEqualTo(true, "Help should mention forcing behavior")
@@ -343,7 +343,7 @@ class CalculateVersionCommandTest : CalculateVersionTestSpec {
     fun helpTextExplainsReleaseBranchOption() = setup(object {
         val cli = cli()
     }) exercise {
-        cli.test("calculate-version --help")
+        cli.test("calculate-version --help", width = 120)
     } verify { result ->
         result.output.contains("--release-branch").assertIsEqualTo(true)
         result.output.contains("release branch name").assertIsEqualTo(true, "Help should explain purpose")
@@ -354,7 +354,7 @@ class CalculateVersionCommandTest : CalculateVersionTestSpec {
     fun helpTextExplainsAllowDetachedHeadOption() = setup(object {
         val cli = cli()
     }) exercise {
-        cli.test("calculate-version --help")
+        cli.test("calculate-version --help", width = 120)
     } verify { result ->
         result.output.contains("--allow-detached-head").assertIsEqualTo(true)
         result.output.contains("detached HEAD").assertIsEqualTo(true, "Help should explain what detached HEAD means")
@@ -365,7 +365,7 @@ class CalculateVersionCommandTest : CalculateVersionTestSpec {
     fun helpTextExplainsImplicitPatchOption() = setup(object {
         val cli = cli()
     }) exercise {
-        cli.test("calculate-version --help")
+        cli.test("calculate-version --help", width = 120)
     } verify { result ->
         result.output.contains("--implicit-patch").assertIsEqualTo(true)
         result.output.contains("patch version").assertIsEqualTo(true, "Help should mention patch bumping")
@@ -376,7 +376,7 @@ class CalculateVersionCommandTest : CalculateVersionTestSpec {
     fun helpTextMentionsConfigFile() = setup(object {
         val cli = cli()
     }) exercise {
-        cli.test("calculate-version --help")
+        cli.test("calculate-version --help", width = 120)
     } verify { result ->
         result.output.contains(".tagger").assertIsEqualTo(true, "Help should mention .tagger config file")
         result.output.contains(Regex("configuration|config file|settings")).assertIsEqualTo(true)
