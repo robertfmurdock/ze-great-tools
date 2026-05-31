@@ -15,6 +15,18 @@ import kotlin.test.assertNotNull
 import kotlin.test.fail
 
 class CalculateVersionCommandTest : CalculateVersionTestSpec {
+    @Test
+    fun helpTextIncludesSnapshotRemediationGuidance() = setup(object {
+        val command = cli()
+    }) exercise {
+        command.test("calculate-version --help")
+    } verify { result ->
+        result.output.contains("DIRTY").assertIsEqualTo(true, "Help should list DIRTY snapshot reason")
+        result.output.contains("Uncommitted changes").assertIsEqualTo(true, "Help should explain DIRTY reason")
+        result.output.contains("AHEAD").assertIsEqualTo(true, "Help should list AHEAD snapshot reason")
+        result.output.contains("Push changes").assertIsEqualTo(true, "Help should explain how to fix AHEAD")
+        result.output.contains("NOT_RELEASE_BRANCH").assertIsEqualTo(true, "Help should list NOT_RELEASE_BRANCH reason")
+    }
 
     override lateinit var projectDir: String
 
