@@ -21,6 +21,9 @@ private val requiredGuidePhrases = listOf(
     "Do not use Digger when",
     "Workflow philosophy",
     "Best practices",
+    "Prerequisites",
+    "Regex override contract",
+    "First-run workflow",
 )
 
 private fun String.toWhitespaceTolerantRegex(): String = trim()
