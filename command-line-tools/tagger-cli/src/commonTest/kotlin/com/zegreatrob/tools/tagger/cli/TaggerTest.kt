@@ -120,4 +120,16 @@ class TaggerTest {
         result.output.contains("AHEAD").assertIsEqualTo(true, "Help should list AHEAD")
         result.output.contains("sync").assertIsEqualTo(true, "Help should suggest sync for AHEAD/BEHIND")
     }
+
+    @Test
+    fun helpTextIncludesAntiPatternGuidance() = setup(object {
+        val command = cli()
+    }) exercise {
+        command.test("--help")
+    } verify { result ->
+        result.output.contains("Do:").assertIsEqualTo(true, "Help should include do/don't patterns")
+        result.output.contains("Don't:").assertIsEqualTo(true, "Help should include do/don't patterns")
+        result.output.contains("Calculate then tag").assertIsEqualTo(true, "Help should emphasize two-step workflow")
+        result.output.contains("Tag arbitrary versions").assertIsEqualTo(true, "Help should warn against ad hoc versions")
+    }
 }

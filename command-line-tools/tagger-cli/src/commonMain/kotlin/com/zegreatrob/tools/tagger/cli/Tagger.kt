@@ -22,6 +22,8 @@ class Tagger : CliktCommand() {
 
         ${workflowSection()}
 
+        ${antiPatternSection()}
+
         ${configurationSection()}
 
         ${outputSection()}
@@ -51,6 +53,18 @@ class Tagger : CliktCommand() {
 
         The tag command expects the output of calculate-version.
         Manual version override is for controlled exceptions only.
+    """.trimIndent()
+
+    private fun antiPatternSection() = """
+        Do:
+          • Calculate then tag (two-step workflow)
+          • Run with full Git history/tags in CI
+          • Use calculated version as tag input
+
+        Don't:
+          • Tag arbitrary versions from local assumptions
+          • Run with shallow/partial checkout when calculating release versions
+          • Override computed versions casually
     """.trimIndent()
 
     private fun configurationSection() = """
