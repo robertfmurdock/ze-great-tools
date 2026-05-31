@@ -1,18 +1,18 @@
 [versions]
+com-github-ajalt-clikt = "5.1.0"
 com-zegreatrob-testmints = "12.6.23"
 kotlin = "2.3.21"
 
 [libraries]
-com-github-ajalt-clikt-clikt = "com.github.ajalt.clikt:clikt:5.1.0"
-com-github-ajalt-clikt-clikt-markdown = "com.github.ajalt.clikt:clikt-markdown:5.1.0"
+com-github-ajalt-clikt-clikt = { module = "com.github.ajalt.clikt:clikt", version.ref = "com-github-ajalt-clikt" }
+com-github-ajalt-clikt-clikt-markdown = { module = "com.github.ajalt.clikt:clikt-markdown", version.ref = "com-github-ajalt-clikt" }
 com-zegreatrob-testmints-bom = { module = "com.zegreatrob.testmints:testmints-bom", version.ref = "com-zegreatrob-testmints" }
 com-zegreatrob-testmints-minassert = { module = "com.zegreatrob.testmints:minassert" }
 com-zegreatrob-testmints-standard = { module = "com.zegreatrob.testmints:standard" }
 org-jetbrains-kotlin-kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin" }
 org-jetbrains-kotlin-kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 org-jetbrains-kotlin-kotlin-test-junit5 = { module = "org.jetbrains.kotlin:kotlin-test-junit5", version.ref = "kotlin" }
-# @pin
-org-jetbrains-kotlinx-kotlinx-serialization-bom = "org.jetbrains.kotlinx:kotlinx-serialization-bom:1.9.0"
+org-jetbrains-kotlinx-kotlinx-serialization-bom = "org.jetbrains.kotlinx:kotlinx-serialization-bom:1.11.0"
 
 [plugins]
 nl-littlerobots-version-catalog-update = "nl.littlerobots.version-catalog-update:1.1.0"
