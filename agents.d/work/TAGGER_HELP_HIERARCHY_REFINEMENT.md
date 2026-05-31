@@ -10,8 +10,8 @@ Restructure tagger help content so root help stays <10 lines (commands visible w
 - Semver intent (initial): `[minor]` - adding new `guide` subcommand is new functionality
 
 ## Checklist
-- [ ] Review this work card for compliance with template and update to conform
-- [ ] If this card plans subagent delegation, ask user to explicitly authorize subagents for this card and record the response in Implementation Notes
+- [x] Review this work card for compliance with template and update to conform
+- [x] If this card plans subagent delegation, ask user to explicitly authorize subagents for this card and record the response in Implementation Notes
 - [ ] Condense root help to <10 lines: tool purpose, quick command list pointer, guide pointer
   - Agent cycle: test → implement → refactor-light → verify pushable
   - Update plan if guidelines revealed new constraints
@@ -33,6 +33,8 @@ Restructure tagger help content so root help stays <10 lines (commands visible w
 
 ## Implementation Notes
 Semver intent (initial): `[minor]` - new `guide` subcommand adds functionality.
+
+**Subagent authorization**: User authorized subagent delegation on 2026-05-30.
 
 ### Proposed Content Distribution
 

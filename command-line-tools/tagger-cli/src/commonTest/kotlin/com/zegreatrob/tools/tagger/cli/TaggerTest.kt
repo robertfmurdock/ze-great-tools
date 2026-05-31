@@ -49,20 +49,6 @@ class TaggerTest {
     }
 
     @Test
-    fun helpTextIncludesOutputSection() = setup(object {
-        val command = cli()
-    }) exercise {
-        command.test("--help")
-    } verify { result ->
-        result.output.contains("Output:").assertIsEqualTo(true, "Help should include Output section")
-        result.output.contains("-SNAPSHOT").assertIsEqualTo(true, "Help should explain -SNAPSHOT semantics")
-        SnapshotReason.entries.forEach { reason ->
-            result.output.contains(reason.name)
-                .assertIsEqualTo(true, "Help should document ${reason.name} status flag")
-        }
-    }
-
-    @Test
     fun helpTextGuidesAutomationToJsonFormat() = setup(object {
         val command = cli()
     }) exercise {
@@ -71,33 +57,22 @@ class TaggerTest {
         result.output.contains("Automation").assertIsEqualTo(true)
         result.output.contains("--format=json").assertIsEqualTo(true)
         result.output.contains("unmet conditions").assertIsEqualTo(true)
-        result.output.contains("should not be used in releases or tags").assertIsEqualTo(true)
+        result.output.contains(Regex("should\\s+not\\s+be\\s+used\\s+in\\s+releases\\s+or\\s+tags"))
+            .assertIsEqualTo(true)
     }
 
     @Test
-    fun helpTextIncludesConfigurationSection() = setup(object {
+    fun helpTextReferencesFitCheckInGuide() = setup(object {
         val command = cli()
     }) exercise {
         command.test("--help")
     } verify { result ->
-        result.output.contains("Configuration:").assertIsEqualTo(true, "Help should include Configuration section")
-        result.output.contains(".tagger").assertIsEqualTo(true, "Help should mention .tagger file")
-        result.output.contains("generate-settings-file").assertIsEqualTo(true, "Help should reference settings generation")
+        result.output.contains("tagger guide").assertIsEqualTo(true, "Help should reference guide command for fit check")
+        result.output.contains("fit assessment").assertIsEqualTo(true, "Help should mention fit assessment")
     }
 
     @Test
-    fun helpTextIncludesFitCheckGuidance() = setup(object {
-        val command = cli()
-    }) exercise {
-        command.test("--help")
-    } verify { result ->
-        result.output.contains("Use Tagger when").assertIsEqualTo(true, "Help should include fit check")
-        result.output.contains("Do not use Tagger when").assertIsEqualTo(true, "Help should include anti-fit guidance")
-        result.output.contains("docs/why-tagger.md").assertIsEqualTo(true, "Help should reference philosophy doc")
-    }
-
-    @Test
-    fun helpTextIncludesTwoStepWorkflowGuidance() = setup(object {
+    fun helpTextIncludesQuickStart() = setup(object {
         val command = cli()
     }) exercise {
         command.test("--help")
@@ -105,31 +80,27 @@ class TaggerTest {
         result.output.contains("Quick start").assertIsEqualTo(true, "Help should include quick start")
         result.output.contains("calculate-version").assertIsEqualTo(true, "Help should reference calculate-version")
         result.output.contains("tag --version").assertIsEqualTo(true, "Help should reference tag with version")
-        result.output.contains("snapshot == false").assertIsEqualTo(true, "Help should show snapshot check gate")
+        result.output.contains("snapshot").assertIsEqualTo(true, "Help should mention snapshot check")
     }
 
     @Test
-    fun helpTextIncludesSnapshotRemediationGuidance() = setup(object {
+    fun rootHelpIsConcise() = setup(object {
         val command = cli()
     }) exercise {
         command.test("--help")
     } verify { result ->
-        result.output.contains("Resolving snapshot").assertIsEqualTo(true, "Help should include remediation section")
-        result.output.contains("DIRTY").assertIsEqualTo(true, "Help should list DIRTY")
-        result.output.contains("commit/stash").assertIsEqualTo(true, "Help should suggest commit/stash for DIRTY")
-        result.output.contains("AHEAD").assertIsEqualTo(true, "Help should list AHEAD")
-        result.output.contains("sync").assertIsEqualTo(true, "Help should suggest sync for AHEAD/BEHIND")
-    }
+        val lines = result.output.lines()
+        val commandsLineIndex = lines.indexOfFirst { it.trim().startsWith("Commands:") }
+        if (commandsLineIndex == -1) error("Commands section not found in help output")
 
-    @Test
-    fun helpTextIncludesAntiPatternGuidance() = setup(object {
-        val command = cli()
-    }) exercise {
-        command.test("--help")
-    } verify { result ->
-        result.output.contains("Do:").assertIsEqualTo(true, "Help should include do/don't patterns")
-        result.output.contains("Don't:").assertIsEqualTo(true, "Help should include do/don't patterns")
-        result.output.contains("Calculate then tag").assertIsEqualTo(true, "Help should emphasize two-step workflow")
-        result.output.contains("Tag arbitrary versions").assertIsEqualTo(true, "Help should warn against ad hoc versions")
+        (commandsLineIndex <= 25).assertIsEqualTo(
+            true,
+            "Commands section should appear within first screen (~25 lines), found at line $commandsLineIndex",
+        )
+
+        result.output.contains(Regex("tagger\\s+guide")).assertIsEqualTo(
+            true,
+            "Help should reference guide command",
+        )
     }
 }
