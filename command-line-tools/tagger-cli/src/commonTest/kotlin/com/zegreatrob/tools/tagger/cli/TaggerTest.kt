@@ -54,11 +54,8 @@ class TaggerTest {
     }) exercise {
         command.test("--help")
     } verify { result ->
-        result.output.contains("Automation").assertIsEqualTo(true)
-        result.output.contains("--format=json").assertIsEqualTo(true)
-        result.output.contains("unmet conditions").assertIsEqualTo(true)
-        result.output.contains(Regex("should\\s+not\\s+be\\s+used\\s+in\\s+releases\\s+or\\s+tags"))
-            .assertIsEqualTo(true)
+        result.output.contains("--format=json").assertIsEqualTo(true, "Help should mention JSON format")
+        result.output.contains("machine-readable").assertIsEqualTo(true, "Help should mention machine-readable output")
     }
 
     @Test
@@ -72,15 +69,17 @@ class TaggerTest {
     }
 
     @Test
-    fun helpTextIncludesQuickStart() = setup(object {
+    fun helpTextIncludesBuildScriptExample() = setup(object {
         val command = cli()
     }) exercise {
         command.test("--help")
     } verify { result ->
-        result.output.contains("Quick start").assertIsEqualTo(true, "Help should include quick start")
-        result.output.contains("calculate-version").assertIsEqualTo(true, "Help should reference calculate-version")
-        result.output.contains("tag --version").assertIsEqualTo(true, "Help should reference tag with version")
-        result.output.contains("snapshot").assertIsEqualTo(true, "Help should mention snapshot check")
+        result.output.contains("CI/build script").assertIsEqualTo(true, "Help should reference CI/build script usage")
+        result.output.contains("calculate-version").assertIsEqualTo(true, "Help should show calculate-version")
+        result.output.contains("your-build-script").assertIsEqualTo(true, "Help should show generic build script")
+        result.output.contains("tag --version").assertIsEqualTo(true, "Help should show tagging step")
+        result.output.contains("before tagging")
+            .assertIsEqualTo(true, "Help should emphasize building before tagging")
     }
 
     @Test

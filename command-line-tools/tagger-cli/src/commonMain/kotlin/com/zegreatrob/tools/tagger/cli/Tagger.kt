@@ -3,7 +3,7 @@ package com.zegreatrob.tools.tagger.cli
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.Context
 import com.github.ajalt.clikt.core.context
-import com.github.ajalt.clikt.output.MordantHelpFormatter
+import com.github.ajalt.clikt.output.MordantMarkdownHelpFormatter
 import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.versionOption
@@ -12,7 +12,7 @@ class Tagger : CliktCommand() {
 
     init {
         context {
-            helpFormatter = { MordantHelpFormatter(it, showDefaultValues = true) }
+            helpFormatter = { MordantMarkdownHelpFormatter(it, showDefaultValues = true) }
         }
         versionOption(Versions.taggerVersion)
     }
@@ -21,18 +21,16 @@ class Tagger : CliktCommand() {
         Tagger calculates semantic versions from Git history and enforces tagging policy.
         Version numbers live on Git tags. Commit content determines the next version.
 
-        Quick start: tagger calculate-version → check snapshot → tagger tag --version <result>
+        Typical CI/build script usage:
+
+        ```
+        VERSION=${'$'}(tagger calculate-version)
+        ./your-build-script.sh version=${'$'}VERSION
+        tagger tag --version ${'$'}VERSION
+        ```
+
+        Use --format=json for machine-readable output. Build with calculated version before tagging.
         For fit assessment and philosophy: tagger guide
-
-        Automation & AI Agents:
-          Use --format=json for structured data with machine-readable fields:
-            - 'snapshot' boolean indicating tagging readiness
-            - 'snapshotReasons' array listing unmet conditions
-            - 'version' string for consistent parsing
-
-          -SNAPSHOT suffix means unmet conditions; should not be used in releases or tags.
-
-          Example: tagger calculate-version --format=json
     """.trimIndent()
 
     private val quiet by option(

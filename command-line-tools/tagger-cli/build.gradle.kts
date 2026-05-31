@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalKotlinGradlePluginApi::class)
+
 import org.apache.tools.ant.filters.ReplaceTokens
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.targets.js.npm.npmProject
@@ -16,7 +18,13 @@ repositories {
 val generatedDirectory = project.layout.buildDirectory.dir("generated-sources/templates/kotlin/main")
 
 kotlin {
-    jvm()
+    jvm {
+        binaries {
+            executable {
+                mainClass.set("com.zegreatrob.coupling.cli.MainKt")
+            }
+        }
+    }
     js(IR) {
         nodejs {
             useCommonJs()
@@ -57,6 +65,7 @@ dependencies {
     commonMainImplementation("com.zegreatrob.tools:tagger-json")
     commonMainImplementation("com.zegreatrob.tools:tagger-core")
     commonMainImplementation(libs.com.github.ajalt.clikt.clikt)
+    commonMainImplementation(libs.com.github.ajalt.clikt.clikt.markdown)
     commonMainImplementation("org.jetbrains.kotlinx:kotlinx-serialization-json")
     commonTestImplementation("com.zegreatrob.tools:tagger-test")
     commonTestImplementation(kotlin("test"))

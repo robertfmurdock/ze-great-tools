@@ -10,9 +10,10 @@ class GuideTest {
     fun guideCommandShowsFitAssessment() = setup(object {
         val command = cli()
     }) exercise {
-        command.test("guide --help")
+        command.test("guide")
     } verify { result ->
         result.output.contains("Use Tagger when").assertIsEqualTo(true)
         result.output.contains("Do not use Tagger when").assertIsEqualTo(true)
+        result.output.contains("https://github.com").assertIsEqualTo(true, "Guide should include GitHub docs link")
     }
 }

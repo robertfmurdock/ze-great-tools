@@ -4,6 +4,7 @@ kotlin = "2.3.21"
 
 [libraries]
 com-github-ajalt-clikt-clikt = "com.github.ajalt.clikt:clikt:5.1.0"
+com-github-ajalt-clikt-clikt-markdown = "com.github.ajalt.clikt:clikt-markdown:5.1.0"
 com-zegreatrob-testmints-bom = { module = "com.zegreatrob.testmints:testmints-bom", version.ref = "com-zegreatrob-testmints" }
 com-zegreatrob-testmints-minassert = { module = "com.zegreatrob.testmints:minassert" }
 com-zegreatrob-testmints-standard = { module = "com.zegreatrob.testmints:standard" }
