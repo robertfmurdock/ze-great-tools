@@ -10,8 +10,8 @@ Strengthen Tagger in-app help so users understand both how to run commands and w
 - Semver intent (initial): `[none]` for analysis/work-card planning; implementation items in this card are expected to be `[patch]` unless they change machine-readable output contracts.
 
 ## Checklist
-- [ ] Review this work card for compliance with template and update to conform
-- [ ] If this card plans subagent delegation, ask user to explicitly authorize subagents for this card and record the response in Implementation Notes
+- [x] Review this work card for compliance with template and update to conform
+- [x] If this card plans subagent delegation, ask user to explicitly authorize subagents for this card and record the response in Implementation Notes
 - [ ] Add a philosophy-first "fit check" layer to in-app help before option-level details
   - Agent cycle: test → implement → refactor-light → verify pushable
   - Update plan if guidelines revealed new constraints
@@ -36,6 +36,8 @@ Strengthen Tagger in-app help so users understand both how to run commands and w
 
 ## Implementation Notes
 Semver intent (initial): `[none]` for this planning artifact only.
+
+**Subagent authorization**: Granted 2026-05-30. Final refactor subagent will be used per REFACTOR_AGENT.md requirements.
 
 ### Source Inputs Reviewed
 - `docs/why-tagger.md`
