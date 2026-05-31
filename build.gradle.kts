@@ -46,6 +46,26 @@ tasks {
     register("formatKotlin") {
         dependsOn(provider { gradle.includedBuilds.map { it.task(":formatKotlin") }.toList() })
     }
+    register("resetYarnLock") {
+        description = "Deletes all kotlin-js-store/yarn.lock files to force fresh transitive dependency resolution"
+        dependsOn(provider {
+            listOf(
+                gradle.includedBuild("command-line-tools").task(":resetYarnLock"),
+                gradle.includedBuild("tools").task(":resetYarnLock"),
+                gradle.includedBuild("tools-tests").task(":resetYarnLock"),
+            )
+        })
+    }
+    register("kotlinUpgradeYarnLock") {
+        mustRunAfter("resetYarnLock")
+        dependsOn(provider {
+            listOf(
+                gradle.includedBuild("command-line-tools").task(":kotlinUpgradeYarnLock"),
+                gradle.includedBuild("tools").task(":kotlinUpgradeYarnLock"),
+                gradle.includedBuild("tools-tests").task(":kotlinUpgradeYarnLock"),
+            )
+        })
+    }
     val testBuilds = listOf(
         gradle.includedBuild("tools"),
         gradle.includedBuild("tools-tests"),

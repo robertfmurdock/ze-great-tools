@@ -1,0 +1,21 @@
+version: 2
+updates:
+  # Disable Dependabot for Kotlin/JS kotlin-js-store directories
+  # These are managed by Gradle, not npm/yarn directly
+  - package-ecosystem: "npm"
+    directory: "/command-line-tools/kotlin-js-store"
+    schedule:
+      interval: "daily"
+    open-pull-requests-limit: 0
+
+  - package-ecosystem: "npm"
+    directory: "/tools-tests/kotlin-js-store"
+    schedule:
+      interval: "daily"
+    open-pull-requests-limit: 0
+
+  - package-ecosystem: "npm"
+    directory: "/tools/kotlin-js-store"
+    schedule:
+      interval: "daily"
+    open-pull-requests-limit: 0

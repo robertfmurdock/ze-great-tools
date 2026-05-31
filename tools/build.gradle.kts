@@ -33,6 +33,13 @@ tasks {
     assemble { dependsOn(provider { (getTasksByName("assemble", true) - this).toList() }) }
     check { dependsOn(provider { (getTasksByName("check", true) - this).toList() }) }
     clean { dependsOn(provider { (getTasksByName("clean", true) - this).toList() }) }
+    register<Delete>("resetYarnLock") {
+        description = "Deletes kotlin-js-store/yarn.lock to force fresh transitive dependency resolution"
+        delete(file("kotlin-js-store/yarn.lock"))
+    }
+    matching { it.name == "kotlinUpgradeYarnLock" }.configureEach {
+        mustRunAfter("resetYarnLock")
+    }
     register("collectResults") {
         dependsOn(provider { (getTasksByName("collectResults", true) - this).toList() })
     }
