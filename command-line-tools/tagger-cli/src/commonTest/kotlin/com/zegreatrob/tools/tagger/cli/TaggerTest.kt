@@ -95,4 +95,16 @@ class TaggerTest {
         result.output.contains("Do not use Tagger when").assertIsEqualTo(true, "Help should include anti-fit guidance")
         result.output.contains("docs/why-tagger.md").assertIsEqualTo(true, "Help should reference philosophy doc")
     }
+
+    @Test
+    fun helpTextIncludesTwoStepWorkflowGuidance() = setup(object {
+        val command = cli()
+    }) exercise {
+        command.test("--help")
+    } verify { result ->
+        result.output.contains("Quick start").assertIsEqualTo(true, "Help should include quick start")
+        result.output.contains("calculate-version").assertIsEqualTo(true, "Help should reference calculate-version")
+        result.output.contains("tag --version").assertIsEqualTo(true, "Help should reference tag with version")
+        result.output.contains("snapshot == false").assertIsEqualTo(true, "Help should show snapshot check gate")
+    }
 }

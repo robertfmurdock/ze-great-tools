@@ -20,6 +20,8 @@ class Tagger : CliktCommand() {
     override fun help(context: Context) = """
         ${fitCheckSection()}
 
+        ${workflowSection()}
+
         ${configurationSection()}
 
         ${outputSection()}
@@ -39,6 +41,16 @@ class Tagger : CliktCommand() {
           • You cannot enforce Git/CI prerequisites (full history, tags, branch context)
 
         For full rationale: docs/why-tagger.md
+    """.trimIndent()
+
+    private fun workflowSection() = """
+        Quick start (default safe path):
+          1. tagger calculate-version --format=json
+          2. Check that snapshot == false (if true, fix conditions before tagging)
+          3. tagger tag --version <calculated>
+
+        The tag command expects the output of calculate-version.
+        Manual version override is for controlled exceptions only.
     """.trimIndent()
 
     private fun configurationSection() = """
