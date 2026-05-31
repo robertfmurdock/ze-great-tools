@@ -84,4 +84,15 @@ class TaggerTest {
         result.output.contains(".tagger").assertIsEqualTo(true, "Help should mention .tagger file")
         result.output.contains("generate-settings-file").assertIsEqualTo(true, "Help should reference settings generation")
     }
+
+    @Test
+    fun helpTextIncludesFitCheckGuidance() = setup(object {
+        val command = cli()
+    }) exercise {
+        command.test("--help")
+    } verify { result ->
+        result.output.contains("Use Tagger when").assertIsEqualTo(true, "Help should include fit check")
+        result.output.contains("Do not use Tagger when").assertIsEqualTo(true, "Help should include anti-fit guidance")
+        result.output.contains("docs/why-tagger.md").assertIsEqualTo(true, "Help should reference philosophy doc")
+    }
 }

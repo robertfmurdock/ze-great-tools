@@ -18,11 +18,27 @@ class Tagger : CliktCommand() {
     }
 
     override fun help(context: Context) = """
+        ${fitCheckSection()}
+
         ${configurationSection()}
 
         ${outputSection()}
 
         ${automationSection()}
+    """.trimIndent()
+
+    private fun fitCheckSection() = """
+        Use Tagger when:
+          • Version numbers should live on Git tags as the source of truth
+          • Commit content should determine the next version
+          • You can enforce full Git history/tags in CI
+
+        Do not use Tagger when:
+          • Version truth must come from artifact repos or build metadata
+          • You need multi-stream version lines as a first-class workflow
+          • You cannot enforce Git/CI prerequisites (full history, tags, branch context)
+
+        For full rationale: docs/why-tagger.md
     """.trimIndent()
 
     private fun configurationSection() = """
