@@ -17,7 +17,7 @@ Improve digger fit-assessment guidance and create a high-quality `why-digger.md`
   - Produce a concise question set that captures workflow, constraints, failure modes, alternatives considered, and success criteria
   - Record user responses in Implementation Notes and treat them as source inputs for rationale content
   - Do not mark this item complete until the user has answered and ambiguities are resolved
-- [ ] Upgrade `digger guide` content for operational fit assessment quality
+- [x] Upgrade `digger guide` content for operational fit assessment quality
   - Agent cycle: test → implement → refactor-light → verify pushable
   - Add explicit prerequisites, anti-fit criteria, and first-run workflow guidance
   - Document regex override contract including required named groups (`storyId`, `ease`)
