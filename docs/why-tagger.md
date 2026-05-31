@@ -133,6 +133,20 @@ Compare against pre-Tagger behavior in the same repo and workflow.
 If Tagger-specific churn stays high, incidents remain frequent, or outcomes are not better than a simpler alternative
 over a meaningful period.
 
+## Comparison with Similar Tools
+
+Tagger shares philosophical alignment with tools like [semantic-release](https://semantic-release.gitbook.io/) around making releases mechanical and unsentimental. However, they differ significantly in scope and integration approach.
+
+For a detailed comparison that helps you choose the right tool for your context, see:
+
+**[Tagger vs Semantic-Release: Choosing the Right Tool](tagger-vs-semantic-release.md)**
+
+Key differentiators:
+- **Tagger**: Narrowly-scoped, scriptable tool focused on version calculation and tagging. Platform-neutral, stays out of your build process.
+- **Semantic-release**: Full-lifecycle release orchestrator with integrated changelog generation, artifact publishing, and notifications.
+
+Both approaches are valid—choose based on whether you prefer focused composability or integrated orchestration.
+
 ## Further Reading
 
 <a id="support-core"></a>

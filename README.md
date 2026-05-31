@@ -23,6 +23,8 @@ Basic tools for continuous development and release.
 
 An opinionated plugin for automatic semantic versioning via git tags and information in commits.
 
+**Evaluating versioning tools?** See [Tagger vs Semantic-Release](docs/tagger-vs-semantic-release.md) for a detailed comparison.
+
 See its [README](tools/tagger-plugin/README.md) for more.
 
 ### Digger
@@ -36,6 +38,8 @@ See its [README](tools/digger-plugin/README.md) for more.
 ### Tagger CLI
 
 An opinionated program for automatic semantic versioning via git tags and information in commits.
+
+**Evaluating versioning tools?** See [Tagger vs Semantic-Release](docs/tagger-vs-semantic-release.md) for a detailed comparison.
 
 See its [README](command-line-tools/tagger-cli/README.md) for more.
 
