@@ -58,6 +58,7 @@ dependencies {
     commonMainImplementation("com.zegreatrob.tools:digger-core")
     commonMainImplementation("com.zegreatrob.tools:digger-json")
     commonMainImplementation(libs.com.github.ajalt.clikt.clikt)
+    commonMainImplementation(libs.com.github.ajalt.clikt.clikt.markdown)
     commonMainImplementation("org.jetbrains.kotlinx:kotlinx-serialization-json")
 
     commonTestImplementation("com.zegreatrob.tools:digger-test")
