@@ -135,17 +135,32 @@ over a meaningful period.
 
 ## Comparison with Similar Tools
 
-Tagger shares philosophical alignment with tools like [semantic-release](https://semantic-release.gitbook.io/) around making releases mechanical and unsentimental. However, they differ significantly in scope and integration approach.
+Tagger shares philosophical alignment with tools like [semantic-release](https://semantic-release.gitbook.io/)
+and [Axion Release Plugin](https://github.com/allegro/axion-release-plugin) around making releases mechanical and
+unsentimental. However, they differ significantly in scope, integration approach, and version derivation philosophy.
 
-For a detailed comparison that helps you choose the right tool for your context, see:
+For detailed comparisons that help you choose the right tool for your context, see:
 
 **[Tagger vs Semantic-Release: Choosing the Right Tool](tagger-vs-semantic-release.md)**
 
 Key differentiators:
-- **Tagger**: Narrowly-scoped, scriptable tool focused on version calculation and tagging. Platform-neutral, stays out of your build process.
-- **Semantic-release**: Full-lifecycle release orchestrator with integrated changelog generation, artifact publishing, and notifications.
 
-Both approaches are valid—choose based on whether you prefer focused composability or integrated orchestration.
+- **Tagger**: Narrowly-scoped, scriptable tool focused on version calculation and tagging. Platform-neutral, stays out
+  of your build process.
+- **Semantic-release**: Full-lifecycle release orchestrator with integrated changelog generation, artifact publishing,
+  and notifications.
+
+**[Tagger vs Axion Release Plugin: Choosing the Right Tool](tagger-vs-axion-release.md)**
+
+Key differentiators:
+
+- **Tagger**: Commit messages contain increment instructions that determine how to bump from the last tag. Two-phase
+  workflow enables validation before tagging.
+- **Axion**: Automatic patch increment on each release, or manual major/minor specification. Single-command release
+  workflow.
+
+All approaches are valid—choose based on whether you prefer commit-driven increment instructions vs
+automatic/manual versioning, focused composability vs integrated orchestration.
 
 ## Further Reading
 

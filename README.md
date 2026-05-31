@@ -1,6 +1,6 @@
 # ze-great-tools
 
-![Build](https://github.com/robertfmurdock/ze-great-tools/actions/workflows/main.yml/badge.svg?branch=main) 
+![Build](https://github.com/robertfmurdock/ze-great-tools/actions/workflows/main.yml/badge.svg?branch=main)
 ![Maven Central](https://img.shields.io/maven-central/v/com.zegreatrob.tools.tagger/com.zegreatrob.tools.tagger.gradle.plugin)
 ![GitHub tag (latest by date)](https://img.shields.io/github/v/tag/robertfmurdock/ze-great-tools?label=Release)
 
@@ -23,7 +23,11 @@ Basic tools for continuous development and release.
 
 An opinionated plugin for automatic semantic versioning via git tags and information in commits.
 
-**Evaluating versioning tools?** See [Tagger vs Semantic-Release](docs/tagger-vs-semantic-release.md) for a detailed comparison.
+**Evaluating versioning tools?** See:
+
+- [Tagger vs Semantic-Release](docs/tagger-vs-semantic-release.md) — comparing full-lifecycle orchestration approaches
+- [Tagger vs Axion Release Plugin](docs/tagger-vs-axion-release.md) — comparing commit-driven vs tag-driven Gradle
+  versioning
 
 See its [README](tools/tagger-plugin/README.md) for more.
 
@@ -39,7 +43,11 @@ See its [README](tools/digger-plugin/README.md) for more.
 
 An opinionated program for automatic semantic versioning via git tags and information in commits.
 
-**Evaluating versioning tools?** See [Tagger vs Semantic-Release](docs/tagger-vs-semantic-release.md) for a detailed comparison.
+**Evaluating versioning tools?** See:
+
+- [Tagger vs Semantic-Release](docs/tagger-vs-semantic-release.md) — comparing full-lifecycle orchestration approaches
+- [Tagger vs Axion Release Plugin](docs/tagger-vs-axion-release.md) — comparing commit-driven vs tag-driven Gradle
+  versioning
 
 See its [README](command-line-tools/tagger-cli/README.md) for more.
 
