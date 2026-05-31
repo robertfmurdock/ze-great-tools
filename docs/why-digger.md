@@ -16,13 +16,16 @@ If those sound wrong for your team, Digger is likely a poor fit.
 
 - Your repository does not use Git tags to mark version boundaries.
 - You have no downstream plan for consuming the extracted contribution data.
-- You need real-time work tracking rather than post-contribution analysis (Note: Digger supports real-time via `current-contribution-data`, but the primary use case is analytical retrospective).
+- You need real-time work tracking rather than post-contribution analysis (Note: Digger supports real-time via
+  `current-contribution-data`, but the primary use case is analytical retrospective).
 
 ## Scope Boundary
 
 Digger is responsible for extracting contribution data from git (commits, tags, timing, contributors, metadata).
 
-Digger is not responsible for visualization, statistical analysis, pairing correlation, actionable insights, validation, or enforcement. It surfaces data in a consistent shape; consuming tools (e.g., Coupling) handle interpretation and presentation.
+Digger is not responsible for visualization, statistical analysis, pairing correlation, actionable insights, validation,
+or enforcement. It surfaces data in a consistent shape; consuming tools (e.g., Coupling) handle interpretation and
+presentation.
 
 ## Fast "Should We Use It?" Questions
 
@@ -41,7 +44,8 @@ Digger is not responsible for visualization, statistical analysis, pairing corre
 
 ### Q: What does Digger reduce well?
 
-**A:** Manual contribution data aggregation, inconsistent contribution boundary definitions, dependency on external service APIs for contribution analytics.
+**A:** Manual contribution data aggregation, inconsistent contribution boundary definitions, dependency on external
+service APIs for contribution analytics.
 
 ### Q: What does Digger not magically fix?
 
@@ -99,4 +103,5 @@ Digger was built rather than using existing git analytics tools because:
 
 - **Tagger**: Defines version boundaries that Digger uses as contribution windows
 - **Coupling**: Consumes Digger output for visualization, statistics, and pairing correlation
-- **External tracking (JIRA, etc.)**: Complementary, not competitive—git is mechanical truth; tracking systems capture human time allocation
+- **External tracking (JIRA, etc.)**: Complementary, not competitive—git is mechanical truth; tracking systems capture
+  human time allocation

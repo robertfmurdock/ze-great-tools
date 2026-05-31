@@ -207,3 +207,9 @@ For a full listing of the available options in the program, please use the built
 ```bash
 digger --help
 ```
+
+For fit-assessment guidance and workflow recommendations:
+
+```bash
+digger guide
+```

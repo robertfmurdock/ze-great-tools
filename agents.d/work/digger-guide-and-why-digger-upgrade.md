@@ -22,7 +22,7 @@ Improve digger fit-assessment guidance and create a high-quality `why-digger.md`
   - Add explicit prerequisites, anti-fit criteria, and first-run workflow guidance
   - Document regex override contract including required named groups (`storyId`, `ease`)
   - Replace broad link target with direct docs pointer once available
-- [ ] Create `docs/why-digger.md` from interrogated inputs and verified behavior
+- [x] Create `docs/why-digger.md` from interrogated inputs and verified behavior
   - Agent cycle: test → implement → refactor-light → verify pushable
   - Include: principles, not-for-you cases, scope boundary, tradeoffs, failure modes, evaluation criteria, and alternatives framing
   - Ensure claims are tied to either code behavior or captured user context, not conjecture

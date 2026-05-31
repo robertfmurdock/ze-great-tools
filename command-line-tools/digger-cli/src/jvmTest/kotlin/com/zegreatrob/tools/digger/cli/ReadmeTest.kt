@@ -73,6 +73,14 @@ class ReadmeTest {
         readme.contains("current-contribution-data").assertIsEqualTo(true)
         readme.contains("all-contribution-data").assertIsEqualTo(true)
     }
+
+    @Test
+    fun readmeReferencesGuideCommand() = setup(object {
+    }) exercise {
+        readReadme()
+    } verify { readme ->
+        readme.contains("digger guide").assertIsEqualTo(true)
+    }
 }
 
 private fun readReadme(): String {
