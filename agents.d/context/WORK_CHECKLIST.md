@@ -99,9 +99,9 @@ Each broad checklist item follows a test-driven cycle that repeats until the fea
    - `[patch]` — bug fix, refactor, anything affecting build output (e.g., `[patch] adding tagger error message link to help resolve common issue`)
    - `[none]` — no build output impact: docs, work cards, build config (e.g., `updating a card`, `work item update`)
    
-   **Co-authorship**: All commits created during live agent sessions with the user must include agent co-authorship attribution in the commit message:
+   **Co-authorship**: All commits created during live agent sessions with the user must include agent co-authorship attribution in the commit message using the active agent's identity (e.g., Gemini, Claude, etc.):
    ```
-   Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>
+   Co-Authored-By: <Agent Name> <noreply@<agent-provider>.com>
    ```
    
    **For CLI tools**: stdout is first-class API (parseable contract); stderr is diagnostic (flexible). Changing stdout format is `[major]`, improving stderr clarity is `[patch]`. Structured output formats (JSON, etc.) are API; text formats for humans are diagnostic.
