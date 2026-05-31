@@ -55,48 +55,6 @@ It will include all fields listed [here](../digger-json/src/commonMain/kotlin/co
 
 Any "Instant" in the specification is an ISO 8601 date-time. Any Duration is an ISO 8601 duration.
 
-## Fields of Interest
-
-### Authors
-
-This will include all authors listed on the commit, including committer, author, and co-authors.
-
-### Story ID
-
-This is parsed out of the commit message by looking for square bracketed text that does not match semver.
-
-eg:
-commit message: `[Cowdog-42] [patch] I did that thing`
-produces: { storyId: "Cowdog-42" }
-
-### Semver
-
-This is parsed out of the commit message by looking for the strings "[major]", "[minor]", "[patch]", or "[none]".
-
-eg:
-commit message: `[Cowdog-42] [patch] I did that thing`
-produces: { semver: "Patch" }
-
-### Label
-
-All contributions from one repository will share the same label. By default, this will be the Gradle project's name.
-
-This can be overridden by argument:
-
-```bash
-digger current-contribution-data --label SomethingMoreExciting $(pwd)
-```
-
-### Ease
-
-This is parsed out of the commit message by looking for a number between one and five, wrapped in dashes.
-
-This field is inspired by https://www.scrumexpert.com/knowledge/measuring-joy-for-software-developers/
-
-eg:
-commit message: `-3- I did that thing`
-produces: { ease: 3 }
-
 ## Structured Output
 
 Both commands support machine-readable JSON output for CI/CD pipelines and automation scripts via the `--format` flag.

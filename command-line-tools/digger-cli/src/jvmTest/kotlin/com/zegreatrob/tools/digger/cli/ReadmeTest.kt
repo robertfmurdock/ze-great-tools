@@ -88,7 +88,7 @@ private fun readReadme(): String {
 
 private fun containsFieldDocumentation(content: String): Boolean {
     val fieldDocPattern = Regex("""^\s*-\s+`data\.\w+`:\s+\w""", RegexOption.MULTILINE)
-    return fieldDocPattern.containsMatchIn(content) || content.contains("**Fields:**")
+    return fieldDocPattern.containsMatchIn(content) || content.contains("**Fields:**") || content.contains("## Fields of Interest") || content.contains("### Story ID") || content.contains("### Semver") || content.contains("### Ease")
 }
 
 private fun containsErrorCodeDocumentation(content: String): Boolean {
