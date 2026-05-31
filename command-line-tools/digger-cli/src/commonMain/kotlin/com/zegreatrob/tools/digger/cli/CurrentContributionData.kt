@@ -1,6 +1,7 @@
 package com.zegreatrob.tools.digger.cli
 
 import com.github.ajalt.clikt.core.CliktCommand
+import com.github.ajalt.clikt.core.Context
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.option
@@ -41,6 +42,33 @@ class CurrentContributionData : CliktCommand() {
             ),
             tagRegex = tagRegex?.let(::Regex) ?: DiggerCore.Defaults.tagRegex,
         )
+
+    override fun help(context: Context) = $$"""
+        $${super.help(context)}
+
+        ## Output and Field Notes
+
+        Fields in the resulting contribution object:
+
+        - `storyId`: Story/ticket identifier extracted from commit messages.
+        - `semver`: Highest semantic version impact in the contribution window (`major`, `minor`, `patch`, or `none`).
+        - `ease`: Optional ease score extracted from commit messages.
+        - `dateTime`, `firstCommitDateTime`, `tagDateTime`: ISO 8601 timestamps.
+
+        ## Regex Customization
+
+        Override parsing behavior with:
+        `--major-regex`, `--minor-regex`, `--patch-regex`, `--none-regex`, `--story-id-regex`, `--ease-regex`, `--tag-regex`.
+
+        ## CI Examples
+
+        Extract story ID in a script:
+
+        ```
+        STORY_ID=$(digger current-contribution-data --format=json . | jq -r '.data.storyId')
+        echo "story-id=$STORY_ID"
+        ```
+    """.trimIndent()
 
     override fun run() {
         val jsonString = core.currentContributionData().toJsonString()

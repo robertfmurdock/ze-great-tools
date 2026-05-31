@@ -36,22 +36,19 @@ class AllContributionDataTest : AllContributionTestSpec {
         easeRegex: String?,
         tagRegex: String?,
     ) {
-        val majorEntries = listOfNotNull(
-            majorRegex?.let { "--major-regex=$it" },
-            majorRegex?.let { "--major-regex=$it" },
-        )
         arguments = listOf(
             "--output-file=$outputFile",
             projectDir,
         ) + listOfNotNull(
             label?.let { "--label=$it" },
+            majorRegex?.let { "--major-regex=$it" },
             minorRegex?.let { "--minor-regex=$it" },
             patchRegex?.let { "--patch-regex=$it" },
             noneRegex?.let { "--none-regex=$it" },
             storyRegex?.let { "--story-id-regex=$it" },
             easeRegex?.let { "--ease-regex=$it" },
             tagRegex?.let { "--tag-regex=$it" },
-        ) + majorEntries
+        )
     }
 
     override fun runAllContributionData(): AllContributionTestSpec.AllContributionDataResult {
@@ -126,6 +123,22 @@ class AllContributionDataTest : AllContributionTestSpec {
         result.output.contains("json", ignoreCase = true).assertIsEqualTo(
             true,
             "Error should mention 'json' option. Output: ${result.output}",
+        )
+    }
+
+    @Test
+    fun helpExplainsTagBasedBoundariesAndOutputShape() = setup(object {
+        val command = cli()
+    }) exercise {
+        command.test("all-contribution-data --help")
+    } verify { result ->
+        result.output.contains("tag boundaries").assertIsEqualTo(
+            true,
+            "Help should explain tag-based contribution boundaries",
+        )
+        result.output.contains("data[]").assertIsEqualTo(
+            true,
+            "Help should describe output array structure in json mode",
         )
     }
 }

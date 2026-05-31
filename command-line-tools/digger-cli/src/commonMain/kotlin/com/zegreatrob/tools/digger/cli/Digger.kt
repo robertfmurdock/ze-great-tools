@@ -37,6 +37,8 @@ class Digger : CliktCommand() {
             | `current-contribution-data` | Data since the latest version tag |
             | `all-contribution-data` | Data grouped across all tagged contribution windows |
             | `guide` | Fit-check, best practices, and workflow philosophy |
+
+            For fit assessment and philosophy: digger guide
         """.trimIndent()
     }
 }

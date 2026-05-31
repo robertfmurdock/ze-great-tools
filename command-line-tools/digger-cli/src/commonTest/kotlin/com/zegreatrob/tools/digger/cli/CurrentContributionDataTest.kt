@@ -122,4 +122,36 @@ class CurrentContributionDataTest : CurrentContributionTestSpec {
             "Error should mention 'json' option. Output: ${result.output}",
         )
     }
+
+    @Test
+    fun helpExplainsContributionFields() = setup(object {
+        val command = cli()
+    }) exercise {
+        command.test("current-contribution-data --help")
+    } verify { result ->
+        result.output.contains("storyId").assertIsEqualTo(true, "Help should explain storyId field")
+        result.output.contains("semver").assertIsEqualTo(true, "Help should explain semver field")
+        result.output.contains("ease").assertIsEqualTo(true, "Help should explain ease field")
+        result.output.contains("Fields in the resulting contribution object").assertIsEqualTo(
+            true,
+            "Help should include contribution field explanation section",
+        )
+    }
+
+    @Test
+    fun helpShowsRegexAndCiUsageGuidance() = setup(object {
+        val command = cli()
+    }) exercise {
+        command.test("current-contribution-data --help")
+    } verify { result ->
+        result.output.contains("ISO 8601").assertIsEqualTo(true, "Help should document date/time format")
+        result.output.contains("--story-id-regex").assertIsEqualTo(
+            true,
+            "Help should mention regex customization options",
+        )
+        result.output.contains("STORY_ID=").assertIsEqualTo(
+            true,
+            "Help should include actionable CI/script example",
+        )
+    }
 }

@@ -41,4 +41,16 @@ class DiggerTest {
         result.output.contains("```").assertIsEqualTo(false, "Expected markdown code fences to be rendered")
         result.output.contains("| Command |").assertIsEqualTo(false, "Expected markdown table syntax to be rendered")
     }
+
+    @Test
+    fun rootHelpDirectsUsersToGuideCommand() = setup(object {
+        val command = cli()
+    }) exercise {
+        command.test("--help")
+    } verify { result ->
+        result.output.contains(Regex("digger\\s+guide")).assertIsEqualTo(
+            true,
+            "Help should direct users to guide command",
+        )
+    }
 }

@@ -1,6 +1,7 @@
 package com.zegreatrob.tools.digger.cli
 
 import com.github.ajalt.clikt.core.CliktCommand
+import com.github.ajalt.clikt.core.Context
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.option
@@ -41,6 +42,20 @@ class AllContributionData : CliktCommand() {
                 easeRegex = easeRegex?.let(::Regex) ?: MessageDigger.Defaults.easeRegex,
             ),
         )
+
+    override fun help(context: Context) = """
+        ${super.help(context)}
+
+        ## Contribution Boundaries
+
+        This command groups commits into contribution windows using tag boundaries.
+        Each window spans from one version tag to the next and produces one contribution object.
+
+        ## Output Shape
+
+        - `--format=text`: writes a JSON array to file.
+        - `--format=json`: prints envelope JSON with contributions at `data[]`.
+    """.trimIndent()
 
     override fun run() {
         val jsonString = core.allContributionData().toJsonString()
