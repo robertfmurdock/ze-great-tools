@@ -107,4 +107,17 @@ class TaggerTest {
         result.output.contains("tag --version").assertIsEqualTo(true, "Help should reference tag with version")
         result.output.contains("snapshot == false").assertIsEqualTo(true, "Help should show snapshot check gate")
     }
+
+    @Test
+    fun helpTextIncludesSnapshotRemediationGuidance() = setup(object {
+        val command = cli()
+    }) exercise {
+        command.test("--help")
+    } verify { result ->
+        result.output.contains("Resolving snapshot").assertIsEqualTo(true, "Help should include remediation section")
+        result.output.contains("DIRTY").assertIsEqualTo(true, "Help should list DIRTY")
+        result.output.contains("commit/stash").assertIsEqualTo(true, "Help should suggest commit/stash for DIRTY")
+        result.output.contains("AHEAD").assertIsEqualTo(true, "Help should list AHEAD")
+        result.output.contains("sync").assertIsEqualTo(true, "Help should suggest sync for AHEAD/BEHIND")
+    }
 }

@@ -80,6 +80,13 @@ class Tagger : CliktCommand() {
             NOT_RELEASE_BRANCH  - not on configured release branch
             NO_NEW_VERSION      - no new commits since last tag
             FORCED              - --force-snapshot=true was used
+
+          Resolving snapshot reasons:
+            DIRTY              → commit/stash changes
+            AHEAD/BEHIND       → sync with remote (push/pull)
+            NOT_RELEASE_BRANCH → switch to release branch or configure .tagger
+            NO_NEW_VERSION     → add explicit semver signal commit ([major], [minor], [patch])
+            FORCED             → remove --force-snapshot flag in release flows
     """.trimIndent()
 
     private fun automationSection() = """
