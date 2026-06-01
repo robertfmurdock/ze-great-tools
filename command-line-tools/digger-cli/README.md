@@ -155,7 +155,8 @@ The `data` field contains an array of contribution data objects, one for each co
     echo "story-id=$STORY_ID" >> $GITHUB_OUTPUT
 
 - name: Use story ID
-  run: echo "Current story: ${{ steps.contribution.outputs.story-id }}"
+  run: |
+    echo "Current story: ${{ steps.contribution.outputs.story-id }}"
 ```
 
 **Extract contributor list in bash:**
