@@ -14,18 +14,6 @@ private external val nodePath: dynamic
 private external val dirname: String
 
 actual fun loadHelpResource(path: String): String {
-    val candidatePaths = listOf(
-        nodePath.join(dirname, path),
-        nodePath.join(dirname, "../..", "processedResources/js/main", path),
-        nodePath.join(dirname, "../../..", "processedResources/js/main", path),
-        nodePath.join(dirname, "../../../..", "processedResources/js/main", path),
-    )
-
-    for (candidate in candidatePaths) {
-        if (fs.existsSync(candidate).unsafeCast<Boolean>()) {
-            return fs.readFileSync(candidate, json("encoding" to "utf-8")).unsafeCast<String>()
-        }
-    }
-
-    throw IllegalStateException("Could not find resource: $path. Tried: ${candidatePaths.joinToString()}")
+    val resourcePath = nodePath.join(dirname, path)
+    return fs.readFileSync(resourcePath, json("encoding" to "utf-8")).unsafeCast<String>()
 }
