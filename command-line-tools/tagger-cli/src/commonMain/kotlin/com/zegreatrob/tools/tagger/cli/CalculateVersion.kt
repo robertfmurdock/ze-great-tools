@@ -12,6 +12,7 @@ import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.boolean
 import com.github.ajalt.clikt.parameters.types.enum
 import com.zegreatrob.tools.adapter.git.GitAdapter
+import com.zegreatrob.tools.cli.loadHelpResource
 import com.zegreatrob.tools.cli.readFromFile
 import com.zegreatrob.tools.tagger.core.SnapshotReason
 import com.zegreatrob.tools.tagger.core.TaggerCore
@@ -35,18 +36,7 @@ class CalculateVersion : CliktCommand() {
     override fun help(context: Context) = """
         ${super.help(context)}
 
-        ## Snapshot Reasons & Remediation
-
-        When calculate-version outputs a version ending in `-SNAPSHOT`, one or more conditions prevent a release version:
-
-        | Reason | Remediation |
-        |--------|-------------|
-        | `FORCED` — Snapshot forced via `--force-snapshot` flag | Remove `--force-snapshot` flag when ready for release |
-        | `DIRTY` — Uncommitted changes in working directory | Commit or stash changes before tagging |
-        | `AHEAD` — Local branch ahead of remote | Push changes before tagging |
-        | `BEHIND` — Local branch behind remote | Pull changes before tagging |
-        | `NOT_RELEASE_BRANCH` — Not on configured release branch | Switch to release branch before tagging (default: main) |
-        | `NO_NEW_VERSION` — No new commits since last tag | Add commits with version annotations (`[major]`, `[minor]`, `[patch]`) |
+        ${loadHelpResource("help/calculate-version.md")}
 
         ${configFileHelpSuffix()}
     """.trimIndent()
