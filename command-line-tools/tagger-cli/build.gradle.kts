@@ -88,9 +88,15 @@ tasks {
         from(layout.projectDirectory.file("README.md"))
         into(mainNpmProjectDir)
     }
+    val copyHelpResources by registering(Copy::class) {
+        dependsOn("jsProcessResources", "jsPackageJson", ":kotlinNpmInstall")
+        from(layout.buildDirectory.dir("processedResources/js/main"))
+        into(mainNpmProjectDir)
+    }
     val jsCliTar by registering(Tar::class) {
         dependsOn(
             copyReadme,
+            copyHelpResources,
             "jsPackageJson",
             ":kotlinNpmInstall",
             "compileKotlinJs",
