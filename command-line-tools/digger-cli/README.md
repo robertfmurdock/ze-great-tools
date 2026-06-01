@@ -213,3 +213,10 @@ For fit-assessment guidance and workflow recommendations:
 ```bash
 digger guide
 ```
+
+Documentation is also available as markdown files in the repository:
+
+- [Digger Guide](src/commonMain/resources/help/digger-guide.md) - Fit assessment, philosophy, and workflow guidance
+- [Digger Help](src/commonMain/resources/help/digger.md) - Main command overview and options
+- [Current Contribution Data Help](src/commonMain/resources/help/current-contribution-data.md) - Command details and output format
+- [All Contribution Data Help](src/commonMain/resources/help/all-contribution-data.md) - Command details and output format

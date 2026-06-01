@@ -423,3 +423,10 @@ tagger --help
 tagger calculate-version --help
 tagger tag --help
 ```
+
+Documentation is also available as markdown files in the repository:
+
+- [Tagger Guide](src/commonMain/resources/help/tagger-guide.md) - Fit assessment, philosophy, and workflow guidance
+- [Tagger Help](src/commonMain/resources/help/tagger.md) - Main command overview and options
+- [Calculate Version Help](src/commonMain/resources/help/calculate-version.md) - Snapshot reasons, remediation, and version calculation details
+- [Tag Help](src/commonMain/resources/help/tag.md) - Workflow, version override guidance, and tagging options
