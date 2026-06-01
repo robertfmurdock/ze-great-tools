@@ -12,6 +12,7 @@ import com.github.ajalt.clikt.parameters.options.required
 import com.github.ajalt.clikt.parameters.types.boolean
 import com.github.ajalt.clikt.parameters.types.enum
 import com.zegreatrob.tools.adapter.git.GitAdapter
+import com.zegreatrob.tools.cli.loadHelpResource
 import com.zegreatrob.tools.tagger.core.TagResult
 import com.zegreatrob.tools.tagger.core.TaggerCore
 import com.zegreatrob.tools.tagger.core.tag
@@ -25,16 +26,7 @@ class Tag : CliktCommand() {
     override fun help(context: Context) = """
         ${super.help(context)}
 
-        ## Workflow
-
-        Tagger uses a two-step workflow to separate version calculation from tagging:
-
-        1. Run `tagger calculate-version` to compute the next version and check snapshot conditions.
-        2. Review the output. If it's a release version (no -SNAPSHOT suffix), use that version here.
-
-        The `--version` flag is **required**. Typically you pass the version from calculate-version output.
-
-        You can manually override the calculated version when needed (for example, to correct a versioning mistake or handle an exceptional release). When overriding, ensure the version adheres to semantic versioning and follows your project's tagging policy.
+        ${loadHelpResource("help/tag.md")}
 
         ${configFileHelpSuffix()}
     """.trimIndent()
