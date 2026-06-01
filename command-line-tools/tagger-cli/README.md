@@ -3,7 +3,7 @@
 ![GitHub tag (latest by date)](https://img.shields.io/github/v/tag/robertfmurdock/ze-great-tools?label=Release)
 ![NPM Version](https://img.shields.io/npm/v/git-semver-tagger?label=npm%20git-semver-tagger)
 
-An opinionated program for automatic semantic versioning via git tags and information in commits. 
+An opinionated program for automatic semantic versioning via git tags and information in commits.
 
 ## Installation
 
@@ -29,9 +29,11 @@ tagger calculate-version # Now it should be available via NPM's path on your she
 
 ### Calculate Version
 
-The `calculate-version` command will generate a new version number based on all of the commits since the last tag, and output as a string.
+The `calculate-version` command will generate a new version number based on all of the commits since the last tag, and
+output as a string.
 
 **Basic usage:**
+
 ```bash
 tagger calculate-version
 ```
@@ -42,9 +44,11 @@ tagger calculate-version
 
 The `tag` command will create a tag with the given version and push it back to the repository.
 
-We recommend this command only is run after the build is validated. Use discernment to decide if it should happen before publication of artifacts, or afterward.
+We recommend this command only is run after the build is validated. Use discernment to decide if it should happen before
+publication of artifacts, or afterward.
 
 **Basic usage:**
+
 ```bash
 tagger tag --version 1.2.3 --release-branch main
 ```
@@ -53,11 +57,13 @@ For complete option documentation and automation guidance, run `tagger calculate
 
 ## Configuration File
 
-Tagger supports a `.tagger` JSON configuration file at your repository root to eliminate repetitive command-line options.
+Tagger supports a `.tagger` JSON configuration file at your repository root to eliminate repetitive command-line
+options.
 
 ### Creating a Configuration File
 
 Generate a template with default values:
+
 ```bash
 tagger generate-settings-file --file
 ```
@@ -66,11 +72,13 @@ This creates `.tagger` in the current directory. Edit it to customize behavior.
 (`--file=''` is also supported for backward compatibility.)
 
 **Print to stdout without creating file:**
+
 ```bash
 tagger generate-settings-file
 ```
 
 **Merge new defaults into existing file:**
+
 ```bash
 tagger generate-settings-file --file --merge
 ```
@@ -107,16 +115,19 @@ The `.tagger` file supports these fields:
 - `minorRegex`: Pattern to detect minor version bumps
 - `patchRegex`: Pattern to detect patch version bumps
 - `noneRegex`: Pattern to detect commits that don't affect version
-- `versionRegex`: Unified regex with named groups (major, minor, patch, none). Overrides individual regex patterns if set.
+- `versionRegex`: Unified regex with named groups (major, minor, patch, none). Overrides individual regex patterns if
+  set.
 - `userName`: Git user name for creating tags (defaults to git config)
 - `userEmail`: Git user email for creating tags (defaults to git config)
-- `warningsAsErrors`: Enable strict mode - treat warnings as errors (exit non-zero) (default: false). See [Warnings and Strict Mode](#warnings-and-strict-mode) for details.
+- `warningsAsErrors`: Enable strict mode - treat warnings as errors (exit non-zero) (default: false).
+  See [Warnings and Strict Mode](#warnings-and-strict-mode) for details.
 
 **Note:** Command-line options always override `.tagger` file settings.
 
 ### Example Workflows
 
 **Minimal config for standard workflow:**
+
 ```json
 {
   "releaseBranch": "main"
@@ -124,12 +135,14 @@ The `.tagger` file supports these fields:
 ```
 
 Then use simplified commands:
+
 ```bash
 tagger calculate-version  # no --release-branch needed
 tagger tag --version 1.2.3  # no --release-branch needed
 ```
 
 **Custom regex patterns for your commit convention:**
+
 ```json
 {
   "releaseBranch": "production",
@@ -151,11 +164,13 @@ Both commands support machine-readable JSON output for CI/CD pipelines and autom
 ### Calculate Version JSON Output
 
 **Example command:**
+
 ```bash
 tagger calculate-version --format=json
 ```
 
 **Success response:**
+
 ```json
 {
   "status": "success",
@@ -171,6 +186,7 @@ tagger calculate-version --format=json
 ```
 
 **Error response:**
+
 ```json
 {
   "status": "error",
@@ -179,15 +195,16 @@ tagger calculate-version --format=json
 }
 ```
 
-
 ### Tag JSON Output
 
 **Example command:**
+
 ```bash
 tagger tag --version 1.2.3 --release-branch main --format=json
 ```
 
 **Success response:**
+
 ```json
 {
   "status": "success",
@@ -198,6 +215,7 @@ tagger tag --version 1.2.3 --release-branch main --format=json
 ```
 
 **Error response:**
+
 ```json
 {
   "status": "error",
@@ -206,10 +224,10 @@ tagger tag --version 1.2.3 --release-branch main --format=json
 }
 ```
 
-
 ### CI Integration Examples
 
 **Extract version in GitHub Actions:**
+
 ```yaml
 - name: Calculate version
   id: version
@@ -222,6 +240,7 @@ tagger tag --version 1.2.3 --release-branch main --format=json
 ```
 
 **Extract version in bash:**
+
 ```bash
 # Get version
 VERSION=$(tagger calculate-version --format=json 2>/dev/null | jq -r '.data.version')
@@ -235,6 +254,7 @@ fi
 ```
 
 **Error handling:**
+
 ```bash
 OUTPUT=$(tagger calculate-version --format=json 2>&1)
 STATUS=$(echo "$OUTPUT" | jq -r '.status')
@@ -249,11 +269,13 @@ fi
 
 ## Warnings and Strict Mode
 
-Tagger emits warnings to stderr when it detects potentially risky conditions. By default, warnings don't fail the build (exit 0), but you can enable strict mode to treat warnings as errors.
+Tagger emits warnings to stderr when it detects potentially risky conditions. By default, warnings don't fail the
+build (exit 0), but you can enable strict mode to treat warnings as errors.
 
 ### Warning Classes
 
 #### Deprecation Warnings
+
 Issued when using deprecated flags or options:
 
 ```
@@ -265,6 +287,7 @@ Issued when using deprecated flags or options:
 **Action:** Update your commands or config files to use the replacement option.
 
 #### Release Risk Warnings
+
 Issued when potentially unsafe operations are explicitly allowed:
 
 ```
@@ -273,30 +296,37 @@ Issued when potentially unsafe operations are explicitly allowed:
 
 **Cause:** Using `--allow-detached-head` on a release branch in detached HEAD state.
 
-**Action:** Consider whether detached HEAD is appropriate for your workflow. For CI builds on release branches, this usually indicates a configuration issue.
+**Action:** Consider whether detached HEAD is appropriate for your workflow. For CI builds on release branches, this
+usually indicates a configuration issue.
 
 #### Policy Violation Warnings (tag command)
+
 The `tag` command issues warnings (not errors) when it cannot create a tag due to policy constraints:
 
 ```
 ⚠️  Cannot create tag: not on release branch 'main' (current branch: feature/xyz)
 ```
 
-**Cause:** Attempting to create a release tag from a non-release branch, a commit that's already tagged, or a snapshot version.
+**Cause:** Attempting to create a release tag from a non-release branch, a commit that's already tagged, or a snapshot
+version.
 
-**Action:** Switch to the release branch, use `--release-branch` with the correct branch name, or adjust your tagging workflow.
+**Action:** Switch to the release branch, use `--release-branch` with the correct branch name, or adjust your tagging
+workflow.
 
 ### Strict Mode (warningsAsErrors)
 
-Enable strict mode to fail builds when warnings are present. This is useful for CI/CD pipelines where you want to enforce clean execution.
+Enable strict mode to fail builds when warnings are present. This is useful for CI/CD pipelines where you want to
+enforce clean execution.
 
 **Command-line flag:**
+
 ```bash
 tagger calculate-version --warnings-as-errors
 tagger tag --version 1.2.3 --warnings-as-errors
 ```
 
 **Configuration file:**
+
 ```json
 {
   "warningsAsErrors": true
@@ -320,6 +350,7 @@ tagger tag --version 1.2.3 --warnings-as-errors
 3. **Stderr diagnostics**: Warnings remain visible for troubleshooting
 
 **CI integration example:**
+
 ```bash
 # Strict mode catches deprecation warnings before they become breaking changes
 tagger calculate-version --warnings-as-errors --format=json > version.json
@@ -332,11 +363,13 @@ fi
 ```
 
 **When to use strict mode:**
+
 - Production CI/CD pipelines where warnings indicate configuration drift
 - During migration from deprecated options (fail fast on old syntax)
 - When enforcing "clean build" policies across teams
 
 **When NOT to use strict mode:**
+
 - Local development workflows where warnings are informational
 - Gradual rollout of new configuration options
 - When using `allowDetachedHead` intentionally and warnings are expected
@@ -347,7 +380,8 @@ fi
 
 **Error:** `found N tag(s) (...) but it is/they are lightweight.`
 
-**Cause:** Tagger requires annotated tags (created with `git tag -a`) because they store metadata like tagger name, email, and timestamp. Lightweight tags (created with `git tag <name>`) don't include this information.
+**Cause:** Tagger requires annotated tags (created with `git tag -a`) because they store metadata like tagger name,
+email, and timestamp. Lightweight tags (created with `git tag <name>`) don't include this information.
 
 **Solution:** Recreate the tag(s) as annotated tags. The error message will provide exact commands, for example:
 
@@ -364,12 +398,14 @@ Replace `<sha>` with the commit hash where the tag should point (often the same 
 **Error:** `Command failed: git push --tags (exit code 128)` or `exit code 403`
 
 **Common causes:**
+
 - The account running tagger doesn't have push permission on the repository
 - CI/CD pipelines often use restricted service accounts by default
 
 **Solutions:**
 
 **For Azure DevOps:**
+
 1. Go to Project Settings → Repositories → Security
 2. Find the Build Service identity (e.g., `<Project Name> Build Service`)
 3. Grant both `Contribute` and `Create tag` permissions
@@ -380,6 +416,7 @@ Replace `<sha>` with the commit hash where the tag should point (often the same 
    ```
 
 **For GitHub Actions:**
+
 1. Add write permissions to your workflow job:
    ```yaml
    jobs:
@@ -390,10 +427,11 @@ Replace `<sha>` with the commit hash where the tag should point (often the same 
 2. Ensure you're not using a read-only `GITHUB_TOKEN`
 
 **For GitLab CI:**
+
 ```yaml
 variables:
   GIT_STRATEGY: clone
-  
+
 before_script:
   - git config --global user.email "ci@example.com"
   - git config --global user.name "CI Bot"
@@ -416,7 +454,8 @@ After this, tagger can calculate subsequent versions automatically.
 
 ### Help
 
-For detailed option documentation, snapshot reason explanations, and structured output field definitions, use the built-in help:
+For detailed option documentation, snapshot reason explanations, and structured output field definitions, use the
+built-in help:
 
 ```bash
 tagger --help
@@ -428,5 +467,6 @@ Documentation is also available as markdown files in the repository:
 
 - [Tagger Guide](src/commonMain/resources/help/tagger-guide.md) - Fit assessment, philosophy, and workflow guidance
 - [Tagger Help](src/commonMain/resources/help/tagger.md) - Main command overview and options
-- [Calculate Version Help](src/commonMain/resources/help/calculate-version.md) - Snapshot reasons, remediation, and version calculation details
+- [Calculate Version Help](src/commonMain/resources/help/calculate-version.md) - Snapshot reasons, remediation, and
+  version calculation details
 - [Tag Help](src/commonMain/resources/help/tag.md) - Workflow, version override guidance, and tagging options
