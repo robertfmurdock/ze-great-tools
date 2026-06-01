@@ -102,11 +102,14 @@ abstract class CalculateVersion : DefaultTask() {
 
     @Suppress("DEPRECATION")
     private fun buildDeprecationWarnings(): List<String> {
-        val warnings = mutableListOf<String>()
-        if (allowDetachedHead.orNull == null && disableDetached.isPresent) {
-            warnings.add("⚠️  The 'disableDetached' property is deprecated and may be removed in the next major version. Use 'allowDetachedHead' instead with inverted logic.")
+        val disableDetachedDefault = true
+        val usingDeprecatedPropertyWithNonDefaultValue =
+            allowDetachedHead.orNull == null && disableDetached.get() != disableDetachedDefault
+        return buildList {
+            if (usingDeprecatedPropertyWithNonDefaultValue) {
+                add("⚠️  The 'disableDetached' property is deprecated and may be removed in the next major version. Use 'allowDetachedHead' instead with inverted logic.")
+            }
         }
-        return warnings
     }
 
     private fun VersionResult.Success.outputSuccess() {
