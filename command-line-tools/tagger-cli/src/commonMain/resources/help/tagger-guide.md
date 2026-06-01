@@ -1,11 +1,13 @@
 # Tagger Fit Assessment & Workflow Guide
 
 ## Use Tagger when:
+
 - You want deterministic versioning behavior from Git history
 - You're willing to use Git tags as version source-of-truth
 - You can enforce CI prerequisites consistently (full history, tags, branch context)
 
 ## Do not use Tagger when:
+
 - You want version truth from an artifact repository or build metadata instead of Git tags
 - You need multi-stream version lines as a first-class workflow
 - You want a single atomic command to orchestrate the entire release lifecycle
