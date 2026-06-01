@@ -7,6 +7,7 @@ import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.enum
 import com.zegreatrob.tools.adapter.git.GitAdapter
+import com.zegreatrob.tools.cli.loadHelpResource
 import com.zegreatrob.tools.cli.writeToFile
 import com.zegreatrob.tools.digger.core.DiggerCore
 import com.zegreatrob.tools.digger.core.MessageDigger
@@ -46,15 +47,7 @@ class AllContributionData : CliktCommand() {
     override fun help(context: Context) = """
         ${super.help(context)}
 
-        ## Contribution Boundaries
-
-        This command groups commits into contribution windows using tag boundaries.
-        Each window spans from one version tag to the next and produces one contribution object.
-
-        ## Output Shape
-
-        - `--format=text`: writes a JSON array to file.
-        - `--format=json`: prints envelope JSON with contributions at `data[]`.
+        ${loadHelpResource("help/all-contribution-data.md")}
     """.trimIndent()
 
     override fun run() {
