@@ -1,6 +1,6 @@
-## Snapshot Reasons & Remediation
+Calculate the next semantic version from Git history and commit annotations.
 
-When calculate-version outputs a version ending in `-SNAPSHOT`, one or more conditions prevent a release version:
+When `calculate-version` outputs a version ending in `-SNAPSHOT`, one or more conditions prevent a release version:
 
 | Reason                                                  | Remediation                                                            |
 |---------------------------------------------------------|------------------------------------------------------------------------|

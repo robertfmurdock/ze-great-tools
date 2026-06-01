@@ -1,4 +1,4 @@
-# Tagger Fit Assessment & Workflow Guide
+Display the Tagger fit assessment and workflow guide.
 
 ## Use Tagger when:
 

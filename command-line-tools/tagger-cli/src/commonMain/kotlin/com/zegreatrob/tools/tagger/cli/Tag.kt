@@ -23,13 +23,7 @@ class Tag : CliktCommand() {
         context { valueSources(ConfigFileSource(readEnvvar)) }
     }
 
-    override fun help(context: Context) = """
-        ${super.help(context)}
-
-        ${loadHelpResource("help/tag.md")}
-
-        ${configFileHelpSuffix()}
-    """.trimIndent()
+    override fun help(context: Context) = "${loadHelpResource("help/tag.md")}\n\n${configFileHelpSuffix()}".trim()
 
     private val gitRepoArgument by argument("git-repo").optional()
     private val gitRepoOption by option("--git-repo", envvar = "PWD")
