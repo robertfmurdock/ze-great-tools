@@ -129,21 +129,18 @@ digger all-contribution-data $(pwd) --format=json
   "data": [
     {
       "storyId": "STORY-123",
-      "contributors": [...],
-      "commits": [...],
+      "contributors": [],
+      "commits": [],
       "semver": "Patch",
       "label": "my-project",
       "firstCommitDateTime": "2026-05-19T10:30:00Z",
       "lastCommitDateTime": "2026-05-19T10:30:00Z",
       "ease": 3
-    },
-    {
-      "storyId": "STORY-124",
-      ...
     }
   ]
 }
 ```
+(Additional contribution objects omitted for brevity)
 
 The `data` field contains an array of contribution data objects, one for each contribution period. Use `all-contribution-data --help` for more details.
 
