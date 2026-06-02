@@ -20,7 +20,6 @@ class CalculateVersionConfigFileFunctionalTest :
 
     override fun configureWithOverrides(
         implicitPatch: Boolean?,
-        disableDetached: Boolean?,
         allowDetachedHead: Boolean?,
         majorRegex: String?,
         minorRegex: String?,
@@ -36,7 +35,6 @@ class CalculateVersionConfigFileFunctionalTest :
             listOfNotNull(
                 "\"releaseBranch\": \"master\"",
                 ConfigFileFunctionalTestSupport.bool("implicitPatch", implicitPatch),
-                ConfigFileFunctionalTestSupport.bool("disableDetached", disableDetached),
                 ConfigFileFunctionalTestSupport.bool("allowDetachedHead", allowDetachedHead),
                 ConfigFileFunctionalTestSupport.escaped("majorRegex", majorRegex),
                 ConfigFileFunctionalTestSupport.escaped("minorRegex", minorRegex),

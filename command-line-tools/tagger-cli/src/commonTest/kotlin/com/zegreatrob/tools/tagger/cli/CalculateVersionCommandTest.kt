@@ -60,7 +60,6 @@ class CalculateVersionCommandTest : CalculateVersionTestSpec {
 
     override fun configureWithOverrides(
         implicitPatch: Boolean?,
-        disableDetached: Boolean?,
         allowDetachedHead: Boolean?,
         majorRegex: String?,
         minorRegex: String?,
@@ -73,7 +72,6 @@ class CalculateVersionCommandTest : CalculateVersionTestSpec {
         baseArguments = listOf("-q", "calculate-version") +
             listOfNotNull(
                 implicitPatch?.let { "--implicit-patch=$it" },
-                disableDetached?.let { "--disable-detached=$it" },
                 allowDetachedHead?.let { "--allow-detached-head=$it" },
                 versionRegex?.let { "--version-regex=$it" },
                 majorRegex?.let { "--major-regex=$it" },
@@ -470,48 +468,5 @@ class CalculateVersionCommandTest : CalculateVersionTestSpec {
             true,
             "Expected actionable message in stderr. Stderr: $stderr",
         )
-    }
-
-    @Test
-    fun jsonFormatWithWarningsAsErrorsReturnsErrorStatusWhenWarningsExist() = setup(object {
-        val commits = listOf("init", "commit 1")
-        val initialTag = "1.2.3"
-    }) {
-        com.zegreatrob.tools.test.git.initializeGitRepo(
-            directory = projectDir,
-            commits = commits,
-            initialTag = initialTag,
-            remoteUrl = null,
-            addFileNames = addFileNames,
-        )
-        baseArguments = listOf(
-            "-q",
-            "calculate-version",
-            "--release-branch=master",
-            "--disable-detached=false",
-            "--warnings-as-errors=true",
-            "--format=json",
-            projectDir,
-        )
-    } exercise {
-        cli().test(baseArguments)
-    } verify { result ->
-        result.statusCode.assertIsEqualTo(1, "Should exit with code 1 when warnings present and warningsAsErrors enabled")
-
-        val json = Json.parseToJsonElement(result.stdout)
-        json.jsonObject["status"]?.jsonPrimitive?.content.assertIsEqualTo(
-            "error",
-            "JSON status should be 'error' when warnings escalate to errors, not 'success'",
-        )
-
-        val errorMessage = json.jsonObject["error"]?.jsonPrimitive?.content
-        assertNotNull(errorMessage, "JSON should include error message")
-        errorMessage.contains("warning", ignoreCase = true).assertIsEqualTo(
-            true,
-            "Error message should mention warnings. Got: $errorMessage",
-        )
-
-        val code = json.jsonObject["code"]?.jsonPrimitive?.content
-        code.assertIsEqualTo("WARNINGS_AS_ERRORS", "Error code should indicate warnings escalation")
     }
 }

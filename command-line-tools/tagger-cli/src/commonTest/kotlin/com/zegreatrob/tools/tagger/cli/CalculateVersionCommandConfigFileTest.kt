@@ -32,7 +32,6 @@ class CalculateVersionCommandConfigFileTest :
 
     override fun configureWithOverrides(
         implicitPatch: Boolean?,
-        disableDetached: Boolean?,
         allowDetachedHead: Boolean?,
         majorRegex: String?,
         minorRegex: String?,
@@ -45,7 +44,6 @@ class CalculateVersionCommandConfigFileTest :
         val config = TaggerConfig(
             releaseBranch = "master",
             implicitPatch = implicitPatch,
-            disableDetached = disableDetached,
             allowDetachedHead = allowDetachedHead,
             majorRegex = majorRegex,
             minorRegex = minorRegex,

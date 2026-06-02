@@ -36,10 +36,6 @@ abstract class CalculateVersion : DefaultTask() {
     abstract val implicitPatch: Property<Boolean>
 
     @get:Input
-    @Deprecated("Use allowDetachedHead instead (inverted logic)")
-    abstract val disableDetached: Property<Boolean>
-
-    @get:Input
     @get:Optional
     abstract val allowDetachedHead: Property<Boolean>
 
@@ -74,13 +70,11 @@ abstract class CalculateVersion : DefaultTask() {
         is VersionResult.Failure -> throw GradleException(result.message)
     }
 
-    @Suppress("DEPRECATION")
-    private fun resolveAllowDetachedHead(): Boolean = allowDetachedHead.orNull ?: disableDetached.get().let { shouldDisable -> !shouldDisable }
+    private fun resolveAllowDetachedHead(): Boolean = allowDetachedHead.orNull ?: false
 
     private fun calculateVersion(): VersionResult {
         val core = TaggerCore(GitAdapter(workingDirectory.get().asFile.absolutePath))
-        val deprecationWarnings = buildDeprecationWarnings()
-        val result = core.calculateNextVersion(
+        return core.calculateNextVersion(
             implicitPatch = implicitPatch.get(),
             versionRegex = VersionRegex(
                 none = noneRegex.get(),
@@ -94,22 +88,6 @@ abstract class CalculateVersion : DefaultTask() {
             releaseBranch = releaseBranch.orNull
                 ?: throw GradleException("Please configure the tagger release branch."),
         )
-        return when (result) {
-            is VersionResult.Success -> result.copy(warnings = result.warnings + deprecationWarnings)
-            is VersionResult.Failure -> result
-        }
-    }
-
-    @Suppress("DEPRECATION")
-    private fun buildDeprecationWarnings(): List<String> {
-        val disableDetachedDefault = true
-        val usingDeprecatedPropertyWithNonDefaultValue =
-            allowDetachedHead.orNull == null && disableDetached.get() != disableDetachedDefault
-        return buildList {
-            if (usingDeprecatedPropertyWithNonDefaultValue) {
-                add("⚠️  The 'disableDetached' property is deprecated and may be removed in the next major version. Use 'allowDetachedHead' instead with inverted logic.")
-            }
-        }
     }
 
     private fun VersionResult.Success.outputSuccess() {

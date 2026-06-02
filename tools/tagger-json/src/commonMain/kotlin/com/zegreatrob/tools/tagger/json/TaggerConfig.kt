@@ -7,7 +7,6 @@ import kotlinx.serialization.Serializable
 data class TaggerConfig(
     val releaseBranch: String? = null,
     val implicitPatch: Boolean? = null,
-    val disableDetached: Boolean? = null,
     val allowDetachedHead: Boolean? = null,
     val forceSnapshot: Boolean? = null,
     val majorRegex: String? = null,
@@ -22,7 +21,6 @@ data class TaggerConfig(
 
 val runtimeDefaultConfig = TaggerConfig(
     implicitPatch = true,
-    disableDetached = true,
     forceSnapshot = false,
     majorRegex = VersionRegex.Defaults.major.pattern,
     minorRegex = VersionRegex.Defaults.minor.pattern,

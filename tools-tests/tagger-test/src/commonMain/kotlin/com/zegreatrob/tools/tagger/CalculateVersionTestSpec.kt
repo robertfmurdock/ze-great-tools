@@ -31,7 +31,6 @@ interface CalculateVersionTestSpec {
 
     fun configureWithOverrides(
         implicitPatch: Boolean? = null,
-        disableDetached: Boolean? = null,
         allowDetachedHead: Boolean? = null,
         majorRegex: String? = null,
         minorRegex: String? = null,
@@ -150,43 +149,9 @@ interface CalculateVersionTestSpec {
     }
 
     @Test
-    fun whenNoRemoteButDisableDetachedIsFalseDoNotError() = setup(object {
-    }) {
-        configureWithOverrides(disableDetached = false)
-        initializeGitRepo(
-            directory = projectDir,
-            remoteUrl = null,
-            addFileNames = addFileNames,
-            commits = listOf("init", "commit (no) 1"),
-            initialTag = "1.2.3",
-        )
-    } exercise {
-        execute()
-    } verify { result ->
-        result.assertIsOfType<TestResult.Success>().message.assertIsEqualTo("1.2.4-SNAPSHOT")
-    }
-
-    @Test
     fun whenNoRemoteButAllowDetachedHeadIsTrueDoNotError() = setup(object {
     }) {
         configureWithOverrides(allowDetachedHead = true)
-        initializeGitRepo(
-            directory = projectDir,
-            remoteUrl = null,
-            addFileNames = addFileNames,
-            commits = listOf("init", "commit (no) 1"),
-            initialTag = "1.2.3",
-        )
-    } exercise {
-        execute()
-    } verify { result ->
-        result.assertIsOfType<TestResult.Success>().message.assertIsEqualTo("1.2.4-SNAPSHOT")
-    }
-
-    @Test
-    fun whenAllowDetachedHeadTrueOverridesDisableDetachedTrue() = setup(object {
-    }) {
-        configureWithOverrides(disableDetached = true, allowDetachedHead = true)
         initializeGitRepo(
             directory = projectDir,
             remoteUrl = null,
@@ -658,46 +623,5 @@ interface CalculateVersionTestSpec {
             reason.contains("they are lightweight")
                 .assertIsEqualTo(true, "Expected plural lightweight guidance. Output:\n$reason")
         }
-    }
-
-    @Test
-    fun whenDisableDetachedConfigPropertyUsedEmitDeprecationWarning() = setup(object {
-        val commits = listOf("init", "commit 1")
-        val initialTag = "1.2.3"
-    }) {
-        configureWithOverrides(disableDetached = false)
-        initializeGitRepo(
-            commits = commits,
-            initialTag = initialTag,
-        )
-    } exercise {
-        execute()
-    } verify { result ->
-        result.assertIsOfType<TestResult.Success>().assertHasDeprecationWarning(
-            deprecatedFeature = "disableDetached",
-            replacement = "allowDetachedHead",
-        )
-    }
-
-    @Test
-    fun warningsAsErrorsCausesNonZeroExitWhenDeprecationWarningPresent() = setup(object {
-        val commits = listOf("init", "commit 1")
-        val initialTag = "1.2.3"
-    }) {
-        configureWithOverrides(
-            disableDetached = false,
-            warningsAsErrors = true,
-        )
-        initializeGitRepo(
-            commits = commits,
-            initialTag = initialTag,
-        )
-    } exercise {
-        execute()
-    } verify { result ->
-        result.assertIsOfType<TestResult.Failure>().assertHasDeprecationWarningEscalationError(
-            deprecatedFeature = "disableDetached",
-            replacement = "allowDetachedHead",
-        )
     }
 }

@@ -41,13 +41,11 @@ class CalculateVersion : CliktCommand() {
     private val implicitPatch by option(
         help = "Automatically bump patch version when no version-tagged commits exist since last release.",
     ).boolean().default(true)
-    private val disableDetachedDeprecated by option("--disable-detached", hidden = true).boolean()
     private val allowDetachedHeadOption by option(
         "--allow-detached-head",
         help = "Allow version calculation in detached HEAD state. Detached HEAD is blocked by default as it can produce unreliable version calculations.",
     ).boolean()
-    private val allowDetachedHead get() =
-        allowDetachedHeadOption ?: disableDetachedDeprecated?.let { shouldDisable -> !shouldDisable } ?: false
+    private val allowDetachedHead get() = allowDetachedHeadOption ?: false
     private val forceSnapshot by option(
         help = "Force -SNAPSHOT suffix on version, overriding normal release conditions. Use for testing or CI workflows that require snapshot versions.",
     ).boolean().default(false)
@@ -70,8 +68,6 @@ class CalculateVersion : CliktCommand() {
     )
 
     override fun run() {
-        val deprecationWarnings = disableDetachedDeprecationWarning()
-        fun outputDeprecationWarnings() = deprecationWarnings.forEach { echo(it, err = true) }
         TaggerCore(GitAdapter(workingDirectory))
             .calculateNextVersion(
                 implicitPatch = implicitPatch,
@@ -83,8 +79,7 @@ class CalculateVersion : CliktCommand() {
             .run {
                 when (this) {
                     is VersionResult.Success -> {
-                        val allWarnings = warnings + deprecationWarnings
-                        val hasWarnings = allWarnings.isNotEmpty()
+                        val hasWarnings = warnings.isNotEmpty()
                         val shouldEscalate = warningsAsErrors && hasWarnings
 
                         when (format) {
@@ -92,7 +87,7 @@ class CalculateVersion : CliktCommand() {
                                 if (shouldEscalate) {
                                     echo(
                                         errorResponse(
-                                            "Warnings escalated to errors: ${allWarnings.joinToString("; ")}",
+                                            "Warnings escalated to errors: ${warnings.joinToString("; ")}",
                                             "WARNINGS_AS_ERRORS",
                                         ),
                                     )
@@ -100,7 +95,7 @@ class CalculateVersion : CliktCommand() {
                                     outputJson(
                                         version = version,
                                         snapshotReasons = snapshotReasons,
-                                        warnings = allWarnings,
+                                        warnings = warnings,
                                     )
                                 }
                             }
@@ -108,7 +103,7 @@ class CalculateVersion : CliktCommand() {
                             OutputFormat.TEXT -> output(
                                 message = version,
                                 errorMessage = snapshotReasons,
-                                warnings = allWarnings,
+                                warnings = warnings,
                             )
                         }
                         if (shouldEscalate) {
@@ -118,44 +113,16 @@ class CalculateVersion : CliktCommand() {
 
                     is VersionResult.Failure -> when (format) {
                         OutputFormat.JSON -> {
-                            outputDeprecationWarnings()
                             echo(errorResponse(message, "CONFIGURATION_ERROR"))
                             throw CliktError("", printError = false, statusCode = 1)
                         }
 
                         OutputFormat.TEXT -> {
-                            outputDeprecationWarnings()
                             throw CliktError(message)
                         }
                     }
                 }
             }
-    }
-
-    private fun disableDetachedDeprecationWarning(): List<String> {
-        val warnings = mutableListOf<String>()
-
-        // Check CLI flag usage
-        if (disableDetachedDeprecated != null) {
-            warnings.add("⚠️  --disable-detached is deprecated and may be removed in the next major version. Use --allow-detached-head instead.")
-        }
-
-        // Check config file usage
-        if (hasDisableDetachedInConfigFile()) {
-            warnings.add("⚠️  The 'disableDetached' property in .tagger file is deprecated and may be removed in the next major version. Use 'allowDetachedHead' instead with inverted logic.")
-        }
-
-        return warnings
-    }
-
-    private fun hasDisableDetachedInConfigFile(): Boolean {
-        val configFile = readFromFile("$workingDirectory/.tagger") ?: return false
-        return try {
-            val config = Json.decodeFromString<TaggerConfig>(configFile)
-            config.disableDetached != null
-        } catch (e: Exception) {
-            false
-        }
     }
 
     private fun output(
