@@ -1,43 +1,50 @@
 # GitHub Actions Playbook
 
-Use this playbook when adding or changing GitHub Actions workflows.
+## Purpose
+Orchestrate CI/CD via GitHub Actions while keeping logic in Gradle tasks.
 
-## Core Principle
-- Keep workflow YAML thin and declarative.
-- Put durable logic in repository-owned automation (`./gradlew` tasks) so it can run locally and in CI.
-- Treat GitHub Actions as an orchestrator, not the primary implementation surface.
+## When To Use
+- Adding or modifying GitHub Actions workflows
+- Moving CI logic between YAML and Gradle
 
-## Design Rules
-- Prefer `run: ./gradlew <task>` over multi-line shell scripts in workflow steps.
-- Keep GitHub-specific concerns in YAML only:
-  - triggers
-  - permissions
-  - checkout/setup/auth
-  - artifact and PR plumbing
-- Keep business rules and gating logic in Gradle tasks under version control.
-- Avoid embedding non-trivial parsing/branching in workflow shell blocks.
-- Make failure conditions explicit and terminal:
-  - If a required precondition is missing (for example required repo vars/secrets), fail the step/job with a non-zero exit code.
-  - If a declared safety gate fails, fail the step/job with a non-zero exit code.
-  - Use `GITHUB_STEP_SUMMARY` for diagnostics, but never as a substitute for failing the run.
+## Critical Facts
+- Workflow YAML is thin and declarative
+- Business logic lives in `./gradlew` tasks, not workflow YAML
+- All automation must run locally with equivalent behavior
+- Failures must terminate with non-zero exit codes
 
-## Configuration Values
-- Define each configuration value (limits, thresholds, names) in exactly one place.
-- Hardcoding the same value in both a workflow env var and a prompt/template is a smell:
-  one will drift. Push it into the Gradle task that owns that decision.
+## Constraints
+- Use `run: ./gradlew <task>` instead of multi-line shell scripts
+- YAML contains only GitHub-specific concerns:
+  - Triggers, permissions, checkout/setup/auth
+  - Artifact and PR plumbing
+- Business rules and gating logic belong in Gradle tasks
+- No non-trivial parsing/branching in workflow shell blocks
+- Configuration values defined once (in Gradle, not duplicated in YAML)
+- Required preconditions must fail explicitly (no silent skips)
+- `GITHUB_STEP_SUMMARY` for diagnostics only, not as failure substitute
 
-## Decoupling Goals
-- A maintainer should be able to execute core automation locally with equivalent behavior.
-- Workflow behavior should be testable by running the same Gradle task graph outside GitHub.
-- Repository policy should not depend on GitHub event payload shape unless unavoidable.
+## Key Files
+- `.github/workflows/*.yml` — workflow orchestration only
+- Gradle task definitions — actual automation logic
 
-## Validation Expectations
-- Validate workflow syntax and execution path with `workflow_dispatch`.
-- Validate automation logic via Gradle tasks locally first.
-- Keep module-scoped validation commands explicit and wrapper-based (`./gradlew ...`).
+## Decisions
+- GitHub Actions = orchestrator, not implementation surface
+- Repository policy independent of GitHub event payload shape where possible
+
+## Common Mistakes
+- Duplicating configuration values in YAML and Gradle
+- Embedding business logic in workflow shell blocks
+- Silent failures when preconditions missing
+- Using `GITHUB_STEP_SUMMARY` instead of failing the run
+
+## Validation
+- Test workflow syntax with `workflow_dispatch`
+- Test automation logic locally via Gradle first
+- Verify local command sequence produces equivalent results
 
 ## Change Reporting
-- For workflow changes, report:
-  - what moved out of YAML and where
-  - which Gradle tasks now own decision logic
-  - local command sequence for dry-run verification
+Report for each workflow change:
+- What moved out of YAML and destination
+- Which Gradle tasks now own decision logic
+- Local command for dry-run verification

@@ -1,61 +1,67 @@
 # Gradle Playbook
 
-Use this playbook when a task modifies Gradle build logic, dependency wiring, or
-repository automation behavior.
+## Purpose
+Guide for modifying Gradle build logic, dependencies, and repository automation.
 
-## Scope Classification
-- Classify the change before editing:
-  - Root build logic (`build.gradle.kts`, `settings.gradle.kts`, `gradle.properties`)
-  - Module build logic (`:module/build.gradle.kts`)
-  - Shared convention/plugin logic (`build-logic/`)
-  - Dependency/version catalog (`gradle/libs.versions.toml`)
-- Document impacted modules up front.
+## When To Use
+- Modifying `build.gradle.kts`, `settings.gradle.kts`, or `gradle.properties`
+- Changing module build files
+- Updating convention plugins in `build-logic/`
+- Managing `gradle/libs.versions.toml`
+- Adding/modifying Gradle tasks
 
-## Source of Truth Conventions
-- Keep dependency versions in version catalog files unless an existing exception
-  pattern already exists.
-- Keep shared build behavior in convention/plugin code (`build-logic/`); avoid duplicating the
-  same task/dependency/configuration across module build files.
-- Keep module-specific behavior local to the owning module.
-- Keep root build logic lean: do not accumulate unrelated automation tasks in
-  root `build.gradle.kts` when they fit an existing subproject.
-- Add root-level tasks only when they are true cross-repo orchestration entry
-  points that must coordinate multiple modules.
+## Critical Facts
 
-## Task and Automation Conventions
-- Express repository automation as Gradle tasks executed via `./gradlew`.
-- Prefer typed Gradle tasks and Kotlin DSL configuration over ad hoc shell calls.
-- Prefer lazy configuration APIs (`register`, providers) over eager task creation.
-- For custom tasks, declare inputs/outputs when applicable to preserve
-  incremental and cache-friendly behavior.
-- Prefer configuration-cache-compatible task implementations and avoid patterns
-  that capture script object state in task actions.
-- Treat warnings as errors when practical (for build logic, Gradle/Kotlin DSL,
-  and compiler/tooling surfaces) so issues are surfaced early in local and CI
-  feedback loops.
+### Scope Classification
+- Root: `build.gradle.kts`, `settings.gradle.kts`, `gradle.properties`
+- Module: `:module/build.gradle.kts`
+- Convention: `build-logic/`
+- Versions: `gradle/libs.versions.toml`
 
-## Validation Ladder
-- Run the smallest sufficient check first (for example `./gradlew :module:task`).
-- Then run affected module checks.
-- Run broader checks (`./gradlew check`, or `build`/`test` as needed) when change
-  risk crosses module boundaries.
+### Source of Truth
+- Dependency versions → version catalog (`gradle/libs.versions.toml`)
+- Shared behavior → convention plugins (`build-logic/`)
+- Module-specific → module build file
+- Root → orchestration only, keep lean
 
-## CLI Testing
-- For Kotlin/JS CLI tools (e.g., `tagger-cli`, `digger-cli`), use the `jsLink` task
-  to install the latest local build for testing: `./gradlew :command-line-tools:<cli>:jsLink`
-- After running `jsLink`, you can test the CLI via `npm exec <command>` and it will
-  use your local changes instead of the published npm package.
-- This is essential for verifying end-to-end CLI output (help text, stdout/stderr
-  formatting) before committing changes.
+### Task Implementation
+- Use typed tasks and Kotlin DSL over shell scripts
+- Use lazy APIs: `register`, providers (not eager creation)
+- Declare inputs/outputs for incremental builds
+- Configuration-cache compatible (avoid capturing script state)
+- Treat warnings as errors
 
-## Change Coupling Rules
-- Keep build logic updates and required consumer updates in one change set.
-- If conventions change, update canonical context docs in `agents.d/context/`
-  within the same change.
-- Do not place durable Gradle conventions only in `AGENTS.md` or generated files.
+### Validation Ladder
+1. Smallest check: `./gradlew :module:task`
+2. Affected modules
+3. Full: `./gradlew check` (required before commit)
 
-## Agent Completion Reporting for Gradle Changes
-- List Gradle-related files changed and why.
-- List Gradle commands executed and summarized outcomes.
-- State residual risks (for example CI-only behavior, platform-specific behavior,
-  config-cache implications, or checks intentionally deferred).
+### CLI Testing (Kotlin/JS)
+- Install local build: `./gradlew :command-line-tools:<cli>:jsLink`
+- Test via: `npm exec <command>` (uses local, not published)
+
+## Constraints
+- Express automation as Gradle tasks via `./gradlew`
+- Keep build logic and consumer updates in same changeset
+- Update `agents.d/context/` docs when conventions change
+- Never document conventions only in `AGENTS.md` or generated files
+
+## Key Files
+- Root: `build.gradle.kts`, `settings.gradle.kts`, `gradle.properties`
+- Versions: `gradle/libs.versions.toml`
+- Conventions: `build-logic/`
+- Module builds: `:*/build.gradle.kts`
+
+## Common Mistakes
+- Duplicating logic across module files instead of using conventions
+- Adding unrelated tasks to root build file
+- Eager task creation instead of lazy registration
+- Not declaring task inputs/outputs
+- Breaking configuration cache
+- Skipping CLI testing with `jsLink` for Kotlin/JS tools
+- Separating build logic changes from consumer updates
+
+## Completion Checklist
+- List changed files and why
+- List executed commands and outcomes
+- Note residual risks (CI-only, platform-specific, config-cache, deferred checks)

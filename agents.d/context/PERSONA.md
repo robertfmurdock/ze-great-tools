@@ -2,36 +2,48 @@
 
 Repository owner: RoB Murdock.
 
-Use this as the default quick persona. For additional depth, load `agents.d/context/PERSONA_EXTENDED.md`.
+## Purpose
+Default quick persona for AI agents working in this repository. Load `agents.d/context/PERSONA_EXTENDED.md` for additional depth.
 
-## About Me
-- Software engineer since 2005 across many languages and stacks.
-- Product value and team effectiveness are the north star.
-- Prefer clarity over cleverness.
+## When To Use
+- Before starting any task
+- When making architectural decisions
+- When choosing between implementation approaches
+- When determining test coverage
 
-## Working Values
-- Show your work: assumptions, risks, and tradeoffs should be explicit.
-- Run code and verify behavior; reality beats theory.
-- Brevity is clarity; generally prefer whole words.
-- Tests are intent and should fail for the correct reason before passing.
-- Optimize after pain is visible; avoid pre-optimization.
-- Keep functions/files small, names clear, and boundaries intentional.
-- Prefer functional/composable styles over inheritance-heavy designs.
+## Critical Facts
+- Product value and team effectiveness are the north star
+- Prefer clarity over cleverness
+- Tests must fail for the correct reason before passing
+- Verify behavior by running code; reality beats theory
+- Optimize after pain is visible, not before
 
-## Collaboration Preferences
-- Confirm architecture and scope assumptions early.
-- Keep updates concise, concrete, and decision-oriented.
-- Surface blockers quickly with a best-next-path proposal.
+## Constraints
+- Keep functions and files small
+- Keep names clear
+- Keep boundaries intentional
+- Prefer functional/composable styles over inheritance-heavy designs
+- Ship small, reversible steps
+- Minimize blast radius
 
-## Decision Heuristics
-- Prefer established conventions and dependable solutions on critical paths.
-- Minimize blast radius; ship small, reversible steps.
-- Chesterton's Fence: before changing something that looks wrong — especially code overriding a default — ask or surface possible reasons it could be intentional. Don't change it without understanding why it exists.
-- Match test depth to risk, boundary crossings, and user impact.
-- Default to the simplest thing that could work; do not add handling for imagined edge cases or future requirements that don't exist yet.
+## Decisions
+- **Confirm early**: Validate architecture and scope assumptions before implementing
+- **Chesterton's Fence**: Before changing code that overrides defaults or looks wrong, investigate why it exists. Do not change without understanding its purpose.
+- **Simplest solution**: Implement the simplest thing that could work. Do not add handling for imagined edge cases or future requirements.
+- **Established conventions**: Use proven solutions on critical paths
+- **Test depth**: Match test coverage to risk, boundary crossings, and user impact
+
+## Common Mistakes
+- Pre-optimization without visible pain
+- Clever solutions over clear ones
+- Tests that don't demonstrate intent or meaningful failure
+- Changing code without understanding why it exists
+- Adding handling for imagined future requirements
+- Large, non-reversible changes
 
 ## Done Criteria
-- Behavior aligns with intended outcomes and constraints.
-- Tests demonstrate intent and meaningful failure coverage.
-- Changes are scoped, readable, and easy to review.
-- Risks and follow-up concerns are explicitly surfaced.
+- Behavior aligns with intended outcomes and constraints
+- Tests demonstrate intent and meaningful failure coverage
+- Changes are scoped, readable, and easy to review
+- Risks and follow-up concerns are explicitly surfaced
+- Code has been run and behavior verified

@@ -4,3 +4,4 @@ build
 .cache-proxy
 .idea/workspace.xml
 /.output.txt
+.DS_Store
