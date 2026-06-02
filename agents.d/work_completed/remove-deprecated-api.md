@@ -52,7 +52,8 @@ Remove all deprecated APIs from the codebase as part of a major version release,
   - ✅ PLAYBOOK_CODE_STYLE.md: Code formatted, functions small, breaking change documented
   - ✅ GIT_WORKFLOW.md: Proper commit messages, co-authorship, specific file staging
   - Completed 2026-06-02
-- [ ] Move this file to agents.d/work_completed/
+- [x] Move this file to agents.d/work_completed/
+  - Completed 2026-06-02
 
 ## Implementation Notes
 ### Known Deprecated APIs (as of 2026-06-02)
