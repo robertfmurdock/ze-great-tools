@@ -41,27 +41,10 @@ jobs:
         with:
           registry-url: 'https://registry.npmjs.org'
           node-version: 24
-      - name: Validate NPM Token
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}
+      - name: Setup npm
         run: |
           npm install -g npm@latest
           npm --version
-          echo "Verifying npm authentication..."
-          if ! npm whoami; then
-            echo "❌ ERROR: NODE_AUTH_TOKEN is not valid or not configured"
-            echo "Please create a granular access token at https://www.npmjs.com/settings/~/tokens"
-            echo "Token must have: Publish permission for @continuous-excellence organization"
-            exit 1
-          fi
-          echo "✓ Authenticated as: $(npm whoami)"
-          echo "Verifying @continuous-excellence org access..."
-          if ! npm access ls-packages @continuous-excellence 2>&1 | grep -q "@continuous-excellence"; then
-            echo "⚠️  WARNING: Token may not have @continuous-excellence org access"
-            echo "If publish fails, verify the token has publish permissions for the organization"
-          else
-            echo "✓ Token has @continuous-excellence org access"
-          fi
       - uses: testspace-com/setup-testspace@v1
         if: ${{ github.ref == 'refs/heads/master' }}
         with:

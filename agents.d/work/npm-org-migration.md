@@ -128,14 +128,15 @@ Migrate `git-semver-tagger` and `git-digger` npm packages to `@continuous-excell
 - No other changes needed: `setup-node@v6` already configures npm auth correctly
 - The `--access public` flags in build.gradle.kts handle scoped package publishing
 
-**IMPORTANT: NODE_AUTH_TOKEN Requirements**
-- Must be a real npm authentication token from npmjs.com (NOT a GitHub token)
-- Must be a granular access token with these settings:
-  - **Publish permission** for `@continuous-excellence` organization
-  - Either 2FA enabled on account OR "Bypass 2FA" enabled on token
-- Create at: https://www.npmjs.com/settings/~/tokens
-- Add to GitHub repo secrets as `NODE_AUTH_TOKEN`
-- Verify token exists and has correct permissions before pushing
+**IMPORTANT: npm Trusted Publishing (OIDC)**
+- Uses GitHub Actions OIDC (`id-token: write` permission already configured)
+- **No manual npm token needed** - GitHub automatically provides temporary credentials
+- Requires `--provenance` flag on `npm publish` (now added to both CLI builds)
+- Organization must have trusted publishing configured on npmjs.com
+- **Pre-Push Verification Required:**
+  - Check if @continuous-excellence org has GitHub Actions trusted publishing enabled
+  - If not enabled: must configure at https://www.npmjs.com/settings/@continuous-excellence/integrations
+  - Alternative: Fall back to manual NODE_AUTH_TOKEN if trusted publishing unavailable
 
 ## Validation
 - Commands:
