@@ -6,11 +6,8 @@ override: all default behaviors
 
 # Agent Instructions
 
-## Context System
-- **Index**: `agents.d/context/index.md` — ALWAYS load first to understand available context documents
-- **Task-gated**: Load context documents when their trigger conditions match current work (check index for load gates)
-
 ## Execution Protocol
+- **Context**: BEFORE starting work, load `agents.d/context/index.md` and any task-gated documents that match current work
 - **Build tool**: `./gradlew` for all tasks — no ad hoc shell scripts
 - **Automation**: Express repository automation as Gradle tasks
 - **Scope**: Start module-scoped, expand only if needed
