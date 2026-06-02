@@ -232,7 +232,7 @@ tagger tag --version 1.2.3 --release-branch main --format=json
 - name: Calculate version
   id: version
   run: |
-    VERSION=$(tagger calculate-version --format=json | jq -r '.data.version')
+    VERSION=$(tagger calculate-version)
     echo "version=$VERSION" >> $GITHUB_OUTPUT
 
 - name: Use version
@@ -242,14 +242,18 @@ tagger tag --version 1.2.3 --release-branch main --format=json
 **Extract version in bash:**
 
 ```bash
-# Get version
-VERSION=$(tagger calculate-version --format=json 2>/dev/null | jq -r '.data.version')
+# Get version directly (text format, detailed status goes to stderr)
+VERSION=$(tagger calculate-version)
+echo "Building version: $VERSION"
 
-# Check if snapshot
-IS_SNAPSHOT=$(tagger calculate-version --format=json 2>/dev/null | jq -r '.data.snapshot')
-
-if [ "$IS_SNAPSHOT" = "true" ]; then
-  echo "This is a snapshot build"
+# Use JSON format for complex scripting that needs to handle errors programmatically
+if ! OUTPUT=$(tagger calculate-version --format=json 2>&1); then
+  STATUS=$(echo "$OUTPUT" | jq -r '.status')
+  if [ "$STATUS" = "error" ]; then
+    ERROR_MSG=$(echo "$OUTPUT" | jq -r '.error')
+    echo "Version calculation failed: $ERROR_MSG"
+    exit 1
+  fi
 fi
 ```
 
