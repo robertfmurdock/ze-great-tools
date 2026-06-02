@@ -120,10 +120,13 @@ tasks {
     }
     val jsPublish by registering(Exec::class) {
         dependsOn(jsCliTar)
-        enabled = !isSnapshot()
         mustRunAfter(check)
         workingDir(mainNpmProjectDir)
-        commandLine("npm", "publish", "--access", "public")
+        if (isSnapshot()) {
+            commandLine("npm", "publish", "--access", "public", "--tag", "snapshot")
+        } else {
+            commandLine("npm", "publish", "--access", "public")
+        }
     }
     check {
         dependsOn(confirmTaggerCanRun)
