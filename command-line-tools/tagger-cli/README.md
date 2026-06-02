@@ -105,7 +105,6 @@ The `.tagger` file supports these fields:
 {
   "releaseBranch": "main",
   "implicitPatch": true,
-  "disableDetached": true,
   "allowDetachedHead": false,
   "forceSnapshot": false,
   "majorRegex": "\\[major\\]",
