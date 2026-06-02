@@ -30,9 +30,10 @@ Migrate `git-semver-tagger` and `git-digger` npm packages to `@continuous-excell
   - Update publish steps if needed
   - Enhanced token validation to verify org access
 - [ ] Add deprecation notices to old unscoped packages
-  - Agent cycle: test → implement → refactor-light → verify pushable
-  - Create deprecation plan for `git-semver-tagger` and `git-digger`
-  - Document migration instructions in package README files
+  - **Manual step**: Use npm CLI to deprecate old packages (no code changes needed)
+  - `npm deprecate git-semver-tagger "Package moved to @continuous-excellence/tagger. Install with: npm install @continuous-excellence/tagger"`
+  - `npm deprecate git-digger "Package moved to @continuous-excellence/digger. Install with: npm install @continuous-excellence/digger"`
+  - Document completion in Implementation Notes with date
 - [x] Update documentation with new installation commands
   - Agent cycle: test → implement → refactor-light → verify pushable
   - Update README files with `npm install @continuous-excellence/tagger`
@@ -48,19 +49,27 @@ Migrate `git-semver-tagger` and `git-digger` npm packages to `@continuous-excell
 - [ ] Move this file to agents.d/work_completed/
 
 ## Implementation Notes
-### Current State
-- Tagger CLI publishes as `git-semver-tagger` (unscoped)
-- Digger CLI publishes as `git-digger` (unscoped)
+### Current State (as of 2026-06-02)
+- Build configured to publish as `@continuous-excellence/tagger` and `@continuous-excellence/digger`
+- New scoped packages NOT YET published to npm
+- Old packages `git-semver-tagger` and `git-digger` still exist on npm
 - npm publishing happens via `jsPublish` tasks in respective build.gradle.kts
 - GitHub Actions configures npm registry at `https://registry.npmjs.org`
 - Publishing only runs when `!isSnapshot()`
 
 ### Migration Strategy
-1. Create @continuous-excellence npm organization (if not exists)
-2. Update package names to scoped format
-3. Publish first version under new scope
-4. Deprecate old packages with clear migration message
+1. ✓ Create @continuous-excellence npm organization (already exists)
+2. ✓ Update package names to scoped format (build.gradle.kts updated)
+3. ⏳ Publish first version under new scope (requires release/tag)
+4. ⏳ Deprecate old packages with `npm deprecate` commands (after new packages published)
 5. Monitor adoption and support transition period
+
+### Deprecation Approach (2026-06-02)
+**Decision:** Use `npm deprecate` command directly on old packages (no new publish to old location needed)
+- `npm deprecate` marks all versions with a red warning on npmjs.com
+- Users can still install deprecated packages but see migration guidance
+- No code changes or dual-publishing required
+- Must wait until new scoped packages are published before deprecating old ones
 
 ### Required Secrets
 - `NODE_AUTH_TOKEN` (existing secret, must have @continuous-excellence org publish permissions)
