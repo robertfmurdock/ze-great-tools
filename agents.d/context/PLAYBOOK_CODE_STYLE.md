@@ -14,26 +14,7 @@ Enforce TDD discipline, test consistency, and maintainable code patterns across 
 ## Critical Facts
 
 ### Test-Driven Development
-- **Red-Green-Refactor is mandatory**: Write one test, see it fail, make it pass, repeat
-- This overrides any task document saying "add comprehensive coverage"
-- All tests run via `./gradlew check` (Gradle integration required)
-- Use Kotlin with TestMints structure (setup/exercise/verify), not shell scripts
-- One test per distinct scenario; extend existing tests when fitting same scenario
-- Only write passing tests if their absence confuses readers
-
-### Assertions
-- Default to minassert's `assertIsEqualTo` over kotlin.test assertions
-- "Chop down" chains: break before `?.` and before assertions
-- Test behavior/outcomes, not just structure (avoid symbolic `assertNotNull`/type checks)
-- Extract nullable values to variables rather than inline `assertNotNull`
-
-```kotlin
-// Correct
-data["version"]
-    ?.jsonPrimitive
-    ?.content
-    .assertIsEqualTo("1.2.4")
-```
+See `agents.d/context/TESTING.md` for complete TDD cycle, TestMints patterns, and assertion guidelines.
 
 ### Functions
 - Target <10 lines; break only when clarity demands

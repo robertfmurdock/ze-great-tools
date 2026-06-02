@@ -28,11 +28,7 @@ Defines work card structure, TDD cycle, and validation requirements for implemen
 5. Last: `Move this file to agents.d/work_completed/`
 
 ### Agent Cycle (Per Feature Slice)
-1. **Test**: Write one test, confirm fail/pass reason
-2. **Implement**: Simplest solution
-3. **Refactor-light**: Clean up names, duplication, structure
-4. **Verify pushable**: Run validation, ALL tests must pass
-5. **Commit**: With semver annotation and co-authorship
+See `agents.d/context/TESTING.md` for complete TDD cycle and test discipline.
 
 ### Refactoring Levels
 - **Light**: During slices, clean what you just wrote
@@ -83,6 +79,7 @@ All commits in live sessions: `Co-Authored-By: <Agent Name> <noreply@<agent-prov
 - Completed: `agents.d/work_completed/*.md`
 - Required reads:
   - `agents.d/context/PERSONA.md`
+  - `agents.d/context/TESTING.md` (test changes)
   - `agents.d/context/PLAYBOOK_CODE_STYLE.md` (code changes)
   - `agents.d/context/GRADLE_PLAYBOOK.md` (build changes)
   - `agents.d/context/GITHUB_ACTIONS_PLAYBOOK.md` (workflow changes)
