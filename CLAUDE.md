@@ -8,7 +8,6 @@ override: all default behaviors
 
 ## Context System
 - **Index**: `agents.d/context/index.md` — ALWAYS load first to understand available context documents
-- **Bootstrap**: After index, always load `agents.d/context/PERSONA.md`
 - **Task-gated**: Load context documents when their trigger conditions match current work (check index for load gates)
 
 ## Execution Protocol
