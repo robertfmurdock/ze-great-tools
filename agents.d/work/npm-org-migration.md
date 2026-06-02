@@ -24,10 +24,11 @@ Migrate `git-semver-tagger` and `git-digger` npm packages to `@continuous-excell
   - Tagger: `git-semver-tagger` → `@continuous-excellence/tagger`
   - Digger: `git-digger` → `@continuous-excellence/digger`
   - Update `packageJson` blocks in `tagger-cli/build.gradle.kts` and `digger-cli/build.gradle.kts`
-- [ ] Update GitHub Actions workflow for scoped package publishing
+- [x] Update GitHub Actions workflow for scoped package publishing
   - Agent cycle: test → implement → refactor-light → verify pushable
   - Configure npm registry authentication for scoped packages
   - Update publish steps if needed
+  - Enhanced token validation to verify org access
 - [ ] Add deprecation notices to old unscoped packages
   - Agent cycle: test → implement → refactor-light → verify pushable
   - Create deprecation plan for `git-semver-tagger` and `git-digger`
@@ -61,8 +62,8 @@ Migrate `git-semver-tagger` and `git-digger` npm packages to `@continuous-excell
 5. Monitor adoption and support transition period
 
 ### Required Secrets
-- `NODE_AUTH_TOKEN` (may need update for scoped package publishing)
-- npm organization access verification
+- `NODE_AUTH_TOKEN` (existing secret, must have @continuous-excellence org publish permissions)
+- npm organization access verification added to workflow validation step
 
 ## Research Findings (2026-06-02)
 
@@ -109,11 +110,21 @@ Migrate `git-semver-tagger` and `git-digger` npm packages to `@continuous-excell
 - No explicit publish step in workflow — relies on Gradle `release` task (line 79)
 
 ### Required Changes Summary
-1. Organization: Create `@continuous-excellence` on npmjs.com
-2. Package names: Add `@continuous-excellence/` prefix in both build.gradle.kts files
-3. Publish command: Add `--access public` to jsPublish tasks
-4. Token verification: Confirm `NODE_AUTH_TOKEN` has org publish permissions
-5. Deprecation: Post-publish, deprecate old packages with migration message
+1. ✓ Organization: Create `@continuous-excellence` on npmjs.com (already exists)
+2. ✓ Package names: Add `@continuous-excellence/` prefix in both build.gradle.kts files
+3. ✓ Publish command: Add `--access public` to jsPublish tasks
+4. ✓ Token verification: Enhanced workflow validation to check org access
+5. Pending: Deprecation: Post-publish, deprecate old packages with migration message
+
+### GitHub Actions Changes (2026-06-02)
+**Workflow: `.github/workflows/main.yml`**
+- Enhanced "Validate NPM Token" step:
+  - Added explicit `NODE_AUTH_TOKEN` env var
+  - Added `npm whoami` to verify token authentication
+  - Added `npm access ls-packages @continuous-excellence` to verify org access
+  - Warns if token doesn't have org permissions (non-fatal to allow investigation)
+- No other changes needed: `setup-node@v6` already configures npm auth correctly
+- The `--access public` flags in build.gradle.kts handle scoped package publishing
 
 ## Validation
 - Commands:
