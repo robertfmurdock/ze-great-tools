@@ -111,6 +111,7 @@ Perform mandatory code quality audit after implementation completion. Must be ex
 
 ## Key Files
 - `PLAYBOOK_CODE_STYLE.md` — quality criteria details
+- `GIT_WORKFLOW.md` — git history analysis commands
 - Work card in `agents.d/work/` — defines commit scope
 
 ## Common Mistakes

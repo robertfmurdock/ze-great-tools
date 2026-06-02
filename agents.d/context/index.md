@@ -11,6 +11,7 @@ Load cost: tokens shown are approximate full file size.
 - [PLAYBOOK_CODE_STYLE.md](PLAYBOOK_CODE_STYLE.md) (~700t) — function size, data flow, deprecation, formatting. Load when modifying source code (not tests).
 - [GRADLE_PLAYBOOK.md](GRADLE_PLAYBOOK.md) (~600t) — build logic, task patterns, dependency management. Load when modifying build files or version catalog.
 - [GITHUB_ACTIONS_PLAYBOOK.md](GITHUB_ACTIONS_PLAYBOOK.md) (~500t) — CI/CD orchestration. Load when adding/changing workflows.
+- [GIT_WORKFLOW.md](GIT_WORKFLOW.md) (~350t) — commit standards. Load when creating commits, or analyzing git history.
 - [REFACTOR_AGENT.md](REFACTOR_AGENT.md) (~1100t) — mandatory quality audit checklist. Load only for final refactor pass (subagent required).
 
 ## Situational

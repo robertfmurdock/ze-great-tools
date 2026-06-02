@@ -77,9 +77,6 @@ See `agents.d/context/TESTING.md` for complete TDD cycle and test discipline.
 - Pause and ask user if semver impact increases
 - Log discoveries in Implementation Notes
 
-### Co-Authorship (Required)
-All commits in live sessions: `Co-Authored-By: <Agent Name> <noreply@<agent-provider>.com>`
-
 ## Key Files
 - Work cards: `agents.d/work/*.md`
 - Completed: `agents.d/work_completed/*.md`
@@ -88,6 +85,7 @@ All commits in live sessions: `Co-Authored-By: <Agent Name> <noreply@<agent-prov
   - `agents.d/context/TESTING.md` (test changes)
   - `agents.d/context/PLAYBOOK_CODE_STYLE.md` (code changes)
   - `agents.d/context/GRADLE_PLAYBOOK.md` (build changes)
+  - `agents.d/context/GIT_WORKFLOW.md` (commits, PRs)
   - `agents.d/context/GITHUB_ACTIONS_PLAYBOOK.md` (workflow changes)
   - `agents.d/context/REFACTOR_AGENT.md` (final refactor)
 
