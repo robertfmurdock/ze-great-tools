@@ -68,7 +68,7 @@ class CalculateVersion : CliktCommand() {
     )
 
     override fun run() {
-        TaggerCore(GitAdapter(workingDirectory))
+        val result = TaggerCore(GitAdapter(workingDirectory))
             .calculateNextVersion(
                 implicitPatch = implicitPatch,
                 allowDetachedHead = allowDetachedHead,
@@ -76,54 +76,52 @@ class CalculateVersion : CliktCommand() {
                 forceSnapshot = forceSnapshot,
                 releaseBranch = releaseBranch ?: "",
             )
-            .run {
-                when (this) {
-                    is VersionResult.Success -> {
-                        val hasWarnings = warnings.isNotEmpty()
-                        val shouldEscalate = warningsAsErrors && hasWarnings
-
-                        when (format) {
-                            OutputFormat.JSON -> {
-                                if (shouldEscalate) {
-                                    echo(
-                                        errorResponse(
-                                            "Warnings escalated to errors: ${warnings.joinToString("; ")}",
-                                            "WARNINGS_AS_ERRORS",
-                                        ),
-                                    )
-                                } else {
-                                    outputJson(
-                                        version = version,
-                                        snapshotReasons = snapshotReasons,
-                                        warnings = warnings,
-                                    )
-                                }
-                            }
-
-                            OutputFormat.TEXT -> output(
-                                message = version,
-                                errorMessage = snapshotReasons,
-                                warnings = warnings,
-                            )
-                        }
-                        if (shouldEscalate) {
-                            throw CliktError("", printError = false, statusCode = 1)
-                        }
-                    }
-
-                    is VersionResult.Failure -> when (format) {
-                        OutputFormat.JSON -> {
-                            echo(errorResponse(message, "CONFIGURATION_ERROR"))
-                            throw CliktError("", printError = false, statusCode = 1)
-                        }
-
-                        OutputFormat.TEXT -> {
-                            throw CliktError(message)
-                        }
-                    }
-                }
-            }
+        handleResult(result)
     }
+
+    private fun handleResult(result: VersionResult) {
+        when (result) {
+            is VersionResult.Success -> handleSuccess(result)
+            is VersionResult.Failure -> handleFailure(result)
+        }
+    }
+
+    private fun handleSuccess(result: VersionResult.Success) {
+        val shouldEscalate = warningsAsErrors && result.warnings.isNotEmpty()
+        when (format) {
+            OutputFormat.JSON -> handleSuccessJson(result, shouldEscalate)
+            OutputFormat.TEXT -> handleSuccessText(result)
+        }
+        if (shouldEscalate) {
+            throw CliktError("", printError = false, statusCode = 1)
+        }
+    }
+
+    private fun handleSuccessJson(result: VersionResult.Success, shouldEscalate: Boolean) {
+        if (shouldEscalate) {
+            echo(errorResponse("Warnings escalated to errors: ${result.warnings.joinToString("; ")}", "WARNINGS_AS_ERRORS"))
+        } else {
+            outputJson(version = result.version, snapshotReasons = result.snapshotReasons, warnings = result.warnings)
+        }
+    }
+
+    private fun handleSuccessText(result: VersionResult.Success) {
+        output(message = result.version, errorMessage = result.snapshotReasons, warnings = result.warnings)
+    }
+
+    private fun handleFailure(result: VersionResult.Failure) {
+        when (format) {
+            OutputFormat.JSON -> handleFailureJson(result)
+            OutputFormat.TEXT -> handleFailureText(result)
+        }
+    }
+
+    private fun handleFailureJson(result: VersionResult.Failure) {
+        echo(errorResponse(result.message, "CONFIGURATION_ERROR"))
+        throw CliktError("", printError = false, statusCode = 1)
+    }
+
+    private fun handleFailureText(result: VersionResult.Failure): Unit = throw CliktError(result.message)
 
     private fun output(
         message: String,
