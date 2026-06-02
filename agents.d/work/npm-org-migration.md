@@ -1,7 +1,7 @@
 # Migrate npm Packages to @continuous-excellence Organization
 
 ## Goal
-Migrate `git-semver-tagger` and `git-digger` npm packages from unscoped to `@continuous-excellence` scoped packages with smooth transition experience.
+Migrate `git-semver-tagger` and `git-digger` npm packages to `@continuous-excellence` organization with simple names (`tagger` and `digger`) for smooth transition experience.
 
 ## Constraints
 - Must maintain backward compatibility during transition period
@@ -21,8 +21,8 @@ Migrate `git-semver-tagger` and `git-digger` npm packages from unscoped to `@con
   - Identify required secrets/tokens for CI/CD
 - [ ] Update package names in build configuration
   - Agent cycle: test → implement → refactor-light → verify pushable
-  - Tagger: `git-semver-tagger` → `@continuous-excellence/git-semver-tagger`
-  - Digger: `git-digger` → `@continuous-excellence/git-digger`
+  - Tagger: `git-semver-tagger` → `@continuous-excellence/tagger`
+  - Digger: `git-digger` → `@continuous-excellence/digger`
   - Update `packageJson` blocks in `tagger-cli/build.gradle.kts` and `digger-cli/build.gradle.kts`
 - [ ] Update GitHub Actions workflow for scoped package publishing
   - Agent cycle: test → implement → refactor-light → verify pushable
@@ -34,8 +34,8 @@ Migrate `git-semver-tagger` and `git-digger` npm packages from unscoped to `@con
   - Document migration instructions in package README files
 - [ ] Update documentation with new installation commands
   - Agent cycle: test → implement → refactor-light → verify pushable
-  - Update README files with `npm install @continuous-excellence/git-semver-tagger`
-  - Update README files with `npm install @continuous-excellence/git-digger`
+  - Update README files with `npm install @continuous-excellence/tagger`
+  - Update README files with `npm install @continuous-excellence/digger`
   - Add migration guide for existing users
 - [ ] Verify local package builds and functionality
   - Agent cycle: test → implement → refactor-light → verify pushable
@@ -74,7 +74,7 @@ Migrate `git-semver-tagger` and `git-digger` npm packages from unscoped to `@con
 **Scoped Package Publishing:**
 - Requires `--access public` flag (scoped packages default to private)
 - Command: `npm publish --access public`
-- package.json: `name` field must use scope (e.g., `"@continuous-excellence/git-semver-tagger"`)
+- package.json: `name` field must use scope (e.g., `"@continuous-excellence/tagger"`)
 - Authentication: requires 2FA OR granular access token with bypass 2FA enabled
 
 **CI/CD Token Requirements:**
