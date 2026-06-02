@@ -121,11 +121,21 @@ Migrate `git-semver-tagger` and `git-digger` npm packages to `@continuous-excell
 **Workflow: `.github/workflows/main.yml`**
 - Enhanced "Validate NPM Token" step:
   - Added explicit `NODE_AUTH_TOKEN` env var
-  - Added `npm whoami` to verify token authentication
+  - Added `npm whoami` to verify token authentication (fails build if invalid)
   - Added `npm access ls-packages @continuous-excellence` to verify org access
-  - Warns if token doesn't have org permissions (non-fatal to allow investigation)
+  - Warns if token doesn't have org permissions (continues to allow investigation)
+  - Provides helpful error messages with token creation instructions
 - No other changes needed: `setup-node@v6` already configures npm auth correctly
 - The `--access public` flags in build.gradle.kts handle scoped package publishing
+
+**IMPORTANT: NODE_AUTH_TOKEN Requirements**
+- Must be a real npm authentication token from npmjs.com (NOT a GitHub token)
+- Must be a granular access token with these settings:
+  - **Publish permission** for `@continuous-excellence` organization
+  - Either 2FA enabled on account OR "Bypass 2FA" enabled on token
+- Create at: https://www.npmjs.com/settings/~/tokens
+- Add to GitHub repo secrets as `NODE_AUTH_TOKEN`
+- Verify token exists and has correct permissions before pushing
 
 ## Validation
 - Commands:
