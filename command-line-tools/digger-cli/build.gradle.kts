@@ -32,8 +32,8 @@ kotlin {
         compilations {
             "main" {
                 packageJson {
-                    name = "git-digger"
-                    customField("package-name", "git-digger")
+                    name = "@continuous-excellence/digger"
+                    customField("package-name", "@continuous-excellence/digger")
                     customField("author", "rob@continuousexcellence.io")
                     customField("license", "MIT")
                     customField("keywords", arrayOf("git", "contribution", "pair", "agile", "coaching", "statistics"))
@@ -110,7 +110,7 @@ tasks {
         enabled = !isSnapshot()
         mustRunAfter(check)
         workingDir(mainNpmProjectDir)
-        commandLine("npm", "publish")
+        commandLine("npm", "publish", "--access", "public")
     }
     register("publish") {
         dependsOn(jsPublish)

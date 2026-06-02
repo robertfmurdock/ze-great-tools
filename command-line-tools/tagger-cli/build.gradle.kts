@@ -39,8 +39,8 @@ kotlin {
         compilations {
             "main" {
                 packageJson {
-                    name = "git-semver-tagger"
-                    customField("package-name", "git-semver-tagger")
+                    name = "@continuous-excellence/tagger"
+                    customField("package-name", "@continuous-excellence/tagger")
                     customField("author", "rob@continuousexcellence.io")
                     customField("license", "MIT")
                     customField("keywords", arrayOf("git", "contribution", "pair", "agile", "coaching", "statistics"))
@@ -123,7 +123,7 @@ tasks {
         enabled = !isSnapshot()
         mustRunAfter(check)
         workingDir(mainNpmProjectDir)
-        commandLine("npm", "publish")
+        commandLine("npm", "publish", "--access", "public")
     }
     check {
         dependsOn(confirmTaggerCanRun)

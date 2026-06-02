@@ -19,7 +19,7 @@ Migrate `git-semver-tagger` and `git-digger` npm packages to `@continuous-excell
   - Agent cycle: test → implement → refactor-light → verify pushable
   - Document npm organization setup steps
   - Identify required secrets/tokens for CI/CD
-- [ ] Update package names in build configuration
+- [x] Update package names in build configuration
   - Agent cycle: test → implement → refactor-light → verify pushable
   - Tagger: `git-semver-tagger` → `@continuous-excellence/tagger`
   - Digger: `git-digger` → `@continuous-excellence/digger`
@@ -122,4 +122,8 @@ Migrate `git-semver-tagger` and `git-digger` npm packages to `@continuous-excell
   - `./gradlew :command-line-tools:tagger-cli:confirmTaggerCanRun`
   - `./gradlew :command-line-tools:check`
   - `./gradlew check`
-- Results: (to be filled in during implementation)
+- Results:
+  - ✓ tagger-cli:jsCliTar (2026-06-02): SUCCESS, package.json now uses `@continuous-excellence/tagger`
+  - ✓ digger-cli:jsCliTar (2026-06-02): SUCCESS, package.json now uses `@continuous-excellence/digger`
+  - ✓ tagger-cli:confirmTaggerCanRun (2026-06-02): SUCCESS, tagger CLI executes correctly
+  - ✓ command-line-tools:check (2026-06-02): SUCCESS, all tests pass
