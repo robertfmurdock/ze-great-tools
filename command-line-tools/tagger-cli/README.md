@@ -1,7 +1,7 @@
 # Tagger CLI
 
 ![GitHub tag (latest by date)](https://img.shields.io/github/v/tag/robertfmurdock/ze-great-tools?label=Release)
-![NPM Version](https://img.shields.io/npm/v/git-semver-tagger?label=npm%20git-semver-tagger)
+![NPM Version](https://img.shields.io/npm/v/@continuous-excellence/tagger?label=npm%20@continuous-excellence/tagger)
 
 An opinionated program for automatic semantic versioning via git tags and information in commits.
 
@@ -12,7 +12,7 @@ You can install the tool using any NPM-like system.
 ### Local Example
 
 ```bash
-npm i -D git-semver-tagger # this will install it into a project as a dev dependency
+npm i -D @continuous-excellence/tagger # this will install it into a project as a dev dependency
 
 npx tagger calculate-version # You can use npx to run a project's programs easily
 ```
@@ -20,10 +20,24 @@ npx tagger calculate-version # You can use npx to run a project's programs easil
 ### Global Example
 
 ```bash
-npm i -g git-semver-tagger # this will install it globally into npm
+npm i -g @continuous-excellence/tagger # this will install it globally into npm
 
 tagger calculate-version # Now it should be available via NPM's path on your shell.
 ```
+
+### Migration from `git-semver-tagger`
+
+The package has been renamed to `@continuous-excellence/tagger`. The old `git-semver-tagger` package is deprecated. To migrate:
+
+```bash
+# Uninstall old package
+npm uninstall git-semver-tagger
+
+# Install new scoped package
+npm install @continuous-excellence/tagger
+```
+
+The CLI command remains `tagger` - no changes needed to your scripts or workflows.
 
 ## Commands
 

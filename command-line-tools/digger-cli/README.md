@@ -1,7 +1,7 @@
 # Digger CLI
 
 ![GitHub tag (latest by date)](https://img.shields.io/github/v/tag/robertfmurdock/ze-great-tools?label=Release)
-![NPM Version](https://img.shields.io/npm/v/git-digger?label=npm%20git-digger)
+![NPM Version](https://img.shields.io/npm/v/@continuous-excellence/digger?label=npm%20@continuous-excellence/digger)
 
 A program for extracting 'contribution data' from git repositories into JSON files.
 
@@ -12,7 +12,7 @@ You can install the tool using any NPM-like system.
 ### Local Example
 
 ```bash
-npm i -D git-digger # this will install it into a project as a dev dependency
+npm i -D @continuous-excellence/digger # this will install it into a project as a dev dependency
 
 npx digger current-contribution-data $(pwd) # You can use npx to run a project's programs easily
 ```
@@ -20,10 +20,24 @@ npx digger current-contribution-data $(pwd) # You can use npx to run a project's
 ### Global Example
 
 ```bash
-npm i -g git-digger # this will install it globally into npm
+npm i -g @continuous-excellence/digger # this will install it globally into npm
 
 digger current-contribution-data $(pwd) # Now it should be available via NPM's path on your shell.
 ```
+
+### Migration from `git-digger`
+
+The package has been renamed to `@continuous-excellence/digger`. The old `git-digger` package is deprecated. To migrate:
+
+```bash
+# Uninstall old package
+npm uninstall git-digger
+
+# Install new scoped package
+npm install @continuous-excellence/digger
+```
+
+The CLI command remains `digger` - no changes needed to your scripts or workflows.
 
 ## Commands
 

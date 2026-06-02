@@ -33,16 +33,17 @@ Migrate `git-semver-tagger` and `git-digger` npm packages to `@continuous-excell
   - Agent cycle: test → implement → refactor-light → verify pushable
   - Create deprecation plan for `git-semver-tagger` and `git-digger`
   - Document migration instructions in package README files
-- [ ] Update documentation with new installation commands
+- [x] Update documentation with new installation commands
   - Agent cycle: test → implement → refactor-light → verify pushable
   - Update README files with `npm install @continuous-excellence/tagger`
   - Update README files with `npm install @continuous-excellence/digger`
   - Add migration guide for existing users
-- [ ] Verify local package builds and functionality
+- [x] Verify local package builds and functionality
   - Agent cycle: test → implement → refactor-light → verify pushable
   - Test `jsCliTar` tasks complete successfully
   - Verify binary paths remain correct
   - Confirm `confirmTaggerCanRun` still passes
+  - Completed during "Update package names" slice (2026-06-02)
 - [ ] Review changes against applicable playbooks and verify compliance
 - [ ] Move this file to agents.d/work_completed/
 
