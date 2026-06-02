@@ -25,14 +25,19 @@ Standards for git operations: commits, history analysis.
 - Exclude secrets: `.env`, `credentials.json`, etc.
 
 ### Commit Message Format
-- Concise 1-2 sentences (why, not what)
+- Start with semver marker: `[major]`, `[minor]`, `[patch]`, or `[none]`
+  - `[major]`: breaking change
+  - `[minor]`: new backward-compatible functionality
+  - `[patch]`: bug fix, refactor, build output changes
+  - `[none]`: docs, work cards, build config (no output impact)
+- Follow with concise 1-2 sentences (why, not what)
 - Accurate verbs: `add` = new feature, `update` = enhancement, `fix` = bug fix
 - Check `git log` for repository style
 - Always end with: `Co-Authored-By: <Agent Name> <noreply@<agent-provider>.com>`
 - Use HEREDOC:
 ```bash
 git commit -m "$(cat <<'EOF'
-Message here.
+[semver] Message here.
 
 Co-Authored-By: <Agent Name> <noreply@<agent-provider>.com>
 EOF

@@ -7,9 +7,9 @@ override: all default behaviors
 # Agent Instructions
 
 ## Context System
-- **Index**: `agents.d/context/index.md` — document catalog with load gates and token costs
-- **Bootstrap**: Always load `agents.d/context/PERSONA.md` first
-- **Task-gated**: Load context documents only when their trigger conditions match current work
+- **Index**: `agents.d/context/index.md` — ALWAYS load first to understand available context documents
+- **Bootstrap**: After index, always load `agents.d/context/PERSONA.md`
+- **Task-gated**: Load context documents when their trigger conditions match current work (check index for load gates)
 
 ## Execution Protocol
 - **Build tool**: `./gradlew` for all tasks — no ad hoc shell scripts
