@@ -1,3 +1,9 @@
+---
+load_when: performing final refactor pass on completed work (subagent required, not orchestrator)
+cost: ~1100 tokens
+brief: mandatory quality audit checklist, adversarial stance, evidence required for all checks, neutral reporting
+---
+
 # Final Refactor Agent
 
 ## Purpose

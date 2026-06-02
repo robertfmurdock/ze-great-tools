@@ -1,3 +1,9 @@
+---
+load_when: modifying source code (excludes testing, see TESTING.md)
+cost: ~700 tokens
+brief: function size, data flow, backward compatibility, API deprecation, formatting
+---
+
 # Code Style Playbook
 
 ## Purpose

@@ -1,3 +1,9 @@
+---
+load_when: creating work cards, executing implementation tasks, reviewing work card compliance
+cost: ~1000 tokens
+brief: work card template, checklist structure, TDD cycle, subagent authorization, semver annotations
+---
+
 # Work Card Implementation Guide
 
 ## Purpose

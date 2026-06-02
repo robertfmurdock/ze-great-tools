@@ -1,3 +1,9 @@
+---
+load_when: adding or modifying GitHub Actions workflows
+cost: ~500 tokens
+brief: thin YAML (GitHub-specific only), logic in Gradle tasks, local equivalence required
+---
+
 # GitHub Actions Playbook
 
 ## Purpose

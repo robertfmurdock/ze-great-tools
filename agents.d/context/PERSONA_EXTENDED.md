@@ -1,3 +1,9 @@
+---
+load_when: facing ambiguity, architectural risk, conflicting constraints, or collaboration friction
+cost: ~500 tokens
+brief: extended context on working values, collaboration preferences, decision heuristics, anti-goals
+---
+
 # Persona (Extended)
 
 Repository owner: RoB Murdock.

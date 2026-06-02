@@ -1,3 +1,9 @@
+---
+load_when: modifying build.gradle.kts, settings.gradle.kts, gradle.properties, convention plugins, version catalog, or Gradle tasks
+cost: ~600 tokens
+brief: build logic scope (root/module/convention/versions), task patterns, validation ladder, CLI testing
+---
+
 # Gradle Playbook
 
 ## Purpose

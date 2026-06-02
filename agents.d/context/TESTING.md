@@ -1,3 +1,9 @@
+---
+load_when: writing/modifying tests, adding new behavior, before calling submit tool
+cost: ~1000 tokens
+brief: TDD cycle (red-green-refactor), TestMints patterns, setup/exercise/verify, assertion style, test hierarchy
+---
+
 # Testing Guidelines
 
 ## Purpose

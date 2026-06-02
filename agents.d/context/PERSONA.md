@@ -1,3 +1,9 @@
+---
+load_when: before any task (bootstrap)
+cost: ~500 tokens
+brief: values, constraints, decision heuristics for this repository
+---
+
 # Persona (Prep)
 
 Repository owner: RoB Murdock.
