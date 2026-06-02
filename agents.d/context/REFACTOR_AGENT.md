@@ -28,6 +28,11 @@ Perform mandatory code quality audit after implementation completion. Must be ex
 - Prefer immutable data structures
 - Intent-based naming (not implementation-based)
 
+## Violation Handling
+- Critical/major violations: Fix immediately (orchestrator already has context)
+- Pre-existing violations are not exempt if severity is critical/major
+- "Already existed" is not a reason to defer — context is loaded, fix now
+
 ## Mandatory Checklist
 
 ### 1. Identify Commit Scope

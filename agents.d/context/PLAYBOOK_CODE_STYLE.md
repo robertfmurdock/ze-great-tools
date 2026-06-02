@@ -63,6 +63,11 @@ Example:
 - Run `./gradlew formatKotlin` to fix linting issues
 - Use formatter over manual edits
 
+### Tool Safety
+- Prefer IDEA refactoring tools (extract function, rename, move) over manual edits when available
+- IDEA tools preserve correctness through AST-aware transformations
+- Manual edits risk breaking references/imports
+
 ## Common Mistakes
 
 - Writing multiple tests before implementing any
@@ -73,3 +78,4 @@ Example:
 - Not following existing test patterns in codebase
 - Complex assertion chains without "chopping down"
 - Testing structure/presence instead of actual behavior
+- Manual edits without considering IDEA refactoring tools

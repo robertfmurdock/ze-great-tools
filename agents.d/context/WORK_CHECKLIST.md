@@ -26,11 +26,13 @@ Defines work card structure, TDD cycle, and validation requirements for implemen
   - Implementation Notes: discoveries, deviations
   - Validation: commands and results
 
-### Required Checklist Items (Ordered)
+### Required Checklist Items — EXECUTE IN ORDER
+Marking items complete out of sequence violates work discipline.
+
 1. First: `Review this work card for compliance with template and update to conform`
 2. Second (if using subagents): `If this card plans subagent delegation, ask user to explicitly authorize subagents for this card and record the response in Implementation Notes`
 3. Feature slices (broad, not micro-tasks)
-4. Second-to-last: `Review changes against applicable playbooks and verify compliance`
+4. Second-to-last: `Final refactor pass (MANDATORY - see REFACTOR_AGENT.md)`
 5. Last: `Move this file to agents.d/work_completed/`
 
 ### Agent Cycle (Per Feature Slice)
@@ -95,6 +97,7 @@ See `agents.d/context/TESTING.md` for complete TDD cycle and test discipline.
 - Keep changes focused on impacted modules
 - Follow existing patterns and ownership
 - Prefer existing libraries over custom implementations
+- Pre-existing violations found during refactor = fix now (already in context)
 
 ## Common Mistakes
 - Work cards suggesting "tests may fail initially" (violates TDD cycle)
@@ -105,3 +108,5 @@ See `agents.d/context/TESTING.md` for complete TDD cycle and test discipline.
 - Spawning subagents without explicit user authorization
 - Committing failing tests
 - Not running `./gradlew check` before completion
+- Marking checklist items complete out of order (violates sequential discipline)
+- Skipping mandatory final refactor pass before completion

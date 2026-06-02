@@ -13,30 +13,30 @@ Improve agent adherence to mandatory process steps (refactor pass, checklist ord
 
 ## Checklist
 
-- [ ] Review this work card for compliance with template and update to conform
-- [ ] Analyze failure patterns and root causes
+- [x] Review this work card for compliance with template and update to conform
+- [x] Analyze failure patterns and root causes
   - Map each issue (refactor skip, out-of-order checklist execution, hesitation on pre-existing violations, manual edits without IDEA tools) to context gaps
   - Identify which context files agents load at critical decision points
   - Determine minimal signal additions that prevent each failure mode
-- [ ] Enhance WORK_CHECKLIST.md for process adherence
+- [x] Enhance WORK_CHECKLIST.md for process adherence
   - Add explicit "Final refactor pass (MANDATORY - see REFACTOR_AGENT.md)" as second-to-last checklist item
   - Strengthen ordering signal: Replace "(Ordered)" with "EXECUTE IN ORDER - marking items complete out of sequence violates work discipline"
   - Update "Common Mistakes" section: Add checklist reordering violation + refactor pass skipping
   - Add decision heuristic: "Pre-existing violations found during refactor = fix now (already in context)"
-  - Token budget: ≤100 tokens added
-- [ ] Enhance REFACTOR_AGENT.md for violation handling clarity
+  - Token budget: ≤100 tokens added (actual: ~42 words)
+- [x] Enhance REFACTOR_AGENT.md for violation handling clarity
   - Add "Violation Handling" section: Critical/major violations = fix immediately (orchestrator already has context)
   - Clarify that "pre-existing" is not a reason to defer if severity is critical/major
-  - Token budget: ≤60 tokens added
-- [ ] Enhance PLAYBOOK_CODE_STYLE.md for IDEA tool preference
+  - Token budget: ≤60 tokens added (actual: ~37 words)
+- [x] Enhance PLAYBOOK_CODE_STYLE.md for IDEA tool preference
   - Add "Tool Safety" section: Prefer IDEA refactoring tools (extract function, rename, move) over manual edits when available
   - Add to "Common Mistakes": Manual edits without considering IDEA refactoring tools
-  - Token budget: ≤60 tokens added
-- [ ] Validate changes against real scenarios
+  - Token budget: ≤60 tokens added (actual: ~39 words)
+- [x] Validate changes against real scenarios
   - Review modified context files against the three failure scenarios
   - Verify added guidance is specific and actionable (not generic reminders)
   - Confirm token cost increases are within budget
-- [ ] Review changes against applicable playbooks and verify compliance
+- [x] Review changes against applicable playbooks and verify compliance
 - [ ] Move this file to agents.d/work_completed/
 
 ## Implementation Notes
@@ -76,4 +76,15 @@ Improve agent adherence to mandatory process steps (refactor pass, checklist ord
   - Token count validation: `wc -w` before/after on modified files (approximate)
   - Scenario walkthrough: Review each modified file against failure scenarios
   - `./gradlew check` (no build impact expected, but verify)
-- Results: (populated after implementation)
+- Results:
+  - Token costs (word count approximation):
+    - WORK_CHECKLIST.md: 550 → 592 words (+42, budget ≤100) ✓
+    - REFACTOR_AGENT.md: 491 → 528 words (+37, budget ≤60) ✓
+    - PLAYBOOK_CODE_STYLE.md: 328 → 367 words (+39, budget ≤60) ✓
+    - Total: +118 words (~150-180 tokens, budget ≤250) ✓
+  - Scenario validation:
+    - Refactor skip: "MANDATORY" flag + explicit checklist item addresses visibility
+    - Out-of-order execution: "EXECUTE IN ORDER" + violation language strengthens requirement
+    - Pre-existing violation hesitation: Decision heuristic + violation handling section clarifies action
+    - Manual edits: Tool Safety section + common mistake entry signals preference
+  - Build impact: `./gradlew check` PASSED (no build output changes)
