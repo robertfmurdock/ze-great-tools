@@ -15,7 +15,7 @@ Migrate `git-semver-tagger` and `git-digger` npm packages from unscoped to `@con
 
 ## Checklist
 - [ ] Review this work card for compliance with template and update to conform
-- [ ] Research npm organization setup and scoped package publishing requirements
+- [x] Research npm organization setup and scoped package publishing requirements
   - Agent cycle: test → implement → refactor-light → verify pushable
   - Document npm organization setup steps
   - Identify required secrets/tokens for CI/CD
@@ -63,6 +63,57 @@ Migrate `git-semver-tagger` and `git-digger` npm packages from unscoped to `@con
 ### Required Secrets
 - `NODE_AUTH_TOKEN` (may need update for scoped package publishing)
 - npm organization access verification
+
+## Research Findings (2026-06-02)
+
+### npm Organization & Scoped Publishing
+**Organization Status:**
+- `@continuous-excellence` org already exists and owned by user ✓
+- Ready for scoped package publishing
+
+**Scoped Package Publishing:**
+- Requires `--access public` flag (scoped packages default to private)
+- Command: `npm publish --access public`
+- package.json: `name` field must use scope (e.g., `"@continuous-excellence/git-semver-tagger"`)
+- Authentication: requires 2FA OR granular access token with bypass 2FA enabled
+
+**CI/CD Token Requirements:**
+- Current: `NODE_AUTH_TOKEN` secret (already in GitHub Actions via env var)
+- For scoped packages: Same token works IF it has organization publish permissions
+- Verify token has correct scope access before first publish
+- GitHub Actions already configures npm registry at setup-node step
+
+**Package Deprecation:**
+- Command: `npm deprecate <package-name> "<message>"`
+- Entire package removed from search results
+- Red warning displays on package page
+- Messages should direct to new scoped package
+- Better than unpublishing (which breaks all dependents)
+
+### Current Build Configuration Analysis
+**Tagger CLI (`tagger-cli/build.gradle.kts`):**
+- package.json name: `"git-semver-tagger"` (line 42)
+- bin: `tagger` → `kotlin/bin/tagger`
+- jsPublish task: `npm publish` (line 126) — needs `--access public`
+- enabled: `!isSnapshot()`
+
+**Digger CLI (`digger-cli/build.gradle.kts`):**
+- package.json name: `"git-digger"` (line 35)
+- bin: `digger` → `kotlin/bin/digger`
+- jsPublish task: `npm publish` (line 113) — needs `--access public`
+- enabled: `!isSnapshot()`
+
+**GitHub Actions (`.github/workflows/main.yml`):**
+- Node setup: line 40-43, registry `https://registry.npmjs.org`
+- Validates NPM token: line 44-47
+- No explicit publish step in workflow — relies on Gradle `release` task (line 79)
+
+### Required Changes Summary
+1. Organization: Create `@continuous-excellence` on npmjs.com
+2. Package names: Add `@continuous-excellence/` prefix in both build.gradle.kts files
+3. Publish command: Add `--access public` to jsPublish tasks
+4. Token verification: Confirm `NODE_AUTH_TOKEN` has org publish permissions
+5. Deprecation: Post-publish, deprecate old packages with migration message
 
 ## Validation
 - Commands:
