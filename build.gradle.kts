@@ -90,11 +90,7 @@ tasks {
             IFS=',' read -ra PACKAGES <<< "${packages.get()}"
             for package in "${'$'}{PACKAGES[@]}"; do
                 echo "Processing package: ${'$'}package"
-
-                # Get all versions
                 versions=${'$'}(npm view "${'$'}package" versions --json 2>/dev/null || echo "[]")
-
-                # Filter and deprecate snapshot versions
                 echo "${'$'}versions" | jq -r '.[]' | while read -r version; do
                     if [[ "${'$'}version" == *"SNAPSHOT"* ]]; then
                         echo "Deprecating ${'$'}package@${'$'}version"
