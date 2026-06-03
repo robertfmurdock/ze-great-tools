@@ -1,73 +1,82 @@
 ---
 load_when: modifying build.gradle.kts, settings.gradle.kts, gradle.properties, convention plugins, version catalog, or Gradle tasks
-cost: ~600 tokens
-brief: build logic scope (root/module/convention/versions), task patterns, validation ladder, CLI testing
+cost: ~500 tokens
+brief: build scope rules, lazy task APIs, property exposure, plugin patterns, validation steps, CLI testing
 ---
 
 # Gradle Playbook
 
 ## Purpose
-Guide for modifying Gradle build logic, dependencies, and repository automation.
+Guide for Gradle build logic, dependencies, tasks, and repository automation.
 
 ## When To Use
-- Modifying `build.gradle.kts`, `settings.gradle.kts`, or `gradle.properties`
-- Changing module build files
-- Updating convention plugins in `build-logic/`
+- Modifying `build.gradle.kts`, `settings.gradle.kts`, `gradle.properties`
+- Updating convention plugins (`build-logic/`)
 - Managing `gradle/libs.versions.toml`
 - Adding/modifying Gradle tasks
 
 ## Critical Facts
 
-### Scope Classification
-- Root: `build.gradle.kts`, `settings.gradle.kts`, `gradle.properties`
-- Module: `:module/build.gradle.kts`
-- Convention: `build-logic/`
-- Versions: `gradle/libs.versions.toml`
+**Scope**
+- Root: `build.gradle.kts`, `settings.gradle.kts`, `gradle.properties` (orchestration only)
+- Module: `:module/build.gradle.kts` (module-specific config)
+- Convention: `build-logic/` (shared behavior)
+- Versions: `gradle/libs.versions.toml` (dependency versions)
 
-### Source of Truth
-- Dependency versions → version catalog (`gradle/libs.versions.toml`)
-- Shared behavior → convention plugins (`build-logic/`)
-- Module-specific → module build file
-- Root → orchestration only, keep lean
-
-### Task Implementation
+**Task Implementation**
 - Use typed tasks and Kotlin DSL over shell scripts
-- Use lazy APIs: `register`, providers (not eager creation)
+- Use lazy APIs: `register()`, `named()`, `configureEach()`
+- Always set `group` and `description` on user-facing tasks (without group, hidden from `./gradlew tasks`)
+- Expose `Property<T>` or `Provider<T>` directly (no getter/setter wrappers)
 - Declare inputs/outputs for incremental builds
-- Configuration-cache compatible (avoid capturing script state)
-- Treat warnings as errors
+- Configuration-cache compatible
 
-### Validation Ladder
-1. Smallest check: `./gradlew :module:task`
+**Property Types**
+- Configurable: `Property<T>`
+- Read-only: `Provider<T>`
+- Files: `RegularFileProperty`, `DirectoryProperty`
+- Collections: `ListProperty<T>`, `SetProperty<T>`, `MapProperty<K,V>`
+
+**Plugin Implementation (preference order)**
+1. Binary plugins (Kotlin/Java)
+2. Precompiled script plugins
+3. Convention plugins
+- Never Groovy
+- Minimize external dependencies
+
+**Validation**
+1. Module: `./gradlew :module:task`
 2. Affected modules
 3. Full: `./gradlew check` (required before commit)
 
-### CLI Testing (Kotlin/JS)
-- Install local build: `./gradlew :command-line-tools:<cli>:jsLink`
-- Test via: `npm exec <command>` (uses local, not published)
+**CLI Testing (Kotlin/JS)**
+- Install: `./gradlew :command-line-tools:<cli>:jsLink`
+- Test: `npm exec <command>`
 
 ## Constraints
-- Express automation as Gradle tasks via `./gradlew`
-- Keep build logic and consumer updates in same changeset
-- Update `agents.d/context/` docs when conventions change
-- Never document conventions only in `AGENTS.md` or generated files
+- All automation via `./gradlew` tasks
+- Keep build logic and consumer updates together
+- Update `agents.d/context/` when conventions change
+- Treat warnings as errors
 
-## Key Files
-- Root: `build.gradle.kts`, `settings.gradle.kts`, `gradle.properties`
-- Versions: `gradle/libs.versions.toml`
-- Conventions: `build-logic/`
-- Module builds: `:*/build.gradle.kts`
+## Naming Conventions
+- Plugin classes: `PluginNamePlugin`
+- Extensions: `PluginNameExtension`
+- Tasks: `PluginNameTask`
+- Properties/functions: `camelCase`
+- Constants: `SCREAMING_SNAKE_CASE`
+- Plugin IDs: `com.namespace.pluginname`
 
 ## Common Mistakes
-- Duplicating logic across module files instead of using conventions
-- Adding unrelated tasks to root build file
-- Eager task creation instead of lazy registration
-- Not declaring task inputs/outputs
+- Eager APIs: `create()`, `getByName()`, `all()`
+- Missing `group`/`description` on tasks
+- Wrapping `Property<T>` with getters/setters
+- No task inputs/outputs declared
 - Breaking configuration cache
-- Skipping CLI testing with `jsLink` for Kotlin/JS tools
-- Separating build logic changes from consumer updates
+- Duplicating logic instead of using conventions
+- Separating build logic from consumer updates
 
 ## Completion Checklist
-- List changed files and why
+- List changed files and reasons
 - List executed commands and outcomes
-- Note residual risks (CI-only, platform-specific, config-cache, deferred checks)
+- Note residual risks (CI-only, platform-specific, config-cache)
