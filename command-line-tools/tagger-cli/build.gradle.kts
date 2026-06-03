@@ -123,7 +123,7 @@ tasks {
         mustRunAfter(check)
         workingDir(mainNpmProjectDir)
         if (isSnapshot()) {
-            commandLine("npm", "publish", "--dry-run", "--access", "public")
+            commandLine("npm", "publish", "--dry-run", "--access", "public", "--tag", "snapshot")
         } else {
             commandLine("npm", "publish", "--access", "public")
         }
