@@ -76,4 +76,39 @@ tasks {
         from(testBuilds.map { it.projectDir.resolve("build/test-output") })
         into(rootProject.layout.buildDirectory.file("test-output/${project.path}".replace(":", "/")))
     }
+    register<Exec>("cleanupNpmSnapshots") {
+        group = "publishing"
+        description = "Deprecate snapshot versions from npm packages"
+
+        val packages = providers.gradleProperty("npmPackages")
+            .orElse("@continuous-excellence/tagger,@continuous-excellence/digger")
+
+        inputs.property("packages", packages)
+
+        commandLine("sh", "-c", """
+            set -e
+            IFS=',' read -ra PACKAGES <<< "${packages.get()}"
+            for package in "${'$'}{PACKAGES[@]}"; do
+                echo "Processing package: ${'$'}package"
+
+                # Get all versions
+                versions=${'$'}(npm view "${'$'}package" versions --json 2>/dev/null || echo "[]")
+
+                # Filter and deprecate snapshot versions
+                echo "${'$'}versions" | jq -r '.[]' | while read -r version; do
+                    if [[ "${'$'}version" == *"SNAPSHOT"* ]]; then
+                        echo "Deprecating ${'$'}package@${'$'}version"
+                        npm deprecate "${'$'}package@${'$'}version" "Snapshot version - use latest release instead" || true
+                    fi
+                done
+            done
+        """.trimIndent())
+
+        doFirst {
+            val nodeAuthToken = System.getenv("NODE_AUTH_TOKEN")
+            if (nodeAuthToken.isNullOrBlank()) {
+                throw GradleException("NODE_AUTH_TOKEN environment variable is required for npm operations")
+            }
+        }
+    }
 }

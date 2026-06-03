@@ -1,0 +1,49 @@
+name: Cleanup npm Snapshots
+# This workflow automatically deprecates snapshot versions from npm packages
+# to keep the registry clean while preserving release versions.
+#
+# Schedule: Runs daily at 2 AM UTC
+# Manual trigger: Available via workflow_dispatch
+#
+# To run locally:
+#   export NODE_AUTH_TOKEN=<your-npm-token>
+#   ./gradlew cleanupNpmSnapshots
+#
+# To run for specific packages:
+#   ./gradlew cleanupNpmSnapshots -PnpmPackages="@org/pkg1,@org/pkg2"
+#
+# To verify what would be deprecated (dry-run):
+#   npm view @continuous-excellence/tagger versions --json | jq '.[] | select(contains("SNAPSHOT"))'
+#   npm view @continuous-excellence/digger versions --json | jq '.[] | select(contains("SNAPSHOT"))'
+on:
+  schedule:
+    - cron: '0 2 * * *'  # Daily at 2 AM UTC
+  workflow_dispatch:      # Allow manual triggering
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  cleanup:
+    name: "Deprecate npm snapshot versions"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK
+        uses: actions/setup-java@v5
+        with:
+          distribution: 'zulu'
+          java-version: '21'
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v5
+      - uses: actions/setup-node@v6
+        with:
+          registry-url: 'https://registry.npmjs.org'
+          node-version: 24
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+      - name: Cleanup npm snapshots
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: ./gradlew cleanupNpmSnapshots
