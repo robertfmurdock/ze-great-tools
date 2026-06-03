@@ -1,5 +1,5 @@
 ---
-load_when: writing/modifying tests, adding new behavior, before calling submit tool
+load_when: BEFORE implementing any behavior change, writing/modifying tests, before calling submit tool
 cost: ~1000 tokens
 brief: TDD cycle (red-green-refactor), TestMints patterns, setup/exercise/verify, assertion style, test hierarchy
 ---
@@ -10,20 +10,29 @@ brief: TDD cycle (red-green-refactor), TestMints patterns, setup/exercise/verify
 Enforce TDD discipline, TestMints patterns, and consistent test structure.
 
 ## When To Use
+- **MANDATORY: BEFORE implementing any behavior change** (even if you think tests aren't needed)
 - Before calling submit tool
 - Writing or modifying tests
-- Adding new behavior
 
 ## Critical Facts
 
 ### TDD Cycle (Per Feature Slice)
-1. Write one test, confirm fail reason is correct
-2. Simplest implementation to pass
-3. Refactor: clean names, duplication, structure
-4. Verify: `./gradlew check` must pass
-5. Commit with semver annotation and co-authorship
+
+**BEFORE any code changes**:
+1. Load this file (TESTING.md)
+2. Locate or create test file for the module/feature
+3. Write ONE failing test that proves desired behavior doesn't exist yet
+4. Run test, verify it fails with expected reason (missing feature, not syntax error)
+
+**Then implement**:
+5. Simplest implementation to pass the test
+6. Refactor: clean names, duplication, structure
+7. Verify: `./gradlew check` must pass
+8. Commit with semver annotation and co-authorship
 
 **Red-Green-Refactor is mandatory**. Write one test, see it fail correctly, make it pass, repeat.
+
+**If you conclude testing isn't applicable**: Document in Implementation Notes what you attempted and why testing isn't needed BEFORE making any code changes. Legitimate exceptions: pure documentation (README, work cards), build config with no output impact, or testing requires disproportionate infrastructure (with specific justification).
 
 ### TestMints Pattern
 - Use [TestMints](https://github.com/robertfmurdock/testmints) with anonymous-object setup
@@ -96,8 +105,10 @@ Use regex for help text that may wrap: `result.output.contains(Regex("\\(default
 - Use `--quiet` or `--console=plain` for less verbose output
 
 ## Common Mistakes
-- Multiple tests before implementing
-- Feature first, tests second
+- **Implementing code before writing test** (violates TDD — if behavior changes, test must come first)
+- **Pattern-matching work as "just metadata" or "just configuration" and skipping test attempt** (attempt first, document exception if genuinely untestable)
+- **Not loading TESTING.md before implementation** (mandatory before any behavior change)
+- Multiple tests before implementing (write ONE, implement, repeat)
 - Batched check without seeing individual failures
 - Shell scripts instead of Kotlin tests
 - Complex assertion chains without "chopping down"

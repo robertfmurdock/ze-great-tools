@@ -29,7 +29,12 @@ Work card structure, TDD cycle, and validation for implementation tasks.
 **Checklist Execution Order** (sequential, violates work discipline if out of order):
 1. Review card for template compliance
 2. If using subagents: ask user authorization, record in Implementation Notes
-3. Feature slices (each: test → implement → refactor-light → verify pushable; see TESTING.md for complete TDD cycle and test discipline)
+3. Feature slices (each follows strict TDD):
+   - **BEFORE any code changes**: Load TESTING.md, locate/create test file, write ONE failing test, verify fails with expected reason
+   - **Implement**: Minimal code to pass the test
+   - **Refactor-light**: Clean what you just wrote
+   - **Verify pushable**: `./gradlew check` must pass
+   - See TESTING.md for complete TDD cycle and test discipline
 4. Final refactor (MANDATORY subagent - see REFACTOR_AGENT.md, reviews ALL commits/files in work scope)
 5. Move file to `agents.d/work_completed/`
 
@@ -85,7 +90,7 @@ Work card structure, TDD cycle, and validation for implementation tasks.
 - Completed: `agents.d/work_completed/*.md`
 - Required reads:
   - `agents.d/context/PERSONA.md`
-  - `agents.d/context/TESTING.md` (test changes)
+  - `agents.d/context/TESTING.md` (MANDATORY: load BEFORE implementing any feature slice)
   - `agents.d/context/PLAYBOOK_CODE_STYLE.md` (code changes)
   - `agents.d/context/GRADLE_PLAYBOOK.md` (build changes)
   - `agents.d/context/GIT_WORKFLOW.md` (commits, PRs)
@@ -100,7 +105,9 @@ Work card structure, TDD cycle, and validation for implementation tasks.
 - Fix pre-existing violations found during refactor
 
 ## Common Mistakes
-- Tests failing initially (violates TDD)
+- **Implementing code before writing test** (violates TDD — see 2026-06-03 incident in strengthen-test-first-discipline.md)
+- **Pattern-matching work as "just metadata" or "just configuration" and skipping test attempt** (if behavior changes, test first)
+- **Not loading TESTING.md before starting implementation** (required before any feature slice)
 - Spawning subagents without authorization
 - Marking items out of order
 - Batching checklist updates
