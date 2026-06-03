@@ -48,6 +48,15 @@ Enhance the digger-plugin and tagger-plugin Gradle plugins to provide the same l
   - Include examples, common workflows, and configuration guidance
   - Test help output is clear and actionable
   - Completed: All tasks now have groups and descriptions
+- [ ] Refactor guide tasks to share content with CLI guide markdown
+  - Agent cycle: test → implement → refactor-light → verify pushable
+  - PROBLEM: Current implementation duplicates content between CLI (markdown) and Gradle plugins (hardcoded strings)
+  - CLI uses: `command-line-tools/tagger-cli/src/commonMain/resources/help/tagger-guide.md`
+  - CLI uses: `command-line-tools/digger-cli/src/commonMain/resources/help/digger-guide.md`
+  - GOAL: Both CLI and Gradle plugin guide tasks read from same source files
+  - Options: Extract to shared module, copy resources to plugin JARs, or create common guide module
+  - Ensure existing tests still pass after refactor
+  - DRY principle: single source of truth for guide content
 - [ ] Update plugin READMEs to reference new help features
   - Agent cycle: test → implement → refactor-light → verify pushable
   - tools/tagger-plugin/README.md
