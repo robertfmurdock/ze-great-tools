@@ -1,13 +1,13 @@
 ---
 load_when: creating work cards, executing implementation tasks, reviewing work card compliance
-cost: ~1000 tokens
-brief: work card template, checklist structure, TDD cycle, subagent authorization, semver annotations
+cost: ~600 tokens
+brief: work card structure, execution protocol, handoff, semver, subagent rules
 ---
 
-# Work Card Implementation Guide
+# Work Card Protocol
 
 ## Purpose
-Defines work card structure, TDD cycle, and validation requirements for implementation tasks.
+Work card structure, TDD cycle, and validation for implementation tasks.
 
 ## When To Use
 - Creating new work cards (user request: "create a work card")
@@ -16,71 +16,72 @@ Defines work card structure, TDD cycle, and validation requirements for implemen
 
 ## Critical Facts
 
-### Work Card Location & Format
-- Work cards are markdown files in `agents.d/work/`
-- NOT Claude Code's built-in task tool
-- Template structure:
-  - Goal: one sentence
-  - Constraints: boundaries, semver intent
-  - Checklist: broad feature slices
-  - Implementation Notes: discoveries, deviations
-  - Validation: commands and results
+**File Location**: `agents.d/work/*.md` (NOT Claude Code task tool)
 
-### Required Checklist Items — EXECUTE IN ORDER
-Marking items complete out of sequence violates work discipline.
+**Template Sections**:
+- Goal: one sentence
+- Constraints: boundaries, semver intent
+- Checklist: broad feature slices (not micro-tasks)
+- Current State: commit SHA, uncommitted work, blockers, session date
+- Implementation Notes: date-stamped discoveries (newest first)
+- Validation: commands and pass/fail status (update per checklist item)
 
-1. First: `Review this work card for compliance with template and update to conform`
-2. Second (if using subagents): `If this card plans subagent delegation, ask user to explicitly authorize subagents for this card and record the response in Implementation Notes`
-3. Feature slices (broad, not micro-tasks)
-4. Second-to-last: `Final refactor pass (MANDATORY - see REFACTOR_AGENT.md)`
-5. Last: `Move this file to agents.d/work_completed/`
+**Checklist Execution Order** (sequential, violates work discipline if out of order):
+1. Review card for template compliance
+2. If using subagents: ask user authorization, record in Implementation Notes
+3. Feature slices (each: test → implement → refactor-light → verify pushable; see TESTING.md for complete TDD cycle and test discipline)
+4. Final refactor (MANDATORY subagent - see REFACTOR_AGENT.md, reviews ALL commits/files in work scope)
+5. Move file to `agents.d/work_completed/`
 
-### Agent Cycle (Per Feature Slice)
-See `agents.d/context/TESTING.md` for complete TDD cycle and test discipline.
+**Refactoring Levels**:
+- Light: During slices, clean what you just wrote
+- Final: MANDATORY subagent, review ALL commits/files in work scope
 
-### Refactoring Levels
-- **Light**: During slices, clean what you just wrote
-- **Final**: MANDATORY subagent, review ALL commits/files in work scope (see REFACTOR_AGENT.md)
-
-### Semver Annotations
+**Semver Annotations**:
 - `[major]`: breaking change
-- `[minor]`: new backward-compatible functionality
+- `[minor]`: new backward-compatible feature
 - `[patch]`: bug fix, refactor, build output changes
 - `[none]`: docs, work cards, build config (no output impact)
 
-### CLI-Specific
+**CLI-Specific**:
 - stdout = API (parseable), stderr = diagnostic
 - Changing stdout format = `[major]`
 - Improving stderr = `[patch]`
 
-### Deprecation Workflow
-1. Build and test new feature first
-2. Mark old API deprecated (why, replacement, removal timing)
-3. Test both APIs for backward compatibility
-4. Remove only at major version boundaries
+**Deprecation**: Build new feature → mark old deprecated → test both → remove at major boundary
 
 ## Constraints
 
-### Subagent Authorization
+**Subagent Rules**:
 - Before ANY subagent spawn: ask user explicitly in-thread
-- Record answer in Implementation Notes with date
+- Record authorization in Implementation Notes with date
 - Re-ask in new threads even if previously authorized
 - No explicit "yes" = single-agent mode
 
-### Repository State
+**Repository State**:
 - Every checklist item = pushable state
-- No failing tests committed
-- Run `./gradlew check` before completion
-- Mark checklist items complete as you go
+- Run `./gradlew check` before marking complete
+- Mark complete only after commit pushed
+- Update Validation incrementally
+- Never commit failing tests
 
-### Adaptation
-- Project guidelines override work card plans
+**Handoff (Before Pause)**:
+- Update Current State: last SHA, uncommitted changes, checklist status, blockers
+
+**Handoff (Resume)**:
+- Read Current State
+- Verify git state (`git log -1`, `git status`)
+- Check `./gradlew check` passes
+- Add handoff note to Implementation Notes
+
+**Adaptation**:
+- Project guidelines override work card
 - Update plan when constraints discovered
-- Pause and ask user if semver impact increases
+- Ask user if semver impact increases
 - Log discoveries in Implementation Notes
 
 ## Key Files
-- Work cards: `agents.d/work/*.md`
+- Work: `agents.d/work/*.md`
 - Completed: `agents.d/work_completed/*.md`
 - Required reads:
   - `agents.d/context/PERSONA.md`
@@ -92,21 +93,20 @@ See `agents.d/context/TESTING.md` for complete TDD cycle and test discipline.
   - `agents.d/context/REFACTOR_AGENT.md` (final refactor)
 
 ## Decisions
-- Use Gradle wrapper (`./gradlew`) only
-- Start with module-scoped validation
-- Keep changes focused on impacted modules
-- Follow existing patterns and ownership
-- Prefer existing libraries over custom implementations
-- Pre-existing violations found during refactor = fix now (already in context)
+- Use `./gradlew` only
+- Module-scoped validation
+- Focused changes per module
+- Follow existing patterns
+- Fix pre-existing violations found during refactor
 
 ## Common Mistakes
-- Work cards suggesting "tests may fail initially" (violates TDD cycle)
-- Subagent references without authorization prompt item
-- Batching checklist updates to end (mark complete as you go)
-- Silently "fixing" intentional configurations
-- Final refactor reviewing only latest changes (must review ALL commits)
-- Spawning subagents without explicit user authorization
-- Committing failing tests
-- Not running `./gradlew check` before completion
-- Marking checklist items complete out of order (violates sequential discipline)
-- Skipping mandatory final refactor pass before completion
+- Tests failing initially (violates TDD)
+- Spawning subagents without authorization
+- Marking items out of order
+- Batching checklist updates
+- Final refactor reviewing only recent changes (must review ALL)
+- Skipping final refactor
+- Not updating Current State before pause
+- Not updating Validation incrementally
+- Marking complete before push
+- Resuming without verifying git state
