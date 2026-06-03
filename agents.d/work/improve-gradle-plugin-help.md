@@ -31,15 +31,17 @@ Enhance the digger-plugin and tagger-plugin Gradle plugins to provide the same l
   - Ensure consistency between tagger-plugin and digger-plugin
   - Define what "help quality" means in Gradle context
   - Completed: Hybrid 3-phase approach designed
-- [ ] Implement Phase 1 for tagger-plugin (if needed - verify current state first)
+- [x] Implement Phase 1 for tagger-plugin (if needed - verify current state first)
   - Agent cycle: test → implement → refactor-light → verify pushable
   - Check if tagger-plugin task metadata needs any updates
   - Ensure consistency with digger-plugin improvements
-- [ ] Implement Phase 2 for both plugins (guide tasks)
+  - Completed: Verified tagger-plugin already has excellent metadata (all tasks have groups and descriptions with type prefixes)
+- [x] Implement Phase 2 for both plugins (guide tasks)
   - Agent cycle: test → implement → refactor-light → verify pushable
   - Create TaggerGuideTask and DiggerGuideTask
   - Format output to match CLI guide quality
   - Register tasks in plugin classes
+  - Completed: Both guide tasks implemented and tested, formatted output matches CLI quality
 - [x] Implement Phase 1 for digger-plugin (enhanced task metadata)
   - Agent cycle: test → implement → refactor-light → verify pushable
   - Add help task or improve existing task output
@@ -249,6 +251,34 @@ Enhance the digger-plugin and tagger-plugin Gradle plugins to provide the same l
 - Created work card `strengthen-test-first-discipline.md` to address context system gap
 - Future phases should attempt automated testing first per TDD protocol
 
+### Phase 2 Implementation Results (Completed 2026-06-03)
+
+**Changes made:**
+- Created `TaggerGuideTask.kt` with formatted help output matching CLI guide structure
+- Created `DiggerGuideTask.kt` with formatted help output matching CLI guide structure
+- Registered both tasks in respective plugin classes with group = "help"
+- Added tests to verify task registration in both plugin test suites
+- Used `@UntrackedTask` annotation (not cacheable since tasks only print to console)
+
+**Output structure (both tasks):**
+1. Header with plugin name (box drawing)
+2. Fit assessment (use when / don't use when)
+3. Typical usage example (box drawing with commands)
+4. Best practices (Do/Don't format)
+5. Prerequisites (digger only)
+6. Workflow guidance
+7. Available tasks list
+8. Link to external documentation
+
+**Verification:**
+- `./gradlew :tools-tests:tagger-plugin-test:test` — PASSED
+- `./gradlew :tools-tests:digger-plugin-test:test` — PASSED
+- `./gradlew check` — PASSED (all tests including validation)
+- Tests follow TDD: failing test → implementation → passing test
+
+**Next steps:**
+- Remaining checklist items (README updates, final verification, etc.)
+
 ### Success Criteria
 - Users can discover plugin capabilities without leaving terminal
 - Examples and common workflows are easily accessible via dedicated guide tasks
@@ -258,9 +288,10 @@ Enhance the digger-plugin and tagger-plugin Gradle plugins to provide the same l
 ## Validation
 - Commands:
   - `./gradlew :tools:digger-plugin:check` — PASSED (Phase 1)
-  - `./gradlew check` — PASSED (Phase 1)
+  - `./gradlew check` — PASSED (Phase 1 & Phase 2)
   - `./gradlew tasks --group analysis` — VERIFIED (Phase 1)
   - `./gradlew help --task currentContributionData` — VERIFIED (Phase 1)
-  - `./gradlew :tools:tagger-plugin:check` — Pending Phase 2
-  - Test help tasks — Pending Phase 2
-- Results: Phase 1 complete and verified
+  - `./gradlew :tools:tagger-plugin:check` — PASSED (Phase 2)
+  - `./gradlew :tools-tests:tagger-plugin-test:test` — PASSED (Phase 2)
+  - `./gradlew :tools-tests:digger-plugin-test:test` — PASSED (Phase 2)
+- Results: Phase 1 and Phase 2 complete and verified
