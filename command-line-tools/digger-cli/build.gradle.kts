@@ -115,6 +115,26 @@ tasks {
             commandLine("npm", "publish", "--access", "public")
         }
     }
+    val cleanupNpmSnapshots by registering(Exec::class) {
+        group = "publishing"
+        description = "Deprecate snapshot versions from @continuous-excellence/digger"
+
+        commandLine("bash", "-c", """
+            set -e
+            package="@continuous-excellence/digger"
+            echo "Processing package: ${'$'}package"
+            versions=${'$'}(npm view "${'$'}package" versions --json 2>/dev/null || echo "[]")
+            echo "${'$'}versions" | jq -r '.[]' | while read -r version; do
+                if [[ "${'$'}version" == *"SNAPSHOT"* ]]; then
+                    echo "Deprecating ${'$'}package@${'$'}version"
+                    npm deprecate "${'$'}package@${'$'}version" "Snapshot version - use latest release instead"
+                fi
+            done
+        """.trimIndent())
+    }
+    jsPublish {
+        finalizedBy(cleanupNpmSnapshots)
+    }
     register("publish") {
         dependsOn(jsPublish)
         mustRunAfter(check)
