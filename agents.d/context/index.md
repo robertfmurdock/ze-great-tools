@@ -14,4 +14,4 @@ Load cost: tokens shown are approximate full file size.
 ## Situational
 - [PERSONA.md](PERSONA.md) (~500t) — values, constraints, decision heuristics. Load when facing ambiguity or needing project philosophy guidance.
 - [PERSONA_EXTENDED.md](PERSONA_EXTENDED.md) (~500t) — extended context on collaboration, decision heuristics. Load when facing ambiguity, architectural risk, or conflicting constraints.
-- [CLI_EXECUTION.md](CLI_EXECUTION.md) (~1400t) — tagger-cli and digger-cli execution patterns, build tasks, working methods, failure modes. Load when executing, testing, or debugging CLI tools.
+- [CLI_EXECUTION.md](CLI_EXECUTION.md) (~800t) — tagger-cli and digger-cli execution patterns, build tasks, working methods. Load when executing, testing, or debugging CLI tools.
