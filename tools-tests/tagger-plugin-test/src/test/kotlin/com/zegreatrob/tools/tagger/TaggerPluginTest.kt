@@ -179,4 +179,14 @@ class TaggerPluginTest {
             .orNull
             .assertIsEqualTo(true, "Expected tag to receive allowDetachedHead=true from extension")
     }
+
+    @Test
+    fun `plugin registers taggerGuide task`() = setup(object {
+        val project = ProjectBuilder.builder().build()
+    }) exercise {
+        project.plugins.apply("com.zegreatrob.tools.tagger")
+    } verify {
+        project.tasks.findByName("taggerGuide")
+            .assertIsNotEqualTo(null, "Expected taggerGuide task to be registered")
+    }
 }

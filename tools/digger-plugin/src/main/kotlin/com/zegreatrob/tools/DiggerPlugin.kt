@@ -3,6 +3,7 @@ package com.zegreatrob.tools
 import com.zegreatrob.tools.digger.AllContributionData
 import com.zegreatrob.tools.digger.CurrentContributionData
 import com.zegreatrob.tools.digger.DiggerExtension
+import com.zegreatrob.tools.digger.DiggerGuideTask
 import com.zegreatrob.tools.digger.HeadTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -19,6 +20,11 @@ class DiggerPlugin : Plugin<Project> {
 
         val exportToGithub = project.findProperty("exportToGithub")
         val diggerBuildDirectory: Provider<Directory> = project.layout.buildDirectory.dir("digger")
+
+        project.tasks.register("diggerGuide", DiggerGuideTask::class.java) { task ->
+            task.group = "help"
+            task.description = "Display comprehensive usage guide and best practices"
+        }
 
         val gitHead = project.tasks.register("gitHead", HeadTask::class.java) { task ->
             task.group = "versioning"

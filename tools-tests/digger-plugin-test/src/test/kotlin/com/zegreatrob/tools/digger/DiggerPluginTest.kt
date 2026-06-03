@@ -15,4 +15,14 @@ class DiggerPluginTest {
         project.tasks.findByName("currentContributionData")
             .assertIsNotEqualTo(null, "Expected currentContributionData task to be registered")
     }
+
+    @Test
+    fun `plugin registers diggerGuide task`() = setup(object {
+        val project = ProjectBuilder.builder().build()
+    }) exercise {
+        project.plugins.apply("com.zegreatrob.tools.digger")
+    } verify {
+        project.tasks.findByName("diggerGuide")
+            .assertIsNotEqualTo(null, "Expected diggerGuide task to be registered")
+    }
 }

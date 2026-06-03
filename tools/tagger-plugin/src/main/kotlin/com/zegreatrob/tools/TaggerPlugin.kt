@@ -6,6 +6,7 @@ import com.zegreatrob.tools.tagger.PreviousVersion
 import com.zegreatrob.tools.tagger.ReleaseVersion
 import com.zegreatrob.tools.tagger.TagVersion
 import com.zegreatrob.tools.tagger.TaggerExtension
+import com.zegreatrob.tools.tagger.TaggerGuideTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.Exec
@@ -15,6 +16,7 @@ class TaggerPlugin : Plugin<Project> {
         project.plugins.apply("base")
         val tagger = createTaggerExtension(project)
         val exportToGithub = project.findProperty("exportToGithub")
+        registerTaggerGuideTask(project)
         registerPreviousVersionTask(project, tagger)
         registerCalculateVersionTask(project, tagger, exportToGithub)
         val tag = registerTagTask(project, tagger)
@@ -31,6 +33,13 @@ class TaggerPlugin : Plugin<Project> {
             ?.toBooleanStrictOrNull()
             ?.let { tagger.forceSnapshot.set(it) }
         return tagger
+    }
+
+    private fun registerTaggerGuideTask(project: Project) {
+        project.tasks.register("taggerGuide", TaggerGuideTask::class.java) { task ->
+            task.group = "help"
+            task.description = "Display comprehensive usage guide and best practices"
+        }
     }
 
     private fun registerPreviousVersionTask(project: Project, tagger: TaggerExtension) {
