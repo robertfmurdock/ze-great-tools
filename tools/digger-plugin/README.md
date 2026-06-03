@@ -16,6 +16,23 @@ plugins {
 
 ```
 
+## Getting Help
+
+For a comprehensive usage guide with prerequisites, best practices, and workflow guidance:
+
+```bash
+./gradlew diggerGuide
+```
+
+This displays fit assessment, prerequisites, and recommendations for using the plugin effectively.
+
+To see all available tasks:
+
+```bash
+./gradlew tasks --group analysis
+./gradlew tasks --group help
+```
+
 ## Tasks
 
 ### CurrentContributionData

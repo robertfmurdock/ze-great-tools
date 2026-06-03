@@ -20,6 +20,23 @@ tagger {
 }
 ```
 
+## Getting Help
+
+For a comprehensive usage guide with best practices and workflow guidance:
+
+```bash
+./gradlew taggerGuide
+```
+
+This displays fit assessment, typical usage patterns, and recommendations for using the plugin effectively.
+
+To see all available tasks:
+
+```bash
+./gradlew tasks --group versioning
+./gradlew tasks --group help
+```
+
 ## Tasks
 
 The tagger plugin adds a few tasks to your project.

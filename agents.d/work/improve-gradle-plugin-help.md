@@ -48,7 +48,7 @@ Enhance the digger-plugin and tagger-plugin Gradle plugins to provide the same l
   - Include examples, common workflows, and configuration guidance
   - Test help output is clear and actionable
   - Completed: All tasks now have groups and descriptions
-- [ ] Refactor guide tasks to share content with CLI guide markdown
+- [x] Refactor guide tasks to share content with CLI guide markdown
   - Agent cycle: test → implement → refactor-light → verify pushable
   - PROBLEM: Current implementation duplicates content between CLI (markdown) and Gradle plugins (hardcoded strings)
   - CLI uses: `command-line-tools/tagger-cli/src/commonMain/resources/help/tagger-guide.md`
@@ -57,11 +57,13 @@ Enhance the digger-plugin and tagger-plugin Gradle plugins to provide the same l
   - Options: Extract to shared module, copy resources to plugin JARs, or create common guide module
   - Ensure existing tests still pass after refactor
   - DRY principle: single source of truth for guide content
-- [ ] Update plugin READMEs to reference new help features
+  - Completed: Guide markdown files copied to plugin resources, tasks refactored to load from resources
+- [x] Update plugin READMEs to reference new help features
   - Agent cycle: test → implement → refactor-light → verify pushable
   - tools/tagger-plugin/README.md
   - tools/digger-plugin/README.md
   - Document how to access help from Gradle
+  - Completed: Added "Getting Help" sections to both READMEs with guide task usage
 - [ ] Verify help output quality meets CLI standard
   - Agent cycle: test → implement → refactor-light → verify pushable
   - Compare plugin help to CLI help
@@ -287,6 +289,34 @@ Enhance the digger-plugin and tagger-plugin Gradle plugins to provide the same l
 
 **Next steps:**
 - Remaining checklist items (README updates, final verification, etc.)
+
+### Guide Content Consolidation Implementation (Completed 2026-06-03)
+
+**Approach taken:**
+- Copied guide markdown files from CLI resources to plugin resources
+- Each plugin JAR includes its own copy of the guide markdown
+- Guide tasks load content via `javaClass.getResourceAsStream("/help/<tool>-guide.md")`
+- Added `@Internal` annotation to `getGuideContent()` method for Gradle validation
+
+**Changes made:**
+- `tools/tagger-plugin/src/main/resources/help/tagger-guide.md` (copied from CLI)
+- `tools/digger-plugin/src/main/resources/help/digger-guide.md` (copied from CLI)
+- Refactored `TaggerGuideTask` to load markdown from resources
+- Refactored `DiggerGuideTask` to load markdown from resources
+- Added tests verifying guide content loads correctly
+- Marked `getGuideContent()` as `@Internal` for Gradle plugin validation
+
+**Technical decisions:**
+- Chose resource copying over shared module (simpler, no new module dependencies)
+- Each plugin is self-contained with its own guide markdown
+- Future updates require updating markdown in both CLI and plugin resources
+- Trade-off: Slight duplication vs. complexity of shared resource module
+
+**Verification:**
+- `./gradlew :tools-tests:tagger-plugin-test:test` — PASSED (includes new resource loading test)
+- `./gradlew :tools-tests:digger-plugin-test:test` — PASSED (includes new resource loading test)
+- `./gradlew check` — PASSED (all tests and validation)
+- Guide content confirmed to contain CLI guide text ("Use Tagger when:", "Use Digger when:")
 
 ### Success Criteria
 - Users can discover plugin capabilities without leaving terminal
