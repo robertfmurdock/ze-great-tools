@@ -115,25 +115,32 @@ tasks {
             commandLine("npm", "publish", "--access", "public")
         }
     }
-    val cleanupNpmSnapshots by registering(Exec::class) {
-        group = "publishing"
-        description = "Deprecate snapshot versions from @continuous-excellence/digger"
+    val cleanupScript = """
+        set -e
+        package="@continuous-excellence/digger"
+        echo "Processing package: ${'$'}package"
+        versions=${'$'}(npm view "${'$'}package" versions --json 2>/dev/null || echo "[]")
+        echo "${'$'}versions" | jq -r '.[]' | while read -r version; do
+            if [[ "${'$'}version" == *"SNAPSHOT"* ]]; then
+                echo "Unpublishing ${'$'}package@${'$'}version"
+                npm unpublish "${'$'}package@${'$'}version" || echo "Failed to unpublish ${'$'}version (may not exist or be too old)"
+            fi
+        done
+    """.trimIndent()
 
-        commandLine("bash", "-c", """
-            set -e
-            package="@continuous-excellence/digger"
-            echo "Processing package: ${'$'}package"
-            versions=${'$'}(npm view "${'$'}package" versions --json 2>/dev/null || echo "[]")
-            echo "${'$'}versions" | jq -r '.[]' | while read -r version; do
-                if [[ "${'$'}version" == *"SNAPSHOT"* ]]; then
-                    echo "Deprecating ${'$'}package@${'$'}version"
-                    npm deprecate "${'$'}package@${'$'}version" "Snapshot version - use latest release instead"
-                fi
-            done
-        """.trimIndent())
+    val cleanupNpmSnapshotsBefore by registering(Exec::class) {
+        group = "publishing"
+        description = "Unpublish snapshot versions before publishing @continuous-excellence/digger"
+        commandLine("bash", "-c", cleanupScript)
+    }
+    val cleanupNpmSnapshotsAfter by registering(Exec::class) {
+        group = "publishing"
+        description = "Unpublish snapshot versions after publishing @continuous-excellence/digger"
+        commandLine("bash", "-c", cleanupScript)
     }
     jsPublish {
-        finalizedBy(cleanupNpmSnapshots)
+        dependsOn(cleanupNpmSnapshotsBefore)
+        finalizedBy(cleanupNpmSnapshotsAfter)
     }
     register("publish") {
         dependsOn(jsPublish)
