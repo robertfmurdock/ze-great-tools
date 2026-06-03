@@ -9,8 +9,8 @@
 
 Build:
 ```bash
-./gradlew :command-line-tools:tagger-cli:jsProductionExecutableCompileSync
-./gradlew :command-line-tools:digger-cli:jsProductionExecutableCompileSync
+./gradlew :command-line-tools:tagger-cli:jsProductionExecutableCompileSync -q --console=plain
+./gradlew :command-line-tools:digger-cli:jsProductionExecutableCompileSync -q --console=plain
 ```
 - Output: `command-line-tools/build/js/packages/command-line-tools-{cli}/`
 
@@ -28,8 +28,8 @@ npx --package=command-line-tools/build/js/packages/command-line-tools-digger-cli
 ## Alternative: npm link (global install)
 
 ```bash
-./gradlew :command-line-tools:tagger-cli:jsLink
-./gradlew :command-line-tools:digger-cli:jsLink
+./gradlew :command-line-tools:tagger-cli:jsLink -q --console=plain
+./gradlew :command-line-tools:digger-cli:jsLink -q --console=plain
 ```
 - Creates symlinks in global node_modules
 - Execute: `tagger <args>` / `digger <args>` from anywhere
@@ -39,8 +39,8 @@ npx --package=command-line-tools/build/js/packages/command-line-tools-digger-cli
 ## Smoke test (no arguments)
 
 ```bash
-./gradlew :command-line-tools:tagger-cli:jsNodeProductionRun
-./gradlew :command-line-tools:digger-cli:jsNodeProductionRun
+./gradlew :command-line-tools:tagger-cli:jsNodeProductionRun -q --console=plain
+./gradlew :command-line-tools:digger-cli:jsNodeProductionRun -q --console=plain
 ```
 - Builds + runs (displays help only)
 - No argument passing
@@ -48,7 +48,7 @@ npx --package=command-line-tools/build/js/packages/command-line-tools-digger-cli
 
 Tagger CI check:
 ```bash
-./gradlew :command-line-tools:tagger-cli:confirmTaggerCanRun
+./gradlew :command-line-tools:tagger-cli:confirmTaggerCanRun -q --console=plain
 ```
 - Runs `tagger calculate-version` with current git state
 - Part of `check` task
@@ -106,4 +106,4 @@ Environment variables: None required
 Rebuild requirement:
 - Source changes require rebuild
 - `jsNodeProductionRun` auto-compiles
-- Manual: `./gradlew :command-line-tools:{cli}:assemble`
+- Manual: `./gradlew :command-line-tools:{cli}:assemble -q --console=plain`

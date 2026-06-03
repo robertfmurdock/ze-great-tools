@@ -60,7 +60,7 @@ Example:
 ```
 
 ### Formatting
-- Run `./gradlew formatKotlin` to fix linting issues
+- Run `./gradlew formatKotlin -q --console=plain` to fix linting issues
 - Use formatter over manual edits
 
 ### Tool Safety
@@ -72,7 +72,7 @@ Example:
 
 - Writing multiple tests before implementing any
 - Feature first, tests second
-- Batched `./gradlew check` without seeing individual failures
+- Batched `./gradlew check -q --console=plain` without seeing individual failures
 - Redundant tests verifying same behavior
 - Using shell scripts instead of Kotlin tests
 - Not following existing test patterns in codebase

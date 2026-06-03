@@ -23,7 +23,7 @@ Enforce TDD discipline, TestMints patterns, and consistent test structure.
 4. Run test, verify fails with expected reason (not syntax error)
 5. Implement simplest code to pass
 6. Refactor: clean names, duplication, structure
-7. Run `./gradlew check`
+7. Run `./gradlew check -q --console=plain`
 8. Commit with semver annotation and co-authorship
 9. Repeat
 
@@ -79,11 +79,11 @@ Use regex for help text that may wrap: `result.output.contains(Regex("\\(default
 - Example: `assertHasDeprecationWarning()` in spec; adapters handle kebab-case vs camelCase
 
 ## Constraints
-- Run `./gradlew check` before calling submit tool
+- Run `./gradlew check -q --console=plain` before calling submit tool
 - Every work card checklist item = pushable state
 - No failing tests committed
 - Java Toolchain 21
-- All tests via `./gradlew check`
+- All tests via `./gradlew check -q --console=plain`
 - Kotlin with TestMints, not shell scripts
 - One test per scenario
 
@@ -94,8 +94,8 @@ Use regex for help text that may wrap: `result.output.contains(Regex("\\(default
 - `CalculateVersionTestSpec` (shared specs)
 
 ## Decisions
-- For multi-test refactors: batch edits, run targeted compile tasks (`:module:compileKotlinJvm`), then `./gradlew :tools-tests:check` per file or at end
-- Use `--quiet` or `--console=plain` for less verbose output
+- For multi-test refactors: batch edits, run targeted compile tasks (`:module:compileKotlinJvm -q --console=plain`), then `./gradlew :tools-tests:check -q --console=plain` per file or at end
+- Default flags: `-q --console=plain` minimize token usage (errors only, no ANSI)
 - Test both old and new APIs for backward compatibility
 
 ## Common Mistakes
@@ -108,4 +108,4 @@ Use regex for help text that may wrap: `result.output.contains(Regex("\\(default
 - Complex assertion chains without "chopping down"
 - Testing structure/presence instead of behavior
 - Committing failing tests
-- Skipping `./gradlew check` before submission
+- Skipping `./gradlew check -q --console=plain` before submission

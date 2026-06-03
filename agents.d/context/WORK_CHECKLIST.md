@@ -35,7 +35,7 @@ Sequential execution; violates work discipline if out of order:
    - **BEFORE any code changes**: Load TESTING.md, locate/create test file, write ONE failing test, verify fails with expected reason
    - **Implement**: Minimal code to pass the test
    - **Refactor-light**: Clean what you just wrote
-   - **Verify pushable**: `./gradlew check` must pass
+   - **Verify pushable**: `./gradlew check -q --console=plain` must pass
    - See TESTING.md for complete TDD cycle
 4. Final refactor (MANDATORY subagent - see REFACTOR_AGENT.md, reviews ALL commits/files in work scope)
 5. Move file to `agents.d/work_completed/`
@@ -68,7 +68,7 @@ Build new feature → mark old deprecated → test both → remove at major boun
 
 ### Repository State
 - Every checklist item = pushable state
-- Run `./gradlew check` before marking complete
+- Run `./gradlew check -q --console=plain` before marking complete
 - Mark complete only after commit pushed
 - Update Validation incrementally
 - Never commit failing tests
@@ -79,7 +79,7 @@ Update Current State: last SHA, uncommitted changes, checklist status, blockers
 ### Handoff (Resume)
 - Read Current State
 - Verify git state (`git log -1`, `git status`)
-- Check `./gradlew check` passes
+- Check `./gradlew check -q --console=plain` passes
 - Add handoff note to Implementation Notes
 
 ### Adaptation

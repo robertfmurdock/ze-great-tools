@@ -11,7 +11,8 @@ override: all default behaviors
 - **Build tool**: `./gradlew` for all tasks — no ad hoc shell scripts
 - **Automation**: Express repository automation as Gradle tasks
 - **Scope**: Start module-scoped, expand only if needed
-- **Validation**: Run `./gradlew check` before completing any task
+- **Validation**: Run `./gradlew check -q --console=plain` before completing any task
+- **Agent flags**: `-q --console=plain` minimize output tokens (errors only, no ANSI); omit if diagnostics needed
 
 ## Documentation Protocol
 **Human-facing markdown** (READMEs, guides, planning docs):

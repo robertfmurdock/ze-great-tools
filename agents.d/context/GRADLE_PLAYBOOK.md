@@ -45,9 +45,15 @@ Guide for Gradle build logic, dependencies, tasks, and repository automation.
 - Minimize external dependencies
 
 **Validation**
-1. Module: `./gradlew :module:task`
+1. Module: `./gradlew :module:task -q --console=plain`
 2. Affected modules
-3. Full: `./gradlew check` (required before commit)
+3. Full: `./gradlew check -q --console=plain` (required before commit)
+
+**Agent-Optimized Flags**
+- `-q` — quiet mode, errors only (minimize token usage)
+- `--console=plain` — no ANSI codes
+- `--warning-mode=none` — suppress warnings (optional, use if noise remains)
+- Override per task if diagnostics needed
 
 **CLI Testing (Kotlin/JS)**
 - Install: `./gradlew :command-line-tools:<cli>:jsLink`
