@@ -45,8 +45,15 @@ Migrate `git-semver-tagger` and `git-digger` npm packages to `@continuous-excell
   - Verify binary paths remain correct
   - Confirm `confirmTaggerCanRun` still passes
   - Completed during "Update package names" slice (2026-06-02)
-- [ ] Review changes against applicable playbooks and verify compliance
-- [ ] Move this file to agents.d/work_completed/
+- [x] Review changes against applicable playbooks and verify compliance
+  - Reviewed: GRADLE_PLAYBOOK.md, GITHUB_ACTIONS_PLAYBOOK.md, PLAYBOOK_CODE_STYLE.md, WORK_CHECKLIST.md
+  - ✓ Build logic properly scoped in module build files
+  - ✓ GitHub Actions workflow remains thin orchestration layer
+  - ✓ Sequential checklist discipline maintained
+  - ✓ All validation commands passed before marking items complete
+  - ✓ Semver annotations correct (`[none]` for build config, no output impact yet)
+  - Outstanding: manual npm deprecate step (gated on first scoped package publish)
+- [x] Move this file to agents.d/work_completed/
 
 ## Implementation Notes
 ### Current State (as of 2026-06-02)
@@ -159,3 +166,18 @@ Migrate `git-semver-tagger` and `git-digger` npm packages to `@continuous-excell
   - ✓ digger-cli:jsCliTar (2026-06-02): SUCCESS, package.json now uses `@continuous-excellence/digger`
   - ✓ tagger-cli:confirmTaggerCanRun (2026-06-02): SUCCESS, tagger CLI executes correctly
   - ✓ command-line-tools:check (2026-06-02): SUCCESS, all tests pass
+  - ✓ Final ./gradlew check (2026-06-02): BUILD SUCCESSFUL in 3s
+
+## Completion Summary (2026-06-02)
+**What's Ready:**
+- Build configuration updated to publish scoped packages `@continuous-excellence/tagger` and `@continuous-excellence/digger`
+- GitHub Actions workflow configured for OIDC trusted publishing (no manual tokens needed)
+- Documentation updated with new installation commands
+- All validations pass, repository in pushable state
+
+**Next Steps (Post-Release):**
+- After first successful publish of scoped packages, run manual deprecation:
+  - `npm deprecate git-semver-tagger "Package moved to @continuous-excellence/tagger. Install with: npm install @continuous-excellence/tagger"`
+  - `npm deprecate git-digger "Package moved to @continuous-excellence/digger. Install with: npm install @continuous-excellence/digger"`
+
+**Semver Impact:** `[none]` (build configuration only, no published output yet)
