@@ -21,11 +21,15 @@ class DiggerPlugin : Plugin<Project> {
         val diggerBuildDirectory: Provider<Directory> = project.layout.buildDirectory.dir("digger")
 
         val gitHead = project.tasks.register("gitHead", HeadTask::class.java) { task ->
+            task.group = "versioning"
+            task.description = "Read-only: Display current git HEAD commit information"
             task.diggerExtension = digger
             task.outputFile.set(diggerBuildDirectory.map { it.file("head") })
         }
 
         project.tasks.register("currentContributionData", CurrentContributionData::class.java) { task ->
+            task.group = "analysis"
+            task.description = "Read-only: Analyze contributions for current commit"
             task.diggerExtension = digger
             task.dependsOn(gitHead)
             task.inputs.file(gitHead.map { it.outputFile })
@@ -36,6 +40,8 @@ class DiggerPlugin : Plugin<Project> {
         }
 
         project.tasks.register("allContributionData", AllContributionData::class.java) { task ->
+            task.group = "analysis"
+            task.description = "Read-only: Analyze contributions across all repository history"
             task.diggerExtension = digger
             task.dependsOn(gitHead)
             task.inputs.file(gitHead.map { it.outputFile })
