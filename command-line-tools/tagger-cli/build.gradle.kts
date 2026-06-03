@@ -137,6 +137,17 @@ tasks {
             if [[ "${'$'}version" == *"SNAPSHOT"* ]]; then
                 echo "Unpublishing ${'$'}package@${'$'}version"
                 npm unpublish "${'$'}package@${'$'}version" || echo "Failed to unpublish ${'$'}version (may not exist or be too old)"
+
+                # Wait for npm registry to confirm deletion
+                echo "Waiting for ${'$'}version to be removed from registry..."
+                for i in {1..30}; do
+                    if ! npm view "${'$'}package@${'$'}version" version 2>/dev/null; then
+                        echo "${'$'}version confirmed removed"
+                        break
+                    fi
+                    echo "Attempt ${'$'}i: ${'$'}version still visible, waiting 2s..."
+                    sleep 2
+                done
             fi
         done
     """.trimIndent()
@@ -154,6 +165,9 @@ tasks {
     jsPublish {
         dependsOn(cleanupNpmSnapshotsBefore)
         finalizedBy(cleanupNpmSnapshotsAfter)
+    }
+    cleanupNpmSnapshotsAfter {
+        mustRunAfter(jsPublish)
     }
     check {
         dependsOn(confirmTaggerCanRun)
