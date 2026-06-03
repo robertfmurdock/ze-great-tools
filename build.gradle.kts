@@ -85,7 +85,7 @@ tasks {
 
         inputs.property("packages", packages)
 
-        commandLine("sh", "-c", """
+        commandLine("bash", "-c", """
             set -e
             IFS=',' read -ra PACKAGES <<< "${packages.get()}"
             for package in "${'$'}{PACKAGES[@]}"; do
