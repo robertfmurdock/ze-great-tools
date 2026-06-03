@@ -29,11 +29,11 @@ Migrate `git-semver-tagger` and `git-digger` npm packages to `@continuous-excell
   - Configure npm registry authentication for scoped packages
   - Update publish steps if needed
   - Enhanced token validation to verify org access
-- [ ] Add deprecation notices to old unscoped packages
+- [x] Add deprecation notices to old unscoped packages
   - **Manual step**: Use npm CLI to deprecate old packages (no code changes needed)
   - `npm deprecate git-semver-tagger "Package moved to @continuous-excellence/tagger. Install with: npm install @continuous-excellence/tagger"`
   - `npm deprecate git-digger "Package moved to @continuous-excellence/digger. Install with: npm install @continuous-excellence/digger"`
-  - Document completion in Implementation Notes with date
+  - ✓ Completed 2026-06-02: All versions of both packages successfully deprecated
 - [x] Update documentation with new installation commands
   - Agent cycle: test → implement → refactor-light → verify pushable
   - Update README files with `npm install @continuous-excellence/tagger`
@@ -169,15 +169,19 @@ Migrate `git-semver-tagger` and `git-digger` npm packages to `@continuous-excell
   - ✓ Final ./gradlew check (2026-06-02): BUILD SUCCESSFUL in 3s
 
 ## Completion Summary (2026-06-02)
-**What's Ready:**
-- Build configuration updated to publish scoped packages `@continuous-excellence/tagger` and `@continuous-excellence/digger`
-- GitHub Actions workflow configured for OIDC trusted publishing (no manual tokens needed)
-- Documentation updated with new installation commands
-- All validations pass, repository in pushable state
+**Completed:**
+- ✅ Build configuration updated to publish scoped packages `@continuous-excellence/tagger` and `@continuous-excellence/digger`
+- ✅ GitHub Actions workflow configured for OIDC trusted publishing (no manual tokens needed)
+- ✅ Documentation updated with new installation commands
+- ✅ All validations pass, repository in pushable state
+- ✅ New scoped packages successfully published to npm
+- ✅ Old packages deprecated with migration guidance
 
-**Next Steps (Post-Release):**
-- After first successful publish of scoped packages, run manual deprecation:
-  - `npm deprecate git-semver-tagger "Package moved to @continuous-excellence/tagger. Install with: npm install @continuous-excellence/tagger"`
-  - `npm deprecate git-digger "Package moved to @continuous-excellence/digger. Install with: npm install @continuous-excellence/digger"`
+**Deprecation Results (2026-06-02):**
+- `git-semver-tagger`: All versions (1.4.10 through 1.9.3+) deprecated successfully
+- `git-digger`: All versions (1.1.26 through 1.8.44+) deprecated successfully
+- Both packages now display red warning on npmjs.com with installation guidance for new scoped packages
 
-**Semver Impact:** `[none]` (build configuration only, no published output yet)
+**Migration Complete:** Users installing old packages will see deprecation warnings directing them to `@continuous-excellence/tagger` and `@continuous-excellence/digger`
+
+**Semver Impact:** `[none]` (build configuration only)
