@@ -18,8 +18,8 @@ Create a GitHub Action workflow that runs daily to automatically remove snapshot
 - [x] Create Gradle task to identify and deprecate snapshot versions
 - [x] Create GitHub Actions workflow for scheduled cleanup
 - [x] Document manual cleanup procedure
-- [ ] Final refactor pass (MANDATORY - see REFACTOR_AGENT.md)
-- [ ] Move this file to agents.d/work_completed/
+- [x] Final refactor pass (MANDATORY - see REFACTOR_AGENT.md)
+- [x] Move this file to agents.d/work_completed/
 
 ## Implementation Notes
 ### Context (as of 2026-06-02)
