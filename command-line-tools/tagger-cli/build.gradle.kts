@@ -123,40 +123,10 @@ tasks {
         mustRunAfter(check)
         workingDir(mainNpmProjectDir)
         if (isSnapshot()) {
-            commandLine("npm", "publish", "--access", "public", "--tag", "snapshot")
+            commandLine("npm", "publish", "--dry-run", "--access", "public")
         } else {
             commandLine("npm", "publish", "--access", "public")
         }
-    }
-    val cleanupScript = """
-        set -e
-        package="@continuous-excellence/tagger"
-        echo "Processing package: ${'$'}package"
-        versions=${'$'}(npm view "${'$'}package" versions --json 2>/dev/null || echo "[]")
-        echo "${'$'}versions" | jq -r '.[]' | while read -r version; do
-            if [[ "${'$'}version" == *"SNAPSHOT"* ]]; then
-                echo "Unpublishing ${'$'}package@${'$'}version"
-                npm unpublish "${'$'}package@${'$'}version"
-            fi
-        done
-    """.trimIndent()
-
-    val cleanupNpmSnapshotsBefore by registering(Exec::class) {
-        group = "publishing"
-        description = "Unpublish snapshot versions before publishing @continuous-excellence/tagger"
-        commandLine("bash", "-c", cleanupScript)
-    }
-    val cleanupNpmSnapshotsAfter by registering(Exec::class) {
-        group = "publishing"
-        description = "Unpublish snapshot versions after publishing @continuous-excellence/tagger"
-        commandLine("bash", "-c", cleanupScript)
-    }
-    jsPublish {
-        dependsOn(cleanupNpmSnapshotsBefore)
-        finalizedBy(cleanupNpmSnapshotsAfter)
-    }
-    cleanupNpmSnapshotsAfter {
-        mustRunAfter(jsPublish)
     }
     check {
         dependsOn(confirmTaggerCanRun)
