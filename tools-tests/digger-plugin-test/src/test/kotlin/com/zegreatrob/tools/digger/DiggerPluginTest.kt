@@ -1,5 +1,6 @@
 package com.zegreatrob.tools.digger
 
+import com.zegreatrob.minassert.assertIsEqualTo
 import com.zegreatrob.minassert.assertIsNotEqualTo
 import com.zegreatrob.testmints.setup
 import org.gradle.testfixtures.ProjectBuilder
@@ -24,5 +25,20 @@ class DiggerPluginTest {
     } verify {
         project.tasks.findByName("diggerGuide")
             .assertIsNotEqualTo(null, "Expected diggerGuide task to be registered")
+    }
+
+    @Test
+    fun `diggerGuide task loads content from markdown resource`() = setup(object {
+        val project = ProjectBuilder.builder().build()
+    }) exercise {
+        project.plugins.apply("com.zegreatrob.tools.digger")
+        val task = project.tasks.findByName("diggerGuide") as DiggerGuideTask
+        task.getGuideContent()
+    } verify { content ->
+        content
+            .assertIsNotEqualTo(null, "Expected guide content to be loaded from resource")
+        content
+            ?.contains("Use Digger when:")
+            .assertIsEqualTo(true, "Expected guide content to contain CLI guide text")
     }
 }

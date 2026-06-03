@@ -189,4 +189,19 @@ class TaggerPluginTest {
         project.tasks.findByName("taggerGuide")
             .assertIsNotEqualTo(null, "Expected taggerGuide task to be registered")
     }
+
+    @Test
+    fun `taggerGuide task loads content from markdown resource`() = setup(object {
+        val project = ProjectBuilder.builder().build()
+    }) exercise {
+        project.plugins.apply("com.zegreatrob.tools.tagger")
+        val task = project.tasks.findByName("taggerGuide") as TaggerGuideTask
+        task.getGuideContent()
+    } verify { content ->
+        content
+            .assertIsNotEqualTo(null, "Expected guide content to be loaded from resource")
+        content
+            ?.contains("Use Tagger when:")
+            .assertIsEqualTo(true, "Expected guide content to contain CLI guide text")
+    }
 }
