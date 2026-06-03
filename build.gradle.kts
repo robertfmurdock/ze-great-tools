@@ -94,17 +94,10 @@ tasks {
                 echo "${'$'}versions" | jq -r '.[]' | while read -r version; do
                     if [[ "${'$'}version" == *"SNAPSHOT"* ]]; then
                         echo "Deprecating ${'$'}package@${'$'}version"
-                        npm deprecate "${'$'}package@${'$'}version" "Snapshot version - use latest release instead" || true
+                        npm deprecate "${'$'}package@${'$'}version" "Snapshot version - use latest release instead"
                     fi
                 done
             done
         """.trimIndent())
-
-        doFirst {
-            val nodeAuthToken = System.getenv("NODE_AUTH_TOKEN")
-            if (nodeAuthToken.isNullOrBlank()) {
-                throw GradleException("NODE_AUTH_TOKEN environment variable is required for npm operations")
-            }
-        }
     }
 }
