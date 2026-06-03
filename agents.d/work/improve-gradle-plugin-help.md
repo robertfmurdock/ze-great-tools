@@ -14,7 +14,7 @@ Enhance the digger-plugin and tagger-plugin Gradle plugins to provide the same l
 
 ## Checklist
 - [ ] Review this work card for compliance with template and update to conform
-- [ ] Analyze CLI help output quality and features
+- [x] Analyze CLI help output quality and features
   - Agent cycle: test → implement → refactor-light → verify pushable
   - Document tagger CLI help features (structured help, examples, guide command)
   - Document digger CLI help features
@@ -53,16 +53,40 @@ Enhance the digger-plugin and tagger-plugin Gradle plugins to provide the same l
 - [ ] Move this file to agents.d/work_completed/
 
 ## Implementation Notes
-### Current State (CLI)
-- Tagger CLI: Comprehensive `--help` with structured commands, examples, and dedicated `guide` command
-- Digger CLI: Provides help output (quality TBD - needs investigation)
-- Both CLIs use clikt library for well-formatted terminal help
+### CLI Help Analysis (Completed 2026-06-03)
+
+**Tagger CLI Help Quality:**
+- Main help: Comprehensive usage summary, typical CI usage example in box drawing, format options, clear command list
+- Guide command: Dedicated fit assessment with "Use when"/"Don't use when" criteria, best practices (Do/Don't format), workflow philosophy, external docs link
+- Well-formatted with box drawing characters, tables, clear sections
+- Examples embedded directly in help output
+- Philosophy and tradeoffs documented inline
+
+**Digger CLI Help Quality:**
+- Main help: Usage summary with example commands in box, command reference table with purposes
+- Guide command: Fit assessment, prerequisites, first-run workflow (numbered steps), best practices, regex override contract details
+- Similar formatting quality to tagger (box drawings, clear sections)
+- Inline examples and usage patterns
+- Comprehensive prerequisites and workflow guidance
+
+**What Makes CLI Help Effective:**
+- Structured visual formatting (box drawings, tables, sections with clear headers)
+- Concrete usage examples embedded in help (not just "see docs")
+- Fit assessment: explicit "use when" and "don't use when" criteria
+- Philosophy/workflow guidance: helps users understand tool intent
+- Progressive disclosure: main help is concise, guide provides depth
+- Best practices in actionable Do/Don't format
+- Links to external docs for deep-dive
 
 ### Current State (Gradle Plugins)
-- Tagger plugin: README-only documentation, tasks: `calculateVersion`, `release`
-- Digger plugin: README-only documentation, tasks: `currentContributionData`, `allContributionData`
+- Tagger plugin: tasks `calculateVersion`, `release`
+  - `calculateVersion` description: "Read-only: calculate next version from commit history without tagging. Check snapshot == false before tagging."
+  - Group: "versioning"
+- Digger plugin: tasks `currentContributionData`, `allContributionData`
+  - `currentContributionData` description: "-" (empty)
+  - Group: "-" (unassigned)
 - No runtime help tasks or enhanced help output
-- Standard Gradle `help --task <taskname>` provides minimal info
+- Standard Gradle `help --task <taskname>` provides only task path, type, basic description
 
 ### Design Options
 1. **Custom Help Tasks**: Add dedicated `taggerHelp` / `diggerHelp` tasks with formatted output
