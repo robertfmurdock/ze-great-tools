@@ -18,12 +18,12 @@ Fix `npx tagger --help` crash by making `getTaggerGuideContent` resolve help fil
 
 ## Checklist
 - [x] [patch] Fix getTaggerGuideContent to use package-relative path resolution
-- [ ] [patch] Verify help renders correctly from arbitrary working directories
+- [x] [patch] Verify help renders correctly from arbitrary working directories
 - [ ] [none] Final refactor via MANDATORY subagent (REFACTOR_AGENT.md)
 
 ## Current State
-**Commit**: d0d22da4 (Add work card: fix Gradle plugin publishing metadata)
-**Status**: Not started
+**Commit**: db3900c9 ([patch] Fix tagger --help path resolution using __dirname)
+**Status**: In progress - awaiting final refactor
 **Blockers**: None
 **Date**: 2026-06-04
 
@@ -49,7 +49,7 @@ Fix `npx tagger --help` crash by making `getTaggerGuideContent` resolve help fil
 ## Validation
 *Update incrementally as checklist progresses*
 
-- [ ] `./gradlew check -q --console=plain` passes
-- [ ] `npx tagger --help` works from project root
-- [ ] `npx tagger --help` works from subdirectory
-- [ ] Subcommand help still works (sanity check)
+- [x] `./gradlew check -q --console=plain` passes
+- [x] `npx tagger --help` works from project root
+- [x] `npx tagger --help` works from subdirectory
+- [x] Subcommand help still works (sanity check)
