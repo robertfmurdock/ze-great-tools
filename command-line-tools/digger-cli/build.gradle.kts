@@ -74,6 +74,7 @@ dependencies {
 
 tasks {
     val copyGuideResources by registering(Copy::class) {
+        group = "build"
         description = "Copy guide resources from digger-guide module source"
         from(rootProject.layout.projectDirectory.dir("../tools/digger-guide/src/commonMain/resources"))
         into(layout.projectDirectory.dir("src/commonMain/resources"))
@@ -111,6 +112,8 @@ tasks {
         archiveFileName.set("digger-cli-js.tgz")
     }
     register<Exec>("jsLink") {
+        group = "build setup"
+        description = "Link digger CLI to local npm for development testing"
         dependsOn(jsCliTar)
         workingDir(mainNpmProjectDir)
         commandLine("npm", "link")
@@ -126,6 +129,8 @@ tasks {
         }
     }
     register("publish") {
+        group = "publishing"
+        description = "Publish digger CLI to npm registry"
         dependsOn(jsPublish)
         mustRunAfter(check)
     }

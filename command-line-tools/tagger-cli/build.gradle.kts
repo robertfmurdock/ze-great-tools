@@ -95,6 +95,7 @@ tasks {
         into(mainNpmProjectDir)
     }
     val copyGuideResources by registering(Copy::class) {
+        group = "build"
         description = "Copy guide resources from tagger-guide module source"
         from(rootProject.layout.projectDirectory.dir("../tools/tagger-guide/src/commonMain/resources"))
         into(layout.projectDirectory.dir("src/commonMain/resources"))
@@ -124,6 +125,8 @@ tasks {
         archiveFileName.set("tagger-cli-js.tgz")
     }
     register("jsLink", Exec::class) {
+        group = "build setup"
+        description = "Link tagger CLI to local npm for development testing"
         dependsOn(jsCliTar)
         workingDir(mainNpmProjectDir)
         commandLine("npm", "link")
@@ -147,6 +150,8 @@ tasks {
         dependsOn(confirmTaggerCanRun)
     }
     register("publish") {
+        group = "publishing"
+        description = "Publish tagger CLI to npm registry"
         dependsOn(jsPublish)
         mustRunAfter(check)
     }
