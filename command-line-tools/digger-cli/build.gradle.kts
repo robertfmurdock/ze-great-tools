@@ -79,10 +79,7 @@ tasks {
         into(layout.projectDirectory.dir("src/commonMain/resources"))
         include("help/digger-guide.md")
     }
-    named("jsProcessResources") {
-        dependsOn(copyGuideResources)
-    }
-    named("jvmProcessResources") {
+    withType<ProcessResources>().configureEach {
         dependsOn(copyGuideResources)
     }
     withType(Test::class) {

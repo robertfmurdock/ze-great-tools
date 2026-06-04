@@ -100,10 +100,7 @@ tasks {
         into(layout.projectDirectory.dir("src/commonMain/resources"))
         include("help/tagger-guide.md")
     }
-    named("jsProcessResources") {
-        dependsOn(copyGuideResources)
-    }
-    named("jvmProcessResources") {
+    withType<ProcessResources>().configureEach {
         dependsOn(copyGuideResources)
     }
     val copyHelpResources by registering(Copy::class) {
