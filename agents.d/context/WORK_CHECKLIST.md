@@ -88,10 +88,7 @@ Use `./gradlew` only. Module-scoped validation. Focused changes per module. Foll
 - Pattern-matching work as "just metadata" and skipping test (if behavior changes, test first)
 - Not loading TESTING.md before implementation
 - Using generic "Review changes" instead of "Final refactor via MANDATORY subagent (REFACTOR_AGENT.md)"
-- **Marking complete without verifying explicit goals achieved**
-  - Choosing implementation convenience when contradicts stated requirements
-  - Example: "DRY: single source" via resource copying creating duplicates
-  - Verify goal alignment before complete
+- Marking complete without goal verification (see Repository State section)
 - Spawning subagents without authorization
 - Marking items out of order
 - Batching checklist updates
