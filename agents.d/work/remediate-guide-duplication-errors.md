@@ -24,7 +24,7 @@ Fix DRY violation and process errors from improve-gradle-plugin-help.md: elimina
   - Document what "single source of truth" should mean (1 file in git vs 1 file generated at build)
   - Current copyGuideFromCli approach still has CLI markdown in git, just not plugin markdown
   - Both CLI and plugins need to read from SAME resource at runtime, not copies
-- [ ] Design true single-source solution options
+- [x] Design true single-source solution options
   - Agent cycle: test → implement → refactor-light → verify pushable
   - Option 1: Shared module with guide resources, both CLI and plugins depend on it
   - Option 2: Plugins depend on CLI modules and read resources transitively
@@ -95,6 +95,37 @@ Fix DRY violation and process errors from improve-gradle-plugin-help.md: elimina
 - This means CLI modules can be dependencies of plugin modules
 
 **What "single source of truth" should mean**: Only ONE markdown file in git, not two files that happen to be synced at build time
+
+### 2026-06-03: Solution options analysis
+
+**Constraint**: Separate composite builds
+- `tools` and `command-line-tools` are separate Gradle composite builds
+- CLI depends on tools modules via published coordinates (e.g., "com.zegreatrob.tools:tagger-core")
+- Plugins cannot easily add CLI modules as project dependencies due to composite boundary
+
+**Option 1: Shared resource module in tools build** ✓ RECOMMENDED
+- Create `tools/tagger-guide` and `tools/digger-guide` modules containing only resources
+- Both plugins depend on guide modules: `implementation(project(":tagger-guide"))`
+- CLI modules depend via published coordinates: `commonMainImplementation("com.zegreatrob.tools:tagger-guide")`
+- Pros: Single source in git, works with composite structure, clear separation of concerns
+- Cons: Adds two small modules
+- Result: ONE file in git per guide in tools/*/src/main/resources/help/
+
+**Option 2: Plugin depends on CLI module**
+- Plugins add dependency on CLI modules across composite boundary
+- Gradle may support this via composite substitution
+- Pros: No new modules
+- Cons: Complex cross-composite dependency, circular build dependency risk, CLI publishes to Maven Central
+- Result: Not viable - creates circular dependency (CLI depends on tools modules)
+
+**Option 3: Extract to separate resource-only build**
+- Create new `guides` composite build with resource modules
+- Both tools and command-line-tools depend on it
+- Pros: Clean separation
+- Cons: Over-engineered for 2 markdown files, adds build complexity
+- Result: Rejected - too much overhead
+
+**Decision: Option 1** - Create tagger-guide and digger-guide modules in tools build
 
 ## Success Criteria
 - Only ONE copy of tagger-guide.md exists in git repository (not 2)
