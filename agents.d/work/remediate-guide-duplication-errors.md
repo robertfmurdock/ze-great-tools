@@ -43,7 +43,7 @@ Fix DRY violation and process errors from improve-gradle-plugin-help.md: elimina
   - MANDATORY: Load TESTING.md before starting implementation
   - Follow same pattern as tagger
   - Verify both plugins load guide content from single source
-- [ ] Remove copyGuideFromCli tasks and .gitignore entries for plugin resources
+- [x] Remove copyGuideFromCli tasks and .gitignore entries for plugin resources
   - Agent cycle: test → implement → refactor-light → verify pushable
   - Clean up build files
   - Verify guides still accessible at runtime
@@ -178,9 +178,15 @@ Fix DRY violation and process errors from improve-gradle-plugin-help.md: elimina
 *Update incrementally as checklist items complete*
 
 Commands:
-- `./gradlew check -q --console=plain` - Status: Not yet run
-- `find . -name "tagger-guide.md" -o -name "digger-guide.md"` - Status: Not yet run (should show exactly 2 files total, not 4)
-- `./gradlew taggerGuide` - Status: Not yet run (verify output unchanged)
-- `./gradlew diggerGuide` - Status: Not yet run (verify output unchanged)
-- `./gradlew :tools:tagger-plugin:build` - Status: Not yet run
-- `./gradlew :tools:digger-plugin:build` - Status: Not yet run
+- `./gradlew check -q --console=plain` - Status: ✓ PASS (2026-06-03)
+- `find . -name "*-guide.md"` (excluding build/) - Status: ✓ PASS - shows exactly 2 files:
+  - tools/tagger-guide/src/main/resources/help/tagger-guide.md
+  - tools/digger-guide/src/main/resources/help/digger-guide.md
+- `./gradlew taggerGuide` - Status: ✓ PASS - output shows guide content correctly
+- `./gradlew diggerGuide` - Status: ✓ PASS - output shows guide content correctly
+- `./gradlew :tools:tagger-plugin:build` - Status: ✓ PASS (via check)
+- `./gradlew :tools:digger-plugin:build` - Status: ✓ PASS (via check)
+- `./gradlew :tools-tests:tagger-plugin-test:test` - Status: ✓ PASS
+- `./gradlew :tools-tests:digger-plugin-test:test` - Status: ✓ PASS
+- `./gradlew :command-line-tools:tagger-cli:check` - Status: ✓ PASS
+- `./gradlew :command-line-tools:digger-cli:check` - Status: ✓ PASS
