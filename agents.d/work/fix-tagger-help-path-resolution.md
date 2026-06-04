@@ -19,7 +19,7 @@ Fix `npx tagger --help` crash by making `getTaggerGuideContent` resolve help fil
 ## Checklist
 - [x] [patch] Fix getTaggerGuideContent to use package-relative path resolution
 - [x] [patch] Verify help renders correctly from arbitrary working directories
-- [ ] [none] Final refactor via MANDATORY subagent (REFACTOR_AGENT.md)
+- [x] [none] Final refactor via MANDATORY subagent (REFACTOR_AGENT.md)
 
 ## Current State
 **Commit**: db3900c9 ([patch] Fix tagger --help path resolution using __dirname)
@@ -29,6 +29,13 @@ Fix `npx tagger --help` crash by making `getTaggerGuideContent` resolve help fil
 
 ## Implementation Notes
 *Newest entries first, date-stamped*
+
+### 2026-06-04: Refactor complete - subagent authorized
+- Refactor agent found identical bug in `digger-guide` (CRITICAL severity)
+- Applied same fix to `DiggerGuideJs.kt` to prevent `npx digger --help` crashes
+- Identified Node externals duplication (MAJOR) - architectural decision deferred
+- All quality checks passed: function length, naming, data flow, unused code, comments ✓
+- Full validation: `./gradlew check -q --console=plain` passes ✓
 
 ### 2026-06-04: Implementation complete
 - Modified `TaggerGuideJs.kt` to use `__dirname` (via `nodeDirname`) with `NodePath.join()`
