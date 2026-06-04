@@ -12,9 +12,9 @@ Improve conformance with Gradle best practices across build files: add missing t
 
 ## Checklist
 - [x] Review this work card for compliance with template and update to conform
-- [ ] Audit root build.gradle.kts for missing task group/description on registered tasks
+- [x] Audit root build.gradle.kts for missing task group/description on registered tasks
   - Agent cycle: identify violations → test → fix → refactor-light → verify pushable
-  - Tasks: versionCatalogUpdate, formatKotlin, kotlinUpgradeYarnLock, collectResults
+  - Tasks: versionCatalogUpdate, formatKotlin, kotlinUpgradeYarnLock, collectResults, resetYarnLock
 - [ ] Audit module build.gradle.kts files for missing task group/description
   - Agent cycle: identify violations → test → fix → refactor-light → verify pushable
   - Focus: command-line-tools/tagger-cli, command-line-tools/digger-cli
@@ -36,7 +36,7 @@ Improve conformance with Gradle best practices across build files: add missing t
 ## Current State
 - Start commit: 73d8dcc88fb3e7f7c96d3eba8792afc3c231aa29
 - Date: 2026-06-04
-- Status: In progress - auditing root build.gradle.kts
+- Status: In progress - auditing module build files
 - Blockers: None
 
 ## Implementation Notes
@@ -73,4 +73,6 @@ Task group/description changes have user-facing impact (task visibility in `./gr
   - `./gradlew :check -q --console=plain` — full validation passes
   - `./gradlew help --task <task-name>` — descriptions present for user tasks
 - Results:
-  - (to be updated incrementally)
+  - ✅ Root build.gradle.kts: All tasks (versionCatalogUpdate, formatKotlin, resetYarnLock, kotlinUpgradeYarnLock, collectResults) now appear in `./gradlew tasks` with proper groups and descriptions
+  - ✅ ./gradlew check -q --console=plain passes
+  - Commit: d10620a6
