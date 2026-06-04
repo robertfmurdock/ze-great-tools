@@ -24,14 +24,21 @@ class HelpFromDifferentDirectoryTest {
         val originalCwd = NodeProcess.cwd()
         val command = cli()
     }) exercise {
-        NodeProcess.chdir(NodeOs.tmpdir())
-        try {
+        runInTempDirectory(originalCwd) {
             command.test("--help")
-        } finally {
-            NodeProcess.chdir(originalCwd)
         }
     } verify { result ->
-        result.output.contains("Tagger calculates semantic versions")
-            .assertIsEqualTo(true, "Help should display from any working directory")
+        outputContainsExpectedHelpText(result)
+            .assertIsEqualTo(true)
     }
+
+    private fun runInTempDirectory(originalCwd: String, block: () -> Any) = try {
+        NodeProcess.chdir(NodeOs.tmpdir())
+        block()
+    } finally {
+        NodeProcess.chdir(originalCwd)
+    }
+
+    private fun outputContainsExpectedHelpText(result: Any) = (result as com.github.ajalt.clikt.testing.CliktCommandTestResult)
+        .output.contains("Tagger calculates semantic versions")
 }
