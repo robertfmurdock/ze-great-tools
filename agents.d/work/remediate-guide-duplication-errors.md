@@ -17,9 +17,9 @@ Fix DRY violation and process errors from improve-gradle-plugin-help.md: elimina
 - Every checklist item must result in pushable, non-failing state
 
 ## Checklist
-- [ ] Review this work card for compliance with template and update to conform
-- [ ] Load agents.d/context/index.md and verify task-gated documents loaded
-- [ ] Analyze current implementation and identify why build-time copying violated DRY goal
+- [x] Review this work card for compliance with template and update to conform
+- [x] Load agents.d/context/index.md and verify task-gated documents loaded
+- [x] Analyze current implementation and identify why build-time copying violated DRY goal
   - Agent cycle: test → implement → refactor-light → verify pushable
   - Document what "single source of truth" should mean (1 file in git vs 1 file generated at build)
   - Current copyGuideFromCli approach still has CLI markdown in git, just not plugin markdown
@@ -73,6 +73,28 @@ Fix DRY violation and process errors from improve-gradle-plugin-help.md: elimina
 
 ## Implementation Notes
 *Date-stamp discoveries here, newest first*
+
+### 2026-06-03: Session start
+- Loaded WORK_CHECKLIST.md, work card compliant with template
+- Work card and context loaded, ready to analyze current implementation
+
+### 2026-06-03: Current implementation analysis
+**Problem**: Build-time copying violates DRY goal
+- CLI markdown: `command-line-tools/{tool}-cli/src/commonMain/resources/help/{tool}-guide.md` (checked into git)
+- Plugin markdown: `tools/{tool}-plugin/src/main/resources/help/{tool}-guide.md` (checked into git via copyGuideFromCli task)
+- Build task copies CLI → plugin at build time, but BOTH files exist in git requiring manual sync
+- .gitignore excludes plugin resources but they're already committed
+
+**Current loading**:
+- CLI: `loadHelpResource("help/tagger-guide.md")` from own resources
+- Plugin: `getResourceAsStream("/help/tagger-guide.md")` from own resources
+- Both load from separate resource copies in their own JARs
+
+**Key constraint**: Separate composite builds
+- `command-line-tools` build includes `tools` as composite (line 14 in command-line-tools/settings.gradle.kts)
+- This means CLI modules can be dependencies of plugin modules
+
+**What "single source of truth" should mean**: Only ONE markdown file in git, not two files that happen to be synced at build time
 
 ## Success Criteria
 - Only ONE copy of tagger-guide.md exists in git repository (not 2)
