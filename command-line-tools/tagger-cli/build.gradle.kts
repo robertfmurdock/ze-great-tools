@@ -83,10 +83,7 @@ tasks {
         environment("GIT_CONFIG_GLOBAL", "/dev/null")
         environment("GIT_CONFIG_SYSTEM", "/dev/null")
     }
-    named("jsTestTestDevelopmentExecutableCompileSync") {
-        mustRunAfter("copyGuideResources")
-    }
-    named("jsNodeTest") {
+    named("jsProcessResources") {
         dependsOn("copyGuideResources")
     }
     withType<CreateStartScripts> {
@@ -97,17 +94,20 @@ tasks {
         from(layout.projectDirectory.file("README.md"))
         into(mainNpmProjectDir)
     }
-    val taggerGuideJsResources by registering {
-        dependsOn(gradle.includedBuild("tools").task(":tagger-guide:jsProcessResources"))
-    }
     val copyGuideResources by registering(Copy::class) {
-        description = "Copy guide resources from tagger-guide module for JS target"
-        dependsOn(taggerGuideJsResources)
-        from(rootProject.file("../tools/tagger-guide/build/processedResources/js/main"))
-        into(layout.buildDirectory.dir("compileSync/js/test/testDevelopmentExecutable/kotlin"))
+        description = "Copy guide resources from tagger-guide module source"
+        from(rootProject.layout.projectDirectory.dir("../tools/tagger-guide/src/commonMain/resources"))
+        into(layout.projectDirectory.dir("src/commonMain/resources"))
+        include("help/tagger-guide.md")
+    }
+    named("jsProcessResources") {
+        dependsOn(copyGuideResources)
+    }
+    named("jvmProcessResources") {
+        dependsOn(copyGuideResources)
     }
     val copyHelpResources by registering(Copy::class) {
-        dependsOn("jsProcessResources", "jsPackageJson", ":kotlinNpmInstall", copyGuideResources)
+        dependsOn("jsProcessResources", "jsPackageJson", ":kotlinNpmInstall")
         from(layout.buildDirectory.dir("processedResources/js/main"))
         into(mainNpmProjectDir)
     }

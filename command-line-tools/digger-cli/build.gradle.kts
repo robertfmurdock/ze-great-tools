@@ -73,11 +73,17 @@ dependencies {
 }
 
 tasks {
-    named("jsTestTestDevelopmentExecutableCompileSync") {
-        mustRunAfter("copyGuideResources")
+    val copyGuideResources by registering(Copy::class) {
+        description = "Copy guide resources from digger-guide module source"
+        from(rootProject.layout.projectDirectory.dir("../tools/digger-guide/src/commonMain/resources"))
+        into(layout.projectDirectory.dir("src/commonMain/resources"))
+        include("help/digger-guide.md")
     }
-    named("jsNodeTest") {
-        dependsOn("copyGuideResources")
+    named("jsProcessResources") {
+        dependsOn(copyGuideResources)
+    }
+    named("jvmProcessResources") {
+        dependsOn(copyGuideResources)
     }
     withType(Test::class) {
         useJUnitPlatform()
@@ -87,15 +93,6 @@ tasks {
     }
     withType<CreateStartScripts> {
         applicationName = "digger"
-    }
-    val diggerGuideJsResources by registering {
-        dependsOn(gradle.includedBuild("tools").task(":digger-guide:jsProcessResources"))
-    }
-    val copyGuideResources by registering(Copy::class) {
-        description = "Copy guide resources from digger-guide module for JS target"
-        dependsOn(diggerGuideJsResources)
-        from(rootProject.file("../tools/digger-guide/build/processedResources/js/main"))
-        into(layout.buildDirectory.dir("compileSync/js/test/testDevelopmentExecutable/kotlin"))
     }
     val copyReadme by registering(Copy::class) {
         dependsOn("jsPackageJson", ":kotlinNpmInstall")
