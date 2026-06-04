@@ -29,9 +29,10 @@ Improve conformance with Gradle best practices across build files: add missing t
   - Target: tools/digger-plugin, tools/tagger-plugin, tools/certifier-plugin, tools/fingerprint-plugin
   - Pattern: signingKey + Base64 decoding + useInMemoryPgpKeys
   - Included in publish.gradle.kts convention plugin
-- [ ] Verify all user-facing tasks appear in `./gradlew tasks` output
+- [x] Verify all user-facing tasks appear in `./gradlew tasks` output
   - Agent cycle: test → implement → refactor-light → verify pushable
   - Test: tasks with descriptions but no group should have group assigned
+  - Fixed: resetYarnLock, formatKotlin, release in tools, tools-tests, command-line-tools
 - [ ] Final refactor pass via subagent (MANDATORY - see REFACTOR_AGENT.md)
 - [ ] Review changes against applicable playbooks and verify compliance
 - [ ] Move this file to agents.d/work_completed/
@@ -39,7 +40,7 @@ Improve conformance with Gradle best practices across build files: add missing t
 ## Current State
 - Start commit: 73d8dcc88fb3e7f7c96d3eba8792afc3c231aa29
 - Date: 2026-06-04
-- Status: In progress - verifying task visibility
+- Status: In progress - preparing for final refactor
 - Blockers: None
 
 ## Implementation Notes
@@ -50,6 +51,9 @@ Task group/description changes have user-facing impact (task visibility in `./gr
 
 **2026-06-04 - Publishing/Signing convention plugin already exists**:
 The `com.zegreatrob.tools.plugins.publish` convention plugin already contains both publishing and signing configuration. Task is to apply this plugin to the 4 plugin modules (certifier-plugin, digger-plugin, fingerprint-plugin, tagger-plugin) and remove their duplicated configuration blocks.
+
+**2026-06-04 - Semver correction for publishing changes**:
+Changed commit 675cb0da from `[none]` to `[patch]` because publishing/signing config changes affect build output and require republication to verify they work as intended.
 
 ### Known violations identified
 **Root build.gradle.kts**:
@@ -82,4 +86,5 @@ The `com.zegreatrob.tools.plugins.publish` convention plugin already contains bo
   - ✅ Root build.gradle.kts: All tasks (versionCatalogUpdate, formatKotlin, resetYarnLock, kotlinUpgradeYarnLock, collectResults) now appear in `./gradlew tasks` with proper groups and descriptions (commit: d10620a6)
   - ✅ CLI modules: jsLink, publish, copyGuideResources tasks now visible in tagger-cli and digger-cli (commit: acc2ed48)
   - ✅ Publishing/signing config consolidated: Applied publish.gradle.kts to 4 plugins, removed 201 lines of duplication (commit: 8d89bc40)
+  - ✅ Task visibility verified: All user-facing tasks (resetYarnLock, formatKotlin, release) now appear in ./gradlew tasks (commit: fdec6968)
   - ✅ ./gradlew check -q --console=plain passes
