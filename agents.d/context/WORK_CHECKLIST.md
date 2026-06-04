@@ -111,6 +111,9 @@ Update Current State: last SHA, uncommitted changes, checklist status, blockers
 - **Implementing code before writing test** (violates TDD - see 2026-06-03 incident in strengthen-test-first-discipline.md)
 - **Pattern-matching work as "just metadata/configuration" and skipping test attempt** (if behavior changes, test first)
 - **Not loading TESTING.md before starting implementation** (required before any feature slice)
+- **Using generic "Review changes against applicable playbooks" instead of explicit "Final refactor pass via subagent (MANDATORY - see REFACTOR_AGENT.md)"**
+  - Conflates lightweight review with mandatory adversarial quality audit
+  - See 2026-06-03 incident in improve-gradle-plugin-help.md line 83
 - Spawning subagents without authorization
 - Marking items out of order
 - Batching checklist updates
