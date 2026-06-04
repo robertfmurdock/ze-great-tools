@@ -23,13 +23,22 @@ Fix `npx tagger --help` crash by making `getTaggerGuideContent` resolve help fil
 - [x] [none] Final refactor via MANDATORY subagent (REFACTOR_AGENT.md)
 
 ## Current State
-**Commit**: e26c4aed ([none] Add regression tests for help from different working directories)
-**Status**: In progress - awaiting final refactor pass 2
+**Commit**: e7769ada ([none] Refactor regression tests: extract helpers)
+**Status**: Complete
 **Blockers**: None
 **Date**: 2026-06-04
 
 ## Implementation Notes
 *Newest entries first, date-stamped*
+
+### 2026-06-04: Second refactor pass complete - subagent authorized
+- Reviewed commit e7769ada (regression tests)
+- Extracted `runInTempDirectory` helper (5 lines) to encapsulate chdir/restore pattern
+- Extracted `outputContainsExpectedHelpText` helper (2 lines) for explicit verification logic
+- Removed inline assertion comments by making function names self-documenting
+- All functions now ≤10 lines ✓
+- Quality checks passed: function length, naming, data flow, unused code, comments ✓
+- Full validation: `./gradlew check -q --console=plain` passes ✓
 
 ### 2026-06-04: Regression tests added (TDD violation)
 - Added JS-specific tests in `tagger-cli/src/jsTest` and `digger-cli/src/jsTest`

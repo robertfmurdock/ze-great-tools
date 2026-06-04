@@ -37,6 +37,8 @@
       <module name="tools.digger-cli.test" target="11" />
       <module name="tools.digger-core.main" target="11" />
       <module name="tools.digger-core.test" target="11" />
+      <module name="tools.digger-guide.main" target="21" />
+      <module name="tools.digger-guide.test" target="21" />
       <module name="tools.digger-json.main" target="11" />
       <module name="tools.digger-json.test" target="11" />
       <module name="tools.digger-plugin.functionalTest" target="21" />
