@@ -91,7 +91,7 @@ Enhance the digger-plugin and tagger-plugin Gradle plugins to provide the same l
   - PLAYBOOK_CODE_STYLE.md: No new source code added (task classes follow existing patterns)
   - GRADLE_PLAYBOOK.md: Task registration follows standard plugin patterns
   - Changes comply with applicable playbooks
-- [ ] Actually de-duplicate guide markdown files (fix DRY violation)
+- [x] Actually de-duplicate guide markdown files (fix DRY violation)
   - Agent cycle: test → implement → refactor-light → verify pushable
   - PROBLEM: Current state has duplicate markdown files that must be manually synced
     - CLI: `command-line-tools/tagger-cli/src/commonMain/resources/help/tagger-guide.md`
@@ -99,14 +99,17 @@ Enhance the digger-plugin and tagger-plugin Gradle plugins to provide the same l
     - CLI: `command-line-tools/digger-cli/src/commonMain/resources/help/digger-guide.md`
     - Plugin: `tools/digger-plugin/src/main/resources/help/digger-guide.md` (duplicate)
   - GOAL: True single source of truth for guide content
-  - Options to evaluate:
-    1. Shared resource module that both CLI and plugins depend on
-    2. Gradle task that copies from CLI resources to plugin resources at build time
-    3. Plugin reads from CLI module resources directly (cross-module resource access)
-  - Choose approach that maintains build independence while achieving DRY
-  - Ensure both CLI and plugin guide tasks continue to work
-  - Tests must pass after refactor
-- [ ] Move this file to agents.d/work_completed/
+  - SOLUTION CHOSEN: Gradle task copies from CLI resources to plugin resources at build time (option 2)
+  - Implementation:
+    - Added `copyGuideFromCli` Copy task in both plugin build.gradle.kts files
+    - Task copies guide markdown from CLI module to plugin src/main/resources/help/
+    - Made `processResources` depend on `copyGuideFromCli`
+    - Removed duplicate markdown files from git
+    - Added plugin src/main/resources/help/ to .gitignore
+    - Guide files are now generated during build, not committed to source control
+  - Completed: Both plugins now read from CLI markdown as single source of truth
+  - Validation: `./gradlew check` passes, JARs contain guide markdown in resources
+- [x] Move this file to agents.d/work_completed/
 
 ## Implementation Notes
 ### CLI Help Analysis (Completed 2026-06-03)
@@ -357,6 +360,39 @@ Enhance the digger-plugin and tagger-plugin Gradle plugins to provide the same l
 
 **Refactor agent findings:** 10 total quality issues identified, 1 critical fixed immediately, 7 major/minor documented for future work.
 
+### Guide Markdown De-duplication Implementation (Completed 2026-06-03)
+
+**Problem:**
+- Previous implementation copied markdown files creating permanent duplicates
+- Required manual sync between CLI and plugin resources on every content change
+- Violated DRY principle despite goal of "single source of truth"
+
+**Solution:**
+- Build-time resource copying via Gradle Copy tasks
+- CLI markdown files remain the single source of truth
+- Plugin resources are generated during build, not committed to source control
+
+**Implementation details:**
+- Added `copyGuideFromCli` Copy task in `tools/tagger-plugin/build.gradle.kts`
+- Added `copyGuideFromCli` Copy task in `tools/digger-plugin/build.gradle.kts`
+- Tasks copy from `../command-line-tools/<tool>-cli/src/commonMain/resources/help/` to plugin `src/main/resources/help/`
+- Made `processResources` task depend on `copyGuideFromCli`
+- Removed duplicate markdown files from git tracking
+- Added `src/main/resources/help/` to plugin .gitignore files
+
+**Benefits:**
+- True single source of truth (CLI markdown files)
+- Plugin JARs remain self-contained with embedded guide content
+- No manual sync required on content updates
+- Build automatically fails if CLI markdown is missing or inaccessible
+
+**Verification:**
+- `./gradlew :tools:tagger-plugin:build` — PASSED
+- `./gradlew :tools:digger-plugin:build` — PASSED
+- `./gradlew check` — PASSED
+- Verified guide markdown in plugin JAR: `jar tf tools/tagger-plugin/build/libs/tagger-plugin.jar | grep help`
+- Guide tasks load content correctly from resources at runtime
+
 ### Guide Content Consolidation Implementation (Completed 2026-06-03)
 
 **Approach taken:**
@@ -394,7 +430,7 @@ Enhance the digger-plugin and tagger-plugin Gradle plugins to provide the same l
 ## Validation
 - Commands:
   - `./gradlew :tools:digger-plugin:check` — PASSED (Phase 1)
-  - `./gradlew check` — PASSED (Phase 1 & Phase 2 & Final)
+  - `./gradlew check` — PASSED (Phase 1 & Phase 2 & Final & De-duplication)
   - `./gradlew tasks --group analysis` — VERIFIED (Phase 1)
   - `./gradlew help --task currentContributionData` — VERIFIED (Phase 1)
   - `./gradlew :tools:tagger-plugin:check` — PASSED (Phase 2)
@@ -403,4 +439,9 @@ Enhance the digger-plugin and tagger-plugin Gradle plugins to provide the same l
   - `./gradlew taggerGuide` — VERIFIED (outputs comprehensive guide with fit assessment, best practices, workflow)
   - `./gradlew diggerGuide` — VERIFIED (outputs comprehensive guide with fit assessment, prerequisites, workflow)
   - `./gradlew tasks --group help` — VERIFIED (both guide tasks discoverable)
-- Results: All phases complete and verified. Help quality matches CLI standards within Gradle context.
+  - `./gradlew :tools:tagger-plugin:build` — PASSED (De-duplication)
+  - `./gradlew :tools:digger-plugin:build` — PASSED (De-duplication)
+  - `jar tf tools/tagger-plugin/build/libs/tagger-plugin.jar | grep help` — VERIFIED (guide in JAR)
+  - `jar tf tools/digger-plugin/build/libs/digger-plugin.jar | grep help` — VERIFIED (guide in JAR)
+  - `diff` of CLI and generated plugin markdown — VERIFIED (identical content)
+- Results: All phases complete and verified. Help quality matches CLI standards within Gradle context. DRY violation fixed with build-time resource copying.
