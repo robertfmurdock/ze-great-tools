@@ -1,8 +1,7 @@
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 
 plugins {
-    id("org.jetbrains.kotlin.multiplatform")
-    id("com.zegreatrob.tools.plugins.publish")
+    id("com.zegreatrob.tools.plugins.library")
 }
 
 repositories {

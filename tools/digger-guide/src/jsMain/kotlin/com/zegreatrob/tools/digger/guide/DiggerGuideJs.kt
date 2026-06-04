@@ -17,5 +17,4 @@ private external object NodePath {
 @JsName("__dirname")
 private external val nodeDirname: String
 
-actual fun getDiggerGuideContent(): String =
-    NodeFs.readFileSync(NodePath.join(nodeDirname, "help", "digger-guide.md"), json("encoding" to "utf-8"))
+actual fun getDiggerGuideContent(): String = NodeFs.readFileSync(NodePath.join(nodeDirname, "help", "digger-guide.md"), json("encoding" to "utf-8"))

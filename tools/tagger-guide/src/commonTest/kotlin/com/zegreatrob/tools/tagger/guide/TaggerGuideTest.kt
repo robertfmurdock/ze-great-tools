@@ -1,7 +1,7 @@
 package com.zegreatrob.tools.tagger.guide
 
-import com.zegreatrob.testmints.setup
 import com.zegreatrob.minassert.assertIsEqualTo
+import com.zegreatrob.testmints.setup
 import kotlin.test.Test
 
 class TaggerGuideTest {
