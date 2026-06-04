@@ -19,14 +19,16 @@ Improve conformance with Gradle best practices across build files: add missing t
   - Agent cycle: identify violations → test → fix → refactor-light → verify pushable
   - Focus: command-line-tools/tagger-cli, command-line-tools/digger-cli
   - Fixed: jsLink, publish, copyGuideResources in both CLIs
-- [ ] Extract duplicated publishing config to convention plugin
+- [x] Extract duplicated publishing config to convention plugin
   - Agent cycle: test → implement → refactor-light → verify pushable
-  - Target: tools/digger-plugin, tools/tagger-plugin, tools/*-plugin
-  - Pattern: afterEvaluate + pom configuration appears in 3+ files
-- [ ] Extract duplicated signing config to convention plugin
+  - Target: tools/digger-plugin, tools/tagger-plugin, tools/certifier-plugin, tools/fingerprint-plugin
+  - Pattern: afterEvaluate + pom configuration appears in 4 files
+  - Applied existing publish.gradle.kts convention plugin
+- [x] Extract duplicated signing config to convention plugin
   - Agent cycle: test → implement → refactor-light → verify pushable
-  - Target: tools/digger-plugin, tools/tagger-plugin
+  - Target: tools/digger-plugin, tools/tagger-plugin, tools/certifier-plugin, tools/fingerprint-plugin
   - Pattern: signingKey + Base64 decoding + useInMemoryPgpKeys
+  - Included in publish.gradle.kts convention plugin
 - [ ] Verify all user-facing tasks appear in `./gradlew tasks` output
   - Agent cycle: test → implement → refactor-light → verify pushable
   - Test: tasks with descriptions but no group should have group assigned
@@ -37,7 +39,7 @@ Improve conformance with Gradle best practices across build files: add missing t
 ## Current State
 - Start commit: 73d8dcc88fb3e7f7c96d3eba8792afc3c231aa29
 - Date: 2026-06-04
-- Status: In progress - extracting duplicated publishing config
+- Status: In progress - verifying task visibility
 - Blockers: None
 
 ## Implementation Notes
@@ -45,6 +47,9 @@ Improve conformance with Gradle best practices across build files: add missing t
 
 **2026-06-04 - Testing approach for task metadata**:
 Task group/description changes have user-facing impact (task visibility in `./gradlew tasks` output). Testing approach: manual verification via `./gradlew tasks` command before and after changes. Automated testing would require GradleRunner test infrastructure setup, which is disproportionate for metadata validation. Verification commands documented in Validation section.
+
+**2026-06-04 - Publishing/Signing convention plugin already exists**:
+The `com.zegreatrob.tools.plugins.publish` convention plugin already contains both publishing and signing configuration. Task is to apply this plugin to the 4 plugin modules (certifier-plugin, digger-plugin, fingerprint-plugin, tagger-plugin) and remove their duplicated configuration blocks.
 
 ### Known violations identified
 **Root build.gradle.kts**:
@@ -76,4 +81,5 @@ Task group/description changes have user-facing impact (task visibility in `./gr
 - Results:
   - ✅ Root build.gradle.kts: All tasks (versionCatalogUpdate, formatKotlin, resetYarnLock, kotlinUpgradeYarnLock, collectResults) now appear in `./gradlew tasks` with proper groups and descriptions (commit: d10620a6)
   - ✅ CLI modules: jsLink, publish, copyGuideResources tasks now visible in tagger-cli and digger-cli (commit: acc2ed48)
+  - ✅ Publishing/signing config consolidated: Applied publish.gradle.kts to 4 plugins, removed 201 lines of duplication (commit: 8d89bc40)
   - ✅ ./gradlew check -q --console=plain passes
