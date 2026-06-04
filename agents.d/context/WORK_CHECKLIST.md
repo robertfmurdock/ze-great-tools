@@ -69,6 +69,10 @@ Build new feature → mark old deprecated → test both → remove at major boun
 ### Repository State
 - Every checklist item = pushable state
 - Run `./gradlew check -q --console=plain` before marking complete
+- **Goal verification**: When checklist item states explicit goal/principle (DRY, SOLID, performance target), verify implementation achieves that goal before marking complete
+  - Example: "DRY principle: single source of truth" means reading from ONE location, not creating synchronized copies
+  - Ask: "Does this implementation actually achieve the stated goal, or just solve the tactical problem?"
+  - Implementation convenience does not override explicit requirements
 - Mark complete only after commit pushed
 - Update Validation incrementally
 - Never commit failing tests
@@ -114,6 +118,10 @@ Update Current State: last SHA, uncommitted changes, checklist status, blockers
 - **Using generic "Review changes against applicable playbooks" instead of explicit "Final refactor pass via subagent (MANDATORY - see REFACTOR_AGENT.md)"**
   - Conflates lightweight review with mandatory adversarial quality audit
   - See 2026-06-03 incident in improve-gradle-plugin-help.md line 83
+- **Marking complete without verifying explicit goals achieved** (see 2026-06-03 incident in improve-gradle-plugin-help.md line 65)
+  - Choosing implementation convenience when it contradicts stated requirements
+  - Example: "DRY principle: single source" implemented via resource copying that created duplicates
+  - Must verify goal alignment before marking complete
 - Spawning subagents without authorization
 - Marking items out of order
 - Batching checklist updates

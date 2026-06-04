@@ -12,34 +12,38 @@ Add guidance to WORK_CHECKLIST.md or PERSONA.md to prevent marking checklist ite
 - Should integrate with existing WORK_CHECKLIST.md structure
 
 ## Checklist
-- [ ] Review this work card for compliance with template and update to conform
-- [ ] Load agents.d/context/index.md and verify task-gated documents loaded
-- [ ] Analyze improve-gradle-plugin-help.md line 65 failure mode in detail
+- [x] Review this work card for compliance with template and update to conform
+- [x] Load agents.d/context/index.md and verify task-gated documents loaded
+- [x] Analyze improve-gradle-plugin-help.md line 65 failure mode in detail
   - Agent cycle: test → implement → refactor-light → verify pushable
   - Checklist item: "Refactor guide tasks to share content with CLI guide markdown"
   - Explicit goal: "DRY principle: single source of truth"
   - Implementation: Resource copying creating 2 copies (1 in CLI, 1 in plugin)
   - Completion criteria gap: Agent marked complete without verifying "single source of truth" achieved
   - Document what verification step would have caught this
-- [ ] Research where goal-verification guidance belongs
+  - Completed: See Implementation Notes 2026-06-03 analysis
+- [x] Research where goal-verification guidance belongs
   - Agent cycle: test → implement → refactor-light → verify pushable
   - Option 1: Add to WORK_CHECKLIST.md "Common Mistakes" section
   - Option 2: Add to PERSONA.md decision heuristics
   - Option 3: Add to PERSONA_EXTENDED.md as architectural risk pattern
   - Option 4: Add checklist sub-step requirement when items state explicit goals/principles
   - Document tradeoff between visibility and token cost
-- [ ] Draft goal-verification guidance
+  - Completed: WORK_CHECKLIST.md Repository State section is optimal location (see Implementation Notes)
+- [x] Draft goal-verification guidance
   - Agent cycle: test → implement → refactor-light → verify pushable
   - Key principle: If checklist item states explicit goal/principle (DRY, SOLID, performance target), implementation must be verified against that goal before marking complete
   - Wording should prevent rationalization like "simpler approach" when it contradicts stated goal
   - Should trigger agent to ask: "Does this implementation actually achieve the stated goal, or just solve the tactical problem?"
   - Draft specific language that would have caught line 65 failure
-- [ ] Implement guidance in chosen location
+  - Completed: Guidance added to WORK_CHECKLIST.md Repository State section with concrete example
+- [x] Implement guidance in chosen location
   - Agent cycle: test → implement → refactor-light → verify pushable
   - MANDATORY: Load TESTING.md before implementation (even for docs)
   - If modifying WORK_CHECKLIST.md, maintain ~500 token target
   - If modifying PERSONA files, maintain token targets
   - Consider adding example failure (line 65 case) to illustrate pattern
+  - Completed: Added 3 lines (~50 tokens) to Repository State section, added Common Mistakes entry referencing line 65 incident
 - [ ] Spawn context-rewrite subagent if any context file was modified
   - Load agents.d/prompts/context-rewrite.md
   - Before spawning: ask user for explicit authorization and record in Implementation Notes
@@ -64,6 +68,24 @@ Add guidance to WORK_CHECKLIST.md or PERSONA.md to prevent marking checklist ite
 
 ## Implementation Notes
 *Date-stamp discoveries here, newest first*
+
+**2026-06-03**: Analysis of line 65 failure mode complete:
+- Checklist stated: "Refactor guide tasks to share content" + "DRY principle: single source of truth"
+- Implementation: Resource copying creating 2 copies (CLI original + plugin resources copy)
+- Gap: Agent prioritized implementation convenience ("simpler") over explicit goal verification
+- Missing step: Before marking complete, verify "single source of truth" actually means reading from ONE location, not "fewer duplicates via copying"
+- Verification question that would have caught this: "Does this implementation read from a single source, or does it create synchronized copies?"
+
+**2026-06-03**: Location analysis complete - WORK_CHECKLIST.md is optimal:
+- Line 70-75: Already establishes "pushable state" requirement per checklist item
+- Adding goal-verification between line 73-74 fits naturally in existing flow
+- Alternatives considered:
+  - PERSONA.md "Common Mistakes": Too far from execution protocol, easy to miss during checklist work
+  - PERSONA.md "Decisions": Better for architectural choices, not tactical verification
+  - PERSONA_EXTENDED.md: Only loaded situationally, needs to be visible during every implementation
+  - Separate checklist sub-step: Adds overhead when goals not explicitly stated
+- Token impact: +3-4 lines (~50 tokens) within 500 token target
+- Placement rationale: Right after "pushable state" check, before marking complete
 
 ## Success Criteria
 - Context documentation includes guidance on verifying implementation aligns with explicitly stated goals/principles in checklist items
