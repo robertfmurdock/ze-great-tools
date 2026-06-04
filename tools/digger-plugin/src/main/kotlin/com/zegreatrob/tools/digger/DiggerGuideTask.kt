@@ -1,5 +1,6 @@
 package com.zegreatrob.tools.digger
 
+import com.zegreatrob.tools.digger.guide.getDiggerGuideContent
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
@@ -9,18 +10,12 @@ import org.gradle.api.tasks.UntrackedTask
 abstract class DiggerGuideTask : DefaultTask() {
 
     @Internal
-    fun getGuideContent(): String? = javaClass.getResourceAsStream("/help/digger-guide.md")
-        ?.bufferedReader()
-        ?.use { it.readText() }
+    fun getGuideContent(): String = getDiggerGuideContent()
 
     @TaskAction
     fun execute() {
         val content = getGuideContent()
-        if (content != null) {
-            println(formatGuideForConsole(content))
-        } else {
-            println("Error: Guide content not found")
-        }
+        println(formatGuideForConsole(content))
     }
 
     private fun formatGuideForConsole(markdown: String): String = """

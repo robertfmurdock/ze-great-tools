@@ -51,6 +51,8 @@
       <module name="tools.git-test.test" target="11" />
       <module name="tools.tagger-cli.main" target="11" />
       <module name="tools.tagger-cli.test" target="11" />
+      <module name="tools.tagger-guide.main" target="21" />
+      <module name="tools.tagger-guide.test" target="21" />
       <module name="tools.tagger-plugin.functionalTest" target="21" />
       <module name="tools.tagger-test" target="21" />
       <module name="tools.tagger-test.jvmMain" target="21" />

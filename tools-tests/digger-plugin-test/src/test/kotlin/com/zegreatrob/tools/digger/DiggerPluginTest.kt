@@ -35,10 +35,7 @@ class DiggerPluginTest {
         val task = project.tasks.findByName("diggerGuide") as DiggerGuideTask
         task.getGuideContent()
     } verify { content ->
-        content
-            .assertIsNotEqualTo(null, "Expected guide content to be loaded from resource")
-        content
-            ?.contains("Use Digger when:")
+        content.contains("Use Digger when:")
             .assertIsEqualTo(true, "Expected guide content to contain CLI guide text")
     }
 }

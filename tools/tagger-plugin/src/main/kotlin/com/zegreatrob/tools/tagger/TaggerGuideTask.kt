@@ -10,16 +10,12 @@ import org.gradle.api.tasks.UntrackedTask
 abstract class TaggerGuideTask : DefaultTask() {
 
     @Internal
-    fun getGuideContent(): String? = getTaggerGuideContent()
+    fun getGuideContent(): String = getTaggerGuideContent()
 
     @TaskAction
     fun execute() {
         val content = getGuideContent()
-        if (content != null) {
-            println(formatGuideForConsole(content))
-        } else {
-            println("Error: Guide content not found")
-        }
+        println(formatGuideForConsole(content))
     }
 
     private fun formatGuideForConsole(markdown: String): String = """

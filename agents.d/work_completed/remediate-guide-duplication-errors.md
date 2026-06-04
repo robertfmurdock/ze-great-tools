@@ -65,31 +65,67 @@ Fix DRY violation and process errors from improve-gradle-plugin-help.md: elimina
   - Update CLI: calls getTaggerGuideContent(), adds copyGuideResources for JS
   - Verify tests still pass and guides load correctly
   - Result: Single source in git, build-time copy only for JS targets
-- [ ] Final refactor pass via subagent (MANDATORY - see REFACTOR_AGENT.md)
-  - Must use subagent (not orchestrator) for adversarial quality audit
-  - Reviews ALL commits and files in work scope
-  - Before spawning: explicitly ask user for authorization and record response in Implementation Notes
-- [ ] Optimize any prompt changes using context-rewrite subagent
-  - Load agents.d/prompts/context-rewrite.md
-  - If ANY context files were modified during this work, spawn subagent to re-optimize for token efficiency
-  - Assess optimized version for loss of original intent
-  - Correct any integrity issues before completing
-  - Record subagent authorization and results in Implementation Notes
-- [ ] Review changes against applicable playbooks and verify compliance
-  - PLAYBOOK_CODE_STYLE.md: function sizes, data flow patterns
-  - GRADLE_PLAYBOOK.md: build file changes, dependency management
-  - Document compliance or issues found
-- [ ] Move this file to agents.d/work_completed/
+- [x] Refactor digger-guide to KMP (following successful tagger pattern)
+  - Agent cycle: test → implement → refactor-light → verify pushable
+  - Convert digger-guide to KMP module with commonMain resources
+  - Add expect/actual functions for getDiggerGuideContent()
+  - Update plugin: calls getDiggerGuideContent()
+  - Update CLI: calls getDiggerGuideContent(), adds copyGuideResources for JS
+  - Verify tests still pass and guides load correctly
+  - Result: Single source in git, build-time copy only for JS targets
+- [x] Final refactor pass via subagent (MANDATORY - see REFACTOR_AGENT.md)
+  - User authorization: Yes, proceed with refactor agent (2026-06-03)
+  - Subagent spawned (agent ID: af32597d5a2967424)
+  - Issues found: 1 major (TaggerGuideTask return type inconsistency)
+  - Fixed immediately: TaggerGuideTask.getGuideContent() changed to return non-null String
+  - Deferred issues: 2 (resource loading duplication, formatGuideForConsole duplication)
+  - Cross-module validation: PASS (./gradlew check)
+- [x] Optimize any prompt changes using context-rewrite subagent
+  - No context files modified (verified with git status)
+  - Skipped - not applicable
+- [x] Review changes against applicable playbooks and verify compliance
+  - PLAYBOOK_CODE_STYLE.md review:
+    - Function sizes: All functions ≤10 lines ✓
+    - Data flow: All implementations use immutable String loading ✓
+    - Comments: No comments, code self-documenting ✓
+    - Naming: Intent-based (getDiggerGuideContent, getTaggerGuideContent) ✓
+    - Compliance: PASS ✓
+  - GRADLE_PLAYBOOK.md review:
+    - Task dependencies: copyGuideResources task uses lazy APIs (registering, named) ✓
+    - Build structure: KMP modules use proper commonMain/jvmMain/jsMain structure ✓
+    - Dependencies: commonMainImplementation used correctly for KMP dependencies ✓
+    - Validation: Full check passes ✓
+    - Compliance: PASS ✓
+- [x] Move this file to agents.d/work_completed/
 
 ## Current State
 - Date: 2026-06-03
-- Last commit: (pending) Implement KMP guide modules with expect/actual pattern
-- Status: Tagger guide refactored to KMP, tests passing. Ready for digger.
+- Last commit: 419d364e (tagger-guide KMP refactor)
+- Status: ✅ COMPLETE - All success criteria met, all checklist items done
 - Blockers: None
-- Uncommitted work: tagger-guide KMP refactor, tagger-cli and tagger-plugin updates
+- Uncommitted work: digger-guide KMP refactor, TaggerGuideTask consistency fix
+- Work card moved to agents.d/work_completed/
 
 ## Implementation Notes
 *Date-stamp discoveries here, newest first*
+
+### 2026-06-03: Digger guide KMP refactor complete
+- Converted digger-guide to KMP following tagger pattern
+- Created expect/actual functions: getDiggerGuideContent()
+- Updated DiggerGuideTask and Guide.kt to use new function
+- Updated digger-cli build.gradle.kts: removed old copyGuideFromModule approach, added KMP dependency and copyGuideResources task
+- Fixed DiggerPluginTest: removed unnecessary safe call
+- Tests pass: digger-guide (jvm+js), digger-plugin, digger-cli (jvm+js)
+- Single source verified: only one digger-guide.md in source control
+
+### 2026-06-03: Refactor agent findings and fixes
+- Authorization: User approved refactor agent (explicit "Yes, proceed")
+- Agent ID: af32597d5a2967424
+- **Fixed immediately**: TaggerGuideTask.getGuideContent() return type changed from String? to String (consistency with Digger)
+- **Fixed immediately**: TaggerPluginTest updated to remove unnecessary safe call
+- **Deferred**: Resource loading duplication (JVM/JS actuals) - affects 4 files, low risk, works correctly
+- **Deferred**: formatGuideForConsole template duplication - cosmetic, low priority
+- Validation: ./gradlew check passes after fixes
 
 ### 2026-06-03: Session start
 - Loaded WORK_CHECKLIST.md, work card compliant with template
@@ -228,23 +264,24 @@ Fix DRY violation and process errors from improve-gradle-plugin-help.md: elimina
 
 ## Success Criteria
 - Only ONE copy of tagger-guide.md exists in git repository source directories (not 2) ✓
-- Only ONE copy of digger-guide.md exists in git repository source directories (not 2)
-- Both CLI and plugin guide tasks read from the same KMP module via expect/actual ✓ (tagger)
-- Build-time copying acceptable for JS targets (not in git, only in build/)
+- Only ONE copy of digger-guide.md exists in git repository source directories (not 2) ✓
+- Both CLI and plugin guide tasks read from the same KMP module via expect/actual ✓
+- Build-time copying acceptable for JS targets (not in git, only in build/) ✓
 - ./gradlew check passes ✓
 - Guide tasks still produce identical output as before ✓
 
 ## Validation
 *Update incrementally as checklist items complete*
 
-Commands after tagger KMP refactor (commit 419d364e):
-- `./gradlew check -q --console=plain` - Status: ✓ PASS (2026-06-03)
-- `find . -name "tagger-guide.md" -type f -not -path "*/build/*"` - Status: ✓ PASS - shows exactly 1 file:
+Final validation (2026-06-03):
+- `./gradlew check -q --console=plain` - Status: ✓ PASS
+- `find . -name "tagger-guide.md" -type f -not -path "*/build/*"` - Status: ✓ PASS (1 file):
   - tools/tagger-guide/src/commonMain/resources/help/tagger-guide.md
-- `find . -name "digger-guide.md" -type f -not -path "*/build/*"` - Status: shows 1 file (still JVM-only):
-  - tools/digger-guide/src/main/resources/help/digger-guide.md
-- `./gradlew :tools:tagger-guide:jvmTest` - Status: ✓ PASS - KMP tests work
-- `./gradlew :tools:tagger-guide:jsTest` - Status: ✓ PASS - KMP tests work
-- `./gradlew :tools-tests:tagger-plugin-test:test` - Status: ✓ PASS - plugin loads from KMP module
-- `./gradlew :command-line-tools:tagger-cli:jsNodeTest` - Status: ✓ PASS - CLI JS loads from KMP module
-- `./gradlew :command-line-tools:tagger-cli:jvmTest` - Status: ✓ PASS - CLI JVM loads from KMP module
+- `find . -name "digger-guide.md" -type f -not -path "*/build/*"` - Status: ✓ PASS (1 file):
+  - tools/digger-guide/src/commonMain/resources/help/digger-guide.md
+- `./gradlew :tools:tagger-guide:jvmTest :tools:tagger-guide:jsTest` - Status: ✓ PASS
+- `./gradlew :tools:digger-guide:jvmTest :tools:digger-guide:jsTest` - Status: ✓ PASS
+- `./gradlew :tools-tests:tagger-plugin-test:test` - Status: ✓ PASS
+- `./gradlew :tools-tests:digger-plugin-test:test` - Status: ✓ PASS
+- `./gradlew :command-line-tools:tagger-cli:jsNodeTest :command-line-tools:tagger-cli:jvmTest` - Status: ✓ PASS
+- `./gradlew :command-line-tools:digger-cli:jsNodeTest :command-line-tools:digger-cli:jvmTest` - Status: ✓ PASS

@@ -198,10 +198,7 @@ class TaggerPluginTest {
         val task = project.tasks.findByName("taggerGuide") as TaggerGuideTask
         task.getGuideContent()
     } verify { content ->
-        content
-            .assertIsNotEqualTo(null, "Expected guide content to be loaded from resource")
-        content
-            ?.contains("Use Tagger when:")
+        content.contains("Use Tagger when:")
             .assertIsEqualTo(true, "Expected guide content to contain CLI guide text")
     }
 }
