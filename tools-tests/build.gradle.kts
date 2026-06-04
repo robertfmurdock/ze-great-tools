@@ -49,6 +49,7 @@ tasks {
     check { dependsOn(provider { (getTasksByName("check", true) - this).toList() }) }
     clean { dependsOn(provider { (getTasksByName("clean", true) - this).toList() }) }
     register<Delete>("resetYarnLock") {
+        group = "build setup"
         description = "Deletes kotlin-js-store/yarn.lock to force fresh transitive dependency resolution"
         delete(file("kotlin-js-store/yarn.lock"))
     }
@@ -59,6 +60,8 @@ tasks {
         dependsOn(provider { (getTasksByName("collectResults", true) - this).toList() })
     }
     register("formatKotlin") {
+        group = "formatting"
+        description = "Applies Kotlin code formatting across all test modules"
         dependsOn(provider { (getTasksByName("formatKotlin", true) - this).toList() })
     }
 }
