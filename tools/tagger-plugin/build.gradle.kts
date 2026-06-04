@@ -19,6 +19,7 @@ repositories {
 dependencies {
     implementation(platform(project(":dependency-bom")))
     implementation(project(":tagger-gradle"))
+    implementation(project(":tagger-guide"))
     implementation(project(":tagger-json"))
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json")
     testImplementation(kotlin("test-junit5", embeddedKotlinVersion))
@@ -40,15 +41,6 @@ gradlePlugin {
 }
 
 tasks {
-    val copyGuideFromCli by registering(Copy::class) {
-        description = "Copy guide markdown from tagger-cli to plugin resources (single source of truth)"
-        from(rootProject.projectDir.resolve("../command-line-tools/tagger-cli/src/commonMain/resources/help"))
-        into(project.projectDir.resolve("src/main/resources/help"))
-        include("tagger-guide.md")
-    }
-    processResources {
-        dependsOn(copyGuideFromCli)
-    }
     publish { finalizedBy("::closeAndReleaseSonatypeStagingRepository") }
     withType(Test::class) {
         useJUnitPlatform()

@@ -31,6 +31,7 @@
                   <project path="$PROJECT_DIR$/tools/plugin-dependency-bom" />
                   <project path="$PROJECT_DIR$/tools/tagger-core" />
                   <project path="$PROJECT_DIR$/tools/tagger-gradle" />
+                  <project path="$PROJECT_DIR$/tools/tagger-guide" />
                   <project path="$PROJECT_DIR$/tools/tagger-json" />
                   <project path="$PROJECT_DIR$/tools/tagger-plugin" />
                   <project path="$PROJECT_DIR$/tools/tools-bom" />
@@ -57,7 +58,6 @@
           </compositeBuild>
         </compositeConfiguration>
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
-        <option name="gradleHome" value="/usr/local/Cellar/gradle/8.2/libexec" />
         <option name="gradleJvm" value="21" />
         <option name="modules">
           <set>
@@ -89,6 +89,7 @@
             <option value="$PROJECT_DIR$/tools/plugin-dependency-bom" />
             <option value="$PROJECT_DIR$/tools/tagger-core" />
             <option value="$PROJECT_DIR$/tools/tagger-gradle" />
+            <option value="$PROJECT_DIR$/tools/tagger-guide" />
             <option value="$PROJECT_DIR$/tools/tagger-json" />
             <option value="$PROJECT_DIR$/tools/tagger-plugin" />
             <option value="$PROJECT_DIR$/tools/tools-bom" />

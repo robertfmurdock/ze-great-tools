@@ -59,6 +59,10 @@ kotlin {
 
 val mainNpmProjectDir = kotlin.js().compilations.getByName("main").npmProject.dir
 
+val taggerGuideConfig: Configuration by configurations.creating {
+    isCanBeConsumed = false
+}
+
 dependencies {
     commonMainImplementation(platform(libs.org.jetbrains.kotlinx.kotlinx.serialization.bom))
     commonMainImplementation("com.zegreatrob.tools:cli-tools")
@@ -71,9 +75,23 @@ dependencies {
     commonTestImplementation(kotlin("test"))
     commonTestImplementation(libs.com.zegreatrob.testmints.minassert)
     commonTestImplementation(libs.com.zegreatrob.testmints.standard)
+    taggerGuideConfig("com.zegreatrob.tools:tagger-guide")
 }
 
 tasks {
+    val copyGuideFromModule by registering(Copy::class) {
+        description = "Copy guide markdown from tagger-guide module"
+        from(taggerGuideConfig.map { zipTree(it).matching { include("help/tagger-guide.md") } })
+        into(layout.buildDirectory.dir("tagger-guide-resources"))
+    }
+    named<ProcessResources>("jsProcessResources") {
+        dependsOn(copyGuideFromModule)
+        from(copyGuideFromModule)
+    }
+    named<ProcessResources>("jvmProcessResources") {
+        dependsOn(copyGuideFromModule)
+        from(copyGuideFromModule)
+    }
     withType(Test::class) {
         useJUnitPlatform()
         environment("EXPECTED_VERSION", project.version)

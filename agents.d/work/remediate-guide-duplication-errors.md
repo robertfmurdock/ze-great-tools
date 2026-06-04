@@ -31,7 +31,7 @@ Fix DRY violation and process errors from improve-gradle-plugin-help.md: elimina
   - Option 3: Extract guides to separate resource-only module
   - Document tradeoffs and recommend approach
   - Verify chosen approach means only ONE copy of each guide markdown in entire git repository
-- [ ] Implement chosen solution for tagger guide
+- [x] Implement chosen solution for tagger guide
   - Agent cycle: test → implement → refactor-light → verify pushable
   - MANDATORY: Load TESTING.md before starting implementation
   - Write failing test first (verify guide content loads)
@@ -126,6 +126,45 @@ Fix DRY violation and process errors from improve-gradle-plugin-help.md: elimina
 - Result: Rejected - too much overhead
 
 **Decision: Option 1** - Create tagger-guide and digger-guide modules in tools build
+
+### 2026-06-03: Testing approach for refactoring
+**Behavior test already exists**: `tools-tests/tagger-plugin-test/.../TaggerPluginTest.kt:194`
+- Test: "taggerGuide task loads content from markdown resource"
+- Verifies guide content loads and contains expected text
+- Currently passes using copyGuideFromCli approach
+
+**Refactoring approach**:
+- Existing test validates the behavior (guide loads correctly)
+- Change implementation to load from shared module
+- Verify existing test still passes - proves behavior unchanged
+- This is refactoring (restructuring without behavior change), not new feature TDD
+- Similar for digger-plugin-test
+
+**Test-first step**: Verify current tests pass before refactoring
+
+### 2026-06-03: Tagger implementation complete
+**Created tagger-guide module**: `tools/tagger-guide`
+- Contains ONLY the guide resource at `src/main/resources/help/tagger-guide.md`
+- Java toolchain 21 for plugin compatibility
+- Published module for CLI consumption
+
+**Plugin updated**: `tools/tagger-plugin`
+- Added dependency: `implementation(project(":tagger-guide"))`
+- Removed `copyGuideFromCli` task
+- Removed .gitignore (no longer needed)
+- Guide resource comes transitively from tagger-guide module
+
+**CLI updated**: `command-line-tools/tagger-cli`
+- Added `taggerGuideConfig` configuration for published module dependency
+- Added `copyGuideFromModule` task to extract guide from module JAR at build time
+- Copies into processedResources, NOT src/ (stays out of git)
+- Both JS and JVM processResources depend on copy task
+
+**Verification**:
+- Only ONE tagger-guide.md in source tree: `tools/tagger-guide/src/main/resources/help/tagger-guide.md`
+- Plugin tests pass (guide loads correctly)
+- CLI tests pass (guide loads correctly)
+- Full check passes
 
 ## Success Criteria
 - Only ONE copy of tagger-guide.md exists in git repository (not 2)
