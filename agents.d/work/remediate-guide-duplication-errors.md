@@ -141,6 +141,39 @@ Fix DRY violation and process errors from improve-gradle-plugin-help.md: elimina
 
 **Decision: Option 1** - Create tagger-guide and digger-guide modules in tools build
 
+### 2026-06-03: KMP investigation findings
+
+**Initial attempt**: Convert guide modules to KMP with commonMain resources, direct dependency
+**Result**: FAILED - transitive resource loading limitation
+
+**Problem 1**: Direct resource loading doesn't work transitively across KMP dependencies
+- KMP module with commonMain resources works for JVM target (plugin) ✓  
+- Same module does NOT work for JS target (CLI) ✗
+- JS builds don't process/include resources from KMP dependencies transitively
+- Resources must be physically present in the consuming JS module
+
+**Evidence from first attempt**:
+- tools/tagger-guide/build/processedResources/ contains only `jvm/` directory
+- No `js/` directory created for JS target  
+- CLI jsNodeTest fails: cannot find tagger-guide.md resource
+- JVM plugin test passes: loads resource correctly from dependency
+
+**Coupling investigation** (`../Coupling`):
+- **Pattern found**: `expect/actual` for resource loading in `libraries/action`
+  - `commonTest/resources/` has shared JSON test data
+  - `commonTest/PartySetup.kt` has `expect fun loadResource<T>(fileResource: String): T`
+  - `jsTest/JsResourceLoader.kt` has `actual fun` using `readFileSync("./kotlin/$fileResource")`
+  - `jvmTest/JvmResourceLoader.kt` has `actual fun` using `classLoader.getResourceAsStream(fileResource)`
+- Pattern also used in production (`cli/src/commonMain` has expect functions)
+- **Key insight**: expect/actual allows platform-specific resource loading from shared commonMain/resources
+
+**Revised approach**: KMP module with expect/actual resource loading
+- Put markdown in `commonMain/resources/`
+- Add `expect fun getGuideContent()` in `commonMain/`
+- Add `actual fun` in `jvmMain/` using classLoader.getResourceAsStream
+- Add `actual fun` in `jsMain/` using platform-specific loading
+- Both CLI and plugin depend on KMP module, get correct platform implementation
+
 ### 2026-06-03: Testing approach for refactoring
 **Behavior test already exists**: `tools-tests/tagger-plugin-test/.../TaggerPluginTest.kt:194`
 - Test: "taggerGuide task loads content from markdown resource"

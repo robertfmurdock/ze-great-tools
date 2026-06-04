@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="tagger-guide-jvm">
+    <output-path>$PROJECT_DIR$/tools/tagger-guide/build/libs</output-path>
+    <root id="archive" name="tagger-guide-jvm.jar">
+      <element id="module-output" name="tools.tagger-guide.jvmMain" />
+    </root>
+  </artifact>
+</component>
