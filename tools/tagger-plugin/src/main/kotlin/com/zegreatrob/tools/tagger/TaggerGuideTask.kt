@@ -1,5 +1,6 @@
 package com.zegreatrob.tools.tagger
 
+import com.zegreatrob.tools.tagger.guide.getTaggerGuideContent
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
@@ -9,9 +10,7 @@ import org.gradle.api.tasks.UntrackedTask
 abstract class TaggerGuideTask : DefaultTask() {
 
     @Internal
-    fun getGuideContent(): String? = javaClass.getResourceAsStream("/help/tagger-guide.md")
-        ?.bufferedReader()
-        ?.use { it.readText() }
+    fun getGuideContent(): String? = getTaggerGuideContent()
 
     @TaskAction
     fun execute() {

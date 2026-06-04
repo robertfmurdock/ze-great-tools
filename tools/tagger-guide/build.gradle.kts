@@ -1,25 +1,39 @@
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
+
 plugins {
-    `java-library`
+    id("org.jetbrains.kotlin.multiplatform")
     id("com.zegreatrob.tools.plugins.publish")
 }
 
-java {
-    toolchain {
-        languageVersion.set(JavaLanguageVersion.of(21))
+repositories {
+    mavenCentral()
+}
+
+kotlin {
+    jvm {
+        @OptIn(ExperimentalKotlinGradlePluginApi::class)
+        compilerOptions {
+            allWarningsAsErrors = true
+        }
     }
-    withSourcesJar()
+    js(IR) {
+        nodejs()
+        @OptIn(ExperimentalKotlinGradlePluginApi::class)
+        compilerOptions {
+            allWarningsAsErrors = true
+        }
+    }
+}
+
+dependencies {
+    commonTestImplementation(platform(libs.com.zegreatrob.testmints.bom))
+    commonTestImplementation(kotlin("test"))
+    commonTestImplementation(libs.com.zegreatrob.testmints.minassert)
+    commonTestImplementation(libs.com.zegreatrob.testmints.standard)
 }
 
 tasks {
-    val javadocJar by registering(Jar::class) {
-        archiveClassifier.set("javadoc")
-        from("${rootDir.absolutePath}/javadocs")
-    }
-
-    publishing.publications {
-        create<MavenPublication>("mavenJava") {
-            from(components["java"])
-            artifact(javadocJar)
-        }
+    withType(Test::class) {
+        useJUnitPlatform()
     }
 }

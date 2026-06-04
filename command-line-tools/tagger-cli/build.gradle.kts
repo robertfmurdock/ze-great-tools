@@ -1,7 +1,9 @@
 @file:OptIn(ExperimentalKotlinGradlePluginApi::class)
 
 import org.apache.tools.ant.filters.ReplaceTokens
+import org.gradle.api.attributes.Usage
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
+import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 import org.jetbrains.kotlin.gradle.targets.js.npm.npmProject
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
@@ -59,15 +61,12 @@ kotlin {
 
 val mainNpmProjectDir = kotlin.js().compilations.getByName("main").npmProject.dir
 
-val taggerGuideConfig: Configuration by configurations.creating {
-    isCanBeConsumed = false
-}
-
 dependencies {
     commonMainImplementation(platform(libs.org.jetbrains.kotlinx.kotlinx.serialization.bom))
     commonMainImplementation("com.zegreatrob.tools:cli-tools")
     commonMainImplementation("com.zegreatrob.tools:tagger-json")
     commonMainImplementation("com.zegreatrob.tools:tagger-core")
+    commonMainImplementation("com.zegreatrob.tools:tagger-guide")
     commonMainImplementation(libs.com.github.ajalt.clikt.clikt)
     commonMainImplementation(libs.com.github.ajalt.clikt.clikt.markdown)
     commonMainImplementation("org.jetbrains.kotlinx:kotlinx-serialization-json")
@@ -75,28 +74,20 @@ dependencies {
     commonTestImplementation(kotlin("test"))
     commonTestImplementation(libs.com.zegreatrob.testmints.minassert)
     commonTestImplementation(libs.com.zegreatrob.testmints.standard)
-    taggerGuideConfig("com.zegreatrob.tools:tagger-guide")
 }
 
 tasks {
-    val copyGuideFromModule by registering(Copy::class) {
-        description = "Copy guide markdown from tagger-guide module"
-        from(taggerGuideConfig.map { zipTree(it).matching { include("help/tagger-guide.md") } })
-        into(layout.buildDirectory.dir("tagger-guide-resources"))
-    }
-    named<ProcessResources>("jsProcessResources") {
-        dependsOn(copyGuideFromModule)
-        from(copyGuideFromModule)
-    }
-    named<ProcessResources>("jvmProcessResources") {
-        dependsOn(copyGuideFromModule)
-        from(copyGuideFromModule)
-    }
     withType(Test::class) {
         useJUnitPlatform()
         environment("EXPECTED_VERSION", project.version)
         environment("GIT_CONFIG_GLOBAL", "/dev/null")
         environment("GIT_CONFIG_SYSTEM", "/dev/null")
+    }
+    named("jsTestTestDevelopmentExecutableCompileSync") {
+        mustRunAfter("copyGuideResources")
+    }
+    named("jsNodeTest") {
+        dependsOn("copyGuideResources")
     }
     withType<CreateStartScripts> {
         applicationName = "tagger"
@@ -106,8 +97,17 @@ tasks {
         from(layout.projectDirectory.file("README.md"))
         into(mainNpmProjectDir)
     }
+    val taggerGuideJsResources by registering {
+        dependsOn(gradle.includedBuild("tools").task(":tagger-guide:jsProcessResources"))
+    }
+    val copyGuideResources by registering(Copy::class) {
+        description = "Copy guide resources from tagger-guide module for JS target"
+        dependsOn(taggerGuideJsResources)
+        from(rootProject.file("../tools/tagger-guide/build/processedResources/js/main"))
+        into(layout.buildDirectory.dir("compileSync/js/test/testDevelopmentExecutable/kotlin"))
+    }
     val copyHelpResources by registering(Copy::class) {
-        dependsOn("jsProcessResources", "jsPackageJson", ":kotlinNpmInstall")
+        dependsOn("jsProcessResources", "jsPackageJson", ":kotlinNpmInstall", copyGuideResources)
         from(layout.buildDirectory.dir("processedResources/js/main"))
         into(mainNpmProjectDir)
     }
