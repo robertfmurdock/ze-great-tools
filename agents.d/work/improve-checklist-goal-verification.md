@@ -44,13 +44,14 @@ Add guidance to WORK_CHECKLIST.md or PERSONA.md to prevent marking checklist ite
   - If modifying PERSONA files, maintain token targets
   - Consider adding example failure (line 65 case) to illustrate pattern
   - Completed: Added 3 lines (~50 tokens) to Repository State section, added Common Mistakes entry referencing line 65 incident
-- [ ] Spawn context-rewrite subagent if any context file was modified
+- [x] Spawn context-rewrite subagent if any context file was modified
   - Load agents.d/prompts/context-rewrite.md
   - Before spawning: ask user for explicit authorization and record in Implementation Notes
   - Re-optimize for token efficiency
   - Assess for loss of original intent
   - Correct integrity issues
   - Record results in Implementation Notes
+  - Completed: 25% token reduction, all goal-verification guidance preserved (see Implementation Notes)
 - [ ] Final refactor pass via subagent (MANDATORY - see REFACTOR_AGENT.md)
   - Before spawning: ask user for explicit authorization and record in Implementation Notes
   - Documentation-only work, focus on clarity and consistency
@@ -68,6 +69,14 @@ Add guidance to WORK_CHECKLIST.md or PERSONA.md to prevent marking checklist ite
 
 ## Implementation Notes
 *Date-stamp discoveries here, newest first*
+
+**2026-06-03**: Context-rewrite subagent results:
+- Reduced WORK_CHECKLIST.md from 767 words to 573 words (25% reduction)
+- All goal-verification guidance preserved intact
+- No loss of critical implementation facts
+- Compressions: merged redundant headers, consolidated semver/CLI sections, streamlined handoff and key files sections
+
+**2026-06-03**: User authorized both context-rewrite and refactor subagents
 
 **2026-06-03**: Analysis of line 65 failure mode complete:
 - Checklist stated: "Refactor guide tasks to share content" + "DRY principle: single source of truth"

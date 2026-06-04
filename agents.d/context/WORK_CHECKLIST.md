@@ -7,121 +7,91 @@ brief: work card structure, execution protocol, handoff, semver, subagent rules
 # Work Card Protocol
 
 ## Purpose
-Work card structure, TDD cycle, and validation for implementation tasks.
+Work card structure, TDD cycle, validation for implementation tasks.
 
 ## When To Use
-- Creating new work cards
-- Executing any implementation task
-- Reviewing work card compliance
+Creating/executing/reviewing work cards in `agents.d/work/*.md`.
 
 ## Critical Facts
-
-### File Location
-`agents.d/work/*.md` (NOT Claude Code task tool)
 
 ### Template Sections
 - **Goal**: one sentence
 - **Constraints**: boundaries, semver intent
 - **Checklist**: broad feature slices (not micro-tasks)
-- **Current State**: commit SHA, uncommitted work, blockers, session date
+- **Current State**: commit SHA, uncommitted work, blockers, date
 - **Implementation Notes**: date-stamped discoveries (newest first)
-- **Validation**: commands and pass/fail status (update per checklist item)
+- **Validation**: commands, pass/fail status (update per item)
 
-### Checklist Execution Order
-Sequential execution; violates work discipline if out of order:
-1. Review card for template compliance
-2. If using subagents: ask user authorization, record in Implementation Notes
-3. Feature slices (each follows strict TDD):
-   - **BEFORE any code changes**: Load TESTING.md, locate/create test file, write ONE failing test, verify fails with expected reason
-   - **Implement**: Minimal code to pass the test
-   - **Refactor-light**: Clean what you just wrote
-   - **Verify pushable**: `./gradlew check -q --console=plain` must pass
-   - See TESTING.md for complete TDD cycle
-4. Final refactor (MANDATORY subagent - see REFACTOR_AGENT.md, reviews ALL commits/files in work scope)
-5. Move file to `agents.d/work_completed/`
-
-### Refactoring Levels
-- **Light**: During slices, clean what you just wrote
-- **Final**: MANDATORY subagent, review ALL commits/files in work scope
+### Execution Order (sequential, no reordering)
+1. Review card template compliance
+2. If subagents: ask user authorization, record in notes
+3. Feature slices (strict TDD per TESTING.md):
+   - Load TESTING.md BEFORE code changes
+   - Write ONE failing test, verify expected failure
+   - Minimal implementation to pass
+   - Refactor-light (just-written code only)
+   - `./gradlew check -q --console=plain` passes
+4. Final refactor: MANDATORY subagent (REFACTOR_AGENT.md), reviews ALL commits/files
+5. Move to `agents.d/work_completed/`
 
 ### Semver Annotations
 - `[major]`: breaking change
 - `[minor]`: new backward-compatible feature
 - `[patch]`: bug fix, refactor, build output changes
-- `[none]`: docs, work cards, build config (no output impact)
+- `[none]`: docs, work cards, build config
 
-### CLI-Specific
-- stdout = API (parseable), stderr = diagnostic
-- Changing stdout format = `[major]`
-- Improving stderr = `[patch]`
+CLI: stdout = API (changes = `[major]`), stderr = diagnostic (changes = `[patch]`)
 
-### Deprecation
-Build new feature → mark old deprecated → test both → remove at major boundary
+Deprecation: build new → mark old deprecated → test both → remove at major boundary
 
 ## Constraints
 
-### Subagent Rules
-- Before ANY subagent spawn: ask user explicitly in-thread
+### Subagents
+- Ask user authorization BEFORE spawn (every thread, even if previously authorized)
 - Record authorization in Implementation Notes with date
-- Re-ask in new threads even if previously authorized
 - No explicit "yes" = single-agent mode
 
 ### Repository State
 - Every checklist item = pushable state
 - Run `./gradlew check -q --console=plain` before marking complete
-- **Goal verification**: When checklist item states explicit goal/principle (DRY, SOLID, performance target), verify implementation achieves that goal before marking complete
-  - Example: "DRY principle: single source of truth" means reading from ONE location, not creating synchronized copies
-  - Ask: "Does this implementation actually achieve the stated goal, or just solve the tactical problem?"
+- **Goal verification**: When checklist states explicit goal/principle (DRY, SOLID, performance), verify implementation achieves goal before complete
+  - Example: "DRY: single source" means reading from ONE location, not synchronized copies
+  - Ask: "Does this achieve stated goal, or just solve tactical problem?"
   - Implementation convenience does not override explicit requirements
 - Mark complete only after commit pushed
 - Update Validation incrementally
 - Never commit failing tests
 
-### Handoff (Before Pause)
-Update Current State: last SHA, uncommitted changes, checklist status, blockers
+### Handoff
+Before pause: update Current State (SHA, uncommitted changes, status, blockers)
 
-### Handoff (Resume)
-- Read Current State
-- Verify git state (`git log -1`, `git status`)
-- Check `./gradlew check -q --console=plain` passes
-- Add handoff note to Implementation Notes
+Resume: read Current State, verify git (`git log -1`, `git status`), run `./gradlew check -q --console=plain`, log handoff in notes
 
 ### Adaptation
-- Project guidelines override work card
-- Update plan when constraints discovered
-- Ask user if semver impact increases
-- Log discoveries in Implementation Notes
+Project guidelines override work card. Update plan when constraints discovered. Ask user if semver impact increases. Log discoveries in Implementation Notes.
 
 ## Key Files
-- Work: `agents.d/work/*.md`
-- Completed: `agents.d/work_completed/*.md`
-- Required reads:
-  - `agents.d/context/PERSONA.md`
-  - `agents.d/context/TESTING.md` (MANDATORY: load BEFORE implementing any feature slice)
-  - `agents.d/context/PLAYBOOK_CODE_STYLE.md` (code changes)
-  - `agents.d/context/GRADLE_PLAYBOOK.md` (build changes)
-  - `agents.d/context/GIT_WORKFLOW.md` (commits, PRs)
-  - `agents.d/context/GITHUB_ACTIONS_PLAYBOOK.md` (workflow changes)
-  - `agents.d/context/REFACTOR_AGENT.md` (final refactor)
+Required reads:
+- `agents.d/context/PERSONA.md`
+- `agents.d/context/TESTING.md` (MANDATORY before any feature slice)
+- `agents.d/context/PLAYBOOK_CODE_STYLE.md` (code changes)
+- `agents.d/context/GRADLE_PLAYBOOK.md` (build changes)
+- `agents.d/context/GIT_WORKFLOW.md` (commits, PRs)
+- `agents.d/context/GITHUB_ACTIONS_PLAYBOOK.md` (workflow changes)
+- `agents.d/context/REFACTOR_AGENT.md` (final refactor)
 
 ## Decisions
-- Use `./gradlew` only
-- Module-scoped validation
-- Focused changes per module
-- Follow existing patterns
-- Fix pre-existing violations found during refactor
+Use `./gradlew` only. Module-scoped validation. Focused changes per module. Follow existing patterns. Fix pre-existing violations during refactor.
 
 ## Common Mistakes
-- **Implementing code before writing test** (violates TDD - see 2026-06-03 incident in strengthen-test-first-discipline.md)
-- **Pattern-matching work as "just metadata/configuration" and skipping test attempt** (if behavior changes, test first)
-- **Not loading TESTING.md before starting implementation** (required before any feature slice)
-- **Using generic "Review changes against applicable playbooks" instead of explicit "Final refactor pass via subagent (MANDATORY - see REFACTOR_AGENT.md)"**
-  - Conflates lightweight review with mandatory adversarial quality audit
-  - See 2026-06-03 incident in improve-gradle-plugin-help.md line 83
-- **Marking complete without verifying explicit goals achieved** (see 2026-06-03 incident in improve-gradle-plugin-help.md line 65)
-  - Choosing implementation convenience when it contradicts stated requirements
-  - Example: "DRY principle: single source" implemented via resource copying that created duplicates
-  - Must verify goal alignment before marking complete
+- Implementing code before writing test (violates TDD)
+- Pattern-matching work as "just metadata" and skipping test (if behavior changes, test first)
+- Not loading TESTING.md before implementation
+- Using generic "Review changes" instead of "Final refactor via MANDATORY subagent (REFACTOR_AGENT.md)"
+- **Marking complete without verifying explicit goals achieved**
+  - Choosing implementation convenience when contradicts stated requirements
+  - Example: "DRY: single source" via resource copying creating duplicates
+  - Verify goal alignment before complete
 - Spawning subagents without authorization
 - Marking items out of order
 - Batching checklist updates
