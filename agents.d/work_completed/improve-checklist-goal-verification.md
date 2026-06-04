@@ -52,13 +52,15 @@ Add guidance to WORK_CHECKLIST.md or PERSONA.md to prevent marking checklist ite
   - Correct integrity issues
   - Record results in Implementation Notes
   - Completed: 25% token reduction, all goal-verification guidance preserved (see Implementation Notes)
-- [ ] Final refactor pass via subagent (MANDATORY - see REFACTOR_AGENT.md)
+- [x] Final refactor pass via subagent (MANDATORY - see REFACTOR_AGENT.md)
   - Before spawning: ask user for explicit authorization and record in Implementation Notes
   - Documentation-only work, focus on clarity and consistency
   - Review all modified files
-- [ ] Review changes against applicable playbooks and verify compliance
+  - Completed: Found and fixed duplication, all checks passed (see Implementation Notes)
+- [x] Review changes against applicable playbooks and verify compliance
   - GIT_WORKFLOW.md: commit message standards
-- [ ] Move this file to agents.d/work_completed/
+  - Completed: All 3 commits follow standards (description, Co-Authored-By)
+- [x] Move this file to agents.d/work_completed/
 
 ## Current State
 - Date: 2026-06-03
@@ -69,6 +71,13 @@ Add guidance to WORK_CHECKLIST.md or PERSONA.md to prevent marking checklist ite
 
 ## Implementation Notes
 *Date-stamp discoveries here, newest first*
+
+**2026-06-03**: Final refactor subagent results:
+- Found and fixed duplication: goal verification guidance repeated in both Repository State and Common Mistakes sections
+- Consolidated by keeping full guidance in Repository State, replaced Common Mistakes with cross-reference
+- Saved 3 lines (~50 tokens)
+- All validation checks passed
+- 0 other issues found
 
 **2026-06-03**: Context-rewrite subagent results:
 - Reduced WORK_CHECKLIST.md from 767 words to 573 words (25% reduction)
