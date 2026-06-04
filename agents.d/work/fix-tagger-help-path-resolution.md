@@ -17,7 +17,7 @@ Fix `npx tagger --help` crash by making `getTaggerGuideContent` resolve help fil
 - Solution should prevent similar issues in future
 
 ## Checklist
-- [ ] [patch] Fix getTaggerGuideContent to use package-relative path resolution
+- [x] [patch] Fix getTaggerGuideContent to use package-relative path resolution
 - [ ] [patch] Verify help renders correctly from arbitrary working directories
 - [ ] [none] Final refactor via MANDATORY subagent (REFACTOR_AGENT.md)
 
@@ -29,6 +29,15 @@ Fix `npx tagger --help` crash by making `getTaggerGuideContent` resolve help fil
 
 ## Implementation Notes
 *Newest entries first, date-stamped*
+
+### 2026-06-04: Implementation complete
+- Modified `TaggerGuideJs.kt` to use `__dirname` (via `nodeDirname`) with `NodePath.join()`
+- Path now resolves to `join(__dirname, "help", "tagger-guide.md")` instead of `"./kotlin/help/tagger-guide.md"`
+- Compiled JS places modules in `/kotlin/` subdirectory with help files in `/kotlin/help/`
+- Using `__dirname` makes path relative to module location, not cwd
+- Reused existing patterns from `NodeExternals.kt` (nodeDirname, NodePath)
+- Tests pass: `:tools:tagger-guide:check` ✓
+- Manual verification: `npx tagger --help` works from both project root and subdirectories ✓
 
 ### 2026-06-04: Work card created
 - Issue #317: `npx tagger --help` crashes with ENOENT
