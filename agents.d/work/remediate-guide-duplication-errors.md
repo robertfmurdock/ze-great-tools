@@ -48,6 +48,20 @@ Fix DRY violation and process errors from improve-gradle-plugin-help.md: elimina
   - Clean up build files
   - Verify guides still accessible at runtime
   - Verify only one copy of each guide exists in git
+- [ ] Investigate KMP with commonMain resources for guide modules
+  - Agent cycle: test → implement → refactor-light → verify pushable
+  - Current approach: JVM-only modules + build-time copy tasks for CLI
+  - Investigation: Can KMP module with commonMain resources work for both JVM plugin and KMP CLI?
+  - Test: Create proof-of-concept KMP guide module with commonMain resources
+  - Verify: Both JVM (plugin) and KMP (CLI) can depend on and load resources without copying
+  - Document findings and decide whether to refactor
+- [ ] Refactor guide modules to KMP if investigation successful
+  - Agent cycle: test → implement → refactor-light → verify pushable
+  - Convert tagger-guide and digger-guide to KMP modules with commonMain resources
+  - Remove build-time copy tasks from CLI modules
+  - Update dependencies: CLI uses commonMain dependency, plugin uses JVM dependency
+  - Verify tests still pass and guides load correctly
+  - Verify no build-time copying needed
 - [ ] Final refactor pass via subagent (MANDATORY - see REFACTOR_AGENT.md)
   - Must use subagent (not orchestrator) for adversarial quality audit
   - Reviews ALL commits and files in work scope
