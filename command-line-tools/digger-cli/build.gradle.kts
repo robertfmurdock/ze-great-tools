@@ -18,7 +18,7 @@ val generatedDirectory = project.layout.buildDirectory.dir("generated-sources/te
 
 kotlin {
     jvm()
-    js(IR) {
+    js {
         nodejs {
             useCommonJs()
             binaries.executable()

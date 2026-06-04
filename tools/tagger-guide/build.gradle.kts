@@ -15,7 +15,7 @@ kotlin {
             allWarningsAsErrors = true
         }
     }
-    js(IR) {
+    js {
         nodejs()
         @OptIn(ExperimentalKotlinGradlePluginApi::class)
         compilerOptions {

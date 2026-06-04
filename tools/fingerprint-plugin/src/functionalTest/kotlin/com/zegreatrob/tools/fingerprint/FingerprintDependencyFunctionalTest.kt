@@ -44,7 +44,7 @@ class FingerprintDependencyFunctionalTest : FingerprintFunctionalTestBase() {
         val baseBuildScript = kmpBuild(
             kotlinBlock = """
                 kotlin {
-                    js(IR) { browser() }
+                    js { browser() }
                 }
             """.trimIndent(),
         )

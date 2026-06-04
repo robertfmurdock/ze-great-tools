@@ -130,7 +130,7 @@ class FingerprintResourcesFunctionalTest : FingerprintFunctionalTestBase() {
             kmpBuild(
                 kotlinBlock = """
                     kotlin {
-                        js(IR) { browser() }
+                        js { browser() }
                         sourceSets {
                             val $sourceSet by getting {
                                 resources.srcDir("$directory")

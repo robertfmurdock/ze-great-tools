@@ -16,7 +16,7 @@ repositories {
 
 kotlin {
     jvm()
-    js(IR) { nodejs() }
+    js { nodejs() }
 }
 
 dependencies {

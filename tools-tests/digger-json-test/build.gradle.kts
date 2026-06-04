@@ -10,7 +10,7 @@ repositories {
 
 kotlin {
     jvm()
-    js(IR) { nodejs() }
+    js { nodejs() }
     sourceSets.all { languageSettings.optIn("kotlin.uuid.ExperimentalUuidApi") }
 }
 
