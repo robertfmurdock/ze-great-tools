@@ -11,7 +11,7 @@ Improve conformance with Gradle best practices across build files: add missing t
 - Semver intent: `[none]` — internal build improvements with no API changes
 
 ## Checklist
-- [ ] Review this work card for compliance with template and update to conform
+- [x] Review this work card for compliance with template and update to conform
 - [ ] Audit root build.gradle.kts for missing task group/description on registered tasks
   - Agent cycle: identify violations → test → fix → refactor-light → verify pushable
   - Tasks: versionCatalogUpdate, formatKotlin, kotlinUpgradeYarnLock, collectResults
@@ -36,11 +36,14 @@ Improve conformance with Gradle best practices across build files: add missing t
 ## Current State
 - Start commit: 73d8dcc88fb3e7f7c96d3eba8792afc3c231aa29
 - Date: 2026-06-04
-- Status: Not started
+- Status: In progress - auditing root build.gradle.kts
 - Blockers: None
 
 ## Implementation Notes
 **Semver intent**: `[none]` — internal build improvements with no API changes
+
+**2026-06-04 - Testing approach for task metadata**:
+Task group/description changes have user-facing impact (task visibility in `./gradlew tasks` output). Testing approach: manual verification via `./gradlew tasks` command before and after changes. Automated testing would require GradleRunner test infrastructure setup, which is disproportionate for metadata validation. Verification commands documented in Validation section.
 
 ### Known violations identified
 **Root build.gradle.kts**:

@@ -41,12 +41,17 @@ tasks {
         dependsOn(provider { gradle.includedBuilds.map { it.task(":clean") }.toList() })
     }
     register("versionCatalogUpdate") {
+        group = "dependencies"
+        description = "Updates version catalog entries across all included builds"
         dependsOn(provider { gradle.includedBuilds.map { it.task(":versionCatalogUpdate") }.toList() })
     }
     register("formatKotlin") {
+        group = "formatting"
+        description = "Applies Kotlin code formatting across all included builds"
         dependsOn(provider { gradle.includedBuilds.map { it.task(":formatKotlin") }.toList() })
     }
     register("resetYarnLock") {
+        group = "build setup"
         description = "Deletes all kotlin-js-store/yarn.lock files to force fresh transitive dependency resolution"
         dependsOn(provider {
             listOf(
@@ -57,6 +62,8 @@ tasks {
         })
     }
     register("kotlinUpgradeYarnLock") {
+        group = "build setup"
+        description = "Upgrades Yarn lock files for Kotlin/JS dependencies across all included builds"
         mustRunAfter("resetYarnLock")
         dependsOn(provider {
             listOf(
@@ -71,6 +78,8 @@ tasks {
         gradle.includedBuild("tools-tests"),
     )
     register<Copy>("collectResults") {
+        group = "verification"
+        description = "Collects test results from all test builds into root build directory"
         dependsOn(provider { (getTasksByName("collectResults", true) - this).toList() })
         dependsOn(provider { testBuilds.map { it.task(":collectResults") } })
         from(testBuilds.map { it.projectDir.resolve("build/test-output") })
