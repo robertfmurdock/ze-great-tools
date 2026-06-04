@@ -237,16 +237,14 @@ Fix DRY violation and process errors from improve-gradle-plugin-help.md: elimina
 ## Validation
 *Update incrementally as checklist items complete*
 
-Commands:
+Commands after tagger KMP refactor (commit 419d364e):
 - `./gradlew check -q --console=plain` - Status: ✓ PASS (2026-06-03)
-- `find . -name "*-guide.md"` (excluding build/) - Status: ✓ PASS - shows exactly 2 files:
-  - tools/tagger-guide/src/main/resources/help/tagger-guide.md
+- `find . -name "tagger-guide.md" -type f -not -path "*/build/*"` - Status: ✓ PASS - shows exactly 1 file:
+  - tools/tagger-guide/src/commonMain/resources/help/tagger-guide.md
+- `find . -name "digger-guide.md" -type f -not -path "*/build/*"` - Status: shows 1 file (still JVM-only):
   - tools/digger-guide/src/main/resources/help/digger-guide.md
-- `./gradlew taggerGuide` - Status: ✓ PASS - output shows guide content correctly
-- `./gradlew diggerGuide` - Status: ✓ PASS - output shows guide content correctly
-- `./gradlew :tools:tagger-plugin:build` - Status: ✓ PASS (via check)
-- `./gradlew :tools:digger-plugin:build` - Status: ✓ PASS (via check)
-- `./gradlew :tools-tests:tagger-plugin-test:test` - Status: ✓ PASS
-- `./gradlew :tools-tests:digger-plugin-test:test` - Status: ✓ PASS
-- `./gradlew :command-line-tools:tagger-cli:check` - Status: ✓ PASS
-- `./gradlew :command-line-tools:digger-cli:check` - Status: ✓ PASS
+- `./gradlew :tools:tagger-guide:jvmTest` - Status: ✓ PASS - KMP tests work
+- `./gradlew :tools:tagger-guide:jsTest` - Status: ✓ PASS - KMP tests work
+- `./gradlew :tools-tests:tagger-plugin-test:test` - Status: ✓ PASS - plugin loads from KMP module
+- `./gradlew :command-line-tools:tagger-cli:jsNodeTest` - Status: ✓ PASS - CLI JS loads from KMP module
+- `./gradlew :command-line-tools:tagger-cli:jvmTest` - Status: ✓ PASS - CLI JVM loads from KMP module
