@@ -16,6 +16,10 @@ repositories {
 
 val generatedDirectory = project.layout.buildDirectory.dir("generated-sources/templates/kotlin/main")
 
+val diggerGuideConfig: Configuration by configurations.creating {
+    isCanBeConsumed = false
+}
+
 kotlin {
     jvm()
     js(IR) {
@@ -69,9 +73,23 @@ dependencies {
     "jvmTestImplementation"(libs.org.jetbrains.kotlin.kotlin.test.junit5)
     "jvmTestImplementation"("org.junit.jupiter:junit-jupiter-api")
     "jvmTestImplementation"("org.junit.jupiter:junit-jupiter-engine")
+    diggerGuideConfig("com.zegreatrob.tools:digger-guide")
 }
 
 tasks {
+    val copyGuideFromModule by registering(Copy::class) {
+        description = "Copy guide markdown from digger-guide module"
+        from(diggerGuideConfig.map { zipTree(it).matching { include("help/digger-guide.md") } })
+        into(layout.buildDirectory.dir("digger-guide-resources"))
+    }
+    named<ProcessResources>("jsProcessResources") {
+        dependsOn(copyGuideFromModule)
+        from(copyGuideFromModule)
+    }
+    named<ProcessResources>("jvmProcessResources") {
+        dependsOn(copyGuideFromModule)
+        from(copyGuideFromModule)
+    }
     withType(Test::class) {
         useJUnitPlatform()
         environment("EXPECTED_VERSION", project.version)

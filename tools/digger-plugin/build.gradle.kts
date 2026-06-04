@@ -17,6 +17,7 @@ repositories {
 
 dependencies {
     implementation(project(":digger-gradle"))
+    implementation(project(":digger-guide"))
 }
 
 gradlePlugin {
@@ -35,15 +36,6 @@ gradlePlugin {
 }
 
 tasks {
-    val copyGuideFromCli by registering(Copy::class) {
-        description = "Copy guide markdown from digger-cli to plugin resources (single source of truth)"
-        from(rootProject.projectDir.resolve("../command-line-tools/digger-cli/src/commonMain/resources/help"))
-        into(project.projectDir.resolve("src/main/resources/help"))
-        include("digger-guide.md")
-    }
-    processResources {
-        dependsOn(copyGuideFromCli)
-    }
     publish { finalizedBy("::closeAndReleaseSonatypeStagingRepository") }
     withType(Test::class) {
         useJUnitPlatform()

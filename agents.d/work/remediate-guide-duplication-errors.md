@@ -38,7 +38,7 @@ Fix DRY violation and process errors from improve-gradle-plugin-help.md: elimina
   - Implement minimum code to pass
   - Refactor-light
   - Verify `./gradlew check -q --console=plain` passes
-- [ ] Implement chosen solution for digger guide
+- [x] Implement chosen solution for digger guide
   - Agent cycle: test → implement → refactor-light → verify pushable
   - MANDATORY: Load TESTING.md before starting implementation
   - Follow same pattern as tagger
