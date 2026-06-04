@@ -115,6 +115,6 @@ Add guidance to WORK_CHECKLIST.md or PERSONA.md to prevent marking checklist ite
 *Update incrementally as checklist items complete*
 
 Commands:
-- `./gradlew check -q --console=plain` - Status: Not yet run
-- Review modified context file for clarity - Status: Not yet run
-- Verify token count maintained within targets - Status: Not yet run
+- `./gradlew check -q --console=plain` - Status: PASS (project validation succeeds)
+- Review modified context file for clarity - Status: PASS (grammar/formatting checks clean)
+- Verify token count maintained within targets - Status: PASS (reduced from 767 to 573 words, then to 570 after deduplication)
