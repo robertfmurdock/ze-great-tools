@@ -15,9 +15,10 @@ Improve conformance with Gradle best practices across build files: add missing t
 - [x] Audit root build.gradle.kts for missing task group/description on registered tasks
   - Agent cycle: identify violations → test → fix → refactor-light → verify pushable
   - Tasks: versionCatalogUpdate, formatKotlin, kotlinUpgradeYarnLock, collectResults, resetYarnLock
-- [ ] Audit module build.gradle.kts files for missing task group/description
+- [x] Audit module build.gradle.kts files for missing task group/description
   - Agent cycle: identify violations → test → fix → refactor-light → verify pushable
   - Focus: command-line-tools/tagger-cli, command-line-tools/digger-cli
+  - Fixed: jsLink, publish, copyGuideResources in both CLIs
 - [ ] Extract duplicated publishing config to convention plugin
   - Agent cycle: test → implement → refactor-light → verify pushable
   - Target: tools/digger-plugin, tools/tagger-plugin, tools/*-plugin
@@ -36,7 +37,7 @@ Improve conformance with Gradle best practices across build files: add missing t
 ## Current State
 - Start commit: 73d8dcc88fb3e7f7c96d3eba8792afc3c231aa29
 - Date: 2026-06-04
-- Status: In progress - auditing module build files
+- Status: In progress - extracting duplicated publishing config
 - Blockers: None
 
 ## Implementation Notes
@@ -73,6 +74,6 @@ Task group/description changes have user-facing impact (task visibility in `./gr
   - `./gradlew :check -q --console=plain` — full validation passes
   - `./gradlew help --task <task-name>` — descriptions present for user tasks
 - Results:
-  - ✅ Root build.gradle.kts: All tasks (versionCatalogUpdate, formatKotlin, resetYarnLock, kotlinUpgradeYarnLock, collectResults) now appear in `./gradlew tasks` with proper groups and descriptions
+  - ✅ Root build.gradle.kts: All tasks (versionCatalogUpdate, formatKotlin, resetYarnLock, kotlinUpgradeYarnLock, collectResults) now appear in `./gradlew tasks` with proper groups and descriptions (commit: d10620a6)
+  - ✅ CLI modules: jsLink, publish, copyGuideResources tasks now visible in tagger-cli and digger-cli (commit: acc2ed48)
   - ✅ ./gradlew check -q --console=plain passes
-  - Commit: d10620a6
