@@ -100,11 +100,6 @@ tasks {
     withType<CreateStartScripts> {
         applicationName = "digger"
     }
-    named<Jar>("jvmJar") {
-        manifest {
-            attributes("Main-Class" to "com.zegreatrob.tools.digger.cli.MainKt")
-        }
-    }
     val copyReadme by registering(Copy::class) {
         dependsOn("jsPackageJson", ":kotlinNpmInstall")
         from(layout.projectDirectory.file("README.md"))
