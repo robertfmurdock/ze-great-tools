@@ -23,7 +23,7 @@ kotlin {
     jvm {
         binaries {
             executable {
-                mainClass.set("com.zegreatrob.coupling.cli.MainKt")
+                mainClass.set("com.zegreatrob.tools.tagger.cli.MainKt")
             }
         }
     }
@@ -136,6 +136,11 @@ tasks {
         workingDir(mainNpmProjectDir)
         commandLine("kotlin/bin/tagger", "calculate-version")
     }
+    val confirmJvmTaggerCanRun by registering(Exec::class) {
+        dependsOn("installJvmDist")
+        workingDir(layout.projectDirectory)
+        commandLine("build/install/tagger-cli-jvm/bin/tagger", "--version")
+    }
     val jsPublish by registering(Exec::class) {
         dependsOn(jsCliTar)
         mustRunAfter(check)
@@ -148,6 +153,7 @@ tasks {
     }
     check {
         dependsOn(confirmTaggerCanRun)
+        dependsOn(confirmJvmTaggerCanRun)
     }
     register("publish") {
         group = "publishing"

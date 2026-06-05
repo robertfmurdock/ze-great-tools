@@ -12,8 +12,8 @@ Fix and complete JVM distribution support for tagger-cli to enable standalone JA
 - Semver intent: `[patch]` - fixes broken JVM binary configuration
 
 ## Checklist
-- [ ] Review this work card for compliance with template and update to conform
-- [ ] If this card plans subagent delegation, ask user to explicitly authorize subagents for this card and record the response in Implementation Notes
+- [x] Review this work card for compliance with template and update to conform
+- [x] If this card plans subagent delegation, ask user to explicitly authorize subagents for this card and record the response in Implementation Notes
 - [ ] Fix mainClass configuration in tagger-cli/build.gradle.kts
   - Change from `com.zegreatrob.coupling.cli.MainKt` to `com.zegreatrob.tools.tagger.cli.MainKt`
   - Verify with `./gradlew :command-line-tools:tagger-cli:installJvmDist`
@@ -50,6 +50,9 @@ Fix and complete JVM distribution support for tagger-cli to enable standalone JA
 
 ## Implementation Notes
 _(newest first)_
+
+### 2026-06-05: Subagent authorization granted
+User authorized subagent usage for final refactor step (REFACTOR_AGENT.md).
 
 ### 2026-06-05: Work card created
 Investigation shows that tagger-cli already has JVM target configured with distribution tasks (installJvmDist, jvmDistZip, jvmDistTar) but has critical configuration error:
