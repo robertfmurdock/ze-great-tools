@@ -3,7 +3,7 @@
 ## Modules
 - Tagger: `:command-line-tools:tagger-cli`
 - Digger: `:command-line-tools:digger-cli`
-- Platform: JS/Node.js (JVM exists for testing, not productized)
+- Platform: JS/Node.js (primary), JVM (standalone distribution)
 
 ## Primary: npx execution (recommended)
 
@@ -46,11 +46,38 @@ npx --package=command-line-tools/build/js/packages/command-line-tools-digger-cli
 - No argument passing
 - Use: quick verification
 
-Tagger CI check:
+## JVM Distribution
+
+Build:
 ```bash
-./gradlew :command-line-tools:tagger-cli:confirmTaggerCanRun -q --console=plain
+./gradlew :command-line-tools:tagger-cli:installJvmDist -q --console=plain
+./gradlew :command-line-tools:digger-cli:installJvmDist -q --console=plain
 ```
-- Runs `tagger calculate-version` with current git state
+- Output: `command-line-tools/{cli}/build/install/{cli}-jvm/`
+
+Execute:
+```bash
+command-line-tools/tagger-cli/build/install/tagger-cli-jvm/bin/tagger <args>
+command-line-tools/digger-cli/build/install/digger-cli-jvm/bin/digger <args>
+```
+- Standalone distribution with all dependencies
+- Works without Node.js
+- Scripts handle classpath automatically
+
+Distribution archives:
+```bash
+./gradlew :command-line-tools:tagger-cli:jvmDistZip -q --console=plain
+./gradlew :command-line-tools:digger-cli:jvmDistZip -q --console=plain
+```
+- Output: `build/distributions/{cli}-jvm.zip`
+
+CI checks:
+```bash
+./gradlew :command-line-tools:tagger-cli:confirmJvmTaggerCanRun -q --console=plain
+./gradlew :command-line-tools:digger-cli:confirmJvmDiggerCanRun -q --console=plain
+```
+- Tagger: runs `tagger --version`
+- Digger: runs `digger --version`
 - Part of `check` task
 
 ## CLI Commands
