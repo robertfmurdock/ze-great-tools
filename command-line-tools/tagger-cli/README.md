@@ -7,9 +7,13 @@ An opinionated program for automatic semantic versioning via git tags and inform
 
 ## Installation
 
+Tagger is available as both an npm package and a JVM distribution.
+
+### NPM Installation
+
 You can install the tool using any NPM-like system.
 
-### Local Example
+#### Local Example
 
 ```bash
 npm i -D @continuous-excellence/tagger # this will install it into a project as a dev dependency
@@ -17,7 +21,7 @@ npm i -D @continuous-excellence/tagger # this will install it into a project as 
 npx tagger calculate-version # You can use npx to run a project's programs easily
 ```
 
-### Global Example
+#### Global Example
 
 ```bash
 npm i -g @continuous-excellence/tagger # this will install it globally into npm
@@ -25,7 +29,7 @@ npm i -g @continuous-excellence/tagger # this will install it globally into npm
 tagger calculate-version # Now it should be available via NPM's path on your shell.
 ```
 
-### Migration from `git-semver-tagger`
+#### Migration from `git-semver-tagger`
 
 The package has been renamed to `@continuous-excellence/tagger`. The old `git-semver-tagger` package is deprecated. To migrate:
 
@@ -38,6 +42,35 @@ npm install @continuous-excellence/tagger
 ```
 
 The CLI command remains `tagger` - no changes needed to your scripts or workflows.
+
+### JVM Distribution
+
+For environments without Node.js or when you prefer a JVM-based tool, download and extract the JVM distribution archive.
+
+#### Manual Installation
+
+1. Download the `tagger-cli-jvm.zip` distribution archive from releases
+2. Extract the archive to your preferred location
+3. Add `bin/tagger` to your PATH or run directly
+
+```bash
+# Extract archive
+unzip tagger-cli-jvm.zip
+
+# Run directly
+./tagger-cli-jvm/bin/tagger calculate-version
+
+# Or add to PATH
+export PATH="$PATH:/path/to/tagger-cli-jvm/bin"
+tagger calculate-version
+```
+
+The distribution includes:
+- `bin/tagger` - Shell script wrapper for Unix-like systems
+- `bin/tagger.bat` - Batch script wrapper for Windows
+- `lib/` - All required JVM dependencies
+
+**Requirements:** Java Runtime Environment (JRE) 8 or higher
 
 ## Commands
 
