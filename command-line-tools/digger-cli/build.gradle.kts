@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalKotlinGradlePluginApi::class)
+
 import org.apache.tools.ant.filters.ReplaceTokens
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootPlugin
@@ -17,7 +19,13 @@ repositories {
 val generatedDirectory = project.layout.buildDirectory.dir("generated-sources/templates/kotlin/main")
 
 kotlin {
-    jvm()
+    jvm {
+        binaries {
+            executable {
+                mainClass.set("com.zegreatrob.tools.digger.cli.MainKt")
+            }
+        }
+    }
     js {
         nodejs {
             useCommonJs()
@@ -92,6 +100,11 @@ tasks {
     withType<CreateStartScripts> {
         applicationName = "digger"
     }
+    named<Jar>("jvmJar") {
+        manifest {
+            attributes("Main-Class" to "com.zegreatrob.tools.digger.cli.MainKt")
+        }
+    }
     val copyReadme by registering(Copy::class) {
         dependsOn("jsPackageJson", ":kotlinNpmInstall")
         from(layout.projectDirectory.file("README.md"))
@@ -117,6 +130,14 @@ tasks {
         dependsOn(jsCliTar)
         workingDir(mainNpmProjectDir)
         commandLine("npm", "link")
+    }
+    val confirmJvmDiggerCanRun by registering(Exec::class) {
+        dependsOn("installJvmDist")
+        workingDir(layout.projectDirectory)
+        commandLine("build/install/digger-cli-jvm/bin/digger", "--version")
+    }
+    check {
+        dependsOn(confirmJvmDiggerCanRun)
     }
     val jsPublish by registering(Exec::class) {
         dependsOn(jsCliTar)
