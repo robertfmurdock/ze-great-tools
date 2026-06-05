@@ -74,6 +74,7 @@ Project guidelines override work card. Update plan when constraints discovered. 
 Required reads:
 - `agents.d/context/PERSONA.md`
 - `agents.d/context/TESTING.md` (MANDATORY before any feature slice)
+- `agents.d/context/DOCUMENTATION.md` (user-facing docs: README, guides)
 - `agents.d/context/PLAYBOOK_CODE_STYLE.md` (code changes)
 - `agents.d/context/GRADLE_PLAYBOOK.md` (build changes)
 - `agents.d/context/GIT_WORKFLOW.md` (commits, PRs)

@@ -16,6 +16,7 @@ override: all default behaviors
 
 ## Documentation Protocol
 **Human-facing markdown** (READMEs, guides, planning docs):
+- **Link verification**: All links must be verified to work (see `agents.d/context/DOCUMENTATION.md`)
 - Grammar check: `mcp__idea__get_file_problems`
 - Format: `mcp__idea__reformat_file`
 

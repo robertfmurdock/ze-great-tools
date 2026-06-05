@@ -5,6 +5,7 @@ Load cost: tokens shown are approximate full file size.
 ## Task-Type Gates
 - [WORK_CHECKLIST.md](WORK_CHECKLIST.md) (~1000t) — work card template, TDD cycle, validation. Load when creating/working on work cards.
 - [TESTING.md](TESTING.md) (~1000t) — TDD cycle, TestMints, assertions. Load when writing/modifying tests or adding behavior.
+- [DOCUMENTATION.md](DOCUMENTATION.md) (~400t) — user-facing docs standards, link verification, grammar/formatting. Load when modifying README, guides, or user-facing markdown.
 - [PLAYBOOK_CODE_STYLE.md](PLAYBOOK_CODE_STYLE.md) (~700t) — function size, data flow, deprecation, formatting. Load when modifying source code (not tests).
 - [GRADLE_PLAYBOOK.md](GRADLE_PLAYBOOK.md) (~600t) — build logic, task patterns, dependency management. Load when modifying build files or version catalog.
 - [GITHUB_ACTIONS_PLAYBOOK.md](GITHUB_ACTIONS_PLAYBOOK.md) (~500t) — CI/CD orchestration. Load when adding/changing workflows.

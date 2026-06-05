@@ -56,6 +56,7 @@ Perform mandatory code quality audit after implementation completion. Must be ex
 - Unused code
 - Data flow (immutability)
 - Naming clarity
+- Documentation (user-facing only): link verification per DOCUMENTATION.md
 
 ### 5. Function Evolution
 - Identify functions modified in multiple commits
@@ -100,6 +101,9 @@ Perform mandatory code quality audit after implementation completion. Must be ex
 #### Naming
 - Issues found: <count>
 
+#### Documentation (if user-facing files modified)
+- Issues found: <count>
+
 #### Function Evolution
 - Issues found: <count>
 
@@ -116,6 +120,7 @@ Perform mandatory code quality audit after implementation completion. Must be ex
 
 ## Key Files
 - `PLAYBOOK_CODE_STYLE.md` — quality criteria details
+- `DOCUMENTATION.md` — user-facing docs standards, link verification
 - `GIT_WORKFLOW.md` — git history analysis commands
 - Work card in `agents.d/work/` — defines commit scope
 
