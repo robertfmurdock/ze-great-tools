@@ -31,22 +31,7 @@ digger current-contribution-data $(pwd) # Now it should be available via NPM's p
 
 For environments without Node.js, a standalone JVM distribution is available.
 
-#### Download and Extract
-
-Download the distribution archive from the releases page and extract:
-
-```bash
-# Download from GitHub releases
-curl -L -o digger-cli-jvm.zip https://github.com/robertfmurdock/ze-great-tools/releases/download/VERSION/digger-cli-jvm.zip
-
-# Extract
-unzip digger-cli-jvm.zip
-
-# Run
-digger-cli-jvm/bin/digger --version
-```
-
-Or build from source:
+#### Build from Source
 
 ```bash
 ./gradlew :command-line-tools:digger-cli:jvmDistZip

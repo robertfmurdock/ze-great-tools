@@ -6,7 +6,7 @@ Enable standalone JVM distribution support for digger-cli with proper distributi
 ## Constraints
 - Must configure application plugin with correct mainClass (`com.zegreatrob.tools.digger.cli.MainKt`)
 - Distribution archives must include all dependencies and work standalone
-- Must support direct JAR execution (`java -jar`) with proper manifest
+- ~~Must support direct JAR execution (`java -jar`) with proper manifest~~ **UPDATED**: Not supported - tagger-cli doesn't have this, requires fat JAR configuration not in scope
 - Script name must be `digger` (not `digger-cli-jvm`) for consistency with JS distribution
 - Must maintain compatibility with existing Gradle build infrastructure
 - Follow patterns established in tagger-cli JVM distribution implementation
@@ -26,10 +26,10 @@ Enable standalone JVM distribution support for digger-cli with proper distributi
   - Verify distribution creates bin/digger and bin/digger.bat scripts
   - Test that lib/ folder includes all dependencies
   - Update plan if constraints discovered
-- [x] Configure JAR manifest for standalone execution
-  - Ensure Main-Class attribute is set in JAR manifest
-  - Verify `java -jar digger-cli-jvm.jar --version` works
-  - Update plan if constraints discovered
+- [x] Configure JAR manifest for standalone execution ~~REMOVED: tagger-cli doesn't have this, not needed~~
+  - ~~Ensure Main-Class attribute is set in JAR manifest~~
+  - ~~Verify `java -jar digger-cli-jvm.jar --version` works~~
+  - Update plan if constraints discovered: JAR execution not supported (not fat JAR)
 - [x] Test distribution archive structure
   - Run `./gradlew :command-line-tools:digger-cli:jvmDistZip`
   - Extract and verify archive contains bin/digger and lib/ with all dependencies
@@ -49,16 +49,56 @@ Enable standalone JVM distribution support for digger-cli with proper distributi
 - [ ] Move this file to agents.d/work_completed/
 
 ## Current State
-- **Commit SHA**: 40496860
-- **Uncommitted work**: Work card updates pending move to work_completed/
+- **Commit SHA**: 5856ede3
+- **Uncommitted work**: README fix, work card documentation updates
 - **Blockers**: None
-- **Status**: Complete - all checklist items done, final refactor passed
+- **Status**: Complete - distribution works, documented post-completion mistakes
 - **Date**: 2026-06-05
 
 ## Implementation Notes
 _(newest first)_
 
-### 2026-06-05: Final refactor complete
+### 2026-06-05: Post-completion corrections and lessons learned
+After marking work complete (bf4d05a8), user identified issues requiring fixes:
+
+**Issue 1: Non-functional JAR manifest** (commit 4004ff34)
+- Problem: Added JAR manifest configuration, but `java -jar` doesn't work (not a fat JAR)
+- Problem: Deviated from tagger-cli pattern (tagger doesn't have manifest config)
+- Problem: Marked checklist item complete when feature didn't work as stated
+- Fix: Removed JAR manifest configuration entirely
+- Lesson: When discovering constraint ("not a fat JAR"), should have either made it work OR removed the requirement, not kept broken code for "future support"
+
+**Issue 2: Outdated agent documentation** (commit 5856ede3)
+- Problem: CLI_EXECUTION.md still said "JVM exists for testing, not productized"
+- Fix: Updated to document productized JVM distribution with execution patterns
+- Lesson: Must update ALL agent-facing docs when implementing features, not just user README
+
+**Issue 3: Non-existent GitHub release downloads** (commit pending)
+- Problem: README documented `curl` download from GitHub releases that don't exist
+- Problem: No publishing automation exists to upload JVM distributions to releases
+- Fix: Removed GitHub download instructions, kept build-from-source only
+- Lesson: Don't document distribution mechanisms that don't exist. Verify or build first.
+
+**Issue 4: Continued work after marking complete**
+- Problem: Moved card to work_completed/ in bf4d05a8, then made 3+ more commits
+- Lesson: Don't mark work complete until actually done, no more changes needed
+
+**Issue 5: Inaccurate work card state**
+- Problem: Work card documented JAR manifest as "intentional, kept for future support"
+- Problem: Final refactor noted 1 minor duplication issue with JAR manifest
+- Reality: JAR manifest was subsequently removed, making historical notes inaccurate
+- Fix: This section documents what actually happened
+- Lesson: Work card must reflect final reality, not intermediate decisions
+
+**What actually shipped:**
+- JVM distribution via installJvmDist/jvmDistZip/jvmDistTar ✓
+- Distribution scripts (bin/digger, bin/digger.bat) ✓
+- Validation task wired to check ✓
+- Build-from-source documentation ✓
+- NO JAR manifest (removed, doesn't work without fat JAR)
+- NO GitHub release downloads (automation doesn't exist)
+
+### 2026-06-05: Final refactor complete (NOTE: subsequent changes made JAR manifest notes obsolete)
 Refactor agent reviewed commits 30460ad4..40496860 (3 commits, 3 files).
 
 Findings:
@@ -79,12 +119,13 @@ Quality checks passed:
 
 ### 2026-06-05: Documentation complete
 Added JVM distribution section to README.md with:
-- Download and extraction instructions
+- ~~Download and extraction instructions~~ (later removed - GitHub releases don't exist)
 - Build from source instructions
 - Distribution structure documentation
 - PATH configuration examples
 
 Commit: 40496860 [none] document JVM distribution installation and usage
+Later fix: Removed non-existent GitHub release download instructions
 
 ### 2026-06-05: JVM distribution implementation complete
 **Subagent authorization**: User approved subagents for final refactor pass
@@ -92,7 +133,7 @@ Commit: 40496860 [none] document JVM distribution installation and usage
 Configured JVM distribution support in digger-cli/build.gradle.kts:
 1. Added `@file:OptIn(ExperimentalKotlinGradlePluginApi::class)` annotation
 2. Configured `jvm { binaries.executable { mainClass } }` block
-3. Added JAR manifest with Main-Class attribute
+3. ~~Added JAR manifest with Main-Class attribute~~ (later removed in 4004ff34)
 4. Created `confirmJvmDiggerCanRun` validation task
 5. Wired validation to check task
 
@@ -107,9 +148,9 @@ Distribution structure:
 - lib/ (all JVM dependencies included)
 
 JAR execution notes:
-- JAR has Main-Class manifest but requires classpath (no fat JAR)
+- ~~JAR has Main-Class manifest but requires classpath (no fat JAR)~~ JAR manifest removed (4004ff34)
 - Distribution scripts handle classpath automatically
-- Direct JAR execution requires manual classpath assembly
+- Direct JAR execution NOT SUPPORTED (would require fat JAR configuration)
 - Primary distribution method: distribution archives (matches tagger-cli pattern)
 
 Validation:
