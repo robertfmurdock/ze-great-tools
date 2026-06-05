@@ -32,7 +32,7 @@ Enable SDKMAN! distribution for tagger-cli and digger-cli JVM versions to reach 
   - Apply plugin to digger-cli module
   - Configure plugin with candidate names and distribution URLs
   - Update plan if constraints discovered
-- [ ] Configure SHA-256 checksum generation
+- [x] Configure SHA-256 checksum generation
   - Add checksum task for tagger-cli jvmDistZip
   - Add checksum task for digger-cli jvmDistZip
   - Verify checksums are generated correctly
@@ -66,6 +66,13 @@ Enable SDKMAN! distribution for tagger-cli and digger-cli JVM versions to reach 
 
 ## Implementation Notes
 _(newest first)_
+
+### 2026-06-05: SHA-256 checksum generation configured
+Added `org.gradle.crypto.checksum:1.4.0` plugin and created `jvmDistZipChecksum` tasks for both CLIs. Tasks generate `.sha256` files alongside distribution zips. Checksums verified working correctly (64-character hex strings).
+
+Output files:
+- `build/distributions/tagger-cli-jvm.zip.sha256`
+- `build/distributions/digger-cli-jvm.zip.sha256`
 
 ### 2026-06-05: Plugin applied and configured
 Added `io.sdkman.vendors:3.0.0` to version catalog and applied to both CLI modules. Plugin provides tasks:

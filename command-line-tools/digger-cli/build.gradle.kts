@@ -1,6 +1,7 @@
 @file:OptIn(ExperimentalKotlinGradlePluginApi::class)
 
 import org.apache.tools.ant.filters.ReplaceTokens
+import org.gradle.crypto.checksum.Checksum
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootPlugin
 import org.jetbrains.kotlin.gradle.targets.js.npm.npmProject
@@ -11,10 +12,21 @@ plugins {
     id("org.jetbrains.kotlin.plugin.serialization") version embeddedKotlinVersion
     alias(libs.plugins.org.jmailen.kotlinter)
     alias(libs.plugins.io.sdkman.vendors)
+    alias(libs.plugins.org.gradle.crypto.checksum)
 }
 
 repositories {
     mavenCentral()
+}
+
+tasks.register<Checksum>("jvmDistZipChecksum") {
+    group = "distribution"
+    description = "Generate SHA-256 checksum for JVM distribution zip"
+    dependsOn("jvmDistZip")
+    inputFiles.from(layout.buildDirectory.file("distributions/digger-cli-jvm.zip"))
+    outputDirectory.set(layout.buildDirectory.dir("distributions"))
+    checksumAlgorithm.set(Checksum.Algorithm.SHA256)
+    appendFileNameToChecksum.set(false)
 }
 
 val generatedDirectory = project.layout.buildDirectory.dir("generated-sources/templates/kotlin/main")
