@@ -31,7 +31,8 @@ tagger calculate-version # Now it should be available via NPM's path on your she
 
 #### Migration from `git-semver-tagger`
 
-The package has been renamed to `@continuous-excellence/tagger`. The old `git-semver-tagger` package is deprecated. To migrate:
+The package has been renamed to `@continuous-excellence/tagger`. The old `git-semver-tagger` package is deprecated. To
+migrate:
 
 ```bash
 # Uninstall old package
@@ -45,32 +46,39 @@ The CLI command remains `tagger` - no changes needed to your scripts or workflow
 
 ### JVM Distribution
 
-For environments without Node.js or when you prefer a JVM-based tool, download and extract the JVM distribution archive.
+For environments without Node.js or when you prefer a JVM-based tool, you can build the JVM distribution locally.
 
-#### Manual Installation
-
-1. Download the `tagger-cli-jvm.zip` distribution archive from releases
-2. Extract the archive to your preferred location
-3. Add `bin/tagger` to your PATH or run directly
+#### Building Locally
 
 ```bash
-# Extract archive
-unzip tagger-cli-jvm.zip
+# Clone the repository
+git clone https://github.com/robertfmurdock/ze-great-tools.git
+cd ze-great-tools
+
+# Build the JVM distribution
+./gradlew :command-line-tools:tagger-cli:jvmDistZip
+
+# Extract the distribution
+unzip command-line-tools/tagger-cli/build/distributions/tagger-cli-jvm.zip -d ~/bin/
 
 # Run directly
-./tagger-cli-jvm/bin/tagger calculate-version
+~/bin/tagger-cli-jvm/bin/tagger calculate-version
 
 # Or add to PATH
-export PATH="$PATH:/path/to/tagger-cli-jvm/bin"
+export PATH="$PATH:$HOME/bin/tagger-cli-jvm/bin"
 tagger calculate-version
 ```
 
 The distribution includes:
+
 - `bin/tagger` - Shell script wrapper for Unix-like systems
 - `bin/tagger.bat` - Batch script wrapper for Windows
 - `lib/` - All required JVM dependencies
 
 **Requirements:** Java Runtime Environment (JRE) 8 or higher
+
+**Note:** Pre-built JVM distribution archives are not yet available in releases. Distribution via SDKMAN! and GitHub
+releases is planned for future versions.
 
 ## Commands
 
