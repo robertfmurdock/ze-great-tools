@@ -15,6 +15,7 @@ org-jetbrains-kotlin-kotlin-test-junit5 = { module = "org.jetbrains.kotlin:kotli
 org-jetbrains-kotlinx-kotlinx-serialization-bom = "org.jetbrains.kotlinx:kotlinx-serialization-bom:1.11.0"
 
 [plugins]
+io-sdkman-vendors = "io.sdkman.vendors:3.0.0"
 nl-littlerobots-version-catalog-update = "nl.littlerobots.version-catalog-update:1.1.0"
 org-jetbrains-kotlin-multiplatform = "org.jetbrains.kotlin.multiplatform:2.4.0"
 org-jmailen-kotlinter = "org.jmailen.kotlinter:5.5.0"

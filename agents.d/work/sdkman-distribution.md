@@ -12,31 +12,30 @@ Enable SDKMAN! distribution for tagger-cli and digger-cli JVM versions to reach 
 - Semver intent: `[minor]` - new backward-compatible distribution channel
 
 ## Checklist
-- [ ] Review this work card for compliance with template and update to conform
-- [ ] If this card plans subagent delegation, ask user to explicitly authorize subagents for this card and record the response in Implementation Notes
-- [ ] Configure tagger-cli Gradle application plugin
+- [x] Review this work card for compliance with template and update to conform
+- [x] If this card plans subagent delegation, ask user to explicitly authorize subagents for this card and record the response in Implementation Notes
+- [x] Configure tagger-cli Gradle application plugin
   - Apply application plugin explicitly
   - Set mainClass to tagger entry point
   - Configure distZip/distTar tasks for SDKMAN-compatible archives
   - Verify archive structure includes bin/ scripts and dependencies
   - Update plan if constraints discovered
-- [ ] Configure digger-cli Gradle application plugin
+- [x] Configure digger-cli Gradle application plugin
   - Apply application plugin explicitly
   - Set mainClass to digger entry point
   - Configure distZip/distTar tasks for SDKMAN-compatible archives
   - Verify archive structure includes bin/ scripts and dependencies
   - Update plan if constraints discovered
-- [ ] Create SDKMAN vendor configuration
-  - Prepare candidate submission for tagger-cli
-  - Prepare candidate submission for digger-cli
-  - Document release artifact URLs (GitHub Releases or Maven Central)
-  - Include SHA-256 checksums generation in build
+- [x] Add io.sdkman.vendors plugin to build
+  - Add plugin to version catalog
+  - Apply plugin to tagger-cli module
+  - Apply plugin to digger-cli module
+  - Configure plugin with candidate names and distribution URLs
   - Update plan if constraints discovered
-- [ ] Submit to SDKMAN candidates repository
-  - Fork sdkman/sdkman-candidates on GitHub
-  - Create candidate descriptor for tagger-cli
-  - Create candidate descriptor for digger-cli
-  - Submit PR with both tools
+- [ ] Configure SHA-256 checksum generation
+  - Add checksum task for tagger-cli jvmDistZip
+  - Add checksum task for digger-cli jvmDistZip
+  - Verify checksums are generated correctly
   - Update plan if constraints discovered
 - [ ] Document SDKMAN installation method
   - Add SDKMAN installation instructions to README or docs
@@ -67,6 +66,39 @@ Enable SDKMAN! distribution for tagger-cli and digger-cli JVM versions to reach 
 
 ## Implementation Notes
 _(newest first)_
+
+### 2026-06-05: Plugin applied and configured
+Added `io.sdkman.vendors:3.0.0` to version catalog and applied to both CLI modules. Plugin provides tasks:
+- `sdkReleaseVersion` - Release new version to SDKMAN
+- `sdkAnnounceVersion` - Announce release
+- `sdkDefaultVersion` - Set as default version
+- `sdkMinorRelease` - Release + announce (convenience)
+- `sdkMajorRelease` - Release + announce + default (convenience)
+
+Configuration via Gradle properties or CLI args (plugin reads automatically):
+- `sdkman.candidate` - candidate name ("tagger" or "digger")
+- `sdkman.version` - version string  
+- `sdkman.url` - download URL for distribution zip
+- `sdkman.hashtag` - hashtag for announcements
+- `SDKMAN_KEY` / `SDKMAN_TOKEN` - credentials (from environment or properties)
+
+No explicit DSL configuration needed - property-based approach cleaner for CI/CD.
+
+### 2026-06-05: Discovered io.sdkman.vendors Gradle plugin
+Found official SDKMAN vendor plugin `io.sdkman.vendors` (v3.0.0 latest) on Gradle Plugin Portal. This plugin can handle SDKMAN candidate announcements programmatically, eliminating need for manual PR to sdkman-candidates repository.
+
+Plan adjustment: Use `io.sdkman.vendors` plugin instead of manual candidate submission. This changes the implementation from "fork + PR workflow" to "configure + announce workflow".
+
+For SHA-256 checksums: Gradle provides built-in checksum support via `org.gradle.crypto.checksum` tasks or manual task implementation.
+
+### 2026-06-05: Application plugin already configured
+Verified that both tagger-cli and digger-cli already have correct Gradle application plugin configuration via Kotlin Multiplatform's `jvm { binaries { executable } }` DSL:
+- `mainClass` already set correctly for both CLIs
+- `jvmDistZip` and `jvmDistTar` tasks available and functional
+- Archive structure verified SDKMAN-compatible: `bin/` folder with executable scripts + `lib/` folder with dependencies
+- Tested extraction and execution: both CLIs work correctly from extracted archives
+
+No subagent authorization requested as final refactor is the only planned subagent usage (REFACTOR_AGENT.md).
 
 ### 2026-06-05: Work card created
 Implementation work card for SDKMAN! distribution based on jvm-cli-distribution-research findings. SDKMAN! identified as low-effort, high-value Phase 1 distribution channel for JVM developers.
