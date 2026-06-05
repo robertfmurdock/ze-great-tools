@@ -7,9 +7,11 @@ A program for extracting 'contribution data' from git repositories into JSON fil
 
 ## Installation
 
+### NPM Installation (Recommended)
+
 You can install the tool using any NPM-like system.
 
-### Local Example
+#### Local Example
 
 ```bash
 npm i -D @continuous-excellence/digger # this will install it into a project as a dev dependency
@@ -17,12 +19,52 @@ npm i -D @continuous-excellence/digger # this will install it into a project as 
 npx digger current-contribution-data $(pwd) # You can use npx to run a project's programs easily
 ```
 
-### Global Example
+#### Global Example
 
 ```bash
 npm i -g @continuous-excellence/digger # this will install it globally into npm
 
 digger current-contribution-data $(pwd) # Now it should be available via NPM's path on your shell.
+```
+
+### JVM Distribution (Alternative)
+
+For environments without Node.js, a standalone JVM distribution is available.
+
+#### Download and Extract
+
+Download the distribution archive from the releases page and extract:
+
+```bash
+# Download from GitHub releases
+curl -L -o digger-cli-jvm.zip https://github.com/robertfmurdock/ze-great-tools/releases/download/VERSION/digger-cli-jvm.zip
+
+# Extract
+unzip digger-cli-jvm.zip
+
+# Run
+digger-cli-jvm/bin/digger --version
+```
+
+Or build from source:
+
+```bash
+./gradlew :command-line-tools:digger-cli:jvmDistZip
+unzip command-line-tools/digger-cli/build/distributions/digger-cli-jvm.zip -d /path/to/install
+```
+
+#### Distribution Structure
+
+The JVM distribution archive contains:
+- `bin/digger` - Unix/Linux/macOS executable script
+- `bin/digger.bat` - Windows executable script
+- `lib/` - All required JVM dependencies
+
+Add the `bin` directory to your PATH for easy access:
+
+```bash
+export PATH="/path/to/digger-cli-jvm/bin:$PATH"
+digger --version
 ```
 
 ### Migration from `git-digger`
