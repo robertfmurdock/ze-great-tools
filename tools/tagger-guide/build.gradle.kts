@@ -23,9 +23,3 @@ kotlin {
         }
     }
 }
-
-tasks {
-    withType(Test::class) {
-        useJUnitPlatform()
-    }
-}
