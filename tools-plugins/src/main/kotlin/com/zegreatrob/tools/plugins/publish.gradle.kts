@@ -1,6 +1,5 @@
 package com.zegreatrob.tools.plugins
 
-import org.gradle.api.publish.maven.MavenPom
 import java.nio.charset.Charset
 import java.util.*
 
@@ -16,41 +15,35 @@ repositories {
 group = "com.zegreatrob.tools"
 
 afterEvaluate {
-    publishing.publications.withType<MavenPublication>().forEach { configurePom(it) }
-}
+    publishing.publications.withType<MavenPublication>().forEach {
+        with(it) {
+            val scmUrl = "https://github.com/robertfmurdock/ze-great-tools"
 
-fun configurePom(publication: MavenPublication) {
-    val scmUrl = "https://github.com/robertfmurdock/ze-great-tools"
-    publication.pom.apply {
-        name.set(project.name)
-        description.set(project.name)
-        url.set(scmUrl)
-        configureLicense(scmUrl)
-        configureDevelopers()
-        configureScm(scmUrl)
+            pom.name.set(project.name)
+            pom.description.set(project.name)
+            pom.url.set(scmUrl)
+
+            pom.licenses {
+                license {
+                    name.set("MIT License")
+                    url.set("$scmUrl/blob/main/LICENSE")
+                    distribution.set("repo")
+                }
+            }
+            pom.developers {
+                developer {
+                    id.set("robertfmurdock")
+                    name.set("Rob Murdock")
+                    email.set("rob@continuousexcellence.io")
+                }
+            }
+            pom.scm {
+                url.set(scmUrl)
+                connection.set("git@github.com:robertfmurdock/ze-great-tools.git")
+                developerConnection.set("git@github.com:robertfmurdock/ze-great-tools.git")
+            }
+        }
     }
-}
-
-fun MavenPom.configureLicense(scmUrl: String) = licenses {
-    license {
-        name.set("MIT License")
-        url.set("$scmUrl/blob/main/LICENSE")
-        distribution.set("repo")
-    }
-}
-
-fun MavenPom.configureDevelopers() = developers {
-    developer {
-        id.set("robertfmurdock")
-        name.set("Rob Murdock")
-        email.set("rob@continuousexcellence.io")
-    }
-}
-
-fun MavenPom.configureScm(scmUrl: String) = scm {
-    url.set(scmUrl)
-    connection.set("git@github.com:robertfmurdock/ze-great-tools.git")
-    developerConnection.set("git@github.com:robertfmurdock/ze-great-tools.git")
 }
 
 signing {

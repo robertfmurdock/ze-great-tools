@@ -10,7 +10,7 @@ tasks {
             "test-output/${project.path}/results".replace(":", "/"),
         )
 
-    val check = named("check")
+    val check by getting
     val copyReportsToRootDirectory by registering(Copy::class) {
         mustRunAfter(check)
         from("build/reports")
@@ -22,8 +22,6 @@ tasks {
         into(projectResultPath)
     }
     register("collectResults") {
-        group = "verification"
-        description = "Collects test reports and results to root build directory"
         dependsOn(copyReportsToRootDirectory, copyTestResultsToRootDirectory)
     }
 }
