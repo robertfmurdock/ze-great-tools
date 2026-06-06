@@ -42,6 +42,7 @@ Enable SDKMAN! distribution for tagger-cli and digger-cli JVM versions to reach 
   - Document `sdk install tagger` and `sdk install digger` commands
   - Document version management (`sdk list`, `sdk upgrade`)
   - Update plan if constraints discovered
+  - NOTE: Draft documentation prepared in `docs/drafts/sdkman-installation-docs.md`, ready to merge once SDKMAN distribution is live and tested
 - [ ] Test SDKMAN installation workflow
   - Verify archive format works with SDKMAN
   - Test installation from candidate URL
@@ -66,6 +67,16 @@ Enable SDKMAN! distribution for tagger-cli and digger-cli JVM versions to reach 
 
 ## Implementation Notes
 _(newest first)_
+
+### 2026-06-05: SDKMAN installation documentation drafted
+Prepared complete SDKMAN installation documentation in `docs/drafts/sdkman-installation-docs.md`:
+- SDKMAN! installation instructions with `sdk install tagger`/`sdk install digger`
+- Version management commands (`sdk list`, `sdk use`, `sdk default`, `sdk upgrade`)
+- SDKMAN! website link (https://sdkman.io) - verified working (200 OK)
+- Installation script link (https://get.sdkman.io) - verified working (200 OK)
+- Grammar and formatting verified via MCP IDEA tools
+
+Documentation is ready to merge into CLI READMEs once SDKMAN distribution is actually live and tested. Keeping READMEs in current state (with "planned for future versions" note) until candidates are published and working.
 
 ### 2026-06-05: SHA-256 checksum generation configured
 Added `org.gradle.crypto.checksum:1.4.0` plugin and created `jvmDistZipChecksum` tasks for both CLIs. Tasks generate `.sha256` files alongside distribution zips. Checksums verified working correctly (64-character hex strings).
