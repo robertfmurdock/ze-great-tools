@@ -31,34 +31,35 @@ constructor(
     @TaskAction
     fun installCertificate() {
         val cert = certificatePath.get()
-        val javaLauncher =
-            javaToolchainService.launcherFor { spec ->
-                spec.getLanguageVersion().set(JavaLanguageVersion.of(jdkSelector.get()))
-            }
-        val javaHome = javaLauncher.get().metadata.installationPath
+        val keytoolPath = resolveKeytoolPath()
+        val output = executeKeytool(keytoolPath, cert)
+        validateResult(output)
+    }
 
+    private fun resolveKeytoolPath(): String {
+        val javaLauncher = javaToolchainService.launcherFor { spec ->
+            spec.getLanguageVersion().set(JavaLanguageVersion.of(jdkSelector.get()))
+        }
+        val javaHome = javaLauncher.get().metadata.installationPath
+        return javaHome.file("bin/keytool").asFile.absolutePath
+    }
+
+    private fun executeKeytool(keytoolPath: String, cert: String): ExecutionOutput {
         val outStream = ByteArrayOutputStream()
         val result = execOperations.exec { spec ->
-            spec.commandLine(
-                javaHome.file("bin/keytool").asFile.absolutePath,
-                "-importcert",
-                "-file",
-                cert,
-                "-alias",
-                cert,
-                "-cacerts",
-                "-storepass",
-                "changeit",
-                "-noprompt",
-            )
+            spec.commandLine(keytoolPath, "-importcert", "-file", cert, "-alias", cert, "-cacerts", "-storepass", "changeit", "-noprompt")
             spec.standardOutput = outStream
             spec.errorOutput = outStream
             spec.isIgnoreExitValue = true
         }
+        return ExecutionOutput(result.exitValue, outStream.toString())
+    }
 
-        val results = outStream.toString()
-        if (result.exitValue != 0 && !results.contains("already exists")) {
-            throw Exception("Unexpected error.\n$results")
+    private fun validateResult(output: ExecutionOutput) {
+        if (output.exitCode != 0 && !output.text.contains("already exists")) {
+            throw Exception("Unexpected error.\n${output.text}")
         }
     }
+
+    private data class ExecutionOutput(val exitCode: Int, val text: String)
 }

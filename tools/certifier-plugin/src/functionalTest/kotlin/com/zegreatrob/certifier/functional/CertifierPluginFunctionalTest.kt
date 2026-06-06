@@ -16,16 +16,19 @@ class CertifierPluginFunctionalTest {
     private val settingsFile by lazy { projectDir.resolve("settings.gradle") }
     private val ignoreFile by lazy { projectDir.resolve(".gitignore") }
 
-    @Test
-    fun installCertIsConfigurationCacheCompatible() = setup(object {
-        val certificatePath = this@CertifierPluginFunctionalTest.javaClass.getResource("/localhost.crt")
-            ?.toURI()
-            ?.path
-            ?: error("Test not setup correctly - missing /localhost.crt")
-        val args = listOf("installCert", "--configuration-cache", "-m")
-    }) {
+    private fun certificatePath() = javaClass.getResource("/localhost.crt")?.toURI()?.path
+        ?: error("Test not setup correctly - missing /localhost.crt")
+
+    private fun initializeProjectFiles() {
         settingsFile.writeText("")
         ignoreFile.writeText(".gradle")
+    }
+
+    private fun writeBuildFile(certificatePath: String? = certificatePath(), jdkSelector: String? = "21") {
+        val installCertConfig = buildString {
+            if (jdkSelector != null) appendLine("                    jdkSelector = \"$jdkSelector\"")
+            if (certificatePath != null) appendLine("                    certificatePath = \"$certificatePath\"")
+        }.trimEnd()
         buildFile.writeText(
             """
             plugins {
@@ -34,13 +37,19 @@ class CertifierPluginFunctionalTest {
 
             tasks {
                 installCert {
-                    jdkSelector = "21"
-                    certificatePath = "$certificatePath"
+$installCertConfig
                 }
             }
-
             """.trimIndent(),
         )
+    }
+
+    @Test
+    fun installCertIsConfigurationCacheCompatible() = setup(object {
+        val args = listOf("installCert", "--configuration-cache", "-m")
+    }) {
+        initializeProjectFiles()
+        writeBuildFile()
     } exercise {
         val firstRun = GradleRunner.create()
             .forwardOutput()
@@ -62,33 +71,14 @@ class CertifierPluginFunctionalTest {
 
     @Test
     fun canRunInstallCertTask() = setup(object {
-        val certificatePath = this@CertifierPluginFunctionalTest.javaClass.getResource("/localhost.crt")
-            ?.toURI()
-            ?.path
-            ?: error("Test not setup correctly - missing /localhost.crt")
         val runner = GradleRunner.create()
             .forwardOutput()
             .withPluginClasspath()
             .withArguments("installCert")
             .withProjectDir(projectDir)
     }) {
-        settingsFile.writeText("")
-        ignoreFile.writeText(".gradle")
-        buildFile.writeText(
-            """
-            plugins {
-                id("com.zegreatrob.tools.certifier")
-            }
-
-            tasks {
-                installCert {
-                    jdkSelector = "21"
-                    certificatePath = "$certificatePath"
-                }
-            }
-
-            """.trimIndent(),
-        )
+        initializeProjectFiles()
+        writeBuildFile()
     } exercise {
         runner.build()
     } verify { result ->
@@ -97,32 +87,14 @@ class CertifierPluginFunctionalTest {
 
     @Test
     fun willEmitErrorWhenNoJdkSelected() = setup(object {
-        val certificatePath = this@CertifierPluginFunctionalTest.javaClass.getResource("/localhost.crt")
-            ?.toURI()
-            ?.path
-            ?: error("Test not setup correctly - missing /localhost.crt")
         val runner = GradleRunner.create()
             .forwardOutput()
             .withPluginClasspath()
             .withArguments("installCert")
             .withProjectDir(projectDir)
     }) {
-        settingsFile.writeText("")
-        ignoreFile.writeText(".gradle")
-        buildFile.writeText(
-            """
-            plugins {
-                id("com.zegreatrob.tools.certifier")
-            }
-
-            tasks {
-                installCert {
-                    certificatePath = "$certificatePath"
-                }
-            }
-
-            """.trimIndent(),
-        )
+        initializeProjectFiles()
+        writeBuildFile(jdkSelector = null)
     } exercise {
         runner.buildAndFail()
     } verify { result ->
@@ -138,21 +110,8 @@ class CertifierPluginFunctionalTest {
             .withArguments("installCert")
             .withProjectDir(projectDir)
     }) {
-        settingsFile.writeText("")
-        ignoreFile.writeText(".gradle")
-        buildFile.writeText(
-            """
-            plugins {
-                id("com.zegreatrob.tools.certifier")
-            }
-
-            tasks {
-                installCert {
-                    jdkSelector = "21"
-                }
-            }
-            """.trimIndent(),
-        )
+        initializeProjectFiles()
+        writeBuildFile(certificatePath = null)
     } exercise {
         runner.buildAndFail()
     } verify { result ->

@@ -2,7 +2,6 @@
 
 import org.jmailen.gradle.kotlinter.tasks.FormatTask
 import org.jmailen.gradle.kotlinter.tasks.LintTask
-import java.nio.charset.Charset
 import java.util.*
 
 plugins {
@@ -72,7 +71,7 @@ signing {
     val signingPassword: String? by project
 
     if (signingKey != null) {
-        val decodedKey = Base64.getDecoder().decode(signingKey).toString(Charset.defaultCharset())
+        val decodedKey = String(Base64.getDecoder().decode(signingKey))
         useInMemoryPgpKeys(
             decodedKey,
             signingPassword
