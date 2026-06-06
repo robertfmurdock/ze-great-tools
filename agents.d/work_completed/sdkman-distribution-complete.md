@@ -56,14 +56,14 @@ Enable SDKMAN! distribution for tagger-cli and digger-cli JVM versions to reach 
   - Document release process
   - Update plan if constraints discovered
 - [x] Final refactor: MANDATORY subagent (REFACTOR_AGENT.md), reviews ALL commits/files
-- [ ] Move this file to agents.d/work_completed/
+- [x] Move this file to agents.d/work_completed/
 
 ## Current State
-- **Commit SHA**: fccc76c2 (main)
-- **Uncommitted work**: CI/CD automation (build.gradle.kts, main.yml workflow), work card updates
-- **Blockers**: None - awaiting next release to test end-to-end workflow
-- **Status**: Implementation complete, ready for final refactor and SDKMAN submission after next release
-- **Date**: 2026-06-05
+- **Commit SHA**: 4b9bfafb (main)
+- **Uncommitted work**: None
+- **Blockers**: None
+- **Status**: COMPLETE - Release has run, distributions uploaded to GitHub Releases, ready for SDKMAN submission
+- **Date**: 2026-06-06
 
 ## Implementation Notes
 _(newest first)_

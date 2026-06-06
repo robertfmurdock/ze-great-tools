@@ -14,6 +14,14 @@ repositories {
 
 group = "com.zegreatrob.tools"
 
+// WARNING: Do NOT refactor this afterEvaluate block to extract top-level helper functions.
+//
+// Commit d149003a attempted to extract configurePom/configureLicense/etc as top-level functions,
+// which caused initializeSonatypeStagingRepository to fail with HTTP 403 from Sonatype.
+// Root cause unclear, but likely related to project reference semantics or nexus-publish-plugin interaction.
+//
+// Keep all POM configuration inline within this afterEvaluate block.
+// See: PUBLISH_ISSUE_ANALYSIS.md and agents.d/context/GRADLE_PLUGIN_CONSTRAINTS.md
 afterEvaluate {
     publishing.publications.withType<MavenPublication>().forEach {
         with(it) {

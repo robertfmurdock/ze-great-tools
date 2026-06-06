@@ -46,9 +46,41 @@ The CLI command remains `tagger` - no changes needed to your scripts or workflow
 
 ### JVM Distribution
 
-For environments without Node.js or when you prefer a JVM-based tool, you can build the JVM distribution locally.
+For environments without Node.js or when you prefer a JVM-based tool, pre-built JVM distributions are available.
 
-#### Building Locally
+#### Install from GitHub Releases
+
+Download the latest release from [GitHub Releases](https://github.com/robertfmurdock/ze-great-tools/releases):
+
+```bash
+# Download the latest version (replace 3.1.2 with current version)
+VERSION=3.1.2
+curl -L -O https://github.com/robertfmurdock/ze-great-tools/releases/download/${VERSION}/tagger-cli-jvm.zip
+
+# Verify checksum (optional but recommended)
+curl -L -O https://github.com/robertfmurdock/ze-great-tools/releases/download/${VERSION}/tagger-cli-jvm.zip.sha256
+sha256sum -c tagger-cli-jvm.zip.sha256
+
+# Extract to installation directory
+unzip tagger-cli-jvm.zip -d ~/.local/share/
+
+# Add to PATH (add this line to your ~/.bashrc or ~/.zshrc)
+export PATH="$HOME/.local/share/tagger-cli-jvm/bin:$PATH"
+
+# Verify installation
+tagger --version
+```
+
+**Distribution contents:**
+- `bin/tagger` - Shell script wrapper for Unix-like systems
+- `bin/tagger.bat` - Batch script wrapper for Windows
+- `lib/` - All required JVM dependencies
+
+**Requirements:** Java Runtime Environment (JRE) 8 or higher
+
+#### Build from Source
+
+Alternatively, you can build the JVM distribution locally:
 
 ```bash
 # Clone the repository
@@ -59,26 +91,12 @@ cd ze-great-tools
 ./gradlew :command-line-tools:tagger-cli:jvmDistZip
 
 # Extract the distribution
-unzip command-line-tools/tagger-cli/build/distributions/tagger-cli-jvm.zip -d ~/bin/
+unzip command-line-tools/tagger-cli/build/distributions/tagger-cli-jvm.zip -d ~/.local/share/
 
-# Run directly
-~/bin/tagger-cli-jvm/bin/tagger calculate-version
-
-# Or add to PATH
-export PATH="$PATH:$HOME/bin/tagger-cli-jvm/bin"
-tagger calculate-version
+# Add to PATH
+export PATH="$HOME/.local/share/tagger-cli-jvm/bin:$PATH"
+tagger --version
 ```
-
-The distribution includes:
-
-- `bin/tagger` - Shell script wrapper for Unix-like systems
-- `bin/tagger.bat` - Batch script wrapper for Windows
-- `lib/` - All required JVM dependencies
-
-**Requirements:** Java Runtime Environment (JRE) 8 or higher
-
-**Note:** Pre-built JVM distribution archives are not yet available in releases. Distribution via SDKMAN! and GitHub
-releases is planned for future versions.
 
 ## Commands
 

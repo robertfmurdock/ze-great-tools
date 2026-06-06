@@ -31,24 +31,53 @@ digger current-contribution-data $(pwd) # Now it should be available via NPM's p
 
 For environments without Node.js, a standalone JVM distribution is available.
 
-#### Build from Source
+#### Install from GitHub Releases
+
+Download the latest release from [GitHub Releases](https://github.com/robertfmurdock/ze-great-tools/releases):
 
 ```bash
-./gradlew :command-line-tools:digger-cli:jvmDistZip
-unzip command-line-tools/digger-cli/build/distributions/digger-cli-jvm.zip -d /path/to/install
+# Download the latest version (replace 3.1.2 with current version)
+VERSION=3.1.2
+curl -L -O https://github.com/robertfmurdock/ze-great-tools/releases/download/${VERSION}/digger-cli-jvm.zip
+
+# Verify checksum (optional but recommended)
+curl -L -O https://github.com/robertfmurdock/ze-great-tools/releases/download/${VERSION}/digger-cli-jvm.zip.sha256
+sha256sum -c digger-cli-jvm.zip.sha256
+
+# Extract to installation directory
+unzip digger-cli-jvm.zip -d ~/.local/share/
+
+# Add to PATH (add this line to your ~/.bashrc or ~/.zshrc)
+export PATH="$HOME/.local/share/digger-cli-jvm/bin:$PATH"
+
+# Verify installation
+digger --version
 ```
 
-#### Distribution Structure
-
-The JVM distribution archive contains:
+**Distribution contents:**
 - `bin/digger` - Unix/Linux/macOS executable script
 - `bin/digger.bat` - Windows executable script
 - `lib/` - All required JVM dependencies
 
-Add the `bin` directory to your PATH for easy access:
+**Requirements:** Java Runtime Environment (JRE) 8 or higher
+
+#### Build from Source
+
+Alternatively, you can build the JVM distribution locally:
 
 ```bash
-export PATH="/path/to/digger-cli-jvm/bin:$PATH"
+# Clone the repository
+git clone https://github.com/robertfmurdock/ze-great-tools.git
+cd ze-great-tools
+
+# Build the JVM distribution
+./gradlew :command-line-tools:digger-cli:jvmDistZip
+
+# Extract to installation directory
+unzip command-line-tools/digger-cli/build/distributions/digger-cli-jvm.zip -d ~/.local/share/
+
+# Add to PATH
+export PATH="$HOME/.local/share/digger-cli-jvm/bin:$PATH"
 digger --version
 ```
 
