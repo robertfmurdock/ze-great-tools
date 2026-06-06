@@ -12,87 +12,129 @@ import org.gradle.jvm.tasks.Jar
 
 class FingerprintPlugin : Plugin<Project> {
     override fun apply(project: Project) {
-        val version = project.providers.systemProperty("test.plugin.version")
-            .orElse(
-                project.provider {
-                    this.javaClass.`package`.implementationVersion ?: "development"
-                },
-            )
+        val version = resolvePluginVersion(project)
+        val extension = createExtension(project)
+        registerGenerateFingerprintTask(project, version, extension)
+        registerRootTasksIfNeeded(project, extension)
+    }
 
-        val isRoot = project == project.rootProject
+    private fun registerRootTasksIfNeeded(project: Project, extension: FingerprintExtension) {
+        if (project.isRoot()) {
+            registerRootTasks(project, extension)
+        }
+    }
 
+    private fun resolvePluginVersion(project: Project) = project.providers.systemProperty("test.plugin.version")
+        .orElse(project.provider { this.javaClass.`package`.implementationVersion ?: "development" })
+
+    private fun createExtension(project: Project): FingerprintExtension {
         val extension = project.extensions.create("fingerprintConfig", FingerprintExtension::class.java)
         extension.includedProjects.convention(emptySet())
         extension.includedBuilds.convention(emptySet())
+        extension.compareToFile.convention(project.layout.file(project.providers.gradleProperty("fingerprintCompareToFile").map { project.file(it) }))
+        return extension
+    }
 
-        project.providers.gradleProperty("fingerprintCompareToFile")
-            .map { project.file(it) }
-            .let { fileProvider ->
-                extension.compareToFile.convention(project.layout.file(fileProvider))
-            }
-
+    private fun registerGenerateFingerprintTask(project: Project, version: org.gradle.api.provider.Provider<String>, extension: FingerprintExtension) {
         project.tasks.register("generateFingerprint", FingerprintTask::class.java) { task ->
-            task.pluginVersion.set(version)
-            task.outputFile.set(project.layout.buildDirectory.file("fingerprint.txt"))
-            task.manifestFile.set(project.layout.buildDirectory.file("fingerprint-manifest.log"))
-            task.baseDir.set(project.layout.projectDirectory)
-
-            val includedNames = extension.includedProjects.get()
-            val targets = if (isRoot) project.allprojects else listOf(project)
-
-            targets
-                .filter { it.isIncludedByConfig(includedNames, project.rootProject) }
-                .forEach { sub ->
-                    task.addNonTestCompileClasspaths(sub)
-
-                    sub.pluginManager.withPlugin("java") {
-                        task.addJavaMainSources(sub)
-                        task.addJavaJarArtifact(sub)
-                    }
-                    sub.pluginManager.withPlugin("org.jetbrains.kotlin.jvm") {
-                        task.addJavaMainSources(sub)
-                        task.addJavaJarArtifact(sub)
-                    }
-                    sub.pluginManager.withPlugin("org.jetbrains.kotlin.multiplatform") {
-                        task.addKmpMainSources(sub)
-                        task.addKmpPublishedArtifacts(sub)
-                    }
-                }
+            configureGenerateFingerprintTask(task, project, version, extension)
         }
+    }
 
-        if (isRoot) {
-            project.tasks.register("aggregateFingerprints", AggregateFingerprintsTask::class.java) { task ->
-                val localTask = project.tasks.named("generateFingerprint", FingerprintTask::class.java)
-                task.localFingerprint.set(localTask.flatMap { it.outputFile })
-                task.localManifest.set(localTask.flatMap { it.manifestFile })
+    private fun configureGenerateFingerprintTask(
+        task: FingerprintTask,
+        project: Project,
+        version: org.gradle.api.provider.Provider<String>,
+        extension: FingerprintExtension,
+    ) {
+        task.pluginVersion.set(version)
+        task.baseDir.set(project.layout.projectDirectory)
+        setTaskOutputPaths(task, project)
+        addProjectSources(task, project, extension)
+    }
 
-                task.dependsOn(localTask)
+    private fun setTaskOutputPaths(task: FingerprintTask, project: Project) {
+        task.outputFile.set(project.layout.buildDirectory.file("fingerprint.txt"))
+        task.manifestFile.set(project.layout.buildDirectory.file("fingerprint-manifest.log"))
+    }
 
-                extension.includedBuilds.orElse(emptySet()).get().forEach { buildName ->
-                    task.dependsOn(project.gradle.includedBuild(buildName).task(":generateFingerprint"))
+    private fun addProjectSources(task: FingerprintTask, project: Project, extension: FingerprintExtension) {
+        val targets = if (project.isRoot()) project.allprojects else listOf(project)
+        targets.filter { it.isIncludedByConfig(extension.includedProjects.get(), project.rootProject) }.forEach { sub ->
+            configureProjectFingerprints(task, sub)
+        }
+    }
 
-                    task.includedFingerprints.from(
-                        project.gradle.includedBuild(buildName).projectDir.resolve("build/fingerprint.txt"),
-                    )
-                    task.includedManifests.from(
-                        project.gradle.includedBuild(buildName).projectDir.resolve("build/fingerprint-manifest.log"),
-                    )
-                }
+    private fun configureProjectFingerprints(task: FingerprintTask, sub: Project) {
+        task.addNonTestCompileClasspaths(sub)
+        sub.pluginManager.withPlugin("java") { configureJavaProject(task, sub) }
+        sub.pluginManager.withPlugin("org.jetbrains.kotlin.jvm") { configureJavaProject(task, sub) }
+        sub.pluginManager.withPlugin("org.jetbrains.kotlin.multiplatform") { configureKmpProject(task, sub) }
+    }
 
-                task.outputFile.set(project.layout.buildDirectory.file("aggregate-fingerprint.txt"))
-                task.outputManifestFile.set(project.layout.buildDirectory.file("aggregate-fingerprint-manifest.log"))
-            }
+    private fun configureJavaProject(task: FingerprintTask, sub: Project) {
+        task.addJavaMainSources(sub)
+        task.addJavaJarArtifact(sub)
+    }
 
-            project.tasks.register("compareAggregateFingerprints", CompareAggregateFingerprintsTask::class.java) { task ->
-                val aggregateTask = project.tasks.named("aggregateFingerprints", AggregateFingerprintsTask::class.java)
-                task.dependsOn(aggregateTask)
+    private fun configureKmpProject(task: FingerprintTask, sub: Project) {
+        task.addKmpMainSources(sub)
+        task.addKmpPublishedArtifacts(sub)
+    }
 
-                task.currentFingerprint.set(aggregateTask.flatMap { it.outputFile })
-                task.expectedFingerprint.set(extension.compareToFile)
-            }
+    private fun registerRootTasks(project: Project, extension: FingerprintExtension) {
+        registerAggregateFingerprintsTask(project, extension)
+        registerCompareAggregateFingerprints(project, extension)
+    }
+
+    private fun registerAggregateFingerprintsTask(project: Project, extension: FingerprintExtension) {
+        project.tasks.register("aggregateFingerprints", AggregateFingerprintsTask::class.java) { task ->
+            configureAggregateFingerprintsTask(task, project, extension)
+        }
+    }
+
+    private fun configureAggregateFingerprintsTask(task: AggregateFingerprintsTask, project: Project, extension: FingerprintExtension) {
+        val localTask = project.tasks.named("generateFingerprint", FingerprintTask::class.java)
+        setLocalTaskDependencies(task, localTask)
+        addIncludedBuilds(task, project, extension)
+        setAggregateOutputPaths(task, project)
+    }
+
+    private fun setLocalTaskDependencies(task: AggregateFingerprintsTask, localTask: org.gradle.api.tasks.TaskProvider<FingerprintTask>) {
+        task.localFingerprint.set(localTask.flatMap { it.outputFile })
+        task.localManifest.set(localTask.flatMap { it.manifestFile })
+        task.dependsOn(localTask)
+    }
+
+    private fun setAggregateOutputPaths(task: AggregateFingerprintsTask, project: Project) {
+        task.outputFile.set(project.layout.buildDirectory.file("aggregate-fingerprint.txt"))
+        task.outputManifestFile.set(project.layout.buildDirectory.file("aggregate-fingerprint-manifest.log"))
+    }
+
+    private fun addIncludedBuilds(task: AggregateFingerprintsTask, project: Project, extension: FingerprintExtension) {
+        extension.includedBuilds.orElse(emptySet()).get().forEach { buildName ->
+            addIncludedBuild(task, project, buildName)
+        }
+    }
+
+    private fun addIncludedBuild(task: AggregateFingerprintsTask, project: Project, buildName: String) {
+        val includedBuild = project.gradle.includedBuild(buildName)
+        task.dependsOn(includedBuild.task(":generateFingerprint"))
+        task.includedFingerprints.from(includedBuild.projectDir.resolve("build/fingerprint.txt"))
+        task.includedManifests.from(includedBuild.projectDir.resolve("build/fingerprint-manifest.log"))
+    }
+
+    private fun registerCompareAggregateFingerprints(project: Project, extension: FingerprintExtension) {
+        project.tasks.register("compareAggregateFingerprints", CompareAggregateFingerprintsTask::class.java) { task ->
+            val aggregateTask = project.tasks.named("aggregateFingerprints", AggregateFingerprintsTask::class.java)
+            task.dependsOn(aggregateTask)
+            task.currentFingerprint.set(aggregateTask.flatMap { it.outputFile })
+            task.expectedFingerprint.set(extension.compareToFile)
         }
     }
 }
+
+private fun Project.isRoot(): Boolean = this == rootProject
 
 private fun Project.isIncludedByConfig(includedNames: Set<String>, root: Project): Boolean = includedNames.isEmpty() || name in includedNames || this == root
 
@@ -120,14 +162,12 @@ private fun Any.kmpResourcesOrNull(): SourceDirectorySet? = invokeNoArg("getReso
 private fun Project.kmpMainSourceSets(): Sequence<Any> = kmpSourceSets().filter { it.kmpNameOrNull()?.endsWith("Main") == true }
 
 private fun FingerprintTask.addNonTestCompileClasspaths(from: Project) {
-    from.configurations
-        .matching {
-            val name = it.name.lowercase()
-            it.isCanBeResolved &&
-                (name.contains("compileclasspath") || name.contains("compilationclasspath")) &&
-                !name.contains("test")
-        }
-        .forEach { cfg -> classpath.from(cfg) }
+    from.configurations.matching { it.isCompileClasspathConfiguration() }.forEach { cfg -> classpath.from(cfg) }
+}
+
+private fun org.gradle.api.artifacts.Configuration.isCompileClasspathConfiguration(): Boolean {
+    val name = name.lowercase()
+    return isCanBeResolved && (name.contains("compileclasspath") || name.contains("compilationclasspath")) && !name.contains("test")
 }
 
 private fun FingerprintTask.addJavaMainSources(from: Project) {
@@ -150,14 +190,12 @@ private fun FingerprintTask.addKmpMainSources(from: Project) {
 }
 
 private fun FingerprintTask.addKmpPublishedArtifacts(from: Project) {
-    from.configurations
-        .matching {
-            val n = it.name.lowercase()
-            it.isCanBeConsumed &&
-                (n.endsWith("apielements") || n.endsWith("runtimeelements")) &&
-                !n.contains("test")
-        }
-        .forEach { cfg ->
-            publishedArtifacts.from(cfg.outgoing.artifacts.files)
-        }
+    from.configurations.matching { it.isPublishableKmpConfiguration() }.forEach { cfg ->
+        publishedArtifacts.from(cfg.outgoing.artifacts.files)
+    }
+}
+
+private fun org.gradle.api.artifacts.Configuration.isPublishableKmpConfiguration(): Boolean {
+    val n = name.lowercase()
+    return isCanBeConsumed && (n.endsWith("apielements") || n.endsWith("runtimeelements")) && !n.contains("test")
 }

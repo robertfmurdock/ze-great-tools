@@ -49,133 +49,153 @@ abstract class FingerprintTask : DefaultTask() {
     @TaskAction
     fun execute() {
         val digest = MessageDigest.getInstance("SHA-256")
-
-        val dumpFile = digestInputDumpFile.orNull?.asFile
-        val dump = if (dumpFile != null) StringBuilder() else null
-        var step = 0
-
+        val context = DigestContext(digestInputDumpFile.orNull?.asFile)
         val manifest = StringBuilder()
+        processAllInputs(digest, context, manifest)
+        writeOutputFiles(digest, manifest, context)
+    }
 
-        fun ByteArray.toHex(): String = joinToString("") { "%02x".format(it) }
+    private fun processAllInputs(digest: MessageDigest, context: DigestContext, manifest: StringBuilder) {
+        processPluginVersion(digest, context, manifest)
+        processClasspath(digest, context, manifest)
+        processPublishedArtifacts(digest, context, manifest)
+        processSources(digest, context, manifest)
+    }
 
-        fun writeLine(context: String, detail: String) {
-            dump?.append("%04d".format(step++))
-                ?.append(" | ")
-                ?.append(context)
-                ?.append(" | ")
-                ?.append(detail)
-                ?.append('\n')
-        }
-
-        fun updateBytes(context: String, bytes: ByteArray) {
-            writeLine(
-                context = context,
-                detail = "len=${bytes.size} hex=${bytes.toHex()} ascii=${bytes.toString(Charsets.UTF_8)}",
-            )
-            digest.update(bytes)
-        }
-
-        fun updateByte(context: String, value: Int) {
-            writeLine(
-                context = context,
-                detail = "len=1 hex=${"%02x".format(value and 0xFF)} ascii=\\u${"%04x".format(value and 0xFF)}",
-            )
-            digest.update(value.toByte())
-        }
-
-        fun classpathEntryContentSha256Hex(entry: java.io.File): String {
-            val md = MessageDigest.getInstance("SHA-256")
-
-            if (entry.isFile) {
-                md.update(entry.readBytes())
-                return md.digest().toHex()
-            }
-
-            if (entry.isDirectory) {
-                entry.walkTopDown()
-                    .filter { it.isFile }
-                    .sortedBy { it.relativeTo(entry).invariantSeparatorsPath }
-                    .forEach { f ->
-                        val rel = f.relativeTo(entry).invariantSeparatorsPath
-                        md.update(rel.toByteArray(Charsets.UTF_8))
-                        md.update(0)
-                        md.update(f.readBytes())
-                        md.update(0)
-                    }
-                return md.digest().toHex()
-            }
-
-            return md.digest().toHex()
-        }
-
+    private fun processPluginVersion(digest: MessageDigest, context: DigestContext, manifest: StringBuilder) {
         manifest.append("pluginVersion|").append(pluginVersion.get()).append("|\n")
+        context.updateBytes(digest, "pluginVersion(prefix)", "pluginVersion=".toByteArray())
+        context.updateBytes(digest, "pluginVersion(value)", pluginVersion.get().toByteArray())
+    }
 
-        updateBytes("pluginVersion(prefix)", "pluginVersion=".toByteArray())
-        updateBytes("pluginVersion(value)", pluginVersion.get().toByteArray())
-
-        classpath.files
-            .sortedBy { it.name }
-            .forEach { file ->
-                val classpathSha256 = classpathEntryContentSha256Hex(file)
-                manifest.append("classpath|").append(file.name).append("|").append(file.length()).append("|")
-                    .append(classpathSha256).append("\n")
-
-                val fileContext = "classpath[fileName=${file.name} fileLength=${file.length()}]"
-                updateByte("$fileContext sep(0)", 0)
-                updateBytes("$fileContext file.name", file.name.toByteArray())
-                updateByte("$fileContext sep(0)", 0)
-                updateBytes("$fileContext file.length", file.length().toString().toByteArray())
-
-                updateByte("$fileContext sep(0)", 0)
-                updateBytes("$fileContext content.sha256", classpathSha256.toByteArray())
-            }
-
-        publishedArtifacts.files
-            .sortedBy { it.name }
-            .forEach { file ->
-                val sha256 = classpathEntryContentSha256Hex(file)
-                manifest.append("artifact|").append(file.name).append("|").append(file.length()).append("|")
-                    .append(sha256).append("\n")
-
-                val fileContext = "artifact[fileName=${file.name} fileLength=${file.length()}]"
-                updateByte("$fileContext sep(0)", 0)
-                updateBytes("$fileContext file.name", file.name.toByteArray())
-                updateByte("$fileContext sep(0)", 0)
-                updateBytes("$fileContext file.length", file.length().toString().toByteArray())
-                updateByte("$fileContext sep(0)", 0)
-                updateBytes("$fileContext content.sha256", sha256.toByteArray())
-            }
-
-        val baseDirFile = baseDir.get().asFile
-
-        sources.files
-            .filter { it.isFile }
-            .sortedBy { it.relativeTo(baseDirFile).invariantSeparatorsPath }
-            .forEach { file ->
-                val relPath = file.relativeTo(baseDirFile).invariantSeparatorsPath
-                val fileContext = "sources[path=$relPath length=${file.length()}]"
-
-                val bytes = file.readBytes()
-                val sha256 = MessageDigest.getInstance("SHA-256").digest(bytes).toHex()
-                manifest.append("source|").append(relPath).append("|").append(file.length()).append("|").append(sha256)
-                    .append("\n")
-
-                updateByte("$fileContext sep(0)", 0)
-                updateBytes("$fileContext file.path", relPath.toByteArray())
-                updateByte("$fileContext sep(0)", 0)
-                updateBytes("$fileContext file.bytes", bytes)
-            }
-
-        val hash = digest.digest().joinToString("") { "%02x".format(it) }
-        outputFile.get().asFile.writeText(hash)
-
-        val mf = manifestFile.get().asFile
-        mf.parentFile?.mkdirs()
-        mf.writeText(manifest.toString())
-
-        if (dump != null && dumpFile != null) {
-            dumpFile.parentFile?.mkdirs()
-            dumpFile.writeText(dump.toString())
+    private fun processClasspath(digest: MessageDigest, context: DigestContext, manifest: StringBuilder) {
+        classpath.files.sortedBy { it.name }.forEach { file ->
+            processFileEntry(digest, context, manifest, file, "classpath")
         }
+    }
+
+    private fun processPublishedArtifacts(digest: MessageDigest, context: DigestContext, manifest: StringBuilder) {
+        publishedArtifacts.files.sortedBy { it.name }.forEach { file ->
+            processFileEntry(digest, context, manifest, file, "artifact")
+        }
+    }
+
+    private fun processFileEntry(
+        digest: MessageDigest,
+        context: DigestContext,
+        manifest: StringBuilder,
+        file: java.io.File,
+        category: String,
+    ) {
+        val sha256 = file.sha256Hex()
+        manifest.append("$category|").append(file.name).append("|").append(file.length()).append("|").append(sha256).append("\n")
+        addFileToDigest(digest, context, category, file, sha256)
+    }
+
+    private fun addFileToDigest(digest: MessageDigest, context: DigestContext, category: String, file: java.io.File, sha256: String) {
+        val fileContext = "$category[fileName=${file.name} fileLength=${file.length()}]"
+        addFileMetadataToDigest(digest, context, fileContext, file.name, file.length().toString(), sha256)
+    }
+
+    private fun addFileMetadataToDigest(
+        digest: MessageDigest,
+        context: DigestContext,
+        fileContext: String,
+        name: String,
+        length: String,
+        sha256: String,
+    ) {
+        addFieldToDigest(digest, context, "$fileContext file.name", name.toByteArray())
+        addFieldToDigest(digest, context, "$fileContext file.length", length.toByteArray())
+        addFieldToDigest(digest, context, "$fileContext content.sha256", sha256.toByteArray())
+    }
+
+    private fun addFieldToDigest(digest: MessageDigest, context: DigestContext, label: String, value: ByteArray) {
+        context.updateByte(digest, "$label sep(0)", 0)
+        context.updateBytes(digest, label, value)
+    }
+
+    private fun processSources(digest: MessageDigest, context: DigestContext, manifest: StringBuilder) {
+        val baseDirFile = baseDir.get().asFile
+        sources.files.filter { it.isFile }.sortedBy { it.relativeTo(baseDirFile).invariantSeparatorsPath }.forEach { file ->
+            processSourceFile(digest, context, manifest, file, baseDirFile)
+        }
+    }
+
+    private fun processSourceFile(
+        digest: MessageDigest,
+        context: DigestContext,
+        manifest: StringBuilder,
+        file: java.io.File,
+        baseDirFile: java.io.File,
+    ) {
+        val relPath = file.relativeTo(baseDirFile).invariantSeparatorsPath
+        val bytes = file.readBytes()
+        val sha256 = MessageDigest.getInstance("SHA-256").digest(bytes).toHex()
+        manifest.append("source|$relPath|${file.length()}|$sha256\n")
+        addSourceBytesToDigest(digest, context, relPath, bytes)
+    }
+
+    private fun addSourceBytesToDigest(digest: MessageDigest, context: DigestContext, relPath: String, bytes: ByteArray) {
+        val fileContext = "sources[path=$relPath length=${bytes.size}]"
+        addFieldToDigest(digest, context, "$fileContext file.path", relPath.toByteArray())
+        addFieldToDigest(digest, context, "$fileContext file.bytes", bytes)
+    }
+
+    private fun writeOutputFiles(digest: MessageDigest, manifest: StringBuilder, context: DigestContext) {
+        val hash = digest.digest().toHex()
+        outputFile.get().asFile.writeText(hash)
+        manifestFile.get().asFile.writeToFile(manifest.toString())
+        context.writeDump()
+    }
+}
+
+private fun java.io.File.sha256Hex(): String {
+    val md = MessageDigest.getInstance("SHA-256")
+    if (isFile) {
+        return md.digest(readBytes()).toHex()
+    }
+    if (isDirectory) {
+        processDirectoryContents(md)
+    }
+    return md.digest().toHex()
+}
+
+private fun java.io.File.processDirectoryContents(md: MessageDigest) {
+    walkTopDown().filter { it.isFile }.sortedBy { it.relativeTo(this).invariantSeparatorsPath }.forEach { file ->
+        updateDirectoryHash(md, file)
+    }
+}
+
+private fun java.io.File.updateDirectoryHash(md: MessageDigest, file: java.io.File) {
+    val rel = file.relativeTo(this).invariantSeparatorsPath
+    md.update(rel.toByteArray(Charsets.UTF_8))
+    md.update(0)
+    md.update(file.readBytes())
+    md.update(0)
+}
+
+private class DigestContext(private val dumpFile: java.io.File?) {
+    private val dump = if (dumpFile != null) StringBuilder() else null
+    private var step = 0
+
+    fun updateBytes(digest: MessageDigest, context: String, bytes: ByteArray) {
+        writeLine(context, "len=${bytes.size} hex=${bytes.toHex()} ascii=${bytes.toString(Charsets.UTF_8)}")
+        digest.update(bytes)
+    }
+
+    fun updateByte(digest: MessageDigest, context: String, value: Int) {
+        writeLine(context, "len=1 hex=${"%02x".format(value and 0xFF)} ascii=\\u${"%04x".format(value and 0xFF)}")
+        digest.update(value.toByte())
+    }
+
+    fun writeDump() {
+        if (dump != null && dumpFile != null) {
+            dumpFile.writeToFile(dump.toString())
+        }
+    }
+
+    private fun writeLine(context: String, detail: String) {
+        dump?.append("%04d".format(step++))?.append(" | ")?.append(context)?.append(" | ")?.append(detail)?.append('\n')
     }
 }

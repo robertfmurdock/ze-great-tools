@@ -24,12 +24,19 @@ abstract class CompareAggregateFingerprintsTask : DefaultTask() {
     fun execute() {
         val current = currentFingerprint.get().asFile.readText().trim()
         val expected = expectedFingerprint.get().asFile.readText().trim()
+        validateFingerprints(current, expected)
+    }
 
+    private fun validateFingerprints(current: String, expected: String) {
         if (current == expected) {
             println("FINGERPRINT_MATCH=true")
         } else {
-            println("FINGERPRINT_MATCH=false")
-            throw GradleException("Aggregate fingerprint did not match expected fingerprint.")
+            reportMismatch()
         }
+    }
+
+    private fun reportMismatch(): Nothing {
+        println("FINGERPRINT_MATCH=false")
+        throw GradleException("Aggregate fingerprint did not match expected fingerprint.")
     }
 }

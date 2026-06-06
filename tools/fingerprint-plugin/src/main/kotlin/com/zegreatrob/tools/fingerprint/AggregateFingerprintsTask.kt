@@ -39,38 +39,32 @@ abstract class AggregateFingerprintsTask : DefaultTask() {
 
     @TaskAction
     fun execute() {
+        writeAggregateFingerprint()
+        writeMergedManifest()
+    }
+
+    private fun writeAggregateFingerprint() {
+        val hash = computeAggregateHash()
+        outputFile.get().asFile.writeToFile(hash)
+    }
+
+    private fun computeAggregateHash(): String {
         val allFingerprintFiles = includedFingerprints.files + localFingerprint.get().asFile
+        val combinedContent = allFingerprintFiles.filter { it.exists() }.map { it.readText().trim() }.sorted().joinToString("|")
+        return MessageDigest.getInstance("SHA-256").digest(combinedContent.toByteArray()).toHex()
+    }
 
-        val combinedContent = allFingerprintFiles
-            .filter { it.exists() }
-            .map { it.readText().trim() }
-            .sorted()
-            .joinToString("|")
+    private fun writeMergedManifest() {
+        val merged = mergeManifestFiles()
+        outputManifestFile.get().asFile.writeToFile(merged)
+    }
 
-        val hash = MessageDigest.getInstance("SHA-256")
-            .digest(combinedContent.toByteArray())
-            .joinToString("") { "%02x".format(it) }
-
-        outputFile.get().asFile.apply {
-            parentFile?.mkdirs()
-            writeText(hash)
+    private fun mergeManifestFiles(): String = buildString {
+        val allManifestFiles = (includedManifests.files + localManifest.get().asFile).filter { it.exists() }.sortedBy { it.invariantSeparatorsPath }
+        allManifestFiles.forEachIndexed { index, file ->
+            if (index > 0) append('\n')
+            append(file.readText().trimEnd())
         }
-
-        val allManifestFiles = (includedManifests.files + localManifest.get().asFile)
-            .filter { it.exists() }
-            .sortedBy { it.invariantSeparatorsPath }
-
-        val merged = buildString {
-            allManifestFiles.forEachIndexed { index, file ->
-                if (index > 0) append('\n')
-                append(file.readText().trimEnd())
-            }
-            append('\n')
-        }
-
-        outputManifestFile.get().asFile.apply {
-            parentFile?.mkdirs()
-            writeText(merged)
-        }
+        append('\n')
     }
 }
