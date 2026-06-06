@@ -85,6 +85,8 @@ jobs:
             build/aggregate-fingerprint.txt \
             build/aggregate-fingerprint-manifest.log \
             --clobber
+      - name: Upload CLI distributions
+        run: ./gradlew uploadCliDistributions
       - name: Update Contributions
         uses: robertfmurdock/coupling-contribution-action@v3
         with:

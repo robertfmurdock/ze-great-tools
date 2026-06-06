@@ -181,14 +181,6 @@ tasks {
 
 fun Project.isSnapshot() = version.toString().contains("SNAPSHOT")
 
-// SDKMAN configuration - set via gradle.properties or command line:
-// -Psdkman.candidate=digger
-// -Psdkman.version=x.y.z
-// -Psdkman.url=https://github.com/robertfmurdock/ze-great-tools/releases/download/x.y.z/digger-cli-jvm.zip
-// -Psdkman.hashtag=continuousexcellence
-// -PSDKMAN_KEY=...
-// -PSDKMAN_TOKEN=...
-
 NodeJsRootPlugin.apply(project.rootProject)
 project.rootProject.tasks.named("kotlinNpmInstall") {
     dependsOn(gradle.includedBuild("tools").task(":kotlinNpmInstall"))

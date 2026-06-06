@@ -85,4 +85,26 @@ tasks {
         from(testBuilds.map { it.projectDir.resolve("build/test-output") })
         into(rootProject.layout.buildDirectory.file("test-output/${project.path}".replace(":", "/")))
     }
+    register<Exec>("uploadCliDistributions") {
+        group = "publishing"
+        description = "Uploads CLI distribution archives to GitHub release (requires TAGGER_VERSION)"
+        val versionEnv = providers.environmentVariable("TAGGER_VERSION")
+        onlyIf { versionEnv.isPresent && !versionEnv.getOrElse("").contains("SNAPSHOT") }
+        dependsOn(
+            gradle.includedBuild("command-line-tools").task(":tagger-cli:jvmDistZip"),
+            gradle.includedBuild("command-line-tools").task(":tagger-cli:jvmDistZipChecksum"),
+            gradle.includedBuild("command-line-tools").task(":digger-cli:jvmDistZip"),
+            gradle.includedBuild("command-line-tools").task(":digger-cli:jvmDistZipChecksum"),
+        )
+        doFirst {
+            commandLine(
+                "gh", "release", "upload", versionEnv.get(),
+                "command-line-tools/tagger-cli/build/distributions/tagger-cli-jvm.zip",
+                "command-line-tools/tagger-cli/build/distributions/tagger-cli-jvm.zip.sha256",
+                "command-line-tools/digger-cli/build/distributions/digger-cli-jvm.zip",
+                "command-line-tools/digger-cli/build/distributions/digger-cli-jvm.zip.sha256",
+                "--clobber"
+            )
+        }
+    }
 }
