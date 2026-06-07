@@ -111,7 +111,7 @@ tasks {
         group = "build"
         description = "Copy guide resources from tagger-guide module source"
         from(rootProject.layout.projectDirectory.dir("../tools/tagger-guide/src/commonMain/resources"))
-        into(layout.projectDirectory.dir("src/commonMain/resources"))
+        into(layout.buildDirectory.dir("generated/resources/commonMain"))
         include("help/tagger-guide.md")
     }
     withType<ProcessResources>().configureEach {
@@ -186,7 +186,10 @@ tasks {
         dependsOn(copyTemplates)
     }
     kotlin.sourceSets {
-        commonMain { kotlin.srcDir(copyTemplates) }
+        commonMain {
+            kotlin.srcDir(copyTemplates)
+            resources.srcDir(copyGuideResources.map { it.destinationDir })
+        }
     }
 }
 

@@ -29,14 +29,14 @@ The digger-cli build uses a `copyGuideResources` task to copy `digger-guide.md` 
 
 ## Checklist
 - [x] Review this work card for compliance with template and update to conform
-- [ ] If this card plans subagent delegation, ask user to explicitly authorize subagents for this card and record the response in Implementation Notes
-- [ ] Audit: Find all `Copy` tasks in `*.gradle.kts` files that copy to `src/` directories
+- [x] If this card plans subagent delegation, ask user to explicitly authorize subagents for this card and record the response in Implementation Notes
+- [x] Audit: Find all `Copy` tasks in `*.gradle.kts` files that copy to `src/` directories
   - Agent cycle: investigate only
   - Document findings in Implementation Notes (digger-cli, possibly others)
-- [ ] Audit: Check if any target paths from Copy tasks are tracked in git
+- [x] Audit: Check if any target paths from Copy tasks are tracked in git
   - Agent cycle: investigate only
   - Update plan if more artifacts found
-- [ ] Research: Gradle best practices for Copy tasks and build outputs
+- [x] Research: Gradle best practices for Copy tasks and build outputs
   - Where should Copy task outputs go? (`build/` vs `src/`)
   - When to use Copy vs consuming artifacts via dependencies
   - Gradle docs on generated sources and resources
@@ -45,7 +45,7 @@ The digger-cli build uses a `copyGuideResources` task to copy `digger-guide.md` 
   - Agent cycle: investigate only
   - Document key findings in Implementation Notes
   - Update plan if findings suggest different approach
-- [ ] Research: Correct Gradle pattern for generated resources in Kotlin Multiplatform
+- [x] Research: Correct Gradle pattern for generated resources in Kotlin Multiplatform
   - How to add `build/generated/resources/` to source sets
   - How ProcessResources integrates with custom resource directories
   - KMP-specific considerations for resource handling across platforms
@@ -92,6 +92,67 @@ The digger-cli build uses a `copyGuideResources` task to copy `digger-guide.md` 
 
 ## Implementation Notes
 _(newest first)_
+
+### 2026-06-07: Research findings - implementation pattern confirmed
+**Implementation pattern:**
+```kotlin
+val copyGuideResources by registering(Copy::class) {
+    into(layout.buildDirectory.dir("generated/resources/commonMain"))
+    // ... rest of config
+}
+
+kotlin.sourceSets {
+    commonMain { 
+        resources.srcDir(copyGuideResources.map { it.destinationDir })
+    }
+}
+
+tasks.withType<ProcessResources>().configureEach {
+    dependsOn(copyGuideResources)  // May still be needed for task ordering
+}
+```
+
+**Key insights:**
+- Project already uses correct pattern for generated Kotlin sources (`copyTemplates` → `build/generated-sources/`)
+- Same pattern applies to resources: `build/generated/resources/commonMain/`
+- Source set configuration makes resources available to both JVM and JS targets
+- ProcessResources auto-discovers resources from all configured srcDirs
+- Explicit `dependsOn` still recommended for task ordering
+- `build/` already in .gitignore, no gymnastics needed
+
+**Files to remove from git after refactor:**
+- `command-line-tools/digger-cli/src/commonMain/resources/help/digger-guide.md`
+- `command-line-tools/tagger-cli/src/commonMain/resources/help/tagger-guide.md`
+
+### 2026-06-07: Audit findings - two CLIs affected
+**Copy tasks copying to src/:**
+1. `digger-cli/build.gradle.kts`: `copyGuideResources` copies from `tools/digger-guide/src/commonMain/resources` → `digger-cli/src/commonMain/resources`
+2. `tagger-cli/build.gradle.kts`: `copyGuideResources` copies from `tools/tagger-guide/src/commonMain/resources` → `tagger-cli/src/commonMain/resources`
+
+Both tasks include only the guide file (`*-guide.md`).
+
+**Build artifacts tracked in git:**
+- `command-line-tools/digger-cli/src/commonMain/resources/help/digger-guide.md` (copied from `tools/digger-guide`)
+- `command-line-tools/tagger-cli/src/commonMain/resources/help/tagger-guide.md` (copied from `tools/tagger-guide`)
+
+**Other files in help/ directories:**
+These appear to be hand-written source files (NOT build artifacts):
+- digger-cli: `all-contribution-data.md`, `current-contribution-data.md`, `digger.md`
+- tagger-cli: `calculate-version.md`, `tag.md`, `tagger.md`
+
+**Other Copy tasks found (non-problematic):**
+- digger-cli: `copyReadme` → npm project dir (build output)
+- digger-cli: `copyTemplates` → generated directory (build output)
+- tagger-cli: `copyReadme` → npm project dir (build output)
+- tagger-cli: `copyHelpResources` → npm project dir (build output)
+- tagger-cli: `copyTemplates` → generated directory (build output)
+- reports plugin: `copyReportsToRootDirectory`, `copyTestResultsToRootDirectory` → build output
+- root: `collectResults` → build output
+
+Both CLIs follow identical problematic pattern and need same refactor.
+
+### 2026-06-07: Subagent authorization granted
+User authorized subagent use for final refactor pass.
 
 ### 2026-06-07: Issue discovered during CI/CD terminology cleanup
 While updating documentation to replace "CI/CD" jargon with "build automation", discovered that `command-line-tools/digger-cli/src/commonMain/resources/help/digger-guide.md` is both:

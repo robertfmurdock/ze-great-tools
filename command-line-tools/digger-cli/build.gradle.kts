@@ -98,7 +98,7 @@ tasks {
         group = "build"
         description = "Copy guide resources from digger-guide module source"
         from(rootProject.layout.projectDirectory.dir("../tools/digger-guide/src/commonMain/resources"))
-        into(layout.projectDirectory.dir("src/commonMain/resources"))
+        into(layout.buildDirectory.dir("generated/resources/commonMain"))
         include("help/digger-guide.md")
     }
     withType<ProcessResources>().configureEach {
@@ -175,7 +175,10 @@ tasks {
         dependsOn(copyTemplates)
     }
     kotlin.sourceSets {
-        commonMain { kotlin.srcDir(copyTemplates) }
+        commonMain {
+            kotlin.srcDir(copyTemplates)
+            resources.srcDir(copyGuideResources.map { it.destinationDir })
+        }
     }
 }
 
