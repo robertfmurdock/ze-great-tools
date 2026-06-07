@@ -8,7 +8,11 @@ plugins {
 tasks {
     val javadocJar by registering(Jar::class, fun Jar.() {
         archiveClassifier.set("javadoc")
-        from("${rootDir.absolutePath}/javadocs")
+        // Include project source directories as minimal javadoc content for Maven Central compliance
+        // Kotlin multiplatform libraries don't generate traditional javadocs
+        from(projectDir) {
+            include("src/**/*.kt", "src/**/*.md")
+        }
     })
     publishing.publications {
         withType<MavenPublication> { artifact(javadocJar) }
