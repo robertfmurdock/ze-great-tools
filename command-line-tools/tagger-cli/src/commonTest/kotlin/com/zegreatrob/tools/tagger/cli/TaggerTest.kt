@@ -3,7 +3,6 @@ package com.zegreatrob.tools.tagger.cli
 import com.github.ajalt.clikt.testing.test
 import com.zegreatrob.minassert.assertIsEqualTo
 import com.zegreatrob.testmints.setup
-import com.zegreatrob.tools.tagger.core.SnapshotReason
 import com.zegreatrob.tools.test.git.getEnvironmentVariable
 import kotlin.test.Test
 

@@ -72,6 +72,7 @@ tagger --version
 ```
 
 **Distribution contents:**
+
 - `bin/tagger` - Shell script wrapper for Unix-like systems
 - `bin/tagger.bat` - Batch script wrapper for Windows
 - `lib/` - All required JVM dependencies
@@ -226,7 +227,8 @@ tagger tag --version 1.2.3  # no --release-branch needed
 
 ## Structured Output
 
-Both commands support structured output via the `--format` flag. Use `--format=json` for advanced build automation that needs explicit status envelopes and error handling.
+Both commands support structured output via the `--format` flag. Use `--format=json` for advanced build automation that
+needs explicit status envelopes and error handling.
 
 ### Format Options
 
@@ -541,7 +543,7 @@ tagger tag --help
 
 Documentation is also available as markdown files in the repository:
 
-- [Tagger Guide](src/commonMain/resources/help/tagger-guide.md) - Fit assessment, philosophy, and workflow guidance
+- [Tagger Guide](../../tools/tagger-guide/src/commonMain/resources/help/tagger-guide.md) - Fit assessment, philosophy, and workflow guidance
 - [Tagger Help](src/commonMain/resources/help/tagger.md) - Main command overview and options
 - [Calculate Version Help](src/commonMain/resources/help/calculate-version.md) - Snapshot reasons, remediation, and
   version calculation details

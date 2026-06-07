@@ -1,10 +1,8 @@
 @file:OptIn(ExperimentalKotlinGradlePluginApi::class)
 
 import org.apache.tools.ant.filters.ReplaceTokens
-import org.gradle.api.attributes.Usage
 import org.gradle.crypto.checksum.Checksum
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
-import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 import org.jetbrains.kotlin.gradle.targets.js.npm.npmProject
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 

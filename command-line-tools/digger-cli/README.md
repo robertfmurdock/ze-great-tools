@@ -55,6 +55,7 @@ digger --version
 ```
 
 **Distribution contents:**
+
 - `bin/digger` - Unix/Linux/macOS executable script
 - `bin/digger.bat` - Windows executable script
 - `lib/` - All required JVM dependencies
@@ -109,7 +110,7 @@ after that until the current HEAD.
 The contribution data JSON is created at `./currentContributionData.json`.
 
 It will include all fields
-listed [here](../digger-json/src/commonMain/kotlin/com/zegreatrob/tools/digger/json/ContributionDataJson.kt).
+listed [here](../../tools/digger-json/src/commonMain/kotlin/com/zegreatrob/tools/digger/json/ContributionDataJson.kt).
 
 Any "Instant" in the specification is an ISO 8601 date-time. Any Duration is an ISO 8601 duration.
 
@@ -124,13 +125,14 @@ This is calculated by subdividing the repository by its tags, and each section b
 The contribution data JSON is created at `./allContributionData.json`, as a JSON array.
 
 It will include all fields
-listed [here](../digger-json/src/commonMain/kotlin/com/zegreatrob/tools/digger/json/ContributionDataJson.kt).
+listed [here](../../tools/digger-json/src/commonMain/kotlin/com/zegreatrob/tools/digger/json/ContributionDataJson.kt).
 
 Any "Instant" in the specification is an ISO 8601 date-time. Any Duration is an ISO 8601 duration.
 
 ## Structured Output
 
-Both commands support structured output via the `--format` flag. Use `--format=json` for advanced build automation that needs explicit status envelopes and error handling.
+Both commands support structured output via the `--format` flag. Use `--format=json` for advanced build automation that
+needs explicit status envelopes and error handling.
 
 ### Format Options
 
@@ -191,7 +193,7 @@ digger current-contribution-data $(pwd) --format=json
 ```
 
 The `data` field contains the contribution data object.
-See [ContributionDataJson.kt](../digger-json/src/commonMain/kotlin/com/zegreatrob/tools/digger/json/ContributionDataJson.kt)
+See [ContributionDataJson.kt](../../tools/digger-json/src/commonMain/kotlin/com/zegreatrob/tools/digger/json/ContributionDataJson.kt)
 for the complete schema, or use `current-contribution-data --help` for field descriptions.
 
 ### AllContributionData JSON Mode
@@ -301,7 +303,7 @@ digger guide
 
 Documentation is also available as markdown files in the repository:
 
-- [Digger Guide](src/commonMain/resources/help/digger-guide.md) - Fit assessment, philosophy, and workflow guidance
+- [Digger Guide](../../tools/digger-guide/src/commonMain/resources/help/digger-guide.md) - Fit assessment, philosophy, and workflow guidance
 - [Digger Help](src/commonMain/resources/help/digger.md) - Main command overview and options
 - [Current Contribution Data Help](src/commonMain/resources/help/current-contribution-data.md) - Command details and
   output format
