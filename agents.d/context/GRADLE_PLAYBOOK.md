@@ -37,6 +37,29 @@ Guide for Gradle build logic, dependencies, tasks, and repository automation.
 - Files: `RegularFileProperty`, `DirectoryProperty`
 - Collections: `ListProperty<T>`, `SetProperty<T>`, `MapProperty<K,V>`
 
+**Generated Resources Pattern (KMP)**
+```kotlin
+val copyResources by registering(Copy::class) {
+    from(sourceDir)
+    into(layout.buildDirectory.dir("generated/resources/commonMain"))
+}
+
+kotlin.sourceSets {
+    commonMain {
+        resources.srcDir(copyResources.map { it.destinationDir })
+    }
+}
+
+tasks.withType<ProcessResources>().configureEach {
+    dependsOn(copyResources)  // Explicit task ordering
+}
+```
+- Generated resources go in `build/generated/resources/<sourceSetName>/`
+- Add to source set via `resources.srcDir(task.map { it.destinationDir })`
+- Use `.map { it.destinationDir }` for lazy Provider-based configuration
+- ProcessResources auto-discovers but explicit `dependsOn` ensures ordering
+- Pattern works for both JVM and JS/Native targets in KMP
+
 **Plugin Implementation (preference order)**
 1. Binary plugins (Kotlin/Java)
 2. Precompiled script plugins
@@ -64,6 +87,10 @@ Guide for Gradle build logic, dependencies, tasks, and repository automation.
 - Keep build logic and consumer updates together
 - Update `agents.d/context/` when conventions change
 - Treat warnings as errors
+- **NEVER write Copy task outputs to `src/` directories** — violates Gradle contract
+  - Source directories (`src/`) = authored files only
+  - Build directories (`build/`) = generated/copied files only
+  - Use `build/generated/` and configure source sets to include them
 
 ## Naming Conventions
 - Plugin classes: `PluginNamePlugin`
@@ -81,6 +108,9 @@ Guide for Gradle build logic, dependencies, tasks, and repository automation.
 - Breaking configuration cache
 - Duplicating logic instead of using conventions
 - Separating build logic from consumer updates
+- **Copying build artifacts into `src/` directories** (generates files in source control)
+- Forgetting to add generated directories to source sets (files won't be packaged)
+- Using direct directory paths instead of `task.map { it.destinationDir }` (breaks laziness)
 
 ## Completion Checklist
 - List changed files and reasons
