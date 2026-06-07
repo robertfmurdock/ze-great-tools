@@ -51,29 +51,29 @@ The digger-cli build uses a `copyGuideResources` task to copy `digger-guide.md` 
   - KMP-specific considerations for resource handling across platforms
   - Agent cycle: investigate only
   - Update plan based on findings
-- [ ] Refactor digger-cli build.gradle.kts:
+- [x] Refactor digger-cli build.gradle.kts:
   - Change `copyGuideResources` to copy into `build/generated/resources/commonMain/help/`
   - Configure `commonMain` source set to include generated resources directory
   - Remove dependency on `copyGuideResources` from ProcessResources if no longer needed (may be implicit)
   - Agent cycle: test → implement → refactor-light → verify pushable
   - Update plan if pattern differs from research
-- [ ] Refactor any other Copy tasks found in audit (if any)
+- [x] Refactor any other Copy tasks found in audit (if any)
   - Apply same pattern: `build/generated/` + source set configuration
   - Agent cycle: test → implement → refactor-light → verify pushable
-- [ ] Remove tracked build artifacts from git:
+- [x] Remove tracked build artifacts from git:
   - `git rm --cached command-line-tools/digger-cli/src/commonMain/resources/help/digger-guide.md`
   - Remove any other artifacts found in audit
   - Agent cycle: test → implement → refactor-light → verify pushable
-- [ ] Verify build creates resources in correct location:
+- [x] Verify build creates resources in correct location:
   - Run `./gradlew :command-line-tools:digger-cli:copyGuideResources`
   - Confirm file created in `build/generated/resources/`
   - Confirm file NOT created in `src/`
   - Agent cycle: verify pushable
-- [ ] Verify resources are packaged into JAR:
+- [x] Verify resources are packaged into JAR:
   - Run `./gradlew :command-line-tools:digger-cli:jvmJar`
   - Inspect JAR contents to confirm `help/digger-guide.md` is included
   - Agent cycle: verify pushable
-- [ ] Verify tests pass: Run `./gradlew check`
+- [x] Verify tests pass: Run `./gradlew check`
   - Agent cycle: verify pushable
 - [ ] Verify IDE still recognizes resources (check in IDEA):
   - Open project in IDEA
@@ -84,14 +84,31 @@ The digger-cli build uses a `copyGuideResources` task to copy `digger-guide.md` 
 - [ ] Move this file to agents.d/work_completed/
 
 ## Current State
-- **Commit SHA**: aa6f43f7 (current HEAD)
+- **Commit SHA**: 374d0651 (current HEAD)
 - **Uncommitted work**: Documentation terminology updates in progress (separate work)
 - **Blockers**: None
-- **Status**: Ready to start
+- **Status**: Implementation complete, awaiting IDE verification and final refactor
 - **Date**: 2026-06-07
 
 ## Implementation Notes
 _(newest first)_
+
+### 2026-06-07: Implementation complete - commit 374d0651
+**Changes made:**
+- digger-cli/build.gradle.kts: Changed `copyGuideResources` destination to `build/generated/resources/commonMain`
+- tagger-cli/build.gradle.kts: Changed `copyGuideResources` destination to `build/generated/resources/commonMain`
+- Both: Added `resources.srcDir(copyGuideResources.map { it.destinationDir })` to commonMain source set
+- Both: Kept explicit `dependsOn(copyGuideResources)` in ProcessResources for task ordering
+- Removed build artifacts from git: `digger-guide.md` and `tagger-guide.md` from CLI src directories
+
+**Verification results:**
+- ✅ copyGuideResources creates files in `build/generated/resources/commonMain/help/`
+- ✅ Files NOT created in `src/` directories
+- ✅ Files packaged into JVM JARs at `help/digger-guide.md` and `help/tagger-guide.md`
+- ✅ All tests pass (`./gradlew check`)
+- ⏳ IDE verification pending (requires IntelliJ IDEA)
+
+**Next:** IDE verification, then final refactor pass via subagent.
 
 ### 2026-06-07: Research findings - implementation pattern confirmed
 **Implementation pattern:**
