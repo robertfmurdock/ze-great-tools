@@ -18,6 +18,7 @@ Standards for git operations: commits, history analysis.
 
 ### Commit Creation
 - NEVER skip hooks, update git config, or force push to main/master
+- NEVER push commits when operating in interactive mode — let user push manually
 - Always create NEW commits (never amend unless explicitly requested)
 - When pre-commit hook fails, commit did NOT happen — fix and create NEW commit
 - Stage specific files by name (avoid `git add -A` or `git add .`)
@@ -25,19 +26,33 @@ Standards for git operations: commits, history analysis.
 - Exclude secrets: `.env`, `credentials.json`, etc.
 
 ### Commit Message Format
-- Start with semver marker: `[major]`, `[minor]`, `[patch]`, or `[none]`
-  - `[major]`: breaking change
-  - `[minor]`: new backward-compatible functionality
-  - `[patch]`: bug fix, refactor, build output changes
-  - `[none]`: docs, work cards, build config (no output impact)
-- Follow with concise 1-2 sentences (why, not what)
+**MANDATORY TEMPLATE** — Fill in, do not skip semver marker:
+```
+[<semver>] <one-line summary>
+
+<optional 1-2 sentence details>
+
+Co-Authored-By: <Agent Name> <noreply@<agent-provider>.com>
+```
+
+Semver marker (REQUIRED first character):
+- `[major]`: breaking change
+- `[minor]`: new backward-compatible functionality
+- `[patch]`: bug fix, refactor, build output changes
+- `[none]`: docs, work cards, build config (no output impact)
+
+Guidelines:
+- Check work card for semver intent BEFORE drafting message
+- Concise summary (why, not what)
 - Accurate verbs: `add` = new feature, `update` = enhancement, `fix` = bug fix
 - Check `git log` for repository style
 - Always end with: `Co-Authored-By: <Agent Name> <noreply@<agent-provider>.com>`
 - Use HEREDOC:
 ```bash
 git commit -m "$(cat <<'EOF'
-[semver] Message here.
+[none] Add semver marker here.
+
+Details here.
 
 Co-Authored-By: <Agent Name> <noreply@<agent-provider>.com>
 EOF
@@ -56,7 +71,8 @@ EOF
 - Use exact SHAs
 
 ## Constraints
-- No push unless explicitly requested
+- **NEVER `git push` in interactive mode** — user pushes manually
+- No push unless explicitly requested (automation/CI context only)
 - No `-i` flag (interactive not supported)
 - No `--no-edit` with `git rebase`
 - No empty commits
@@ -74,6 +90,8 @@ EOF
 - `gh` CLI for GitHub operations
 
 ## Common Mistakes
+- **Forgetting semver marker at start of commit message**
+- **Pushing commits in interactive mode (user must push)**
 - `git add -A` committing sensitive files
 - Amending after failed hook (destroys previous commit)
 - Skipping hooks without permission
