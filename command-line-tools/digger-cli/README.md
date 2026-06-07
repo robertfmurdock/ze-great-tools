@@ -130,7 +130,7 @@ Any "Instant" in the specification is an ISO 8601 date-time. Any Duration is an 
 
 ## Structured Output
 
-Both commands support machine-readable JSON output for CI/CD pipelines and automation scripts via the `--format` flag.
+Both commands support structured output via the `--format` flag. Use `--format=json` for advanced build automation that needs explicit status envelopes and error handling.
 
 ### Format Options
 
@@ -227,7 +227,7 @@ digger all-contribution-data $(pwd) --format=json
 The `data` field contains an array of contribution data objects, one for each contribution period. Use
 `all-contribution-data --help` for more details.
 
-### CI Integration Examples
+### Build Automation Examples
 
 **Extract story ID in GitHub Actions:**
 

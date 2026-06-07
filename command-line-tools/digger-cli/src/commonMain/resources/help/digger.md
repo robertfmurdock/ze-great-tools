@@ -1,7 +1,7 @@
 Digger extracts contribution metadata from Git history for CI and reporting workflows.
 **Use `--format=json` for automation** and text mode when writing output files.
 
-Typical CI/build script usage:
+Typical build script usage:
 
 ```
 digger current-contribution-data --format=json path/to/repo

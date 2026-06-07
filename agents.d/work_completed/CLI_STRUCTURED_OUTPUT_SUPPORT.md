@@ -1,7 +1,7 @@
 # Task: Add structured output support to all CLIs
 
 ## Goal
-Implement structured JSON output for all CLI tools in this repository, making them easier to integrate into CI/CD pipelines and automation scripts. Follow TDD approach: write failing tests first, verify failure reasons, then implement.
+Implement structured JSON output for all CLI tools in this repository, making them easier to integrate into build automation. Follow TDD approach: write failing tests first, verify failure reasons, then implement.
 
 ## Background
 CLIs benefit from machine-readable structured output. Currently, tools output text that requires brittle parsing with `grep`, `sed`, and regex. Adding `--format=json` option provides:

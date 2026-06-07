@@ -74,7 +74,7 @@ class TaggerTest {
     }) exercise {
         command.test("--help")
     } verify { result ->
-        result.output.contains("CI/build script").assertIsEqualTo(true, "Help should reference CI/build script usage")
+        result.output.contains("build script").assertIsEqualTo(true, "Help should reference build script usage")
         result.output.contains("calculate-version").assertIsEqualTo(true, "Help should show calculate-version")
         result.output.contains("your-build-script").assertIsEqualTo(true, "Help should show generic build script")
         result.output.contains("tag --version").assertIsEqualTo(true, "Help should show tagging step")

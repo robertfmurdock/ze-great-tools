@@ -226,7 +226,7 @@ tagger tag --version 1.2.3  # no --release-branch needed
 
 ## Structured Output
 
-Both commands support machine-readable JSON output for CI/CD pipelines and automation scripts via the `--format` flag.
+Both commands support structured output via the `--format` flag. Use `--format=json` for advanced build automation that needs explicit status envelopes and error handling.
 
 ### Format Options
 
@@ -296,7 +296,7 @@ tagger tag --version 1.2.3 --release-branch main --format=json
 }
 ```
 
-### CI Integration Examples
+### Build Automation Examples
 
 **Extract version in GitHub Actions:**
 
@@ -425,7 +425,7 @@ tagger tag --version 1.2.3 --warnings-as-errors
    ```
 3. **Stderr diagnostics**: Warnings remain visible for troubleshooting
 
-**CI integration example:**
+**Build automation example:**
 
 ```bash
 # Strict mode catches deprecation warnings before they become breaking changes
@@ -440,7 +440,7 @@ fi
 
 **When to use strict mode:**
 
-- Production CI/CD pipelines where warnings indicate configuration drift
+- Automated build pipelines where warnings indicate configuration drift
 - During migration from deprecated options (fail fast on old syntax)
 - When enforcing "clean build" policies across teams
 

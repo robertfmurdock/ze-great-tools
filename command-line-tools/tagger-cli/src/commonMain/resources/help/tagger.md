@@ -1,7 +1,7 @@
 Tagger calculates semantic versions from Git history and enforces the tagging policy.
 Version numbers live on Git tags. Commit content determines the next version.
 
-Typical CI/build script usage:
+Typical build script usage:
 
 ```bash
 VERSION=$(tagger calculate-version)

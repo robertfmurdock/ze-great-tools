@@ -37,7 +37,7 @@ class DiggerTest {
     }) exercise {
         command.test("--help")
     } verify { result ->
-        result.output.contains("Typical CI/build script usage").assertIsEqualTo(true)
+        result.output.contains("Typical build script usage").assertIsEqualTo(true)
         result.output.contains("```").assertIsEqualTo(false, "Expected markdown code fences to be rendered")
         result.output.contains("| Command |").assertIsEqualTo(false, "Expected markdown table syntax to be rendered")
     }
