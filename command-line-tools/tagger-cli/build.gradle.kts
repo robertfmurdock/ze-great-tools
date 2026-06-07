@@ -54,9 +54,10 @@ kotlin {
                 packageJson {
                     name = "@continuous-excellence/tagger"
                     customField("package-name", "@continuous-excellence/tagger")
+                    customField("description", "Deterministic semantic versioning from git history. Platform-neutral CLI for calculating versions based on commit messages, with zero configuration required.")
                     customField("author", "rob@continuousexcellence.io")
                     customField("license", "MIT")
-                    customField("keywords", arrayOf("git", "contribution", "pair", "agile", "coaching", "statistics"))
+                    customField("keywords", arrayOf("semantic-versioning", "semver", "git-tags", "release-automation", "version-management", "gradle-plugin", "ci-cd", "devops", "git", "contribution", "pair", "agile", "coaching", "statistics"))
                     customField("bin", mapOf("tagger" to "kotlin/bin/tagger"))
                     customField("homepage", "https://github.com/robertfmurdock/ze-great-tools")
                     customField("repository", "github:robertfmurdock/ze-great-tools")

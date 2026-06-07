@@ -55,9 +55,10 @@ kotlin {
                 packageJson {
                     name = "@continuous-excellence/digger"
                     customField("package-name", "@continuous-excellence/digger")
+                    customField("description", "Privacy-controlled git analytics for team insights. CLI for extracting contribution statistics, commit analysis, and developer metrics from git repositories.")
                     customField("author", "rob@continuousexcellence.io")
                     customField("license", "MIT")
-                    customField("keywords", arrayOf("git", "contribution", "pair", "agile", "coaching", "statistics"))
+                    customField("keywords", arrayOf("git-analytics", "contribution-tracking", "team-metrics", "git-statistics", "commit-analysis", "developer-metrics", "code-statistics", "git", "contribution", "pair", "agile", "coaching", "statistics"))
                     customField("bin", mapOf("digger" to "kotlin/bin/digger"))
                     customField("homepage", "https://github.com/robertfmurdock/ze-great-tools")
                     customField("repository", "github:robertfmurdock/ze-great-tools")
