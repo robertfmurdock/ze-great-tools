@@ -6,14 +6,12 @@ plugins {
 }
 
 tasks {
-    val javadocJar by registering(Jar::class, fun Jar.() {
+    val javadocJar = register<Jar>("javadocJar") {
         archiveClassifier.set("javadoc")
-        // Include project source directories as minimal javadoc content for Maven Central compliance
-        // Kotlin multiplatform libraries don't generate traditional javadocs
         from(projectDir) {
             include("src/**/*.kt", "src/**/*.md")
         }
-    })
+    }
     publishing.publications {
         withType<MavenPublication> { artifact(javadocJar) }
     }

@@ -95,7 +95,7 @@ dependencies {
 }
 
 tasks {
-    val copyGuideResources by registering(Copy::class) {
+    val copyGuideResources = register<Copy>("copyGuideResources") {
         group = "build"
         description = "Copy guide resources from digger-guide module source"
         from(rootProject.layout.projectDirectory.dir("../tools/digger-guide/src/commonMain/resources"))
@@ -114,12 +114,12 @@ tasks {
     withType<CreateStartScripts> {
         applicationName = "digger"
     }
-    val copyReadme by registering(Copy::class) {
+    val copyReadme = register<Copy>("copyReadme") {
         dependsOn("jsPackageJson", ":kotlinNpmInstall")
         from(layout.projectDirectory.file("README.md"))
         into(mainNpmProjectDir)
     }
-    val jsCliTar by registering(Tar::class) {
+    val jsCliTar = register<Tar>("jsCliTar") {
         dependsOn(
             copyReadme,
             "jsPackageJson",
@@ -140,7 +140,7 @@ tasks {
         workingDir(mainNpmProjectDir)
         commandLine("npm", "link")
     }
-    val confirmJvmDiggerCanRun by registering(Exec::class) {
+    val confirmJvmDiggerCanRun = register<Exec>("confirmJvmDiggerCanRun") {
         dependsOn("installJvmDist")
         workingDir(layout.projectDirectory)
         commandLine("build/install/digger-cli-jvm/bin/digger", "--version")
@@ -148,7 +148,7 @@ tasks {
     check {
         dependsOn(confirmJvmDiggerCanRun)
     }
-    val jsPublish by registering(Exec::class) {
+    val jsPublish = register<Exec>("jsPublish") {
         dependsOn(jsCliTar)
         mustRunAfter(check)
         workingDir(mainNpmProjectDir)
@@ -164,7 +164,7 @@ tasks {
         dependsOn(jsPublish)
         mustRunAfter(check)
     }
-    val copyTemplates by registering(Copy::class) {
+    val copyTemplates = register<Copy>("copyTemplates") {
         inputs.property("version", rootProject.version)
         filteringCharset = "UTF-8"
         from(project.projectDir.resolve("src/commonMain/templates")) {

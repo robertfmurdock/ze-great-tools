@@ -101,12 +101,12 @@ tasks {
     withType<CreateStartScripts> {
         applicationName = "tagger"
     }
-    val copyReadme by registering(Copy::class) {
+    val copyReadme = register<Copy>("copyReadme") {
         dependsOn("jsPackageJson", ":kotlinNpmInstall")
         from(layout.projectDirectory.file("README.md"))
         into(mainNpmProjectDir)
     }
-    val copyGuideResources by registering(Copy::class) {
+    val copyGuideResources = register<Copy>("copyGuideResources") {
         group = "build"
         description = "Copy guide resources from tagger-guide module source"
         from(rootProject.layout.projectDirectory.dir("../tools/tagger-guide/src/commonMain/resources"))
@@ -116,12 +116,12 @@ tasks {
     withType<ProcessResources>().configureEach {
         dependsOn(copyGuideResources)
     }
-    val copyHelpResources by registering(Copy::class) {
+    val copyHelpResources = register<Copy>("copyHelpResources") {
         dependsOn("jsProcessResources", "jsPackageJson", ":kotlinNpmInstall")
         from(layout.buildDirectory.dir("processedResources/js/main"))
         into(mainNpmProjectDir)
     }
-    val jsCliTar by registering(Tar::class) {
+    val jsCliTar = register<Tar>("jsCliTar") {
         dependsOn(
             copyReadme,
             copyHelpResources,
@@ -143,17 +143,17 @@ tasks {
         workingDir(mainNpmProjectDir)
         commandLine("npm", "link")
     }
-    val confirmJsTaggerCanRun by registering(Exec::class) {
+    val confirmJsTaggerCanRun = register<Exec>("confirmJsTaggerCanRun") {
         dependsOn(jsCliTar)
         workingDir(mainNpmProjectDir)
         commandLine("kotlin/bin/tagger", "calculate-version")
     }
-    val confirmJvmTaggerCanRun by registering(Exec::class) {
+    val confirmJvmTaggerCanRun = register<Exec>("confirmJvmTaggerCanRun") {
         dependsOn("installJvmDist")
         workingDir(layout.projectDirectory)
         commandLine("build/install/tagger-cli-jvm/bin/tagger", "--version")
     }
-    val jsPublish by registering(Exec::class) {
+    val jsPublish = register<Exec>("jsPublish") {
         dependsOn(jsCliTar)
         mustRunAfter(check)
         workingDir(mainNpmProjectDir)
@@ -173,7 +173,7 @@ tasks {
         dependsOn(jsPublish)
         mustRunAfter(check)
     }
-    val copyTemplates by registering(Copy::class) {
+    val copyTemplates = register<Copy>("copyTemplates") {
         inputs.property("version", rootProject.version)
         filteringCharset = "UTF-8"
         from(project.projectDir.resolve("src/commonMain/templates")) {
