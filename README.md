@@ -14,10 +14,10 @@
 [![Gradle Plugin Portal](https://img.shields.io/gradle-plugin-portal/v/com.zegreatrob.tools.digger?label=Digger%20Plugin)](https://plugins.gradle.org/plugin/com.zegreatrob.tools.digger)
 
 ![NPM Version](https://img.shields.io/npm/v/@continuous-excellence/tagger?label=npm%20@continuous-excellence/tagger)
-[![Socket Badge](https://badge.socket.dev/npm/package/@continuous-excellence/tagger)](https://badge.socket.dev/npm/package/@continuous-excellence/tagger)
+[![Socket Badge](https://badge.socket.dev/npm/package/@continuous-excellence/tagger)](https://socket.dev/npm/package/@continuous-excellence/tagger)
 
 ![NPM Version](https://img.shields.io/npm/v/@continuous-excellence/digger?label=npm%20@continuous-excellence/digger)
-[![Socket Badge](https://badge.socket.dev/npm/package/@continuous-excellence/digger)](https://badge.socket.dev/npm/package/@continuous-excellence/digger)
+[![Socket Badge](https://badge.socket.dev/npm/package/@continuous-excellence/digger)](https://socket.dev/npm/package/@continuous-excellence/digger)
 
 Basic tools for continuous development and release.
 
