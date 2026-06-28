@@ -6,7 +6,7 @@ com-zegreatrob-testmints-standard = { module = "com.zegreatrob.testmints:standar
 org-jetbrains-kotlinx-kotlinx-coroutines-bom = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-bom", version.ref = "org-jetbrains-kotlinx" }
 org-jetbrains-kotlinx-kotlinx-datetime = "org.jetbrains.kotlinx:kotlinx-datetime:0.8.0"
 org-jetbrains-kotlinx-kotlinx-serialization-bom = { module = "org.jetbrains.kotlinx:kotlinx-serialization-bom", version.ref = "org-jetbrains-kotlinx" }
-org-junit-junit-bom = "org.junit:junit-bom:6.1.0"
+org-junit-junit-bom = "org.junit:junit-bom:6.1.1"
 
 [plugins]
 com-gradle-plugin-publish = "com.gradle.plugin-publish:2.1.1"
