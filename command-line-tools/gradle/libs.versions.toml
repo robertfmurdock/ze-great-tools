@@ -1,6 +1,6 @@
 [versions]
 com-github-ajalt-clikt = "5.1.0"
-com-zegreatrob-testmints = "12.6.32"
+com-zegreatrob-testmints = "12.6.33"
 kotlin = "2.4.0"
 
 [libraries]
@@ -19,4 +19,4 @@ io-sdkman-vendors = "io.sdkman.vendors:3.0.0"
 nl-littlerobots-version-catalog-update = "nl.littlerobots.version-catalog-update:1.1.0"
 org-gradle-crypto-checksum = "org.gradle.crypto.checksum:1.4.0"
 org-jetbrains-kotlin-multiplatform = "org.jetbrains.kotlin.multiplatform:2.4.0"
-org-jmailen-kotlinter = "org.jmailen.kotlinter:5.5.0"
+org-jmailen-kotlinter = "org.jmailen.kotlinter:5.6.0"
