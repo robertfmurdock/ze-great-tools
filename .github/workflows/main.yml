@@ -23,7 +23,7 @@ jobs:
       SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
       SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
           token: '${{ secrets.GITHUB_TOKEN }}'
@@ -33,13 +33,12 @@ jobs:
           distribution: 'zulu'
           java-version: '21'
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v5
+        uses: gradle/actions/setup-gradle@v6
         with:
           cache-read-only: ${{ github.ref != 'refs/heads/main' }}
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@v7
         with:
-          registry-url: 'https://registry.npmjs.org'
           node-version: 24
       - name: Setup npm
         run: |
@@ -95,7 +94,7 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           gh release view ${{ env.TAGGER_VERSION }} --json name,tagName,isDraft,assets --jq '.assets[] | "- \(.name) (\(.size) bytes)"' >> $GITHUB_STEP_SUMMARY
       - name: Update Contributions
-        uses: robertfmurdock/coupling-contribution-action@v3
+        uses: robertfmurdock/coupling-contribution-action@v4
         with:
           save-contribution: ${{ github.ref == 'refs/heads/main' }}
           coupling-secret: ${{ secrets.COUPLING_API_PARTY_SECRET }}
@@ -105,7 +104,7 @@ jobs:
       - name: Collect Results
         if: ${{ always() }}
         run: ./gradlew collectResults
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: ${{ always() }}
         with:
           name: test-output

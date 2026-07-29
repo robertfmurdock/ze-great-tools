@@ -8,7 +8,7 @@ jobs:
   update-gradle-wrapper:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
           fetch-depth: '25'
@@ -18,14 +18,14 @@ jobs:
           distribution: 'zulu'
           java-version: '21'
       - name: Setup Current Gradle
-        uses: gradle/actions/setup-gradle@v5
+        uses: gradle/actions/setup-gradle@v6
         with:
           gradle-version: current
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
       - run: gradle wrapper --distribution-type all
       - name: Create Pull Request
         id: cpr
-        uses: peter-evans/create-pull-request@v6
+        uses: peter-evans/create-pull-request@v8
         with:
           branch: "create-pull-request/${{github.job}}/${{github.run_id}}"
           commit-message: "[patch] ${{github.workflow}}"

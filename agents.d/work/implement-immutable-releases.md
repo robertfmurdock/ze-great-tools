@@ -27,19 +27,19 @@ Implement GitHub immutable releases to prevent supply chain attacks by ensuring 
   - Fail if tag exists on different commit (prevents version reuse)
   - Agent cycle: test → implement → refactor-light → verify pushable
   - Update plan if guidelines revealed new constraints
-- [ ] Switch GitHub release creation to draft-first pattern
+- [x] Switch GitHub release creation to draft-first pattern
   - Modify `tools/tagger-plugin/src/main/kotlin/com/zegreatrob/tools/TaggerPlugin.kt`
   - Replace `gh api POST` with `gh release create --draft`
   - Remove redundant `generate_release_notes` parameter
   - Add idempotency check (skip if release exists)
   - Agent cycle: test → implement → refactor-light → verify pushable
   - Update plan if guidelines revealed new constraints
-- [ ] Remove `--clobber` flag from CLI distribution uploads
+- [x] Remove `--clobber` flag from CLI distribution uploads
   - Modify `build.gradle.kts` line 106 in `uploadCliDistributions` task
   - Remove `--clobber` argument from `gh release upload` command
   - Agent cycle: test → implement → refactor-light → verify pushable
   - Update plan if guidelines revealed new constraints
-- [ ] Update GitHub Actions workflow for draft-publish flow
+- [x] Update GitHub Actions workflow for draft-publish flow
   - Modify `.github/workflows/main.yml`
   - Remove `--clobber` from fingerprint upload (line 87)
   - Remove `continue-on-error: true` from fingerprint upload (line 82)
@@ -65,14 +65,23 @@ Implement GitHub immutable releases to prevent supply chain attacks by ensuring 
 - [ ] Move this file to agents.d/work_completed/
 
 ## Current State
-- **Commit SHA**: b060dcd7
+- **Commit SHA**: dbc0c9a8
 - **Uncommitted work**: None
 - **Blockers**: None
-- **Status**: In progress - 2 of 9 implementation tasks complete
+- **Status**: In progress - 5 of 9 implementation tasks complete
 - **Date**: 2026-07-29
 
 ## Implementation Notes
 _(newest first)_
+
+### 2026-07-29: Updated GitHub Actions workflow for draft-publish flow (commit dbc0c9a8)
+Removed `--clobber` from fingerprint upload and `continue-on-error: true` to enforce immutability and fail-fast. Added "Publish Release" step using `gh release edit --draft=false` to transition draft to published after all assets uploaded. Added "Release Summary" step to verify immutability and list published assets in GitHub Step Summary. Draft-first pattern ensures atomic asset attachment before publication. All checks pass.
+
+### 2026-07-29: Removed --clobber flag (commit a5dec429)
+Removed `--clobber` flag from `uploadCliDistributions` task in build.gradle.kts. This enforces immutability after GitHub release publication - assets can only be uploaded once, preventing supply chain modification attacks. No unit tests for build configuration (verified via CI execution). All checks pass.
+
+### 2026-07-29: Draft-first GitHub release with idempotency (commit 8e6662a6)
+Replaced `gh api POST` with `gh release create --draft` for immutable release pattern. Added idempotency check using `gh release view` - skips creation if release already exists. Removed `generate_release_notes` parameter (not needed with gh release create). Tests verify draft flag presence, idempotency check, and absence of deprecated parameters. All checks pass.
 
 ### 2026-07-29: Idempotent tagging completed (commit b060dcd7)
 Modified Tag.kt to check if tag exists on same commit (returns Success idempotently) or different commit (returns Warning with error message). Added tests to verify both scenarios. All tests pass.
