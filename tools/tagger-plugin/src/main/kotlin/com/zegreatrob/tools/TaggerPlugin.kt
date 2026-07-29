@@ -101,32 +101,19 @@ class TaggerPlugin : Plugin<Project> {
 
     private fun registerGithubReleaseTask(project: Project, tagger: TaggerExtension, tag: Any) = project.tasks.register("githubRelease", Exec::class.java) { task ->
         task.group = "versioning"
-        task.description = "Side effect: create GitHub release via gh CLI. Requires tag to run first. Disabled for -SNAPSHOT versions."
+        task.description = "Side effect: create GitHub draft release via gh CLI. Requires tag to run first. Disabled for -SNAPSHOT versions. Idempotent - skips if release exists."
         task.enabled = !project.version.toString().contains("SNAPSHOT") && tagger.githubReleaseEnabled.get()
         task.dependsOn(tag)
-        val githubRepository = System.getenv("GITHUB_REPOSITORY")
         task.commandLine(
-            "gh",
-            "api",
-            "--method",
-            "POST",
-            "-H",
-            "Accept: application/vnd.github+json",
-            "-H",
-            "X-GitHub-Api-Version: 2022-11-28",
-            "/repos/$githubRepository/releases",
-            "-f",
-            "tag_name=${project.version}",
-            "-f",
-            "name=${project.version}",
-            "-f",
-            "body=${project.version}",
-            "-F",
-            "draft=false",
-            "-F",
-            "prerelease=false",
-            "-F",
-            "generate_release_notes=false",
+            "sh",
+            "-c",
+            """
+                if gh release view ${project.version} >/dev/null 2>&1; then
+                    echo "Release ${project.version} already exists, skipping creation"
+                else
+                    gh release create ${project.version} --draft --title ${project.version} --notes ${project.version}
+                fi
+            """.trimIndent(),
         )
     }
 

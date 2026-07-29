@@ -214,4 +214,38 @@ class TaggerPluginTest {
             .contains(tagTask)
             .assertIsEqualTo(true, "Expected release task to depend on tag task")
     }
+
+    @Test
+    fun `githubRelease task uses gh release create with draft flag and idempotency check`() = setup(object {
+        val project = ProjectBuilder.builder().build()
+    }) exercise {
+        project.version = "1.2.3"
+        project.plugins.apply("com.zegreatrob.tools.tagger")
+        project.tasks.findByName("githubRelease") as org.gradle.api.tasks.Exec
+    } verify { task ->
+        val commandLine = task.commandLine
+        val script = commandLine.joinToString(" ")
+        script.contains("gh release view")
+            .assertIsEqualTo(true, "Expected idempotency check with 'gh release view'")
+        script.contains("gh release create")
+            .assertIsEqualTo(true, "Expected 'gh release create' command")
+        script.contains("--draft")
+            .assertIsEqualTo(true, "Expected --draft flag for draft-first pattern")
+        script.contains("already exists, skipping creation")
+            .assertIsEqualTo(true, "Expected skip message when release exists")
+    }
+
+    @Test
+    fun `githubRelease task does not include generate_release_notes parameter`() = setup(object {
+        val project = ProjectBuilder.builder().build()
+    }) exercise {
+        project.version = "1.2.3"
+        project.plugins.apply("com.zegreatrob.tools.tagger")
+        project.tasks.findByName("githubRelease") as org.gradle.api.tasks.Exec
+    } verify { task ->
+        val commandLine = task.commandLine
+        val script = commandLine.joinToString(" ")
+        script.contains("generate_release_notes")
+            .assertIsEqualTo(false, "Expected no generate_release_notes parameter with gh release create")
+    }
 }
