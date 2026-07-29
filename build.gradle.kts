@@ -102,8 +102,7 @@ tasks {
                 "command-line-tools/tagger-cli/build/distributions/tagger-cli-jvm.zip",
                 "command-line-tools/tagger-cli/build/distributions/tagger-cli-jvm.zip.sha256",
                 "command-line-tools/digger-cli/build/distributions/digger-cli-jvm.zip",
-                "command-line-tools/digger-cli/build/distributions/digger-cli-jvm.zip.sha256",
-                "--clobber"
+                "command-line-tools/digger-cli/build/distributions/digger-cli-jvm.zip.sha256"
             )
         }
     }
