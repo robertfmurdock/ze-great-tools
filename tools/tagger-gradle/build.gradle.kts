@@ -14,7 +14,7 @@ dependencies {
 }
 
 tasks {
-    val javadocJar by registering(Jar::class) {
+    val javadocJar = register<Jar>("javadocJar") {
         archiveClassifier.set("javadoc")
         from("${rootDir.absolutePath}/javadocs")
     }

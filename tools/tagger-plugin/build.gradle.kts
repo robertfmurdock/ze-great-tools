@@ -56,8 +56,8 @@ tasks {
 }
 
 signing {
-    val signingKey: String? by project
-    val signingPassword: String? by project
+    val signingKey: String? = project.findProperty("signingKey")?.toString()
+    val signingPassword: String? = project.findProperty("signingPassword")?.toString()
 
     if (signingKey != null) {
         val decodedKey = Base64.getDecoder().decode(signingKey).toString(Charset.defaultCharset())
