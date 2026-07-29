@@ -79,14 +79,21 @@ jobs:
         run: ./gradlew release -Pversion=${{ env.TAGGER_VERSION }} -Pgradle.publish.key=${{ secrets.GRADLE_PUBLISH_KEY }} -Pgradle.publish.secret=${{ secrets.GRADLE_PUBLISH_SECRET }}  --no-configuration-cache --scan
       - name: Include fingerprint
         if: ${{ env.FINGERPRINT_MATCHES_PREVIOUS == 'false' }}
-        continue-on-error: true
         run: |
           gh release upload ${{ env.TAGGER_VERSION }} \
             build/aggregate-fingerprint.txt \
-            build/aggregate-fingerprint-manifest.log \
-            --clobber
+            build/aggregate-fingerprint-manifest.log
       - name: Upload CLI distributions
         run: ./gradlew uploadCliDistributions
+      - name: Publish Release
+        run: gh release edit ${{ env.TAGGER_VERSION }} --draft=false
+      - name: Release Summary
+        run: |
+          echo "### Release ${{ env.TAGGER_VERSION }} Published :rocket:" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Release is now immutable - tags and assets cannot be modified or deleted." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          gh release view ${{ env.TAGGER_VERSION }} --json name,tagName,isDraft,assets --jq '.assets[] | "- \(.name) (\(.size) bytes)"' >> $GITHUB_STEP_SUMMARY
       - name: Update Contributions
         uses: robertfmurdock/coupling-contribution-action@v3
         with:
