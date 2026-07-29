@@ -308,4 +308,74 @@ interface TagTestSpec {
             ?.name
             .assertIsEqualTo(expectedVersion)
     }
+
+    @Test
+    fun whenTagAlreadyExistsOnCurrentCommitTagWillSucceedIdempotently() = setup(object {
+        val expectedVersion = "1.0.0"
+        lateinit var gitAdapter: GitAdapter
+    }) {
+        configureWithOverrides(releaseBranch = "master", warningsAsErrors = false)
+
+        val originDirectory = createTempDirectory()
+        val originGitAdapter = GitAdapter(originDirectory)
+        originGitAdapter.init()
+        originGitAdapter.config("receive.denyCurrentBranch", "ignore")
+        originGitAdapter.disableGpgSign()
+        originGitAdapter.addCommitWithMessage("init")
+        gitAdapter = initializeGitRepo(
+            listOf("init", "[patch] commit 1", "[patch] commit 2"),
+            remoteUrl = originDirectory,
+        )
+        gitAdapter.push()
+
+        runProcess(listOf("git", "config", "user.email", "test@zegreatrob.com"), projectDir)
+        runProcess(listOf("git", "config", "user.name", "RoB as Test"), projectDir)
+
+        val firstResult = execute(expectedVersion)
+        firstResult.assertIsOfType<TestResult.Success>()
+    } exercise {
+        execute(expectedVersion)
+    } verify { result ->
+        result.assertIsOfType<TestResult.Success>().run {
+            message.contains(TagErrors.alreadyTagged(expectedVersion))
+                .assertIsEqualTo(false, "Expected no warning when tag exists on same commit for idempotency")
+        }
+        gitAdapter.showTag("HEAD")?.name.assertIsEqualTo(expectedVersion)
+    }
+
+    @Test
+    fun whenTagExistsOnDifferentCommitTagWillFailWithError() = setup(object {
+        val version = "1.0.0"
+        lateinit var gitAdapter: GitAdapter
+    }) {
+        configureWithOverrides(releaseBranch = "master", warningsAsErrors = true)
+
+        val originDirectory = createTempDirectory()
+        val originGitAdapter = GitAdapter(originDirectory)
+        originGitAdapter.init()
+        originGitAdapter.config("receive.denyCurrentBranch", "ignore")
+        originGitAdapter.disableGpgSign()
+        originGitAdapter.addCommitWithMessage("init")
+        gitAdapter = initializeGitRepo(
+            listOf("init", "[patch] commit 1"),
+            remoteUrl = originDirectory,
+        )
+        gitAdapter.push()
+
+        runProcess(listOf("git", "config", "user.email", "test@zegreatrob.com"), projectDir)
+        runProcess(listOf("git", "config", "user.name", "RoB as Test"), projectDir)
+
+        execute(version)
+
+        gitAdapter.addCommitWithMessage("[patch] commit 2")
+    } exercise {
+        execute(version)
+    } verify { result ->
+        result.assertIsOfType<TestResult.Failure>().run {
+            reason.contains("already exists").assertIsEqualTo(
+                true,
+                "Expected error to mention tag already exists\nActual:\n$reason",
+            )
+        }
+    }
 }

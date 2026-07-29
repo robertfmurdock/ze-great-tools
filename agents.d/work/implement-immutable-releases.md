@@ -15,13 +15,13 @@ Implement GitHub immutable releases to prevent supply chain attacks by ensuring 
 ## Checklist
 - [x] Review this work card for compliance with template and update to conform
 - [x] If this card plans subagent delegation, ask user to explicitly authorize subagents for this card and record the response in Implementation Notes
-- [ ] Reorder release task dependencies to create git tag BEFORE publication
+- [x] Reorder release task dependencies to create git tag BEFORE publication
   - Modify `tools/tagger-plugin/src/main/kotlin/com/zegreatrob/tools/TaggerPlugin.kt`
   - Change `registerReleaseTask` to use `dependsOn(tag)` instead of `finalizedBy(tag)`
   - Ensures tag exists if any publication succeeds
   - Agent cycle: test → implement → refactor-light → verify pushable
   - Update plan if guidelines revealed new constraints
-- [ ] Make git tag creation idempotent
+- [x] Make git tag creation idempotent
   - Modify `tools/tagger-plugin/src/main/kotlin/com/zegreatrob/tools/tagger/TagVersion.kt`
   - Check if tag exists on current commit before creating
   - Fail if tag exists on different commit (prevents version reuse)
@@ -65,14 +65,20 @@ Implement GitHub immutable releases to prevent supply chain attacks by ensuring 
 - [ ] Move this file to agents.d/work_completed/
 
 ## Current State
-- **Commit SHA**: a226be6e
+- **Commit SHA**: b060dcd7
 - **Uncommitted work**: None
 - **Blockers**: None
-- **Status**: Ready to start
+- **Status**: In progress - 2 of 9 implementation tasks complete
 - **Date**: 2026-07-29
 
 ## Implementation Notes
 _(newest first)_
+
+### 2026-07-29: Idempotent tagging completed (commit b060dcd7)
+Modified Tag.kt to check if tag exists on same commit (returns Success idempotently) or different commit (returns Warning with error message). Added tests to verify both scenarios. All tests pass.
+
+### 2026-07-29: Tag-first ordering completed (commit fe3ca5a8)
+Changed release task to use `dependsOn(tag)` instead of `finalizedBy(tag)`. Test added to verify tag task is in release task's dependency tree. All checks pass.
 
 ### 2026-07-29: Subagent authorization granted
 User authorized subagent usage for this work card, specifically for mandatory final refactor pass.
