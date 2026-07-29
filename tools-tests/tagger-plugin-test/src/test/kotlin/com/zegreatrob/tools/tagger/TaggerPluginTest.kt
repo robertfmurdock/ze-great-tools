@@ -201,4 +201,17 @@ class TaggerPluginTest {
         content.contains("Use Tagger when:")
             .assertIsEqualTo(true, "Expected guide content to contain CLI guide text")
     }
+
+    @Test
+    fun `release task depends on tag task to ensure tag created before publication`() = setup(object {
+        val project = ProjectBuilder.builder().build()
+    }) exercise {
+        project.plugins.apply("com.zegreatrob.tools.tagger")
+        project.tasks.findByName("release")
+    } verify { releaseTask ->
+        val tagTask = project.tasks.findByName("tag")!!
+        releaseTask!!.taskDependencies.getDependencies(releaseTask)
+            .contains(tagTask)
+            .assertIsEqualTo(true, "Expected release task to depend on tag task")
+    }
 }

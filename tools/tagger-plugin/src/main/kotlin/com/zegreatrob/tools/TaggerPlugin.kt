@@ -141,7 +141,8 @@ class TaggerPlugin : Plugin<Project> {
             task.enabled = !project.version.toString().contains("SNAPSHOT")
             task.dependsOn(project.tasks.named("assemble"))
             task.mustRunAfter(project.tasks.named("check"))
-            task.finalizedBy(tag, githubRelease)
+            task.dependsOn(tag)
+            task.finalizedBy(githubRelease)
             task.finalizedBy(project.provider { project.getTasksByName("publish", true).toList() })
         }
     }
