@@ -53,6 +53,7 @@ Deprecation: build new → mark old deprecated → test both → remove at major
 
 ### Repository State
 - Every checklist item = pushable state
+- **Every commit must be safe to push to main** — this is the basic test of commit quality
 - Run `./gradlew check -q --console=plain` before marking complete
 - **Goal verification**: When checklist states explicit goal/principle (DRY, SOLID, performance), verify implementation achieves goal before complete
   - Example: "DRY: single source" means reading from ONE location, not synchronized copies

@@ -17,6 +17,8 @@ Standards for git operations: commits, history analysis.
 ## Critical Facts
 
 ### Commit Creation
+- **Every commit must be safe to push to main** — this is the basic test of commit quality
+- If you cannot safely push a commit to main, break the work down differently
 - NEVER skip hooks, update git config, or force push to main/master
 - NEVER push commits when operating in interactive mode — let user push manually
 - Always create NEW commits (never amend unless explicitly requested)
