@@ -99,38 +99,52 @@ class TaggerPlugin : Plugin<Project> {
         }
     }
 
-    private fun registerGithubReleaseTask(project: Project, tagger: TaggerExtension, tag: Any) = project.tasks.register("githubRelease", Exec::class.java) { task ->
+    private fun registerGithubReleaseTask(
+        project: Project,
+        tagger: TaggerExtension,
+        tag: Any,
+    ) = project.tasks.register("githubRelease", Exec::class.java) { task ->
         task.group = "versioning"
-        task.description = "Side effect: create GitHub draft release via gh CLI. Requires tag to run first. Disabled for -SNAPSHOT versions. Idempotent - skips if release exists."
+        task.description =
+            "Side effect: create GitHub draft release via gh CLI. Requires tag to run first. Disabled for -SNAPSHOT versions. Idempotent - skips if release exists."
         task.enabled = !project.version.toString().contains("SNAPSHOT") && tagger.githubReleaseEnabled.get()
         task.dependsOn(tag)
-        task.commandLine(
-            "sh",
-            "-c",
-            """
-                if gh release view ${project.version} >/dev/null 2>&1; then
-                    echo "Release ${project.version} already exists, skipping creation"
-                else
-                    gh release create ${project.version} --draft --title ${project.version} --notes ${project.version}
-                fi
-            """.trimIndent(),
-        )
+        task.commandLine("sh", "-c", draftReleaseScript(project.version))
     }
+
+    private fun draftReleaseScript(version: Any) = """
+        if gh release view $version >/dev/null 2>&1; then
+            echo "Release $version already exists, skipping creation"
+        else
+            gh release create $version --draft --title $version --notes $version
+        fi
+    """.trimIndent()
 
     private fun registerReleaseTask(project: Project, tagger: TaggerExtension, tag: Any, githubRelease: Any) {
         project.tasks.register("release", ReleaseVersion::class.java) { task ->
             task.group = "versioning"
-            task.description = "Orchestrator: assemble, then tag, optionally publish and create GitHub release. Disabled for -SNAPSHOT versions."
-            task.workingDirectory.set(tagger.workingDirectory)
-            task.gitDirectory.set(tagger.workingDirectory.dir(".git"))
-            task.releaseBranch.set(tagger.releaseBranchProperty)
-            task.version = "${project.version}"
-            task.enabled = !project.version.toString().contains("SNAPSHOT")
-            task.dependsOn(project.tasks.named("assemble"))
-            task.mustRunAfter(project.tasks.named("check"))
-            task.dependsOn(tag)
-            task.finalizedBy(githubRelease)
-            task.finalizedBy(project.provider { project.getTasksByName("publish", true).toList() })
+            task.description =
+                "Orchestrator: assemble, then tag, optionally publish and create GitHub release. Disabled for -SNAPSHOT versions."
+            configureReleaseTask(task, project, tagger, tag, githubRelease)
         }
+    }
+
+    private fun configureReleaseTask(
+        task: ReleaseVersion,
+        project: Project,
+        tagger: TaggerExtension,
+        tag: Any,
+        githubRelease: Any,
+    ) {
+        task.workingDirectory.set(tagger.workingDirectory)
+        task.gitDirectory.set(tagger.workingDirectory.dir(".git"))
+        task.releaseBranch.set(tagger.releaseBranchProperty)
+        task.version = "${project.version}"
+        task.enabled = !project.version.toString().contains("SNAPSHOT")
+        task.dependsOn(project.tasks.named("assemble"))
+        task.mustRunAfter(project.tasks.named("check"))
+        task.dependsOn(tag)
+        task.finalizedBy(githubRelease)
+        task.finalizedBy(project.provider { project.getTasksByName("publish", true).toList() })
     }
 }
