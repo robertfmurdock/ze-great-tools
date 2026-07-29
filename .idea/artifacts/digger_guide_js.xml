@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="digger-guide-js">
+    <output-path>$PROJECT_DIR$/tools/digger-guide/build/libs</output-path>
+    <root id="archive" name="digger-guide-js.jar">
+      <element id="module-output" name="tools.digger-guide.jsMain" />
+    </root>
+  </artifact>
+</component>

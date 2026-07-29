@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="digger-core-test-jvm">
+    <output-path>$PROJECT_DIR$/tools-tests/digger-core-test/build/libs</output-path>
+    <root id="archive" name="digger-core-test-jvm.jar">
+      <element id="module-output" name="tools-tests.digger-core-test.jvmMain" />
+    </root>
+  </artifact>
+</component>

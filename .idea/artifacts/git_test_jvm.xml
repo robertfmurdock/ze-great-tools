@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="git-test-jvm">
+    <output-path>$PROJECT_DIR$/tools/git-test/build/libs</output-path>
+    <root id="archive" name="git-test-jvm.jar">
+      <element id="module-output" name="tools.git-test.jvmMain" />
+    </root>
+  </artifact>
+</component>

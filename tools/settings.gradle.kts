@@ -1,4 +1,5 @@
 pluginManagement {
+    includeBuild("../tools-plugins")
     repositories {
         gradlePluginPortal()
         mavenCentral()
@@ -26,5 +27,3 @@ include("tagger-guide")
 include("tagger-json")
 include("tagger-plugin")
 include("tools-bom")
-
-includeBuild("../tools-plugins")
