@@ -84,10 +84,6 @@ class TaggerPlugin : Plugin<Project> {
         task.version = "${project.version}"
         task.mustRunAfter(project.tasks.named("check"))
         task.mustRunAfter(project.provider { project.getTasksByName("check", true).toList() })
-        task.mustRunAfter(
-            project.provider { project.getTasksByName("publish", true).toList() },
-            project.provider { project.getTasksByName("publish", true).map { it.finalizedBy }.toList() },
-        )
     }
 
     private fun registerCommitReportTask(project: Project, tagger: TaggerExtension) {

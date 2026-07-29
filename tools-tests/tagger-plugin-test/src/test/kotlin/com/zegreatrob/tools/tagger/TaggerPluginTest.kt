@@ -248,4 +248,22 @@ class TaggerPluginTest {
         script.contains("generate_release_notes")
             .assertIsEqualTo(false, "Expected no generate_release_notes parameter with gh release create")
     }
+
+    @Test
+    fun `tag task does not have mustRunAfter relationship with publish to avoid circular dependency`() = setup(object {
+        val rootProject = ProjectBuilder.builder().build()
+        val innerProject = ProjectBuilder.builder()
+            .withParent(rootProject)
+            .withName("p1")
+            .build()
+    }) exercise {
+        rootProject.plugins.apply("com.zegreatrob.tools.tagger")
+        innerProject.tasks.register("publish")
+        val tagTask = rootProject.tasks.findByName("tag")!!
+        tagTask.mustRunAfter.getDependencies(tagTask)
+    } verify { mustRunAfterDeps ->
+        val publishTask = innerProject.tasks.findByName("publish")!!
+        mustRunAfterDeps.contains(publishTask)
+            .assertIsEqualTo(false, "tag must not run after publish to avoid circular dependency (release depends on tag, publish runs after release)")
+    }
 }
