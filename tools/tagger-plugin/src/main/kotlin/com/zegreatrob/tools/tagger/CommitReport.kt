@@ -23,7 +23,8 @@ abstract class CommitReport : DefaultTask() {
 
     @TaskAction
     fun execute() {
-        val core = TaggerCore(GitAdapter(workingDirectory.get().asFile.absolutePath))
+        val commandLogger: (String) -> Unit = { logger.lifecycle(it) }
+        val core = TaggerCore(GitAdapter(workingDirectory.get().asFile.absolutePath, commandLogger = commandLogger))
         println("COMMIT REPORT-------")
         println("--------------------${core.tagReport()}")
         println("COMMIT REPORT OVAH--")

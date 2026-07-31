@@ -23,7 +23,8 @@ abstract class PreviousVersion : DefaultTask() {
 
     @TaskAction
     fun execute() {
-        val core = TaggerCore(GitAdapter(workingDirectory.get().asFile.absolutePath))
+        val commandLogger: (String) -> Unit = { logger.lifecycle(it) }
+        val core = TaggerCore(GitAdapter(workingDirectory.get().asFile.absolutePath, commandLogger = commandLogger))
         logger.quiet(core.lastVersionAndTag()?.first)
     }
 }

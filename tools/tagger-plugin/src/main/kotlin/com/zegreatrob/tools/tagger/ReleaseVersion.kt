@@ -37,7 +37,8 @@ abstract class ReleaseVersion : DefaultTask() {
     fun execute() {
         val branch = releaseBranch.orNull
             ?: throw GradleException("Please configure the tagger release branch.")
-        val core = TaggerCore(GitAdapter(workingDirectory.get().asFile.absolutePath))
+        val commandLogger: (String) -> Unit = { logger.lifecycle(it) }
+        val core = TaggerCore(GitAdapter(workingDirectory.get().asFile.absolutePath, commandLogger = commandLogger))
         if (core.isOnReleaseBranch(branch) && isSnapshot()) {
             throw GradleException("Cannot release a snapshot")
         }

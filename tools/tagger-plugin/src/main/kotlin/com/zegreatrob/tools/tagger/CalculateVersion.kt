@@ -73,7 +73,8 @@ abstract class CalculateVersion : DefaultTask() {
     private fun resolveAllowDetachedHead(): Boolean = allowDetachedHead.orNull ?: false
 
     private fun calculateVersion(): VersionResult {
-        val core = TaggerCore(GitAdapter(workingDirectory.get().asFile.absolutePath))
+        val commandLogger: (String) -> Unit = { logger.lifecycle(it) }
+        val core = TaggerCore(GitAdapter(workingDirectory.get().asFile.absolutePath, commandLogger = commandLogger))
         return core.calculateNextVersion(
             implicitPatch = implicitPatch.get(),
             versionRegex = VersionRegex(
