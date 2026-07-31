@@ -39,7 +39,7 @@ interface CalculateVersionTestSpec {
         noneRegex: String? = null,
         forceSnapshot: Boolean? = null,
         warningsAsErrors: Boolean? = null,
-        transparency: Boolean? = null,
+        showCommands: Boolean? = null,
     )
 
     fun initializeGitRepo(
@@ -627,11 +627,11 @@ interface CalculateVersionTestSpec {
     }
 
     @Test
-    fun withTransparencyEnabledLogsGitCommandsToDetails() = setup(object {
+    fun withShowCommandsEnabledLogsGitCommandsToDetails() = setup(object {
         val commits = listOf("init", "[patch] commit 1")
         val initialTag = "1.2.3"
     }) {
-        configureWithOverrides(transparency = true)
+        configureWithOverrides(showCommands = true)
         initializeGitRepo(commits = commits, initialTag = initialTag)
     } exercise {
         execute()
@@ -639,17 +639,17 @@ interface CalculateVersionTestSpec {
         result.assertIsOfType<TestResult.Success>().run {
             details.contains("git").assertIsEqualTo(
                 true,
-                "Expected git commands in details when transparency enabled. Details:\n$details",
+                "Expected git commands in details when showCommands enabled. Details:\n$details",
             )
         }
     }
 
     @Test
-    fun withTransparencyDisabledDoesNotLogGitCommandsToDetails() = setup(object {
+    fun withShowCommandsDisabledDoesNotLogGitCommandsToDetails() = setup(object {
         val commits = listOf("init", "[patch] commit 1")
         val initialTag = "1.2.3"
     }) {
-        configureWithOverrides(transparency = false)
+        configureWithOverrides(showCommands = false)
         initializeGitRepo(commits = commits, initialTag = initialTag)
     } exercise {
         execute()
@@ -657,7 +657,7 @@ interface CalculateVersionTestSpec {
         result.assertIsOfType<TestResult.Success>().run {
             details.contains("git").assertIsEqualTo(
                 false,
-                "Expected no git commands in details when transparency disabled. Details:\n$details",
+                "Expected no git commands in details when showCommands disabled. Details:\n$details",
             )
         }
     }
