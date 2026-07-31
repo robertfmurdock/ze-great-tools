@@ -8,7 +8,10 @@ class CalculateVersionConfigFileFunctionalTest :
     override val addFileNames: Set<String>
         get() = ConfigFileFunctionalTestSupport.addFileNames()
 
+    private var enableTransparency: Boolean = false
+
     override fun configureWithDefaults() {
+        enableTransparency = false
         ConfigFileFunctionalTestSupport.setupConfigFileBuild(projectDir)
         ConfigFileFunctionalTestSupport.writeTaggerFile(projectDir, listOf("\"releaseBranch\": \"master\""))
     }
@@ -28,7 +31,9 @@ class CalculateVersionConfigFileFunctionalTest :
         noneRegex: String?,
         forceSnapshot: Boolean?,
         warningsAsErrors: Boolean?,
+        transparency: Boolean?,
     ) {
+        enableTransparency = transparency == true
         ConfigFileFunctionalTestSupport.setupConfigFileBuild(projectDir)
         ConfigFileFunctionalTestSupport.writeTaggerFile(
             projectDir,
@@ -48,7 +53,8 @@ class CalculateVersionConfigFileFunctionalTest :
     }
 
     override fun execute(): TestResult {
-        val output = ConfigFileFunctionalTestSupport.gradleOutput(projectDir, "calculateVersion", "-q")
+        val args = if (enableTransparency) arrayOf("calculateVersion") else arrayOf("calculateVersion", "-q")
+        val output = ConfigFileFunctionalTestSupport.gradleOutput(projectDir, *args)
         return output.fold(
             onSuccess = ConfigFileFunctionalTestSupport::parseCalculateVersion,
             onFailure = { TestResult.Failure(it.message!!) },

@@ -17,34 +17,6 @@ import kotlin.test.fail
 
 class CalculateVersionCommandTest : CalculateVersionTestSpec {
     @Test
-    fun `show-commands flag prints git commands to stderr`() = setup(object {
-        val command = cli()
-        val commits = listOf("init", "[patch] test")
-        val initialTag = "1.0.0"
-    }) {
-        initializeGitRepo(commits = commits, initialTag = initialTag)
-    } exercise {
-        command.test("--show-commands -q calculate-version --release-branch=master $projectDir")
-    } verify { result ->
-        result.stderr.contains("git").assertIsEqualTo(true, "stderr should contain git commands")
-        result.statusCode.assertIsEqualTo(0)
-    }
-
-    @Test
-    fun `without show-commands flag git commands are not printed`() = setup(object {
-        val command = cli()
-        val commits = listOf("init", "[patch] test")
-        val initialTag = "1.0.0"
-    }) {
-        initializeGitRepo(commits = commits, initialTag = initialTag)
-    } exercise {
-        command.test("-q calculate-version --release-branch=master $projectDir")
-    } verify { result ->
-        result.stderr.contains("git").assertIsEqualTo(false, "stderr should not contain git commands")
-        result.statusCode.assertIsEqualTo(0)
-    }
-
-    @Test
     fun helpTextDocumentsEverySnapshotReasonEnum() = setup(object {
         val command = cli()
     }) exercise {
@@ -96,8 +68,10 @@ class CalculateVersionCommandTest : CalculateVersionTestSpec {
         noneRegex: String?,
         forceSnapshot: Boolean?,
         warningsAsErrors: Boolean?,
+        transparency: Boolean?,
     ) {
-        baseArguments = listOf("-q", "calculate-version") +
+        val baseFlags = if (transparency == true) listOf("--show-commands", "-q") else listOf("-q")
+        baseArguments = baseFlags + listOf("calculate-version") +
             listOfNotNull(
                 implicitPatch?.let { "--implicit-patch=$it" },
                 allowDetachedHead?.let { "--allow-detached-head=$it" },

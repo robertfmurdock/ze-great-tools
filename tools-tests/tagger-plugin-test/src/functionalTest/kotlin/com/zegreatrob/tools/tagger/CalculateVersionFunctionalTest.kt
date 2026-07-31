@@ -12,12 +12,15 @@ class CalculateVersionFunctionalTest : CalculateVersionTestSpec {
     override val addFileNames: Set<String>
         get() = setOf(buildFile, settingsFile, ignoreFile).map { it.split("/").last() }.toSet()
 
+    private var enableTransparency: Boolean = false
+
     private fun setup() {
         File(settingsFile).writeText("""includeBuild("${System.getProperty("user.dir")}/../../tools")""")
         File(ignoreFile).writeText(".gradle")
     }
 
     override fun configureWithDefaults() {
+        enableTransparency = false
         setup()
         File(buildFile).writeText(
             """
@@ -41,7 +44,9 @@ class CalculateVersionFunctionalTest : CalculateVersionTestSpec {
         noneRegex: String?,
         forceSnapshot: Boolean?,
         warningsAsErrors: Boolean?,
+        transparency: Boolean?,
     ) {
+        enableTransparency = transparency == true
         setup()
         File(buildFile).writeText(
             """
@@ -78,7 +83,8 @@ class CalculateVersionFunctionalTest : CalculateVersionTestSpec {
     override fun execute(): TestResult {
         val runner = GradleRunner.create()
         runner.forwardOutput()
-        runner.withArguments("calculateVersion", "-q")
+        val args = if (enableTransparency) listOf("calculateVersion") else listOf("calculateVersion", "-q")
+        runner.withArguments(args)
         runner.withProjectDir(File(projectDir))
         return try {
             val result = runner.build()

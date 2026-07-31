@@ -18,9 +18,10 @@ class CalculateVersionCommandConfigFileTest :
 
     private val taggerFile get() = "$projectDir/.tagger"
     override val addFileNames: Set<String> get() = setOf(taggerFile.split("/").last())
-    private val baseArguments: List<String> = listOf("-q", "calculate-version")
+    private var baseArguments: List<String> = listOf("-q", "calculate-version")
 
     override fun configureWithDefaults() {
+        baseArguments = listOf("-q", "calculate-version")
         val config = TaggerConfig(releaseBranch = "master")
         Json.encodeToString(config)
             .writeToFile(taggerFile)
@@ -40,7 +41,10 @@ class CalculateVersionCommandConfigFileTest :
         noneRegex: String?,
         forceSnapshot: Boolean?,
         warningsAsErrors: Boolean?,
+        transparency: Boolean?,
     ) {
+        val baseFlags = if (transparency == true) listOf("--show-commands", "-q") else listOf("-q")
+        baseArguments = baseFlags + listOf("calculate-version")
         val config = TaggerConfig(
             releaseBranch = "master",
             implicitPatch = implicitPatch,

@@ -39,6 +39,7 @@ interface CalculateVersionTestSpec {
         noneRegex: String? = null,
         forceSnapshot: Boolean? = null,
         warningsAsErrors: Boolean? = null,
+        transparency: Boolean? = null,
     )
 
     fun initializeGitRepo(
@@ -622,6 +623,42 @@ interface CalculateVersionTestSpec {
                 .assertIsEqualTo(true, "Expected second tag in error output. Output:\n$reason")
             reason.contains("they are lightweight")
                 .assertIsEqualTo(true, "Expected plural lightweight guidance. Output:\n$reason")
+        }
+    }
+
+    @Test
+    fun withTransparencyEnabledLogsGitCommandsToDetails() = setup(object {
+        val commits = listOf("init", "[patch] commit 1")
+        val initialTag = "1.2.3"
+    }) {
+        configureWithOverrides(transparency = true)
+        initializeGitRepo(commits = commits, initialTag = initialTag)
+    } exercise {
+        execute()
+    } verify { result ->
+        result.assertIsOfType<TestResult.Success>().run {
+            details.contains("git").assertIsEqualTo(
+                true,
+                "Expected git commands in details when transparency enabled. Details:\n$details",
+            )
+        }
+    }
+
+    @Test
+    fun withTransparencyDisabledDoesNotLogGitCommandsToDetails() = setup(object {
+        val commits = listOf("init", "[patch] commit 1")
+        val initialTag = "1.2.3"
+    }) {
+        configureWithOverrides(transparency = false)
+        initializeGitRepo(commits = commits, initialTag = initialTag)
+    } exercise {
+        execute()
+    } verify { result ->
+        result.assertIsOfType<TestResult.Success>().run {
+            details.contains("git").assertIsEqualTo(
+                false,
+                "Expected no git commands in details when transparency disabled. Details:\n$details",
+            )
         }
     }
 }
