@@ -1,55 +1,56 @@
 # Add Command Transparency Tests to Test Specs
 
 ## Goal
-Add command transparency verification to test specs to ensure git commands are logged correctly across all implementations that support transparency.
+Add command transparency verification to test specs to ensure git commands are logged when transparency is enabled across CLI implementations.
 
 ## Constraints
-- Behavior invariant: implementations that support command transparency must log git commands before execution
-- Different transparency mechanisms: CLI flags, automatic Gradle logging, or N/A for programmatic APIs
-- Output destinations vary: stderr (CLI), Gradle logger (plugin tasks), or none (extension)
-- Default implementations: specs provide no-op defaults, supporting implementations override
-- Must verify both transparency-enabled and default (no logging) cases
+- Test specs already capture output via TestResult (stdout/stderr/output) - use existing abstraction
+- CLI implementations support transparency via --show-commands flag
+- Gradle plugin tests are separate functional tests (not spec-based)
+- No new test API concepts needed - just check existing output for git commands
 - Semver intent: `[none]` - test coverage improvement, no behavior changes
-- Follow TestMints patterns and optional feature testing from TESTING.md
+- Follow TestMints patterns from TESTING.md
 
 ## Checklist
 - [ ] Review this work card for compliance with template and update to conform
 - [ ] If this card plans subagent delegation, ask user to explicitly authorize subagents for this card and record the response in Implementation Notes
-- [ ] Add optional transparency hooks to CalculateVersionTestSpec
-  - `fun supportsCommandTransparency(): Boolean = false` - implementations override to true if they support it
-  - `fun captureCommandLogs(block: () -> TestResult): List<String>` - default returns emptyList, implementations capture logs
+- [ ] Add transparency tests to CalculateVersionTestSpec
+  - Test: execute with transparency enabled, verify stderr contains "git"
+  - Test: execute with transparency disabled, verify stderr does not contain "git"
+  - Use existing TestResult abstraction - no new API
   - Agent cycle: test → implement → refactor-light → verify pushable
   - Update plan if guidelines revealed new constraints
-- [ ] Add spec-level command transparency tests to CalculateVersionTestSpec
-  - Test: when supportsCommandTransparency, verify git commands logged during execution
-  - Test: when supportsCommandTransparency, verify default execution produces no command logs
-  - Tests skip if !supportsCommandTransparency (no-op for implementations without transparency)
-  - Agent cycle: test → implement → refactor-light → verify pushable
-  - Update plan if guidelines revealed new constraints
-- [ ] Implement transparency hooks in tagger-cli test adapter
-  - Override supportsCommandTransparency() = true
-  - Implement captureCommandLogs: run with/without --show-commands, extract stderr
+- [ ] Update tagger-cli test implementation for transparency tests
+  - configureWithDefaults/configureWithOverrides: add transparency parameter
+  - Pass transparency setting through to CLI execution
   - Remove existing --show-commands tests from CalculateVersionCommandTest
   - Verify spec tests now provide coverage
   - Agent cycle: test → implement → refactor-light → verify pushable
   - Update plan if guidelines revealed new constraints
-- [ ] Add Gradle plugin transparency tests (new coverage)
-  - Create functional test for calculateVersion task with --info flag
-  - Verify git commands appear in Gradle output via logger.lifecycle
-  - Verify --quiet suppresses command logging
+- [ ] Add transparency tests to CurrentContributionTestSpec
+  - Test: execute with transparency enabled, verify stderr contains "git"
+  - Test: execute with transparency disabled, verify stderr does not contain "git"
+  - Use existing TestResult abstraction
   - Agent cycle: test → implement → refactor-light → verify pushable
   - Update plan if guidelines revealed new constraints
-- [ ] Add optional transparency hooks to digger test specs
-  - CurrentContributionTestSpec: add supportsCommandTransparency and captureCommandLogs
-  - AllContributionTestSpec: add supportsCommandTransparency and captureCommandLogs
-  - Add spec-level transparency tests (skip if not supported)
-  - Agent cycle: test → implement → refactor-light → verify pushable
-  - Update plan if guidelines revealed new constraints
-- [ ] Implement transparency hooks in digger-cli test adapters
-  - Override supportsCommandTransparency() = true in both specs
-  - Implement captureCommandLogs: run with/without --show-commands, extract stderr
+- [ ] Update digger-cli test implementation for transparency tests
+  - setupWithDefaults/setupWithOverrides: add transparency parameter
+  - Pass transparency setting through to CLI execution
   - Remove existing --show-commands tests from CurrentContributionDataTest
   - Verify spec tests now provide coverage
+  - Agent cycle: test → implement → refactor-light → verify pushable
+  - Update plan if guidelines revealed new constraints
+- [ ] Add transparency tests to AllContributionTestSpec
+  - Test: execute with transparency enabled, verify stderr contains "git"
+  - Test: execute with transparency disabled, verify stderr does not contain "git"
+  - Use existing TestResult abstraction
+  - Agent cycle: test → implement → refactor-light → verify pushable
+  - Update plan if guidelines revealed new constraints
+- [ ] Add Gradle plugin functional tests for command transparency
+  - Create functional test for calculateVersion task
+  - Test: run with default logging, verify git commands in output (logger.lifecycle)
+  - Test: run with --quiet, verify git commands suppressed
+  - Separate from spec tests - Gradle plugin uses functional test pattern
   - Agent cycle: test → implement → refactor-light → verify pushable
   - Update plan if guidelines revealed new constraints
 - [ ] Final refactor pass via subagent (MANDATORY - see REFACTOR_AGENT.md)
@@ -65,29 +66,25 @@ Add command transparency verification to test specs to ensure git commands are l
 ## Implementation Notes
 _(newest first)_
 
-### 2026-07-31: Revised approach - optional capability testing
-Initial approach tried to force API into specs for CLI-specific concerns. Revised after
-feedback: command transparency is a behavior that SHOULD work across implementations,
-not just a CLI interface detail.
+### 2026-07-31: Final approach - use existing test infrastructure
+After two revisions, arrived at the correct abstraction: specs already capture output
+via TestResult. No new API needed.
 
-**Behavior invariant**: Implementations that support command transparency must log git
-commands before execution.
+**Key insight**: Test specs don't need to know about "command logs" as a special concept.
+They just check the output that implementations already provide (stdout/stderr/output).
 
-**What varies**:
-- HOW transparency is enabled: CLI flag vs automatic (Gradle tasks) vs N/A (extension)
-- WHERE output goes: stderr vs Gradle logger vs none
+**Solution**: Add tests that check output contains "git" when transparency enabled
+- Specs: write tests that check `result.stderr.contains("git")`
+- CLI implementations: extend configure methods to accept transparency flag
+- Gradle plugin: separate functional tests (different test pattern, not spec-based)
 
-**Solution**: Optional capability pattern with default no-ops
-- Specs provide default implementations returning false/empty
-- Supporting implementations override to true and provide capture logic
-- Tests skip when transparency not supported (no test pollution for extensions)
-- Gradle plugin tasks get NEW functional test coverage (currently untested!)
+**What was wrong with previous approaches**:
+1. First attempt: Created CLI-specific API in specs (`executeWithCommandTransparency`)
+2. Second attempt: Added optional capability pattern (`supportsCommandTransparency`, `captureCommandLogs`)
+3. Both polluted specs with transparency-specific concepts
 
-**Benefits**:
-- No API pollution: defaults are no-ops, non-supporting implementations don't see the methods
-- Tests feature parity: CLI and Gradle tasks both verify logging works
-- Discovers missing coverage: Gradle plugin logging currently has no tests
-- Follows existing optional pattern: similar to deprecation warnings, form-factor abstraction
+**Correct approach**: Transparency is just another configuration option that affects output.
+Use existing configure methods, check existing output fields. No new abstractions.
 
 Key files:
 - `/tools-tests/tagger-test/src/commonMain/kotlin/com/zegreatrob/tools/tagger/CalculateVersionTestSpec.kt`
