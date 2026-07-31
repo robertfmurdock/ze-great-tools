@@ -266,4 +266,30 @@ class TaggerPluginTest {
         mustRunAfterDeps.contains(publishTask)
             .assertIsEqualTo(false, "tag must not run after publish to avoid circular dependency (release depends on tag, publish runs after release)")
     }
+
+    @Test
+    fun `extension showCommands defaults to false`() = setup(object {
+        val project = ProjectBuilder.builder().build()
+    }) exercise {
+        project.plugins.apply("com.zegreatrob.tools.tagger")
+        project.extensions.getByType(TaggerExtension::class.java)
+    } verify { extension ->
+        extension.showCommands
+            .get()
+            .assertIsEqualTo(false, "Expected showCommands default value to be false")
+    }
+
+    @Test
+    fun `extension showCommands can be set to true`() = setup(object {
+        val project = ProjectBuilder.builder().build()
+    }) exercise {
+        project.plugins.apply("com.zegreatrob.tools.tagger")
+        val extension = project.extensions.getByType(TaggerExtension::class.java)
+        extension.showCommands.set(true)
+        extension
+    } verify { extension ->
+        extension.showCommands
+            .get()
+            .assertIsEqualTo(true, "Expected showCommands to be settable")
+    }
 }

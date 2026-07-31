@@ -48,6 +48,7 @@ class TaggerPlugin : Plugin<Project> {
             task.description = "Read-only: report the most recent tagged version"
             task.workingDirectory.set(tagger.workingDirectory)
             task.gitDirectory.set(tagger.workingDirectory.dir(".git"))
+            task.showCommands.set(tagger.showCommands)
         }
     }
 
@@ -68,6 +69,7 @@ class TaggerPlugin : Plugin<Project> {
             task.majorRegex.set(tagger.majorRegex)
             task.exportToGithubEnv.set(exportToGithub != null)
             task.warningsAsErrors.set(tagger.warningsAsErrors)
+            task.showCommands.set(tagger.showCommands)
         }
     }
 
@@ -81,6 +83,7 @@ class TaggerPlugin : Plugin<Project> {
         task.userEmail.set(tagger.userEmailProperty)
         task.warningsAsErrors.set(tagger.warningsAsErrors)
         tagger.allowDetachedHeadProperty.orNull?.let { task.allowDetachedHead.set(it) }
+        task.showCommands.set(tagger.showCommands)
         task.version = "${project.version}"
         task.mustRunAfter(project.tasks.named("check"))
         task.mustRunAfter(project.provider { project.getTasksByName("check", true).toList() })
@@ -92,6 +95,7 @@ class TaggerPlugin : Plugin<Project> {
             task.description = "Read-only: report semver signals in recent commit messages"
             task.workingDirectory.set(tagger.workingDirectory)
             task.gitDirectory.set(tagger.workingDirectory.dir(".git"))
+            task.showCommands.set(tagger.showCommands)
         }
     }
 
@@ -135,6 +139,7 @@ class TaggerPlugin : Plugin<Project> {
         task.workingDirectory.set(tagger.workingDirectory)
         task.gitDirectory.set(tagger.workingDirectory.dir(".git"))
         task.releaseBranch.set(tagger.releaseBranchProperty)
+        task.showCommands.set(tagger.showCommands)
         task.version = "${project.version}"
         task.enabled = !project.version.toString().contains("SNAPSHOT")
         task.dependsOn(project.tasks.named("assemble"))

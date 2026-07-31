@@ -5,7 +5,9 @@ import com.zegreatrob.tools.tagger.core.TaggerCore
 import com.zegreatrob.tools.tagger.core.tagReport
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.provider.Property
 import org.gradle.api.tasks.CacheableTask
+import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.PathSensitive
@@ -21,9 +23,16 @@ abstract class CommitReport : DefaultTask() {
     @get:PathSensitive(PathSensitivity.RELATIVE)
     abstract val gitDirectory: DirectoryProperty
 
+    @get:Input
+    abstract val showCommands: Property<Boolean>
+
     @TaskAction
     fun execute() {
-        val commandLogger: (String) -> Unit = { logger.lifecycle(it) }
+        val commandLogger = if (showCommands.get()) {
+            { command: String -> logger.lifecycle(command) }
+        } else {
+            null
+        }
         val core = TaggerCore(GitAdapter(workingDirectory.get().asFile.absolutePath, commandLogger = commandLogger))
         println("COMMIT REPORT-------")
         println("--------------------${core.tagReport()}")

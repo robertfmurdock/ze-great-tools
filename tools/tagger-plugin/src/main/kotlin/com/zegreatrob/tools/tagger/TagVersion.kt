@@ -45,6 +45,9 @@ abstract class TagVersion : DefaultTask() {
     @get:Optional
     abstract val allowDetachedHead: Property<Boolean>
 
+    @get:Input
+    abstract val showCommands: Property<Boolean>
+
     @Input
     lateinit var version: String
 
@@ -54,7 +57,11 @@ abstract class TagVersion : DefaultTask() {
 
     @TaskAction
     fun execute() {
-        val commandLogger: (String) -> Unit = { logger.lifecycle(it) }
+        val commandLogger = if (showCommands.get()) {
+            { command: String -> logger.lifecycle(command) }
+        } else {
+            null
+        }
         val core = TaggerCore(GitAdapter(workingDirectory.get().asFile.absolutePath, commandLogger = commandLogger))
         when (
             val result = core.tag(

@@ -64,6 +64,9 @@ abstract class CalculateVersion : DefaultTask() {
     @get:Input
     abstract val warningsAsErrors: Property<Boolean>
 
+    @get:Input
+    abstract val showCommands: Property<Boolean>
+
     @TaskAction
     fun execute() = when (val result = calculateVersion()) {
         is VersionResult.Success -> result.outputSuccess()
@@ -73,7 +76,11 @@ abstract class CalculateVersion : DefaultTask() {
     private fun resolveAllowDetachedHead(): Boolean = allowDetachedHead.orNull ?: false
 
     private fun calculateVersion(): VersionResult {
-        val commandLogger: (String) -> Unit = { logger.lifecycle(it) }
+        val commandLogger = if (showCommands.get()) {
+            { command: String -> logger.lifecycle(command) }
+        } else {
+            null
+        }
         val core = TaggerCore(GitAdapter(workingDirectory.get().asFile.absolutePath, commandLogger = commandLogger))
         return core.calculateNextVersion(
             implicitPatch = implicitPatch.get(),
