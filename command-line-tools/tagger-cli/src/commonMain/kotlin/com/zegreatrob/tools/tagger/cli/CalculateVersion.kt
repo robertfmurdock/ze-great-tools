@@ -68,7 +68,13 @@ class CalculateVersion : CliktCommand() {
     )
 
     override fun run() {
-        val result = TaggerCore(GitAdapter(workingDirectory))
+        val taggerContext = currentContext.findObject<TaggerContext>()
+        val commandLogger = if (taggerContext?.showCommands == true) {
+            { command: String -> echo(command, err = true) }
+        } else {
+            null
+        }
+        val result = TaggerCore(GitAdapter(workingDirectory, commandLogger = commandLogger))
             .calculateNextVersion(
                 implicitPatch = implicitPatch,
                 allowDetachedHead = allowDetachedHead,

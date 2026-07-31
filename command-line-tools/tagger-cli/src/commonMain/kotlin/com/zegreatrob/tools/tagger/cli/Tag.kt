@@ -41,7 +41,13 @@ class Tag : CliktCommand() {
         .enum<OutputFormat> { it.name.lowercase() }
         .default(OutputFormat.TEXT, defaultForHelp = "text")
     override fun run() {
-        val gitAdapter = GitAdapter(workingDirectory)
+        val taggerContext = currentContext.findObject<TaggerContext>()
+        val commandLogger = if (taggerContext?.showCommands == true) {
+            { command: String -> echo(command, err = true) }
+        } else {
+            null
+        }
+        val gitAdapter = GitAdapter(workingDirectory, commandLogger = commandLogger)
         if (dryRun) {
             val headCommit = gitAdapter.headCommitId()
             val headBranch = gitAdapter.status().head

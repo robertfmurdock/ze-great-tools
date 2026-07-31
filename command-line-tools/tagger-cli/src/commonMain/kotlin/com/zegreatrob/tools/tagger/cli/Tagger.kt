@@ -9,6 +9,8 @@ import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.versionOption
 import com.zegreatrob.tools.cli.loadHelpResource
 
+data class TaggerContext(val showCommands: Boolean)
+
 class Tagger : CliktCommand() {
 
     init {
@@ -27,7 +29,13 @@ class Tagger : CliktCommand() {
             "(safe for: VERSION=$$(tagger -q ...))",
     ).flag(default = false)
 
+    private val showCommands by option(
+        "--show-commands",
+        help = "Print git commands to stderr before executing them for transparency and audit purposes.",
+    ).flag(default = false)
+
     override fun run() {
+        currentContext.findOrSetObject { TaggerContext(showCommands = showCommands) }
         if (!quiet && currentContext.invokedSubcommand == null) {
             echo("Welcome to Tagger CLI.")
         }

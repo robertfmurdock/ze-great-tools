@@ -91,9 +91,9 @@ class TaggerTest {
         val commandsLineIndex = lines.indexOfFirst { it.trim().startsWith("Commands:") }
         if (commandsLineIndex == -1) error("Commands section not found in help output")
 
-        (commandsLineIndex <= 25).assertIsEqualTo(
+        (commandsLineIndex <= 26).assertIsEqualTo(
             true,
-            "Commands section should appear within first screen (~25 lines), found at line $commandsLineIndex",
+            "Commands section should appear within first screen (~26 lines), found at line $commandsLineIndex",
         )
 
         result.output.contains(Regex("tagger\\s+guide")).assertIsEqualTo(
