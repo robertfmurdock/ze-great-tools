@@ -17,6 +17,11 @@ abstract class HeadTask : DefaultTask() {
 
     @TaskAction
     fun execute() {
+        diggerExtension.logger = if (diggerExtension.showCommands.get()) {
+            { command: String -> logger.lifecycle(command) }
+        } else {
+            null
+        }
         val output = diggerExtension.headId()
         outputFile.get().asFile.writeText(output)
     }

@@ -23,6 +23,11 @@ abstract class AllContributionData : DefaultTask() {
 
     @TaskAction
     fun execute() {
+        diggerExtension.logger = if (diggerExtension.showCommands.get()) {
+            { command: String -> logger.lifecycle(command) }
+        } else {
+            null
+        }
         val output = diggerExtension.allContributionData().toJsonString()
 
         val githubEnvFile = System.getenv("GITHUB_ENV")

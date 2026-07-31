@@ -36,7 +36,16 @@ open class DiggerExtension(objectFactory: ObjectFactory) {
     @Input
     var tagRegex: Property<Regex> = objectFactory.property(Regex::class.java).convention(DiggerCore.Defaults.tagRegex)
 
-    private val gitWrapper get() = GitAdapter(workingDirectory.get().absolutePath)
+    @Input
+    val showCommands: Property<Boolean> = objectFactory.property(Boolean::class.java).convention(false)
+
+    var logger: ((String) -> Unit)? = null
+
+    private val gitWrapper
+        get() = GitAdapter(
+            workingDirectory = workingDirectory.get().absolutePath,
+            commandLogger = if (showCommands.get()) logger else null,
+        )
     private val core
         get() = DiggerCore(
             label = label.get().ifBlank { null },

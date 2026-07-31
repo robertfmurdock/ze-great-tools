@@ -38,4 +38,30 @@ class DiggerPluginTest {
         content.contains("Use Digger when:")
             .assertIsEqualTo(true, "Expected guide content to contain CLI guide text")
     }
+
+    @Test
+    fun `extension showCommands defaults to false`() = setup(object {
+        val project = ProjectBuilder.builder().build()
+    }) exercise {
+        project.plugins.apply("com.zegreatrob.tools.digger")
+        project.extensions.getByType(DiggerExtension::class.java)
+    } verify { extension ->
+        extension.showCommands
+            .get()
+            .assertIsEqualTo(false, "Expected showCommands default value to be false")
+    }
+
+    @Test
+    fun `extension showCommands can be set to true`() = setup(object {
+        val project = ProjectBuilder.builder().build()
+    }) exercise {
+        project.plugins.apply("com.zegreatrob.tools.digger")
+        val extension = project.extensions.getByType(DiggerExtension::class.java)
+        extension.showCommands.set(true)
+        extension
+    } verify { extension ->
+        extension.showCommands
+            .get()
+            .assertIsEqualTo(true, "Expected showCommands to be settable")
+    }
 }
