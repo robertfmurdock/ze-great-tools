@@ -25,6 +25,7 @@ class AllContributionFunctionalTest : AllContributionTestSpec {
     }
 
     override fun setupWithDefaults() {
+        enableTransparency = false
         setup()
         File(buildFile).writeText(
             """
@@ -44,7 +45,9 @@ class AllContributionFunctionalTest : AllContributionTestSpec {
         storyRegex: String?,
         easeRegex: String?,
         tagRegex: String?,
+        transparency: Boolean?,
     ) {
+        enableTransparency = transparency == true
         setup()
         File(buildFile).writeText(
             """
@@ -65,10 +68,13 @@ class AllContributionFunctionalTest : AllContributionTestSpec {
         )
     }
 
+    private var enableTransparency: Boolean = false
+
     override fun runAllContributionData(): AllContributionTestSpec.AllContributionDataResult {
+        val args = if (enableTransparency) listOf("allContributionData") else listOf("allContributionData", "-q")
         val output = GradleRunner.create()
             .forwardOutput()
-            .withArguments("allContributionData", "-q")
+            .withArguments(args)
             .withProjectDir(File(projectDir))
             .build()
             .output

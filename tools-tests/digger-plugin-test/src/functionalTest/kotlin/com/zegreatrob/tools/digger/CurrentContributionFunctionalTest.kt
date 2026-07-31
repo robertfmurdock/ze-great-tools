@@ -23,7 +23,10 @@ class CurrentContributionFunctionalTest : CurrentContributionTestSpec {
         File(ignoreFile).writeText(".gradle")
     }
 
+    private var enableTransparency: Boolean = false
+
     override fun setupWithDefaults() {
+        enableTransparency = false
         setup()
         File(buildFile).writeText(
             """
@@ -43,7 +46,9 @@ class CurrentContributionFunctionalTest : CurrentContributionTestSpec {
         storyRegex: String?,
         easeRegex: String?,
         tagRegex: String?,
+        transparency: Boolean?,
     ) {
+        enableTransparency = transparency == true
         setup()
         File(buildFile).writeText(
             """
@@ -66,9 +71,10 @@ class CurrentContributionFunctionalTest : CurrentContributionTestSpec {
 
     override fun runCurrentContributionData(): CurrentContributionTestSpec.CurrentContributionDataResult {
         val currentOutput by lazy { "$projectDir/build/digger/current.json" }
+        val args = if (enableTransparency) listOf("currentContributionData") else listOf("currentContributionData", "-q")
         val output = GradleRunner.create()
             .forwardOutput()
-            .withArguments("currentContributionData", "-q")
+            .withArguments(args)
             .withProjectDir(File(projectDir))
             .build()
             .output
