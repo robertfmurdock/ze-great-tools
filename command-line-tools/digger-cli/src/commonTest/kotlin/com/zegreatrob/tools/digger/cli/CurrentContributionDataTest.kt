@@ -19,6 +19,30 @@ class CurrentContributionDataTest : CurrentContributionTestSpec {
     override val addFileNames: Set<String> = emptySet()
     private lateinit var arguments: List<String>
 
+    @Test
+    fun `show-commands flag prints git commands to stderr`() = setup(object {
+        val commits = listOf("[major] initial commit", "[minor] add feature")
+    }) {
+        initializeGitRepo(commits = commits)
+    } exercise {
+        cli().test("--show-commands current-contribution-data --format=json $projectDir")
+    } verify { result ->
+        result.stderr.contains("git").assertIsEqualTo(true, "stderr should contain git commands. Got: ${result.stderr}")
+        result.statusCode.assertIsEqualTo(0)
+    }
+
+    @Test
+    fun `without show-commands flag git commands are not printed`() = setup(object {
+        val commits = listOf("[major] initial commit", "[minor] add feature")
+    }) {
+        initializeGitRepo(commits = commits)
+    } exercise {
+        cli().test("current-contribution-data --format=json $projectDir")
+    } verify { result ->
+        result.stderr.contains("git").assertIsEqualTo(false, "stderr should not contain git commands. Got: ${result.stderr}")
+        result.statusCode.assertIsEqualTo(0)
+    }
+
     override fun setupWithDefaults() {
         arguments = listOf(
             "--output-file=$outputFile",

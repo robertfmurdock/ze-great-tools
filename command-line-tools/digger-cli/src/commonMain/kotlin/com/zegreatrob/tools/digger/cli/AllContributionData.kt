@@ -29,11 +29,17 @@ class AllContributionData : CliktCommand() {
         .enum<OutputFormat> { it.name.lowercase() }
         .default(OutputFormat.TEXT)
 
-    private val core
-        get() = DiggerCore(
+    private fun createCore(): DiggerCore {
+        val diggerContext = currentContext.findObject<DiggerContext>()
+        val commandLogger = if (diggerContext?.showCommands == true) {
+            { command: String -> echo(command, err = true) }
+        } else {
+            null
+        }
+        return DiggerCore(
             label = label.ifBlank { dir.split("/").lastOrNull() },
             tagRegex = tagRegex?.let(::Regex) ?: DiggerCore.Defaults.tagRegex,
-            gitWrapper = GitAdapter(dir),
+            gitWrapper = GitAdapter(dir, commandLogger = commandLogger),
             messageDigger = MessageDigger(
                 majorRegex = majorRegex?.let(::Regex) ?: MessageDigger.Defaults.majorRegex,
                 minorRegex = minorRegex?.let(::Regex) ?: MessageDigger.Defaults.minorRegex,
@@ -43,6 +49,7 @@ class AllContributionData : CliktCommand() {
                 easeRegex = easeRegex?.let(::Regex) ?: MessageDigger.Defaults.easeRegex,
             ),
         )
+    }
 
     override fun help(context: Context) = """
         ${super.help(context)}
@@ -51,7 +58,7 @@ class AllContributionData : CliktCommand() {
     """.trimIndent()
 
     override fun run() {
-        val jsonString = core.allContributionData().toJsonString()
+        val jsonString = createCore().allContributionData().toJsonString()
         when (format) {
             OutputFormat.JSON -> {
                 val dataElement = Json.parseToJsonElement(jsonString)
