@@ -46,9 +46,9 @@ class CurrentContributionFunctionalTest : CurrentContributionTestSpec {
         storyRegex: String?,
         easeRegex: String?,
         tagRegex: String?,
-        transparency: Boolean?,
+        showCommands: Boolean?,
     ) {
-        enableTransparency = transparency == true
+        enableTransparency = showCommands == true
         setup()
         File(buildFile).writeText(
             """
@@ -64,6 +64,7 @@ class CurrentContributionFunctionalTest : CurrentContributionTestSpec {
                 ${if (storyRegex != null) "storyIdRegex.set(Regex(\"${storyRegex.replace("\\", "\\\\")}\"))" else ""}
                 ${if (easeRegex != null) """easeRegex.set(Regex("${easeRegex.replace("\\", "\\\\")}"))""" else ""}
                 ${if (tagRegex != null) """tagRegex.set(Regex("${tagRegex.replace("\\", "\\\\")}"))""" else ""}
+                ${if (showCommands != null) "showCommands.set($showCommands)" else ""}
             }
             """.trimIndent(),
         )

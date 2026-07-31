@@ -35,9 +35,9 @@ class CurrentContributionDataTest : CurrentContributionTestSpec {
         storyRegex: String?,
         easeRegex: String?,
         tagRegex: String?,
-        transparency: Boolean?,
+        showCommands: Boolean?,
     ) {
-        val baseFlags = if (transparency == true) listOf("--show-commands") else emptyList()
+        val baseFlags = if (showCommands == true) listOf("--show-commands") else emptyList()
         arguments = baseFlags + listOf(
             "--output-file=$outputFile",
             projectDir,

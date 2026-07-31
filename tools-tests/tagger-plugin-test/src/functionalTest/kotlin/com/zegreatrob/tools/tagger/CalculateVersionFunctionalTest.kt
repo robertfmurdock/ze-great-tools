@@ -44,9 +44,9 @@ class CalculateVersionFunctionalTest : CalculateVersionTestSpec {
         noneRegex: String?,
         forceSnapshot: Boolean?,
         warningsAsErrors: Boolean?,
-        transparency: Boolean?,
+        showCommands: Boolean?,
     ) {
-        enableTransparency = transparency == true
+        enableTransparency = showCommands == true
         setup()
         File(buildFile).writeText(
             """
@@ -75,6 +75,7 @@ class CalculateVersionFunctionalTest : CalculateVersionTestSpec {
             }
                 ${if (forceSnapshot != null) "forceSnapshot.set($forceSnapshot)" else ""}
                 ${if (warningsAsErrors != null) "warningsAsErrors.set($warningsAsErrors)" else ""}
+                ${if (showCommands != null) "showCommands.set($showCommands)" else ""}
             }
             """.trimIndent(),
         )

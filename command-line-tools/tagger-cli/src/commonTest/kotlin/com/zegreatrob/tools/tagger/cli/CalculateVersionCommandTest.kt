@@ -68,9 +68,9 @@ class CalculateVersionCommandTest : CalculateVersionTestSpec {
         noneRegex: String?,
         forceSnapshot: Boolean?,
         warningsAsErrors: Boolean?,
-        transparency: Boolean?,
+        showCommands: Boolean?,
     ) {
-        val baseFlags = if (transparency == true) listOf("--show-commands", "-q") else listOf("-q")
+        val baseFlags = if (showCommands == true) listOf("--show-commands", "-q") else listOf("-q")
         baseArguments = baseFlags + listOf("calculate-version") +
             listOfNotNull(
                 implicitPatch?.let { "--implicit-patch=$it" },

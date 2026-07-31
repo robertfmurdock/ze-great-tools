@@ -31,9 +31,9 @@ class CalculateVersionConfigFileFunctionalTest :
         noneRegex: String?,
         forceSnapshot: Boolean?,
         warningsAsErrors: Boolean?,
-        transparency: Boolean?,
+        showCommands: Boolean?,
     ) {
-        enableTransparency = transparency == true
+        enableTransparency = showCommands == true
         ConfigFileFunctionalTestSupport.setupConfigFileBuild(projectDir)
         ConfigFileFunctionalTestSupport.writeTaggerFile(
             projectDir,
