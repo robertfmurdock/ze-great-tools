@@ -1,6 +1,6 @@
 [versions]
 com-github-ajalt-clikt = "5.1.0"
-com-zegreatrob-testmints = "12.6.37"
+com-zegreatrob-testmints = "12.6.38"
 kotlin = "2.4.10"
 
 [libraries]
