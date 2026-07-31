@@ -42,7 +42,6 @@ class GitAdapterTest {
     }) exercise {
         wrapper.headCommitId()
     } verify {
-        // Should complete without error when callback is null
     }
 
     @Test
