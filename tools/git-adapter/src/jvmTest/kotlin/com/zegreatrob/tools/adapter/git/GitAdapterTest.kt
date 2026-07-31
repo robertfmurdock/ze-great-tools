@@ -15,6 +15,37 @@ class GitAdapterTest {
     lateinit var projectDir: File
 
     @Test
+    fun `commandLogger callback receives git command when provided`() = asyncSetup(object {
+        val loggedCommands = mutableListOf<String>()
+        val commandLogger: (String) -> Unit = { loggedCommands.add(it) }
+        val commitMessage = "initial commit"
+        val wrapper = initializeGitRepo(
+            directory = projectDir.absolutePath,
+            addFileNames = emptySet(),
+            commits = listOf(commitMessage),
+        ).let { GitAdapter(projectDir.absolutePath, commandLogger = commandLogger) }
+    }) exercise {
+        wrapper.headCommitId()
+    } verify {
+        loggedCommands.size.assertIsEqualTo(1)
+        loggedCommands.first().assertIsEqualTo("git --no-pager rev-parse HEAD")
+    }
+
+    @Test
+    fun `commandLogger callback is not invoked when null`() = asyncSetup(object {
+        val commitMessage = "initial commit"
+        val wrapper = initializeGitRepo(
+            directory = projectDir.absolutePath,
+            addFileNames = emptySet(),
+            commits = listOf(commitMessage),
+        ).let { GitAdapter(projectDir.absolutePath, commandLogger = null) }
+    }) exercise {
+        wrapper.headCommitId()
+    } verify {
+        // Should complete without error when callback is null
+    }
+
+    @Test
     fun `will include all tag segments from newest to oldest`() = asyncSetup(object {
         val wrapper = GitAdapter(projectDir.absolutePath)
         val initialTag = "v1.0"

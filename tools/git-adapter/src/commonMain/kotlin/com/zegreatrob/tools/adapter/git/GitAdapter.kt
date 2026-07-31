@@ -2,7 +2,11 @@ package com.zegreatrob.tools.adapter.git
 
 import kotlin.time.Instant
 
-class GitAdapter(private val workingDirectory: String, private val env: Map<String, String> = emptyMap()) {
+class GitAdapter(
+    private val workingDirectory: String,
+    private val env: Map<String, String> = emptyMap(),
+    private val commandLogger: ((String) -> Unit)? = null,
+) {
 
     fun headCommitId(): String = runProcess(
         listOf(
@@ -13,7 +17,11 @@ class GitAdapter(private val workingDirectory: String, private val env: Map<Stri
         ),
     ).trim()
 
-    private fun runProcess(args: List<String>, env: Map<String, String> = emptyMap()) = runProcess(args, workingDirectory, env.plus(this.env))
+    private fun runProcess(args: List<String>, env: Map<String, String> = emptyMap()): String {
+        val command = args.joinToString(" ")
+        commandLogger?.invoke(command)
+        return runProcess(args, workingDirectory, env.plus(this.env))
+    }
 
     fun newAnnotatedTag(name: String, ref: String, userName: String?, userEmail: String?) {
         runProcess(
