@@ -12,9 +12,9 @@ Rename test parameter from `transparency` to `showCommands` and add explicit `sh
 - Universal language: `showCommands` across all implementations
 
 ## Checklist
-- [ ] Review this work card for compliance with template and update to conform
-- [ ] If this card plans subagent delegation, ask user to explicitly authorize subagents for this card and record the response in Implementation Notes
-- [ ] Add showCommands property to tagger-plugin
+- [x] Review this work card for compliance with template and update to conform
+- [x] If this card plans subagent delegation, ask user to explicitly authorize subagents for this card and record the response in Implementation Notes
+- [x] Add showCommands property to tagger-plugin
   - Add `showCommands: Property<Boolean>` to TaggerExtension
   - Default to false
   - Modify command logging to check property before logging
@@ -22,7 +22,7 @@ Rename test parameter from `transparency` to `showCommands` and add explicit `sh
   - Test: verify commands logged when property true
   - Agent cycle: test → implement → refactor-light → verify pushable
   - Update plan if guidelines revealed new constraints
-- [ ] Add showCommands property to digger-plugin
+- [x] Add showCommands property to digger-plugin
   - Add `showCommands: Property<Boolean>` to DiggerExtension
   - Default to false
   - Modify command logging to check property before logging
@@ -30,14 +30,14 @@ Rename test parameter from `transparency` to `showCommands` and add explicit `sh
   - Test: verify commands logged when property true
   - Agent cycle: test → implement → refactor-light → verify pushable
   - Update plan if guidelines revealed new constraints
-- [ ] Rename transparency → showCommands in test specs
+- [x] Rename transparency → showCommands in test specs
   - Rename parameter in CalculateVersionTestSpec.configureWithOverrides
   - Rename parameter in SetupWithOverrides.setupWithOverrides
   - Update test names: withTransparencyEnabled → withShowCommandsEnabled
   - Update test names: withTransparencyDisabled → withShowCommandsDisabled
   - Agent cycle: test → implement → refactor-light → verify pushable
   - Update plan if guidelines revealed new constraints
-- [ ] Update all test implementations for renamed parameter
+- [x] Update all test implementations for renamed parameter
   - Rename transparency → showCommands in all CLI test implementations
   - Rename enableTransparency → showCommands in all Gradle plugin test implementations
   - Update to use new Gradle DSL property instead of -q flag manipulation
@@ -48,14 +48,23 @@ Rename test parameter from `transparency` to `showCommands` and add explicit `sh
 - [ ] Move this file to agents.d/work_completed/
 
 ## Current State
-- **Commit SHA**: a4ea7c50
-- **Uncommitted work**: None
+- **Commit SHA**: 0fad5c9b
+- **Uncommitted work**: Work card updates only
 - **Blockers**: None
-- **Status**: Ready to start
+- **Status**: Implementation complete, awaiting refactor pass
 - **Date**: 2026-07-31
 
 ## Implementation Notes
 _(newest first)_
+
+### 2026-07-31: Phases 1-4 complete
+All implementation phases completed:
+- Phase 1 (e3359673): Added showCommands property to TaggerExtension with false default. Modified all tagger tasks to conditionally log based on showCommands.
+- Phase 2 (8be51bbb): Added showCommands property to DiggerExtension with false default. Modified digger tasks to set logger based on showCommands.
+- Phase 3 (ce04ab4b): Renamed transparency → showCommands in all test specs and test method names.
+- Phase 4 (0fad5c9b): Updated all test implementations (CLI and plugin functional tests) to use showCommands parameter.
+
+All tests pass. Ready for mandatory refactor pass.
 
 ### 2026-07-31: Work card created
 Context: After completing hoist-show-commands-tests-to-specs, identified friction in naming.
@@ -71,10 +80,10 @@ Previous work: hoist-show-commands-tests-to-specs (completed in a4ea7c50)
 
 ## Validation
 Commands to run before marking complete:
-- [ ] `./gradlew check -q --console=plain` - all checks pass
-- [ ] Verify Gradle plugins have showCommands property with false default
-- [ ] Verify commands not logged by default in Gradle plugins
-- [ ] Verify commands logged when showCommands = true in Gradle plugins
-- [ ] Verify all test parameters renamed from transparency to showCommands
-- [ ] Verify test names updated to reflect showCommands terminology
-- [ ] Verify no references to "transparency" remain in test code
+- [x] `./gradlew check -q --console=plain` - all checks pass
+- [x] Verify Gradle plugins have showCommands property with false default
+- [x] Verify commands not logged by default in Gradle plugins
+- [x] Verify commands logged when showCommands = true in Gradle plugins
+- [x] Verify all test parameters renamed from transparency to showCommands
+- [x] Verify test names updated to reflect showCommands terminology
+- [x] Verify no references to "transparency" remain in test code
