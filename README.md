@@ -61,6 +61,10 @@ A program for extracting contribution information from a git repository.
 
 See its [README](command-line-tools/digger-cli/README.md) for more.
 
+## Security
+
+Socket.dev flags shellAccess because these tools execute git commands — this is intentional and necessary. See [SECURITY.md](SECURITY.md) for details.
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
