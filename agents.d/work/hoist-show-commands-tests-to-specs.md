@@ -12,15 +12,15 @@ Add command transparency verification to test specs to ensure git commands are l
 - Follow TestMints patterns from TESTING.md
 
 ## Checklist
-- [ ] Review this work card for compliance with template and update to conform
-- [ ] If this card plans subagent delegation, ask user to explicitly authorize subagents for this card and record the response in Implementation Notes
-- [ ] Add transparency tests to CalculateVersionTestSpec
+- [x] Review this work card for compliance with template and update to conform
+- [x] If this card plans subagent delegation, ask user to explicitly authorize subagents for this card and record the response in Implementation Notes
+- [x] Add transparency tests to CalculateVersionTestSpec
   - Test: execute with transparency enabled, verify stderr contains "git"
   - Test: execute with transparency disabled, verify stderr does not contain "git"
   - Use existing TestResult abstraction - no new API
   - Agent cycle: test → implement → refactor-light → verify pushable
   - Update plan if guidelines revealed new constraints
-- [ ] Update tagger-cli test implementation for transparency tests
+- [x] Update tagger-cli test implementation for transparency tests
   - configureWithDefaults/configureWithOverrides: add transparency parameter
   - Pass transparency setting through to CLI execution
   - Remove existing --show-commands tests from CalculateVersionCommandTest
@@ -65,6 +65,18 @@ Add command transparency verification to test specs to ensure git commands are l
 
 ## Implementation Notes
 _(newest first)_
+
+### 2026-07-31: CalculateVersionTestSpec transparency tests complete
+Added transparency parameter to configureWithOverrides. Tests check `result.details` for git commands.
+- CLI implementations: pass `--show-commands` flag when transparency=true
+- Gradle plugin implementations: omit `-q` flag when transparency=true (lifecycle logs visible)
+- Removed old CLI-specific tests from CalculateVersionCommandTest
+- All implementations updated: tagger-cli, tagger-plugin-test (both functional test classes)
+
+Committed: 4ff5a6cb
+
+### 2026-07-31: Subagent authorization
+User authorized subagent for mandatory final refactor pass only. Single-agent execution for feature implementation work.
 
 ### 2026-07-31: Final approach - use existing test infrastructure
 After two revisions, arrived at the correct abstraction: specs already capture output

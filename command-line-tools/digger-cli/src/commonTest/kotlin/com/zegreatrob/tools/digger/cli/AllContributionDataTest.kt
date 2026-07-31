@@ -35,8 +35,10 @@ class AllContributionDataTest : AllContributionTestSpec {
         storyRegex: String?,
         easeRegex: String?,
         tagRegex: String?,
+        transparency: Boolean?,
     ) {
-        arguments = listOf(
+        val baseFlags = if (transparency == true) listOf("--show-commands") else emptyList()
+        arguments = baseFlags + listOf(
             "--output-file=$outputFile",
             projectDir,
         ) + listOfNotNull(

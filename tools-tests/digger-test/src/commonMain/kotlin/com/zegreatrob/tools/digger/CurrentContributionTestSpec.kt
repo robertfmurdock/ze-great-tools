@@ -624,4 +624,30 @@ interface CurrentContributionTestSpec : SetupWithOverrides {
         addFileNames = addFileNames,
         commits = commits,
     )
+
+    @Test
+    fun withTransparencyEnabledLogsGitCommandsToOutput() = longAsyncSetup(object {}) {
+        setupWithOverrides(transparency = true)
+        initializeGitRepo(commits = listOf("commit 1"))
+    } exercise {
+        runCurrentContributionData()
+    } verify { result ->
+        result.output.contains("git").assertIsEqualTo(
+            true,
+            "Expected git commands in output when transparency enabled. Output:\n${result.output}",
+        )
+    }
+
+    @Test
+    fun withTransparencyDisabledDoesNotLogGitCommandsToOutput() = longAsyncSetup(object {}) {
+        setupWithOverrides(transparency = false)
+        initializeGitRepo(commits = listOf("commit 1"))
+    } exercise {
+        runCurrentContributionData()
+    } verify { result ->
+        result.output.contains("git").assertIsEqualTo(
+            false,
+            "Expected no git commands in output when transparency disabled. Output:\n${result.output}",
+        )
+    }
 }
