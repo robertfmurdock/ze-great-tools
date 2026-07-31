@@ -129,6 +129,26 @@ listed [here](../../tools/digger-json/src/commonMain/kotlin/com/zegreatrob/tools
 
 Any "Instant" in the specification is an ISO 8601 date-time. Any Duration is an ISO 8601 duration.
 
+## Transparency and Audit
+
+The `--show-commands` flag prints all git commands to stderr before execution, providing transparency for security audits
+and troubleshooting:
+
+```bash
+digger --show-commands current-contribution-data $(pwd)
+# stderr output: git --no-pager log --format=%H%n%ae%n...
+# stderr output: git --no-pager tag --list --sort=-taggerdate...
+# stdout: Data written to currentContributionData.json
+```
+
+**Use cases:**
+
+- Security audits: Verify exactly what git operations digger performs
+- Troubleshooting: Debug unexpected results by seeing git command sequence
+- CI/CD transparency: Log all git interactions for compliance or debugging
+
+The flag works with all subcommands and doesn't affect stdout (normal output remains clean for scripting).
+
 ## Structured Output
 
 Both commands support structured output via the `--format` flag. Use `--format=json` for advanced build automation that

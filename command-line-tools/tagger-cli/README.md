@@ -225,6 +225,26 @@ tagger tag --version 1.2.3  # no --release-branch needed
 }
 ```
 
+## Transparency and Audit
+
+The `--show-commands` flag prints all git commands to stderr before execution, providing transparency for security audits
+and troubleshooting:
+
+```bash
+tagger --show-commands calculate-version
+# stderr output: git --no-pager log --format=%H%n%ae%n...
+# stderr output: git status --porcelain=2 --branch --ahead-behind
+# stdout: 1.2.3-SNAPSHOT
+```
+
+**Use cases:**
+
+- Security audits: Verify exactly what git operations tagger performs
+- Troubleshooting: Debug unexpected version calculations by seeing git command sequence
+- CI/CD transparency: Log all git interactions for compliance or debugging
+
+The flag works with all subcommands and doesn't affect stdout (version output remains clean for scripting).
+
 ## Structured Output
 
 Both commands support structured output via the `--format` flag. Use `--format=json` for advanced build automation that
