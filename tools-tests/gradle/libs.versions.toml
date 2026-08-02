@@ -15,6 +15,6 @@ org-jetbrains-kotlinx-kotlinx-coroutines-test = { module = "org.jetbrains.kotlin
 org-jetbrains-kotlinx-kotlinx-serialization-bom = { module = "org.jetbrains.kotlinx:kotlinx-serialization-bom", version.ref = "kotlinx-coroutines" }
 
 [plugins]
-nl-littlerobots-version-catalog-update = "nl.littlerobots.version-catalog-update:1.1.0"
+nl-littlerobots-version-catalog-update = "nl.littlerobots.version-catalog-update:1.1.1"
 org-jetbrains-kotlin-jvm = "org.jetbrains.kotlin.jvm:2.4.10"
 org-jetbrains-kotlin-multiplatform = "org.jetbrains.kotlin.multiplatform:2.4.10"
