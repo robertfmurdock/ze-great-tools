@@ -322,4 +322,36 @@ class TaggerPluginTest {
             .get()
             .assertIsEqualTo(true, "Expected showCommands to be settable")
     }
+
+    @Test
+    fun `extension githubReleaseAssets property exists and defaults to empty collection`() = setup(object {
+        val project = ProjectBuilder.builder().build()
+    }) exercise {
+        project.plugins.apply("com.zegreatrob.tools.tagger")
+        project.extensions.getByType(TaggerExtension::class.java)
+    } verify { extension ->
+        extension.githubReleaseAssets
+            .assertIsNotEqualTo(null, "Expected githubReleaseAssets property to exist")
+        extension.githubReleaseAssets.isEmpty
+            .assertIsEqualTo(true, "Expected githubReleaseAssets to default to empty collection")
+    }
+
+    @Test
+    fun `extension githubReleaseAssets can be configured with files`() = setup(object {
+        val project = ProjectBuilder.builder().build()
+        val testFile = java.io.File.createTempFile("test", ".txt")
+    }) {
+        testFile.deleteOnExit()
+        testFile.writeText("test content")
+    } exercise {
+        project.plugins.apply("com.zegreatrob.tools.tagger")
+        val extension = project.extensions.getByType(TaggerExtension::class.java)
+        extension.githubReleaseAssets.from(testFile)
+        extension.githubReleaseAssets.files
+    } verify { files ->
+        files.size
+            .assertIsEqualTo(1, "Expected one file in githubReleaseAssets")
+        files.first().name
+            .assertIsEqualTo(testFile.name, "Expected configured file to be in collection")
+    }
 }

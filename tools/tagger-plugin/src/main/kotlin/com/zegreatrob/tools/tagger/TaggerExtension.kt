@@ -16,6 +16,8 @@ open class TaggerExtension(
 ) {
     val workingDirectory = objectFactory.directoryProperty()
 
+    val githubReleaseAssets = objectFactory.fileCollection()
+
     private val fileConfig = workingDirectory.map { dir -> readTaggerFileFrom(dir.asFile) ?: TaggerConfig() }
 
     internal val releaseBranchProperty = objectFactory.property(String::class.java).apply {
