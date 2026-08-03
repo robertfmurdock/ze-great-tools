@@ -24,7 +24,7 @@ class TaggerPlugin : Plugin<Project> {
         val githubRelease = registerGithubReleaseTask(project, tagger, tag)
         val githubReleaseUpload = registerGithubReleaseUploadTask(project, tagger, githubRelease)
         val githubReleasePublish = registerGithubReleasePublishTask(project, tagger, githubReleaseUpload)
-        registerReleaseTask(project, tagger, tag, githubRelease)
+        registerReleaseTask(project, tagger, tag, githubRelease, githubReleaseUpload)
     }
 
     private fun createTaggerExtension(project: Project): TaggerExtension {
@@ -172,12 +172,18 @@ class TaggerPlugin : Plugin<Project> {
         fi
     """.trimIndent()
 
-    private fun registerReleaseTask(project: Project, tagger: TaggerExtension, tag: Any, githubRelease: Any) {
+    private fun registerReleaseTask(
+        project: Project,
+        tagger: TaggerExtension,
+        tag: Any,
+        githubRelease: Any,
+        githubReleaseUpload: Any,
+    ) {
         project.tasks.register("release", ReleaseVersion::class.java) { task ->
             task.group = "versioning"
             task.description =
                 "Orchestrator: assemble, then tag, optionally publish and create GitHub release. Disabled for -SNAPSHOT versions."
-            configureReleaseTask(task, project, tagger, tag, githubRelease)
+            configureReleaseTask(task, project, tagger, tag, githubRelease, githubReleaseUpload)
         }
     }
 
@@ -187,6 +193,7 @@ class TaggerPlugin : Plugin<Project> {
         tagger: TaggerExtension,
         tag: Any,
         githubRelease: Any,
+        githubReleaseUpload: Any,
     ) {
         task.workingDirectory.set(tagger.workingDirectory)
         task.gitDirectory.set(tagger.workingDirectory.dir(".git"))
@@ -198,6 +205,7 @@ class TaggerPlugin : Plugin<Project> {
         task.mustRunAfter(project.tasks.named("check"))
         task.dependsOn(tag)
         task.finalizedBy(githubRelease)
+        task.finalizedBy(githubReleaseUpload)
         task.finalizedBy(project.provider { project.getTasksByName("publish", true).toList() })
     }
 }
