@@ -76,14 +76,6 @@ jobs:
         run: ./gradlew check -Pversion=${{ env.TAGGER_VERSION }} --no-configuration-cache --scan
       - name: Release 🔨
         run: ./gradlew release -Pversion=${{ env.TAGGER_VERSION }} -Pgradle.publish.key=${{ secrets.GRADLE_PUBLISH_KEY }} -Pgradle.publish.secret=${{ secrets.GRADLE_PUBLISH_SECRET }}  --no-configuration-cache --scan
-      - name: Include fingerprint
-        if: ${{ env.FINGERPRINT_MATCHES_PREVIOUS == 'false' && !contains(env.TAGGER_VERSION, 'SNAPSHOT') }}
-        run: |
-          gh release upload ${{ env.TAGGER_VERSION }} \
-            build/aggregate-fingerprint.txt \
-            build/aggregate-fingerprint-manifest.log
-      - name: Upload CLI distributions
-        run: ./gradlew uploadCliDistributions
       - name: Publish Release
         if: ${{ !contains(env.TAGGER_VERSION, 'SNAPSHOT') }}
         run: gh release edit ${{ env.TAGGER_VERSION }} --draft=false
