@@ -18,6 +18,16 @@ tagger {
     githubReleaseDraft.set(true)
     userName = "github-actions[bot]"
     userEmail = "6215634+robertfmurdock@users.noreply.github.com"
+    githubReleaseAssets.from(
+        layout.buildDirectory.file("aggregate-fingerprint.txt"),
+        layout.buildDirectory.file("aggregate-fingerprint-manifest.log"),
+        fileTree("command-line-tools/tagger-cli/build/distributions") {
+            include("tagger-cli-jvm.zip", "tagger-cli-jvm.zip.sha256")
+        },
+        fileTree("command-line-tools/digger-cli/build/distributions") {
+            include("digger-cli-jvm.zip", "digger-cli-jvm.zip.sha256")
+        },
+    )
 }
 
 fingerprintConfig {
