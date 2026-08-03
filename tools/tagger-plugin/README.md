@@ -146,34 +146,33 @@ tagger {
 }
 ```
 
-By default, GitHub releases are created as **drafts** that must be published manually or via workflow. This can be
-configured using the `githubReleaseDraft` property:
+By default, GitHub releases are **published immediately**. For enhanced supply chain security, you can configure
+releases to be created as drafts first using the `githubReleaseDraft` property:
 
 ```kotlin
 tagger {
     githubReleaseEnabled.set(true)
     
-    // Draft-first (default) - recommended for supply chain security
-    githubReleaseDraft.set(true)  // Can be omitted, this is the default
+    // Publish immediately (default) - simpler workflow
+    githubReleaseDraft.set(false)  // Can be omitted, this is the default
     
-    // OR: Publish immediately - skips draft step
-    githubReleaseDraft.set(false)
+    // OR: Draft-first - recommended for supply chain security
+    githubReleaseDraft.set(true)
 }
 ```
 
-When `githubReleaseDraft` is `true` (the default), releases are created as drafts. Your workflow must include an
-additional step to publish the release:
+When `githubReleaseDraft` is `false` (the default), releases are published immediately without requiring an extra step.
+
+When `githubReleaseDraft` is `true`, releases are created as drafts. Your workflow must include an additional step to 
+publish the release:
 
 ```bash
 gh release edit $version --draft=false
 ```
 
-When `githubReleaseDraft` is `false`, releases are published immediately without requiring the extra step. This
-simplifies workflows but sacrifices the immutability protection described below.
-
 ### Supply Chain Security
 
-When `githubReleaseEnabled` is true and `githubReleaseDraft` is true (the default), tagger creates **immutable releases**
+When `githubReleaseEnabled` is true and `githubReleaseDraft` is true, tagger creates **immutable releases**
 following GitHub's supply chain security best practices:
 
 - **Tag immutability**: Git tags cannot be deleted or moved once the release is published
@@ -184,9 +183,9 @@ following GitHub's supply chain security best practices:
 This prevents supply chain attacks where an attacker might modify published artifacts. Once published, your release is
 permanently locked.
 
-When `githubReleaseDraft` is false, releases are published immediately upon creation. While simpler, this workflow loses
-the immutability protection benefits of the draft-first pattern since the tag and release become public before all assets
-are uploaded.
+When `githubReleaseDraft` is false (the default), releases are published immediately upon creation. While simpler, this 
+workflow loses the immutability protection benefits of the draft-first pattern since the tag and release become public 
+before all assets are uploaded.
 
 For more information,
 see [GitHub's Immutable Releases documentation](https://docs.github.com/en/code-security/concepts/supply-chain-security/immutable-releases).

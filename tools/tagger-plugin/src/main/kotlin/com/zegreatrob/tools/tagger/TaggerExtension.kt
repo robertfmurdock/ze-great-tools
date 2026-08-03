@@ -74,7 +74,7 @@ open class TaggerExtension(
 
     val githubReleaseEnabled = objectFactory.property(Boolean::class.java).convention(false)
 
-    val githubReleaseDraft = objectFactory.property(Boolean::class.java).convention(true)
+    val githubReleaseDraft = objectFactory.property(Boolean::class.java).convention(false)
 
     val showCommands = objectFactory.property(Boolean::class.java).convention(false)
 

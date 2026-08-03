@@ -216,7 +216,7 @@ class TaggerPluginTest {
     }
 
     @Test
-    fun `githubRelease task uses gh release create with draft flag and idempotency check`() = setup(object {
+    fun `githubRelease task uses gh release create with idempotency check`() = setup(object {
         val project = ProjectBuilder.builder().build()
     }) exercise {
         project.version = "1.2.3"
@@ -229,8 +229,6 @@ class TaggerPluginTest {
             .assertIsEqualTo(true, "Expected idempotency check with 'gh release view'")
         script.contains("gh release create")
             .assertIsEqualTo(true, "Expected 'gh release create' command")
-        script.contains("--draft")
-            .assertIsEqualTo(true, "Expected --draft flag for draft-first pattern")
         script.contains("already exists, skipping creation")
             .assertIsEqualTo(true, "Expected skip message when release exists")
     }
@@ -250,7 +248,7 @@ class TaggerPluginTest {
     }
 
     @Test
-    fun `githubRelease task uses draft flag by default when githubReleaseDraft not set`() = setup(object {
+    fun `githubRelease task publishes immediately by default when githubReleaseDraft not set`() = setup(object {
         val project = ProjectBuilder.builder().build()
     }) exercise {
         project.version = "1.2.3"
@@ -260,25 +258,25 @@ class TaggerPluginTest {
         val commandLine = task.commandLine
         val script = commandLine.joinToString(" ")
         script.contains("--draft")
-            .assertIsEqualTo(true, "Expected --draft flag when githubReleaseDraft not explicitly set (default true)")
+            .assertIsEqualTo(false, "Expected no --draft flag when githubReleaseDraft not explicitly set (default false)")
+        script.contains("gh release create")
+            .assertIsEqualTo(true, "Expected 'gh release create' command to still be present")
     }
 
     @Test
-    fun `githubRelease task excludes draft flag when githubReleaseDraft set to false`() = setup(object {
+    fun `githubRelease task creates draft when githubReleaseDraft set to true`() = setup(object {
         val project = ProjectBuilder.builder().build()
     }) exercise {
         project.version = "1.2.3"
         project.plugins.apply("com.zegreatrob.tools.tagger")
         val tagger = project.extensions.getByType(TaggerExtension::class.java)
-        tagger.githubReleaseDraft.set(false)
+        tagger.githubReleaseDraft.set(true)
         project.tasks.findByName("githubRelease") as org.gradle.api.tasks.Exec
     } verify { task ->
         val commandLine = task.commandLine
         val script = commandLine.joinToString(" ")
         script.contains("--draft")
-            .assertIsEqualTo(false, "Expected no --draft flag when githubReleaseDraft.set(false)")
-        script.contains("gh release create")
-            .assertIsEqualTo(true, "Expected 'gh release create' command to still be present")
+            .assertIsEqualTo(true, "Expected --draft flag when githubReleaseDraft.set(true)")
     }
 
     @Test

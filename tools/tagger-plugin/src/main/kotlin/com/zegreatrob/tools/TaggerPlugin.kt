@@ -106,7 +106,7 @@ class TaggerPlugin : Plugin<Project> {
     ) = project.tasks.register("githubRelease", Exec::class.java) { task ->
         task.group = "versioning"
         task.description =
-            "Side effect: create GitHub release (draft by default) via gh CLI. Requires tag to run first. Disabled for -SNAPSHOT versions. Idempotent - skips if release exists."
+            "Side effect: create GitHub release (published by default, configurable via githubReleaseDraft) via gh CLI. Requires tag to run first. Disabled for -SNAPSHOT versions. Idempotent - skips if release exists."
         task.enabled = !project.version.toString().contains("SNAPSHOT") && tagger.githubReleaseEnabled.get()
         task.dependsOn(tag)
         task.commandLine("sh", "-c", draftReleaseScript(project.version, tagger.githubReleaseDraft.get()))
