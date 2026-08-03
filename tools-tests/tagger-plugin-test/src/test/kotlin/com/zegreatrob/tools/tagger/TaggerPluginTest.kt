@@ -264,6 +264,24 @@ class TaggerPluginTest {
     }
 
     @Test
+    fun `githubRelease task excludes draft flag when githubReleaseDraft set to false`() = setup(object {
+        val project = ProjectBuilder.builder().build()
+    }) exercise {
+        project.version = "1.2.3"
+        project.plugins.apply("com.zegreatrob.tools.tagger")
+        val tagger = project.extensions.getByType(TaggerExtension::class.java)
+        tagger.githubReleaseDraft.set(false)
+        project.tasks.findByName("githubRelease") as org.gradle.api.tasks.Exec
+    } verify { task ->
+        val commandLine = task.commandLine
+        val script = commandLine.joinToString(" ")
+        script.contains("--draft")
+            .assertIsEqualTo(false, "Expected no --draft flag when githubReleaseDraft.set(false)")
+        script.contains("gh release create")
+            .assertIsEqualTo(true, "Expected 'gh release create' command to still be present")
+    }
+
+    @Test
     fun `tag task does not have mustRunAfter relationship with publish to avoid circular dependency`() = setup(object {
         val rootProject = ProjectBuilder.builder().build()
         val innerProject = ProjectBuilder.builder()

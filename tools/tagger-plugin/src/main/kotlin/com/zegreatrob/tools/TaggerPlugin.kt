@@ -106,17 +106,17 @@ class TaggerPlugin : Plugin<Project> {
     ) = project.tasks.register("githubRelease", Exec::class.java) { task ->
         task.group = "versioning"
         task.description =
-            "Side effect: create GitHub draft release via gh CLI. Requires tag to run first. Disabled for -SNAPSHOT versions. Idempotent - skips if release exists."
+            "Side effect: create GitHub release (draft by default) via gh CLI. Requires tag to run first. Disabled for -SNAPSHOT versions. Idempotent - skips if release exists."
         task.enabled = !project.version.toString().contains("SNAPSHOT") && tagger.githubReleaseEnabled.get()
         task.dependsOn(tag)
-        task.commandLine("sh", "-c", draftReleaseScript(project.version))
+        task.commandLine("sh", "-c", draftReleaseScript(project.version, tagger.githubReleaseDraft.get()))
     }
 
-    private fun draftReleaseScript(version: Any) = """
+    private fun draftReleaseScript(version: Any, draft: Boolean) = """
         if gh release view $version >/dev/null 2>&1; then
             echo "Release $version already exists, skipping creation"
         else
-            gh release create $version --draft --title $version --notes $version
+            gh release create $version ${if (draft) "--draft " else ""}--title $version --notes $version
         fi
     """.trimIndent()
 
