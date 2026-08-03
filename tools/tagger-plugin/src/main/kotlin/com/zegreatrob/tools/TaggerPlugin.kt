@@ -22,6 +22,7 @@ class TaggerPlugin : Plugin<Project> {
         val tag = registerTagTask(project, tagger)
         registerCommitReportTask(project, tagger)
         val githubRelease = registerGithubReleaseTask(project, tagger, tag)
+        val githubReleaseUpload = registerGithubReleaseUploadTask(project, tagger, githubRelease)
         registerReleaseTask(project, tagger, tag, githubRelease)
     }
 
@@ -118,6 +119,33 @@ class TaggerPlugin : Plugin<Project> {
         else
             gh release create $version ${if (draft) "--draft " else ""}--title $version --notes $version
         fi
+    """.trimIndent()
+
+    private fun registerGithubReleaseUploadTask(
+        project: Project,
+        tagger: TaggerExtension,
+        githubRelease: Any,
+    ) = project.tasks.register("githubReleaseUpload", Exec::class.java) { task ->
+        task.group = "versioning"
+        task.description =
+            "Side effect: upload assets to GitHub release via gh CLI. Requires githubRelease to run first. Disabled for -SNAPSHOT versions or when no assets configured. Idempotent - skips files already uploaded."
+        task.enabled = !project.version.toString().contains("SNAPSHOT") &&
+            tagger.githubReleaseEnabled.get() &&
+            !tagger.githubReleaseAssets.isEmpty
+        task.dependsOn(githubRelease)
+        task.inputs.files(tagger.githubReleaseAssets)
+        task.commandLine("sh", "-c", uploadAssetsScript(project.version, tagger.githubReleaseAssets.files))
+    }
+
+    private fun uploadAssetsScript(version: Any, assets: Set<java.io.File>) = """
+        for file in ${assets.joinToString(" ") { it.absolutePath }}; do
+            filename=${'$'}(basename "${'$'}file")
+            if gh release view $version --json assets --jq ".assets[].name" | grep -q "^${'$'}filename${'$'}"; then
+                echo "Asset ${'$'}filename already uploaded to release $version, skipping"
+            else
+                gh release upload $version "${'$'}file"
+            fi
+        done
     """.trimIndent()
 
     private fun registerReleaseTask(project: Project, tagger: TaggerExtension, tag: Any, githubRelease: Any) {

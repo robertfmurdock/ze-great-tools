@@ -354,4 +354,89 @@ class TaggerPluginTest {
         files.first().name
             .assertIsEqualTo(testFile.name, "Expected configured file to be in collection")
     }
+
+    @Test
+    fun `plugin registers githubReleaseUpload task`() = setup(object {
+        val project = ProjectBuilder.builder().build()
+    }) exercise {
+        project.version = "1.2.3"
+        project.plugins.apply("com.zegreatrob.tools.tagger")
+    } verify {
+        project.tasks.findByName("githubReleaseUpload")
+            .assertIsNotEqualTo(null, "Expected githubReleaseUpload task to be registered")
+    }
+
+    @Test
+    fun `githubReleaseUpload task disabled for SNAPSHOT versions`() = setup(object {
+        val project = ProjectBuilder.builder().build()
+    }) exercise {
+        project.version = "1.2.3-SNAPSHOT"
+        project.plugins.apply("com.zegreatrob.tools.tagger")
+        val tagger = project.extensions.getByType(TaggerExtension::class.java)
+        tagger.githubReleaseEnabled.set(true)
+        project.tasks.findByName("githubReleaseUpload") as org.gradle.api.tasks.Exec
+    } verify { task ->
+        task.enabled
+            .assertIsEqualTo(false, "Expected githubReleaseUpload to be disabled for SNAPSHOT versions")
+    }
+
+    @Test
+    fun `githubReleaseUpload task disabled when githubReleaseEnabled is false`() = setup(object {
+        val project = ProjectBuilder.builder().build()
+    }) exercise {
+        project.version = "1.2.3"
+        project.plugins.apply("com.zegreatrob.tools.tagger")
+        val tagger = project.extensions.getByType(TaggerExtension::class.java)
+        tagger.githubReleaseEnabled.set(false)
+        project.tasks.findByName("githubReleaseUpload") as org.gradle.api.tasks.Exec
+    } verify { task ->
+        task.enabled
+            .assertIsEqualTo(false, "Expected githubReleaseUpload to be disabled when githubReleaseEnabled is false")
+    }
+
+    @Test
+    fun `githubReleaseUpload task disabled when githubReleaseAssets is empty`() = setup(object {
+        val project = ProjectBuilder.builder().build()
+    }) exercise {
+        project.version = "1.2.3"
+        project.plugins.apply("com.zegreatrob.tools.tagger")
+        val tagger = project.extensions.getByType(TaggerExtension::class.java)
+        tagger.githubReleaseEnabled.set(true)
+        project.tasks.findByName("githubReleaseUpload") as org.gradle.api.tasks.Exec
+    } verify { task ->
+        task.enabled
+            .assertIsEqualTo(false, "Expected githubReleaseUpload to be disabled when no assets configured")
+    }
+
+    @Test
+    fun `githubReleaseUpload task enabled when conditions met`() = setup(object {
+        val project = ProjectBuilder.builder().build()
+        val testFile = java.io.File.createTempFile("test", ".txt")
+    }) {
+        testFile.deleteOnExit()
+    } exercise {
+        project.version = "1.2.3"
+        project.plugins.apply("com.zegreatrob.tools.tagger")
+        val tagger = project.extensions.getByType(TaggerExtension::class.java)
+        tagger.githubReleaseEnabled.set(true)
+        tagger.githubReleaseAssets.from(testFile)
+        project.tasks.findByName("githubReleaseUpload") as org.gradle.api.tasks.Exec
+    } verify { task ->
+        task.enabled
+            .assertIsEqualTo(true, "Expected githubReleaseUpload to be enabled when version is not SNAPSHOT, githubReleaseEnabled is true, and assets are configured")
+    }
+
+    @Test
+    fun `githubReleaseUpload task depends on githubRelease`() = setup(object {
+        val project = ProjectBuilder.builder().build()
+    }) exercise {
+        project.version = "1.2.3"
+        project.plugins.apply("com.zegreatrob.tools.tagger")
+        project.tasks.findByName("githubReleaseUpload")
+    } verify { uploadTask ->
+        val githubReleaseTask = project.tasks.findByName("githubRelease")!!
+        uploadTask!!.taskDependencies.getDependencies(uploadTask)
+            .contains(githubReleaseTask)
+            .assertIsEqualTo(true, "Expected githubReleaseUpload task to depend on githubRelease task")
+    }
 }
