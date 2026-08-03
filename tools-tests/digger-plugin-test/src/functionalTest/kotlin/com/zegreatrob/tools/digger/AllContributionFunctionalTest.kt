@@ -75,6 +75,7 @@ class AllContributionFunctionalTest : AllContributionTestSpec {
         val args = if (enableTransparency) listOf("allContributionData") else listOf("allContributionData", "-q")
         val output = GradleRunner.create()
             .forwardOutput()
+            .withDebug(false)
             .withArguments(args)
             .withProjectDir(File(projectDir))
             .build()
