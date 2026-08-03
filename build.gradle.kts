@@ -15,6 +15,7 @@ plugins {
 tagger {
     releaseBranch = "main"
     githubReleaseEnabled.set(true)
+    githubReleaseDraft.set(true)
     userName = "github-actions[bot]"
     userEmail = "6215634+robertfmurdock@users.noreply.github.com"
 }
