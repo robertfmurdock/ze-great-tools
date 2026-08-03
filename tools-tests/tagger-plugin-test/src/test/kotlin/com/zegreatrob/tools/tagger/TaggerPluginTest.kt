@@ -439,4 +439,89 @@ class TaggerPluginTest {
             .contains(githubReleaseTask)
             .assertIsEqualTo(true, "Expected githubReleaseUpload task to depend on githubRelease task")
     }
+
+    @Test
+    fun `plugin registers githubReleasePublish task`() = setup(object {
+        val project = ProjectBuilder.builder().build()
+    }) exercise {
+        project.version = "1.2.3"
+        project.plugins.apply("com.zegreatrob.tools.tagger")
+    } verify {
+        project.tasks.findByName("githubReleasePublish")
+            .assertIsNotEqualTo(null, "Expected githubReleasePublish task to be registered")
+    }
+
+    @Test
+    fun `githubReleasePublish task disabled for SNAPSHOT versions`() = setup(object {
+        val project = ProjectBuilder.builder().build()
+    }) exercise {
+        project.version = "1.2.3-SNAPSHOT"
+        project.plugins.apply("com.zegreatrob.tools.tagger")
+        val tagger = project.extensions.getByType(TaggerExtension::class.java)
+        tagger.githubReleaseEnabled.set(true)
+        tagger.githubReleaseDraft.set(true)
+        project.tasks.findByName("githubReleasePublish") as org.gradle.api.tasks.Exec
+    } verify { task ->
+        task.enabled
+            .assertIsEqualTo(false, "Expected githubReleasePublish to be disabled for SNAPSHOT versions")
+    }
+
+    @Test
+    fun `githubReleasePublish task disabled when githubReleaseEnabled is false`() = setup(object {
+        val project = ProjectBuilder.builder().build()
+    }) exercise {
+        project.version = "1.2.3"
+        project.plugins.apply("com.zegreatrob.tools.tagger")
+        val tagger = project.extensions.getByType(TaggerExtension::class.java)
+        tagger.githubReleaseEnabled.set(false)
+        tagger.githubReleaseDraft.set(true)
+        project.tasks.findByName("githubReleasePublish") as org.gradle.api.tasks.Exec
+    } verify { task ->
+        task.enabled
+            .assertIsEqualTo(false, "Expected githubReleasePublish to be disabled when githubReleaseEnabled is false")
+    }
+
+    @Test
+    fun `githubReleasePublish task disabled when githubReleaseDraft is false`() = setup(object {
+        val project = ProjectBuilder.builder().build()
+    }) exercise {
+        project.version = "1.2.3"
+        project.plugins.apply("com.zegreatrob.tools.tagger")
+        val tagger = project.extensions.getByType(TaggerExtension::class.java)
+        tagger.githubReleaseEnabled.set(true)
+        tagger.githubReleaseDraft.set(false)
+        project.tasks.findByName("githubReleasePublish") as org.gradle.api.tasks.Exec
+    } verify { task ->
+        task.enabled
+            .assertIsEqualTo(false, "Expected githubReleasePublish to be disabled when githubReleaseDraft is false (nothing to publish)")
+    }
+
+    @Test
+    fun `githubReleasePublish task enabled when conditions met`() = setup(object {
+        val project = ProjectBuilder.builder().build()
+    }) exercise {
+        project.version = "1.2.3"
+        project.plugins.apply("com.zegreatrob.tools.tagger")
+        val tagger = project.extensions.getByType(TaggerExtension::class.java)
+        tagger.githubReleaseEnabled.set(true)
+        tagger.githubReleaseDraft.set(true)
+        project.tasks.findByName("githubReleasePublish") as org.gradle.api.tasks.Exec
+    } verify { task ->
+        task.enabled
+            .assertIsEqualTo(true, "Expected githubReleasePublish to be enabled when version is not SNAPSHOT, githubReleaseEnabled is true, and githubReleaseDraft is true")
+    }
+
+    @Test
+    fun `githubReleasePublish task depends on githubReleaseUpload`() = setup(object {
+        val project = ProjectBuilder.builder().build()
+    }) exercise {
+        project.version = "1.2.3"
+        project.plugins.apply("com.zegreatrob.tools.tagger")
+        project.tasks.findByName("githubReleasePublish")
+    } verify { publishTask ->
+        val uploadTask = project.tasks.findByName("githubReleaseUpload")!!
+        publishTask!!.taskDependencies.getDependencies(publishTask)
+            .contains(uploadTask)
+            .assertIsEqualTo(true, "Expected githubReleasePublish task to depend on githubReleaseUpload task")
+    }
 }

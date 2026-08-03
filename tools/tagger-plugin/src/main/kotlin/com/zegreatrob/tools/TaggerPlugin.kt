@@ -23,6 +23,7 @@ class TaggerPlugin : Plugin<Project> {
         registerCommitReportTask(project, tagger)
         val githubRelease = registerGithubReleaseTask(project, tagger, tag)
         val githubReleaseUpload = registerGithubReleaseUploadTask(project, tagger, githubRelease)
+        val githubReleasePublish = registerGithubReleasePublishTask(project, tagger, githubReleaseUpload)
         registerReleaseTask(project, tagger, tag, githubRelease)
     }
 
@@ -146,6 +147,29 @@ class TaggerPlugin : Plugin<Project> {
                 gh release upload $version "${'$'}file"
             fi
         done
+    """.trimIndent()
+
+    private fun registerGithubReleasePublishTask(
+        project: Project,
+        tagger: TaggerExtension,
+        githubReleaseUpload: Any,
+    ) = project.tasks.register("githubReleasePublish", Exec::class.java) { task ->
+        task.group = "versioning"
+        task.description =
+            "Side effect: publish draft GitHub release via gh CLI. Requires githubReleaseUpload to run first. Disabled for -SNAPSHOT versions or when githubReleaseDraft is false. Idempotent - skips if already published."
+        task.enabled = !project.version.toString().contains("SNAPSHOT") &&
+            tagger.githubReleaseEnabled.get() &&
+            tagger.githubReleaseDraft.get()
+        task.dependsOn(githubReleaseUpload)
+        task.commandLine("sh", "-c", publishReleaseScript(project.version))
+    }
+
+    private fun publishReleaseScript(version: Any) = """
+        if gh release view $version --json isDraft --jq ".isDraft" | grep -q "false"; then
+            echo "Release $version already published, skipping"
+        else
+            gh release edit $version --draft=false
+        fi
     """.trimIndent()
 
     private fun registerReleaseTask(project: Project, tagger: TaggerExtension, tag: Any, githubRelease: Any) {
