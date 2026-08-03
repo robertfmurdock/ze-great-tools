@@ -4,10 +4,10 @@
 Add a `githubReleaseDraft` boolean property to `TaggerExtension` that allows consumers to control whether GitHub releases are created as drafts or published immediately, fixing the unintended breaking change introduced in commit `8e6662a6`.
 
 ## Constraints
-- Must preserve current default behavior (draft-first) for backward compatibility
-- Must maintain supply chain security benefits as the recommended path
+- Must restore pre-8e6662a6 behavior (publish immediately) for true backward compatibility
+- Must maintain supply chain security benefits as the recommended opt-in path
 - Should be well-documented with clear security trade-offs
-- Semver intent: `[minor]` - adds new configuration property (non-breaking, additive)
+- Semver intent: `[minor]` - adds new configuration property (non-breaking, restores previous behavior)
 - Affected modules: `tagger-plugin`, `tagger-plugin-test`
 
 ## Root Cause Analysis
@@ -86,7 +86,7 @@ The `--draft` flag became **hardcoded** with no configuration option. This broke
 - [x] Move this file to agents.d/work_completed/
 
 ## Current State
-- **Commit SHA**: 75b5a1a7
+- **Commit SHA**: 4537f6e9
 - **Uncommitted work**: None
 - **Blockers**: None
 - **Status**: Complete
@@ -95,10 +95,17 @@ The `--draft` flag became **hardcoded** with no configuration option. This broke
 ## Implementation Notes
 _(newest first)_
 
+### 2026-08-03: Default flipped for true backward compatibility
+User correctly identified that default should be `false` (publish immediately) to restore pre-8e6662a6 behavior.
+- Changed convention from `true` to `false`
+- Updated all tests to verify new default
+- Updated documentation to recommend draft-first as opt-in for security
+- Commit: 4537f6e9
+
 ### 2026-08-03: Work complete
 Final mandatory refactor pass completed via subagent. Zero issues found. All tests pass (unit + functional).
 
-Implementation successfully adds `githubReleaseDraft` property with backward-compatible default (true), comprehensive tests, and clear documentation of security trade-offs.
+Implementation successfully adds `githubReleaseDraft` property with true backward-compatible default (false), comprehensive tests, and clear documentation of security trade-offs.
 
 ### 2026-08-03: Feature slices complete
 All three feature slices implemented and committed:
