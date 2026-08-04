@@ -18,16 +18,19 @@ tagger {
     githubReleaseDraft.set(true)
     userName = "github-actions[bot]"
     userEmail = "6215634+robertfmurdock@users.noreply.github.com"
+    val commandLineToolsDir = gradle.includedBuild("command-line-tools").projectDir
+    val taggerCliDist = commandLineToolsDir.resolve("tagger-cli/build/distributions")
+    val diggerCliDist = commandLineToolsDir.resolve("digger-cli/build/distributions")
     val taggerCliAssets = files(
-        "command-line-tools/tagger-cli/build/distributions/tagger-cli-${project.version}-jvm.zip",
-        "command-line-tools/tagger-cli/build/distributions/tagger-cli-${project.version}-jvm.zip.sha256",
+        taggerCliDist.resolve("tagger-cli-${project.version}-jvm.zip"),
+        taggerCliDist.resolve("tagger-cli-${project.version}-jvm.zip.sha256"),
     ).builtBy(
         gradle.includedBuild("command-line-tools").task(":tagger-cli:jvmDistZip"),
         gradle.includedBuild("command-line-tools").task(":tagger-cli:jvmDistZipChecksum"),
     )
     val diggerCliAssets = files(
-        "command-line-tools/digger-cli/build/distributions/digger-cli-${project.version}-jvm.zip",
-        "command-line-tools/digger-cli/build/distributions/digger-cli-${project.version}-jvm.zip.sha256",
+        diggerCliDist.resolve("digger-cli-${project.version}-jvm.zip"),
+        diggerCliDist.resolve("digger-cli-${project.version}-jvm.zip.sha256"),
     ).builtBy(
         gradle.includedBuild("command-line-tools").task(":digger-cli:jvmDistZip"),
         gradle.includedBuild("command-line-tools").task(":digger-cli:jvmDistZipChecksum"),
