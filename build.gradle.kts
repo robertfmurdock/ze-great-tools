@@ -32,9 +32,12 @@ tagger {
         gradle.includedBuild("command-line-tools").task(":digger-cli:jvmDistZip"),
         gradle.includedBuild("command-line-tools").task(":digger-cli:jvmDistZipChecksum"),
     )
-    githubReleaseAssets.from(
+    val fingerprintAssets = files(
         layout.buildDirectory.file("aggregate-fingerprint.txt"),
         layout.buildDirectory.file("aggregate-fingerprint-manifest.log"),
+    ).builtBy(tasks.aggregateFingerprints)
+    githubReleaseAssets.from(
+        fingerprintAssets,
         taggerCliAssets,
         diggerCliAssets,
     )
