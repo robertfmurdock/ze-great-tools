@@ -18,23 +18,25 @@ tagger {
     githubReleaseDraft.set(true)
     userName = "github-actions[bot]"
     userEmail = "6215634+robertfmurdock@users.noreply.github.com"
+    val taggerCliAssets = files(
+        gradle.includedBuild("command-line-tools").projectDir.resolve("tagger-cli/build/distributions/tagger-cli-jvm.zip"),
+        gradle.includedBuild("command-line-tools").projectDir.resolve("tagger-cli/build/distributions/tagger-cli-jvm.zip.sha256"),
+    ).builtBy(
+        gradle.includedBuild("command-line-tools").task(":tagger-cli:jvmDistZip"),
+        gradle.includedBuild("command-line-tools").task(":tagger-cli:jvmDistZipChecksum"),
+    )
+    val diggerCliAssets = files(
+        gradle.includedBuild("command-line-tools").projectDir.resolve("digger-cli/build/distributions/digger-cli-jvm.zip"),
+        gradle.includedBuild("command-line-tools").projectDir.resolve("digger-cli/build/distributions/digger-cli-jvm.zip.sha256"),
+    ).builtBy(
+        gradle.includedBuild("command-line-tools").task(":digger-cli:jvmDistZip"),
+        gradle.includedBuild("command-line-tools").task(":digger-cli:jvmDistZipChecksum"),
+    )
     githubReleaseAssets.from(
         layout.buildDirectory.file("aggregate-fingerprint.txt"),
         layout.buildDirectory.file("aggregate-fingerprint-manifest.log"),
-        fileTree(gradle.includedBuild("command-line-tools").projectDir.resolve("tagger-cli/build/distributions")) {
-            include("tagger-cli-jvm.zip", "tagger-cli-jvm.zip.sha256")
-            builtBy(
-                gradle.includedBuild("command-line-tools").task(":tagger-cli:jvmDistZip"),
-                gradle.includedBuild("command-line-tools").task(":tagger-cli:jvmDistZipChecksum"),
-            )
-        },
-        fileTree(gradle.includedBuild("command-line-tools").projectDir.resolve("digger-cli/build/distributions")) {
-            include("digger-cli-jvm.zip", "digger-cli-jvm.zip.sha256")
-            builtBy(
-                gradle.includedBuild("command-line-tools").task(":digger-cli:jvmDistZip"),
-                gradle.includedBuild("command-line-tools").task(":digger-cli:jvmDistZipChecksum"),
-            )
-        },
+        taggerCliAssets,
+        diggerCliAssets,
     )
 }
 

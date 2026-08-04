@@ -111,7 +111,6 @@ class TaggerPlugin : Plugin<Project> {
         task.description = "Validates all configured GitHub release assets exist"
         task.assets.from(tagger.githubReleaseAssets)
         task.githubReleaseEnabled.set(tagger.githubReleaseEnabled)
-        task.mustRunAfter(project.tasks.named("assemble"))
         task.enabled = !project.version.toString().contains("SNAPSHOT") && tagger.githubReleaseEnabled.get()
     }
 

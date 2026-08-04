@@ -258,7 +258,6 @@ class AdditionalTasksFunctionalTest {
         removeDirectory(projectDir)
     }
 
-
     private fun writeBuildFileWithMissingAssetAndValidation(projectDir: String, missingFile: String) {
         File("$projectDir/build.gradle.kts").writeText(
             """
@@ -324,7 +323,6 @@ class AdditionalTasksFunctionalTest {
             """.trimIndent(),
         )
     }
-
 
     private fun runGradle(
         projectDir: String,
