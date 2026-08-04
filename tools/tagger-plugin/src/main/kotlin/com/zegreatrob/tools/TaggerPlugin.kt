@@ -24,7 +24,7 @@ class TaggerPlugin : Plugin<Project> {
         val githubRelease = registerGithubReleaseTask(project, tagger, tag)
         val githubReleaseUpload = registerGithubReleaseUploadTask(project, tagger, githubRelease)
         val githubReleasePublish = registerGithubReleasePublishTask(project, tagger, githubReleaseUpload)
-        registerReleaseTask(project, tagger, tag, githubRelease, githubReleaseUpload)
+        registerReleaseTask(project, tagger, tag, githubRelease, githubReleaseUpload, githubReleasePublish)
     }
 
     private fun createTaggerExtension(project: Project): TaggerExtension {
@@ -178,12 +178,13 @@ class TaggerPlugin : Plugin<Project> {
         tag: Any,
         githubRelease: Any,
         githubReleaseUpload: Any,
+        githubReleasePublish: Any,
     ) {
         project.tasks.register("release", ReleaseVersion::class.java) { task ->
             task.group = "versioning"
             task.description =
                 "Orchestrator: assemble, then tag, optionally publish and create GitHub release. Disabled for -SNAPSHOT versions."
-            configureReleaseTask(task, project, tagger, tag, githubRelease, githubReleaseUpload)
+            configureReleaseTask(task, project, tagger, tag, githubRelease, githubReleaseUpload, githubReleasePublish)
         }
     }
 
@@ -194,6 +195,7 @@ class TaggerPlugin : Plugin<Project> {
         tag: Any,
         githubRelease: Any,
         githubReleaseUpload: Any,
+        githubReleasePublish: Any,
     ) {
         task.workingDirectory.set(tagger.workingDirectory)
         task.gitDirectory.set(tagger.workingDirectory.dir(".git"))
@@ -206,6 +208,7 @@ class TaggerPlugin : Plugin<Project> {
         task.dependsOn(tag)
         task.finalizedBy(githubRelease)
         task.finalizedBy(githubReleaseUpload)
+        task.finalizedBy(githubReleasePublish)
         task.finalizedBy(project.provider { project.getTasksByName("publish", true).toList() })
     }
 }

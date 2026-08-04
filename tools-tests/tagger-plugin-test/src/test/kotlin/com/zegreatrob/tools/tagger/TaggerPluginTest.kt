@@ -544,4 +544,21 @@ class TaggerPluginTest {
             .contains(uploadTask)
             .assertIsEqualTo(true, "Expected release task to be finalized by githubReleaseUpload when assets configured")
     }
+
+    @Test
+    fun `release task finalizes with githubReleasePublish when draft enabled`() = setup(object {
+        val project = ProjectBuilder.builder().build()
+    }) exercise {
+        project.version = "1.2.3"
+        project.plugins.apply("com.zegreatrob.tools.tagger")
+        val tagger = project.extensions.getByType(TaggerExtension::class.java)
+        tagger.githubReleaseEnabled.set(true)
+        tagger.githubReleaseDraft.set(true)
+        project.tasks.findByName("release")
+    } verify { releaseTask ->
+        val publishTask = project.tasks.findByName("githubReleasePublish")!!
+        releaseTask!!.finalizedBy.getDependencies(releaseTask)
+            .contains(publishTask)
+            .assertIsEqualTo(true, "Expected release task to be finalized by githubReleasePublish when draft enabled")
+    }
 }
