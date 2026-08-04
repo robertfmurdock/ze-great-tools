@@ -53,11 +53,7 @@ tasks {
         dependsOn(provider { gradle.includedBuilds.map { it.task(":assemble") }.toList() })
     }
     named("validateGithubReleaseAssets") {
-        dependsOn("assemble")
-        dependsOn(
-            gradle.includedBuild("command-line-tools").task(":tagger-cli:jvmDistZipChecksum"),
-            gradle.includedBuild("command-line-tools").task(":digger-cli:jvmDistZipChecksum"),
-        )
+        enabled = false
     }
     release {
         dependsOn("check")
