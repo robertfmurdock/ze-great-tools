@@ -129,30 +129,25 @@ class TaggerPlugin : Plugin<Project> {
     ) = project.tasks.register("githubReleaseUpload", Exec::class.java) { task ->
         task.group = "versioning"
         task.description =
-            "Side effect: upload assets to GitHub release via gh CLI. Requires githubRelease to run first. Disabled for -SNAPSHOT versions. Idempotent - skips files already uploaded."
+            "Side effect: upload assets to GitHub release via gh CLI. Requires githubRelease to run first. Disabled for -SNAPSHOT versions or when no assets configured. Idempotent - skips files already uploaded."
         task.enabled = !project.version.toString().contains("SNAPSHOT") &&
-            tagger.githubReleaseEnabled.get()
+            tagger.githubReleaseEnabled.get() &&
+            !tagger.githubReleaseAssets.isEmpty
         task.dependsOn(githubRelease)
         task.inputs.files(tagger.githubReleaseAssets)
         task.commandLine("sh", "-c", uploadAssetsScript(project.version, tagger.githubReleaseAssets.files))
     }
 
-    private fun uploadAssetsScript(version: Any, assets: Set<java.io.File>) = if (assets.isEmpty()) {
-        """
-            echo "No assets configured for release $version, skipping upload"
-        """.trimIndent()
-    } else {
-        """
-            for file in ${assets.joinToString(" ") { it.absolutePath }}; do
-                filename=${'$'}(basename "${'$'}file")
-                if gh release view $version --json assets --jq ".assets[].name" | grep -q "^${'$'}filename${'$'}"; then
-                    echo "Asset ${'$'}filename already uploaded to release $version, skipping"
-                else
-                    gh release upload $version "${'$'}file"
-                fi
-            done
-        """.trimIndent()
-    }
+    private fun uploadAssetsScript(version: Any, assets: Set<java.io.File>) = """
+        for file in ${assets.joinToString(" ") { it.absolutePath }}; do
+            filename=${'$'}(basename "${'$'}file")
+            if gh release view $version --json assets --jq ".assets[].name" | grep -q "^${'$'}filename${'$'}"; then
+                echo "Asset ${'$'}filename already uploaded to release $version, skipping"
+            else
+                gh release upload $version "${'$'}file"
+            fi
+        done
+    """.trimIndent()
 
     private fun registerGithubReleasePublishTask(
         project: Project,
