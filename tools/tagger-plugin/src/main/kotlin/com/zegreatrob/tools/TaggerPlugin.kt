@@ -120,6 +120,8 @@ class TaggerPlugin : Plugin<Project> {
         }
     }
 
+    private fun isGithubReleaseEnabled(isSnapshot: Boolean, tagger: TaggerExtension) = !isSnapshot && tagger.githubReleaseEnabled.get()
+
     private fun registerValidateGithubReleaseAssetsTask(
         project: Project,
         tagger: TaggerExtension,
@@ -129,7 +131,7 @@ class TaggerPlugin : Plugin<Project> {
         task.description = "Validates all configured GitHub release assets exist"
         task.assets.from(tagger.githubReleaseAssets)
         task.githubReleaseEnabled.set(tagger.githubReleaseEnabled)
-        task.enabled = !isSnapshot && tagger.githubReleaseEnabled.get()
+        task.enabled = isGithubReleaseEnabled(isSnapshot, tagger)
     }
 
     private fun registerGithubReleaseTask(
@@ -141,7 +143,7 @@ class TaggerPlugin : Plugin<Project> {
         task.group = "versioning"
         task.description =
             "Side effect: create GitHub release (published by default, configurable via githubReleaseDraft) via gh CLI. Requires tag to run first. Disabled for -SNAPSHOT versions. Idempotent - skips if release exists."
-        task.enabled = !isSnapshot && tagger.githubReleaseEnabled.get()
+        task.enabled = isGithubReleaseEnabled(isSnapshot, tagger)
         task.dependsOn(tag)
         task.commandLine("sh", "-c", draftReleaseScript(project.version, tagger.githubReleaseDraft.get()))
     }
@@ -164,9 +166,7 @@ class TaggerPlugin : Plugin<Project> {
         task.group = "versioning"
         task.description =
             "Side effect: upload assets to GitHub release via gh CLI. Requires githubRelease to run first. Disabled for -SNAPSHOT versions or when no assets configured. Idempotent - skips files already uploaded."
-        task.enabled = !isSnapshot &&
-            tagger.githubReleaseEnabled.get() &&
-            !tagger.githubReleaseAssets.isEmpty
+        task.enabled = isGithubReleaseEnabled(isSnapshot, tagger) && !tagger.githubReleaseAssets.isEmpty
         task.dependsOn(githubRelease)
         task.dependsOn(validateAssets)
         task.inputs.files(tagger.githubReleaseAssets)
@@ -174,12 +174,12 @@ class TaggerPlugin : Plugin<Project> {
     }
 
     private fun uploadAssetsScript(version: Any, assets: Set<java.io.File>) = """
-        for file in ${assets.joinToString(" ") { it.absolutePath }}; do
-            filename=${'$'}(basename "${'$'}file")
-            if gh release view $version --json assets --jq ".assets[].name" | grep -q "^${'$'}filename${'$'}"; then
-                echo "Asset ${'$'}filename already uploaded to release $version, skipping"
+        for asset_file in ${assets.joinToString(" ") { it.absolutePath }}; do
+            asset_name=${'$'}(basename "${'$'}asset_file")
+            if gh release view $version --json assets --jq ".assets[].name" | grep -q "^${'$'}asset_name${'$'}"; then
+                echo "Asset ${'$'}asset_name already uploaded to release $version, skipping"
             else
-                gh release upload $version "${'$'}file"
+                gh release upload $version "${'$'}asset_file"
             fi
         done
     """.trimIndent()
@@ -193,9 +193,7 @@ class TaggerPlugin : Plugin<Project> {
         task.group = "versioning"
         task.description =
             "Side effect: publish draft GitHub release via gh CLI. Requires githubReleaseUpload to run first. Disabled for -SNAPSHOT versions or when githubReleaseDraft is false. Idempotent - skips if already published."
-        task.enabled = !isSnapshot &&
-            tagger.githubReleaseEnabled.get() &&
-            tagger.githubReleaseDraft.get()
+        task.enabled = isGithubReleaseEnabled(isSnapshot, tagger) && tagger.githubReleaseDraft.get()
         task.dependsOn(githubReleaseUpload)
         task.commandLine("sh", "-c", publishReleaseScript(project.version))
     }
