@@ -70,16 +70,27 @@ Research shows no Gradle plugin provides complete tag→draft→upload→publish
   - Grammar check via `mcp__idea__get_file_problems`
   - Format via `mcp__idea__reformat_file`
   - Agent cycle: test → implement → refactor-light → verify pushable
-- [ ] Final refactor pass via subagent (MANDATORY - see REFACTOR_AGENT.md)
+- [x] Final refactor pass via subagent (MANDATORY - see REFACTOR_AGENT.md)
 
 ## Current State
-**Commit**: 62ebbbdf (Remove manual publish step from workflow)
+**Commit**: a04dcc9a (Refactor TaggerPlugin apply method to eliminate duplication)
 **Uncommitted changes**: Work card update only
-**Status**: Complete - all tasks implemented, wired, and tested
+**Status**: COMPLETE - all implementation, testing, and refactoring done
 **Date**: 2026-08-03
 
 ## Implementation Notes
 (Most recent first, date-stamped)
+
+### 2026-08-03: Final refactor pass completed
+- Completed commit a04dcc9a
+- Fixed critical code duplication: extracted `isSnapshot` variable (5 instances eliminated)
+- Refactored `apply()` method from 14→10 lines by extracting helper methods:
+  - `registerVersioningTasks()` - groups versioning-related task registrations
+  - `registerGithubTasks()` - groups GitHub-related task registrations
+- All task registration methods now accept `isSnapshot` as parameter
+- Quality audit passed: 0 critical issues remain
+- Full validation: `./gradlew check` passes
+- Work card ready to move to work_completed
 
 ### 2026-08-03: Publish task integrated
 - Completed commits 00188133 and 62ebbbdf
