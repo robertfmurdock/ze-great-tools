@@ -170,11 +170,15 @@ class TaggerPlugin : Plugin<Project> {
         task.dependsOn(githubRelease)
         task.dependsOn(validateAssets)
         task.inputs.files(tagger.githubReleaseAssets)
-        task.commandLine("sh", "-c", uploadAssetsScript(project.version, tagger.githubReleaseAssets.files))
+        task.commandLine(
+            "sh",
+            "-c",
+            uploadAssetsScript(project.version, tagger.githubReleaseAssets.files, project.projectDir),
+        )
     }
 
-    private fun uploadAssetsScript(version: Any, assets: Set<java.io.File>) = """
-        for asset_file in ${assets.joinToString(" ") { it.absolutePath }}; do
+    private fun uploadAssetsScript(version: Any, assets: Set<java.io.File>, projectDir: java.io.File) = """
+        for asset_file in ${assets.joinToString(" ") { it.relativeTo(projectDir).path }}; do
             asset_name=${'$'}(basename "${'$'}asset_file")
             if gh release view $version --json assets --jq ".assets[].name" | grep -q "^${'$'}asset_name${'$'}"; then
                 echo "Asset ${'$'}asset_name already uploaded to release $version, skipping"
