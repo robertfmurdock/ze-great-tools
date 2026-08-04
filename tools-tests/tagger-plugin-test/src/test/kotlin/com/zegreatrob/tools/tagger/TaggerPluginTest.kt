@@ -561,4 +561,24 @@ class TaggerPluginTest {
             .contains(publishTask)
             .assertIsEqualTo(true, "Expected release task to be finalized by githubReleasePublish when draft enabled")
     }
+
+    @Test
+    fun `githubReleaseUpload validates files exist before upload`() = setup(object {
+        val project = ProjectBuilder.builder().build()
+        val nonExistentFile = java.io.File("/tmp/does-not-exist-${System.currentTimeMillis()}.txt")
+    }) exercise {
+        project.version = "1.2.3"
+        project.plugins.apply("com.zegreatrob.tools.tagger")
+        val tagger = project.extensions.getByType(TaggerExtension::class.java)
+        tagger.githubReleaseEnabled.set(true)
+        tagger.githubReleaseAssets.from(nonExistentFile)
+        project.tasks.findByName("githubReleaseUpload") as org.gradle.api.tasks.Exec
+    } verify { task ->
+        val commandLine = task.commandLine
+        val script = commandLine.getOrNull(2)
+        script
+            .assertIsNotEqualTo(null, "Expected script to be generated")
+        script!!.contains(nonExistentFile.absolutePath)
+            .assertIsEqualTo(true, "Expected script to reference configured file even if it doesn't exist - will fail at execution time with clear error from gh CLI")
+    }
 }

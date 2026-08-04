@@ -21,14 +21,14 @@ tagger {
     githubReleaseAssets.from(
         layout.buildDirectory.file("aggregate-fingerprint.txt"),
         layout.buildDirectory.file("aggregate-fingerprint-manifest.log"),
-        fileTree("command-line-tools/tagger-cli/build/distributions") {
+        fileTree(gradle.includedBuild("command-line-tools").projectDir.resolve("tagger-cli/build/distributions")) {
             include("tagger-cli-jvm.zip", "tagger-cli-jvm.zip.sha256")
             builtBy(
                 gradle.includedBuild("command-line-tools").task(":tagger-cli:jvmDistZip"),
                 gradle.includedBuild("command-line-tools").task(":tagger-cli:jvmDistZipChecksum"),
             )
         },
-        fileTree("command-line-tools/digger-cli/build/distributions") {
+        fileTree(gradle.includedBuild("command-line-tools").projectDir.resolve("digger-cli/build/distributions")) {
             include("digger-cli-jvm.zip", "digger-cli-jvm.zip.sha256")
             builtBy(
                 gradle.includedBuild("command-line-tools").task(":digger-cli:jvmDistZip"),
