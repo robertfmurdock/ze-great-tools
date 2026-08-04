@@ -17,16 +17,33 @@ class TaggerPlugin : Plugin<Project> {
         project.plugins.apply("base")
         val tagger = createTaggerExtension(project)
         val exportToGithub = project.findProperty("exportToGithub")
+        val isSnapshot = project.version.toString().contains("SNAPSHOT")
+        registerVersioningTasks(project, tagger, exportToGithub)
+        val tag = registerTagTask(project, tagger)
+        val githubTasks = registerGithubTasks(project, tagger, tag, isSnapshot)
+        registerReleaseTask(project, tagger, tag, githubTasks.release, githubTasks.upload, githubTasks.publish, isSnapshot)
+    }
+
+    private fun registerVersioningTasks(project: Project, tagger: TaggerExtension, exportToGithub: Any?) {
         registerTaggerGuideTask(project)
         registerPreviousVersionTask(project, tagger)
         registerCalculateVersionTask(project, tagger, exportToGithub)
-        val tag = registerTagTask(project, tagger)
         registerCommitReportTask(project, tagger)
-        val validateAssets = registerValidateGithubReleaseAssetsTask(project, tagger)
-        val githubRelease = registerGithubReleaseTask(project, tagger, tag)
-        val githubReleaseUpload = registerGithubReleaseUploadTask(project, tagger, githubRelease, validateAssets)
-        val githubReleasePublish = registerGithubReleasePublishTask(project, tagger, githubReleaseUpload)
-        registerReleaseTask(project, tagger, tag, githubRelease, githubReleaseUpload, githubReleasePublish)
+    }
+
+    private data class GithubTasks(val release: Any, val upload: Any, val publish: Any)
+
+    private fun registerGithubTasks(
+        project: Project,
+        tagger: TaggerExtension,
+        tag: Any,
+        isSnapshot: Boolean,
+    ): GithubTasks {
+        val validateAssets = registerValidateGithubReleaseAssetsTask(project, tagger, isSnapshot)
+        val release = registerGithubReleaseTask(project, tagger, tag, isSnapshot)
+        val upload = registerGithubReleaseUploadTask(project, tagger, release, validateAssets, isSnapshot)
+        val publish = registerGithubReleasePublishTask(project, tagger, upload, isSnapshot)
+        return GithubTasks(release, upload, publish)
     }
 
     private fun createTaggerExtension(project: Project): TaggerExtension {
@@ -106,23 +123,25 @@ class TaggerPlugin : Plugin<Project> {
     private fun registerValidateGithubReleaseAssetsTask(
         project: Project,
         tagger: TaggerExtension,
+        isSnapshot: Boolean,
     ) = project.tasks.register("validateGithubReleaseAssets", ValidateGithubReleaseAssets::class.java) { task ->
         task.group = "verification"
         task.description = "Validates all configured GitHub release assets exist"
         task.assets.from(tagger.githubReleaseAssets)
         task.githubReleaseEnabled.set(tagger.githubReleaseEnabled)
-        task.enabled = !project.version.toString().contains("SNAPSHOT") && tagger.githubReleaseEnabled.get()
+        task.enabled = !isSnapshot && tagger.githubReleaseEnabled.get()
     }
 
     private fun registerGithubReleaseTask(
         project: Project,
         tagger: TaggerExtension,
         tag: Any,
+        isSnapshot: Boolean,
     ) = project.tasks.register("githubRelease", Exec::class.java) { task ->
         task.group = "versioning"
         task.description =
             "Side effect: create GitHub release (published by default, configurable via githubReleaseDraft) via gh CLI. Requires tag to run first. Disabled for -SNAPSHOT versions. Idempotent - skips if release exists."
-        task.enabled = !project.version.toString().contains("SNAPSHOT") && tagger.githubReleaseEnabled.get()
+        task.enabled = !isSnapshot && tagger.githubReleaseEnabled.get()
         task.dependsOn(tag)
         task.commandLine("sh", "-c", draftReleaseScript(project.version, tagger.githubReleaseDraft.get()))
     }
@@ -140,11 +159,12 @@ class TaggerPlugin : Plugin<Project> {
         tagger: TaggerExtension,
         githubRelease: Any,
         validateAssets: Any,
+        isSnapshot: Boolean,
     ) = project.tasks.register("githubReleaseUpload", Exec::class.java) { task ->
         task.group = "versioning"
         task.description =
             "Side effect: upload assets to GitHub release via gh CLI. Requires githubRelease to run first. Disabled for -SNAPSHOT versions or when no assets configured. Idempotent - skips files already uploaded."
-        task.enabled = !project.version.toString().contains("SNAPSHOT") &&
+        task.enabled = !isSnapshot &&
             tagger.githubReleaseEnabled.get() &&
             !tagger.githubReleaseAssets.isEmpty
         task.dependsOn(githubRelease)
@@ -168,11 +188,12 @@ class TaggerPlugin : Plugin<Project> {
         project: Project,
         tagger: TaggerExtension,
         githubReleaseUpload: Any,
+        isSnapshot: Boolean,
     ) = project.tasks.register("githubReleasePublish", Exec::class.java) { task ->
         task.group = "versioning"
         task.description =
             "Side effect: publish draft GitHub release via gh CLI. Requires githubReleaseUpload to run first. Disabled for -SNAPSHOT versions or when githubReleaseDraft is false. Idempotent - skips if already published."
-        task.enabled = !project.version.toString().contains("SNAPSHOT") &&
+        task.enabled = !isSnapshot &&
             tagger.githubReleaseEnabled.get() &&
             tagger.githubReleaseDraft.get()
         task.dependsOn(githubReleaseUpload)
@@ -194,12 +215,13 @@ class TaggerPlugin : Plugin<Project> {
         githubRelease: Any,
         githubReleaseUpload: Any,
         githubReleasePublish: Any,
+        isSnapshot: Boolean,
     ) {
         project.tasks.register("release", ReleaseVersion::class.java) { task ->
             task.group = "versioning"
             task.description =
                 "Orchestrator: assemble, then tag, optionally publish and create GitHub release. Disabled for -SNAPSHOT versions."
-            configureReleaseTask(task, project, tagger, tag, githubRelease, githubReleaseUpload, githubReleasePublish)
+            configureReleaseTask(task, project, tagger, tag, githubRelease, githubReleaseUpload, githubReleasePublish, isSnapshot)
         }
     }
 
@@ -211,13 +233,14 @@ class TaggerPlugin : Plugin<Project> {
         githubRelease: Any,
         githubReleaseUpload: Any,
         githubReleasePublish: Any,
+        isSnapshot: Boolean,
     ) {
         task.workingDirectory.set(tagger.workingDirectory)
         task.gitDirectory.set(tagger.workingDirectory.dir(".git"))
         task.releaseBranch.set(tagger.releaseBranchProperty)
         task.showCommands.set(tagger.showCommands)
         task.version = "${project.version}"
-        task.enabled = !project.version.toString().contains("SNAPSHOT")
+        task.enabled = !isSnapshot
         task.dependsOn(project.tasks.named("assemble"))
         task.mustRunAfter(project.tasks.named("check"))
         task.dependsOn(tag)
