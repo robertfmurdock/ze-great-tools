@@ -52,6 +52,9 @@ tasks {
         dependsOn(aggregateFingerprints)
         dependsOn(provider { gradle.includedBuilds.map { it.task(":assemble") }.toList() })
     }
+    named("validateGithubReleaseAssets") {
+        dependsOn("assemble")
+    }
     release {
         dependsOn("check")
         dependsOn(provider { gradle.includedBuild("command-line-tools").task(":release") })
