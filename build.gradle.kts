@@ -54,6 +54,10 @@ tasks {
     }
     named("validateGithubReleaseAssets") {
         dependsOn("assemble")
+        dependsOn(
+            gradle.includedBuild("command-line-tools").task(":tagger-cli:jvmDistZipChecksum"),
+            gradle.includedBuild("command-line-tools").task(":digger-cli:jvmDistZipChecksum"),
+        )
     }
     release {
         dependsOn("check")
