@@ -178,27 +178,6 @@ class TaggerPlugin : Plugin<Project> {
     }
 
     private fun uploadAssetsScript(version: Any, assets: Set<java.io.File>, projectDir: java.io.File) = """
-        echo "DEBUG: Project directory: $projectDir"
-        echo "DEBUG: Current directory: ${'$'}(pwd)"
-        echo "DEBUG: Listing command-line-tools directory:"
-        ls -la command-line-tools/ 2>&1 || echo "command-line-tools/ not found"
-        echo "DEBUG: Checking tagger-cli/build contents:"
-        ls -la command-line-tools/tagger-cli/build/ 2>&1 | head -25
-        echo "DEBUG: Checking if tagger-cli/build/distributions exists:"
-        ls -la command-line-tools/tagger-cli/build/distributions/ 2>&1 || echo "distributions/ not found"
-        echo "DEBUG: Checking digger-cli/build contents:"
-        ls -la command-line-tools/digger-cli/build/ 2>&1 | head -25
-        echo "DEBUG: Checking if digger-cli/build/distributions exists:"
-        ls -la command-line-tools/digger-cli/build/distributions/ 2>&1 || echo "distributions/ not found"
-        echo "DEBUG: Asset files to upload:"
-        for asset_file in ${assets.joinToString(" ") { it.relativeTo(projectDir).path }}; do
-            echo "  - ${'$'}asset_file"
-            if [ -f "${'$'}asset_file" ]; then
-                echo "    EXISTS (size: ${'$'}(stat -c%s "${'$'}asset_file" 2>/dev/null || stat -f%z "${'$'}asset_file"))"
-            else
-                echo "    MISSING"
-            fi
-        done
         for asset_file in ${assets.joinToString(" ") { it.relativeTo(projectDir).path }}; do
             asset_name=${'$'}(basename "${'$'}asset_file")
             if gh release view $version --json assets --jq ".assets[].name" | grep -q "^${'$'}asset_name${'$'}"; then
