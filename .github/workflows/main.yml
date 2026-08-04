@@ -55,7 +55,7 @@ jobs:
       - name: Check Fingerprint 🔨
         continue-on-error: true
         run: |
-          export PREVIOUS_VERSION=$(./gradlew previousVersion -q)
+          export PREVIOUS_VERSION=$(gh release list --exclude-drafts --limit 1 --json tagName --jq '.[0].tagName')
           gh release download "$PREVIOUS_VERSION" -p "aggregate-fingerprint.txt" -O build/prev-aggregate-fingerprint.txt || true
           ./gradlew -q compareAggregateFingerprints \
             -Pversion=$PREVIOUS_VERSION \
@@ -66,7 +66,7 @@ jobs:
         if: ${{ env.FINGERPRINT_MATCHES_PREVIOUS == 'false' }}
         continue-on-error: true
         run: |
-          export PREVIOUS_VERSION=$(./gradlew previousVersion -q)
+          export PREVIOUS_VERSION=$(gh release list --exclude-drafts --limit 1 --json tagName --jq '.[0].tagName')
           gh release download "$PREVIOUS_VERSION" -p "aggregate-fingerprint-manifest.log" -O build/prev-aggregate-fingerprint-manifest.log || true
           diff -u build/prev-aggregate-fingerprint-manifest.log build/aggregate-fingerprint-manifest.log \
             && echo "UNEXPECTED: aggregate log matches release $PREVIOUS_VERSION"
