@@ -7,6 +7,7 @@ import com.zegreatrob.tools.tagger.ReleaseVersion
 import com.zegreatrob.tools.tagger.TagVersion
 import com.zegreatrob.tools.tagger.TaggerExtension
 import com.zegreatrob.tools.tagger.TaggerGuideTask
+import com.zegreatrob.tools.tagger.ValidateGithubReleaseAssets
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.Exec
@@ -21,8 +22,9 @@ class TaggerPlugin : Plugin<Project> {
         registerCalculateVersionTask(project, tagger, exportToGithub)
         val tag = registerTagTask(project, tagger)
         registerCommitReportTask(project, tagger)
+        val validateAssets = registerValidateGithubReleaseAssetsTask(project, tagger)
         val githubRelease = registerGithubReleaseTask(project, tagger, tag)
-        val githubReleaseUpload = registerGithubReleaseUploadTask(project, tagger, githubRelease)
+        val githubReleaseUpload = registerGithubReleaseUploadTask(project, tagger, githubRelease, validateAssets)
         val githubReleasePublish = registerGithubReleasePublishTask(project, tagger, githubReleaseUpload)
         registerReleaseTask(project, tagger, tag, githubRelease, githubReleaseUpload, githubReleasePublish)
     }
@@ -101,6 +103,18 @@ class TaggerPlugin : Plugin<Project> {
         }
     }
 
+    private fun registerValidateGithubReleaseAssetsTask(
+        project: Project,
+        tagger: TaggerExtension,
+    ) = project.tasks.register("validateGithubReleaseAssets", ValidateGithubReleaseAssets::class.java) { task ->
+        task.group = "verification"
+        task.description = "Validates all configured GitHub release assets exist"
+        task.assets.from(tagger.githubReleaseAssets)
+        task.githubReleaseEnabled.set(tagger.githubReleaseEnabled)
+        task.mustRunAfter(project.tasks.named("assemble"))
+        task.enabled = !project.version.toString().contains("SNAPSHOT") && tagger.githubReleaseEnabled.get()
+    }
+
     private fun registerGithubReleaseTask(
         project: Project,
         tagger: TaggerExtension,
@@ -126,6 +140,7 @@ class TaggerPlugin : Plugin<Project> {
         project: Project,
         tagger: TaggerExtension,
         githubRelease: Any,
+        validateAssets: Any,
     ) = project.tasks.register("githubReleaseUpload", Exec::class.java) { task ->
         task.group = "versioning"
         task.description =
@@ -134,6 +149,7 @@ class TaggerPlugin : Plugin<Project> {
             tagger.githubReleaseEnabled.get() &&
             !tagger.githubReleaseAssets.isEmpty
         task.dependsOn(githubRelease)
+        task.dependsOn(validateAssets)
         task.inputs.files(tagger.githubReleaseAssets)
         task.commandLine("sh", "-c", uploadAssetsScript(project.version, tagger.githubReleaseAssets.files))
     }

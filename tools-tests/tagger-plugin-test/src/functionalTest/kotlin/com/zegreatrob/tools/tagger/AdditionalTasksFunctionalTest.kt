@@ -131,9 +131,10 @@ class AdditionalTasksFunctionalTest {
     fun githubReleaseUploadFailsWhenAssetFileMissing() = setup(object {
         val projectDir = createTempDirectory()
         val addFileNames = setOf("build.gradle.kts", "settings.gradle", ".gitignore")
+        val missingFile = "does-not-exist.txt"
     }) {
         writeSettings(projectDir)
-        writeBuildFileWithMissingAsset(projectDir)
+        writeBuildFileWithMissingAssetAndValidation(projectDir, missingFile)
         writeGitIgnore(projectDir)
         initializeGitRepo(
             directory = projectDir,
@@ -145,16 +146,120 @@ class AdditionalTasksFunctionalTest {
     } exercise {
         val runner = GradleRunner.create()
         runner.withProjectDir(File(projectDir))
-        runner.withArguments("githubReleaseUpload", "-Pversion=1.0.1")
+        runner.withArguments("validateGithubReleaseAssets", "--console=plain")
         runCatching { runner.build() }
     } verifyAnd { result ->
+        val exception = result.exceptionOrNull()
         result.isFailure
-            .assertIsEqualTo(true, "Expected githubReleaseUpload to fail when asset file missing")
+            .assertIsEqualTo(true, "Expected validation to fail when asset file missing")
+        exception
+            ?.message
+            ?.contains(missingFile)
+            .assertIsEqualTo(true, "Error message should mention missing file: ${exception?.message}")
     } teardown {
         removeDirectory(projectDir)
     }
 
-    private fun writeBuildFileWithMissingAsset(projectDir: String) {
+    @Test
+    fun githubReleaseUploadReportsAllMissingAssets() = setup(object {
+        val projectDir = createTempDirectory()
+        val addFileNames = setOf("build.gradle.kts", "settings.gradle", ".gitignore")
+        val missingFiles = listOf("missing-one.txt", "missing-two.txt", "missing-three.txt")
+    }) {
+        writeSettings(projectDir)
+        writeBuildFileWithMultipleMissingAssetsAndValidation(projectDir, missingFiles)
+        writeGitIgnore(projectDir)
+        initializeGitRepo(
+            directory = projectDir,
+            remoteUrl = projectDir,
+            addFileNames = addFileNames,
+            initialTag = "1.0.0",
+            commits = listOf("init"),
+        )
+    } exercise {
+        val runner = GradleRunner.create()
+        runner.withProjectDir(File(projectDir))
+        runner.withArguments("validateGithubReleaseAssets", "--console=plain")
+        runCatching { runner.build() }
+    } verifyAnd { result ->
+        val exception = result.exceptionOrNull()
+        result.isFailure
+            .assertIsEqualTo(true, "Expected validation to fail when asset files missing")
+        val errorMessage = exception?.message ?: ""
+        missingFiles.forEach { missingFile ->
+            errorMessage
+                .contains(missingFile)
+                .assertIsEqualTo(true, "Error message should mention missing file '$missingFile': $errorMessage")
+        }
+    } teardown {
+        removeDirectory(projectDir)
+    }
+
+    @Test
+    fun validateGithubReleaseAssetsSucceedsWhenAllFilesExist() = setup(object {
+        val projectDir = createTempDirectory()
+        val addFileNames = setOf("build.gradle.kts", "settings.gradle", ".gitignore")
+        val assetFiles = listOf("asset-one.txt", "asset-two.txt")
+    }) {
+        writeSettings(projectDir)
+        writeBuildFileWithExistingAssets(projectDir, assetFiles)
+        writeGitIgnore(projectDir)
+        assetFiles.forEach { fileName ->
+            File("$projectDir/$fileName").writeText("test content")
+        }
+        initializeGitRepo(
+            directory = projectDir,
+            remoteUrl = projectDir,
+            addFileNames = addFileNames,
+            initialTag = "1.0.0",
+            commits = listOf("init"),
+        )
+    } exercise {
+        val runner = GradleRunner.create()
+        runner.withProjectDir(File(projectDir))
+        runner.withArguments("validateGithubReleaseAssets", "--console=plain")
+        runCatching { runner.build() }
+    } verifyAnd { result ->
+        result.isSuccess
+            .assertIsEqualTo(true, "Expected validation to succeed when all files exist: ${result.exceptionOrNull()?.message}")
+    } teardown {
+        removeDirectory(projectDir)
+    }
+
+    @Test
+    fun validateGithubReleaseAssetsSucceedsWhenFileTreeMatchesNoFiles() = setup(object {
+        val projectDir = createTempDirectory()
+        val addFileNames = setOf("build.gradle.kts", "settings.gradle", ".gitignore")
+        val buildDir = "$projectDir/build"
+        val distDir = "$buildDir/distributions"
+    }) {
+        writeSettings(projectDir)
+        writeBuildFileWithFileTreeAssets(projectDir)
+        writeGitIgnore(projectDir)
+        File(distDir).mkdirs()
+        initializeGitRepo(
+            directory = projectDir,
+            remoteUrl = projectDir,
+            addFileNames = addFileNames,
+            initialTag = "1.0.0",
+            commits = listOf("init"),
+        )
+    } exercise {
+        val runner = GradleRunner.create()
+        runner.withProjectDir(File(projectDir))
+        runner.withArguments("validateGithubReleaseAssets", "--console=plain")
+        val result = runner.build()
+        result.output
+    } verifyAnd { output ->
+        output
+            .contains("No GitHub release assets configured")
+            .assertIsEqualTo(true, "Should report no assets when fileTree matches nothing: $output")
+    } teardown {
+        removeDirectory(projectDir)
+    }
+
+
+    private fun writeBuildFileWithMissingAssetAndValidation(projectDir: String, missingFile: String) {
         File("$projectDir/build.gradle.kts").writeText(
             """
             plugins {
@@ -163,11 +268,63 @@ class AdditionalTasksFunctionalTest {
             tagger {
                 releaseBranch = "master"
                 githubReleaseEnabled.set(true)
-                githubReleaseAssets.from(file("does-not-exist.txt"))
+                githubReleaseAssets.from(file("$missingFile"))
             }
             """.trimIndent(),
         )
     }
+
+    private fun writeBuildFileWithMultipleMissingAssetsAndValidation(projectDir: String, missingFiles: List<String>) {
+        val filesDeclaration = missingFiles.joinToString(", ") { "file(\"$it\")" }
+        File("$projectDir/build.gradle.kts").writeText(
+            """
+            plugins {
+                id("com.zegreatrob.tools.tagger")
+            }
+            tagger {
+                releaseBranch = "master"
+                githubReleaseEnabled.set(true)
+                githubReleaseAssets.from($filesDeclaration)
+            }
+            """.trimIndent(),
+        )
+    }
+
+    private fun writeBuildFileWithExistingAssets(projectDir: String, assetFiles: List<String>) {
+        val filesDeclaration = assetFiles.joinToString(", ") { "file(\"$it\")" }
+        File("$projectDir/build.gradle.kts").writeText(
+            """
+            plugins {
+                id("com.zegreatrob.tools.tagger")
+            }
+            tagger {
+                releaseBranch = "master"
+                githubReleaseEnabled.set(true)
+                githubReleaseAssets.from($filesDeclaration)
+            }
+            """.trimIndent(),
+        )
+    }
+
+    private fun writeBuildFileWithFileTreeAssets(projectDir: String) {
+        File("$projectDir/build.gradle.kts").writeText(
+            """
+            plugins {
+                id("com.zegreatrob.tools.tagger")
+            }
+            tagger {
+                releaseBranch = "master"
+                githubReleaseEnabled.set(true)
+                githubReleaseAssets.from(
+                    fileTree("build/distributions") {
+                        include("existing.zip", "missing.zip")
+                    }
+                )
+            }
+            """.trimIndent(),
+        )
+    }
+
 
     private fun runGradle(
         projectDir: String,
