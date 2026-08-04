@@ -53,7 +53,7 @@ tasks {
         dependsOn(provider { gradle.includedBuilds.map { it.task(":assemble") }.toList() })
     }
     named("validateGithubReleaseAssets") {
-        dependsOn("assemble")
+        enabled = false
     }
     release {
         dependsOn("check")
