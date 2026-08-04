@@ -127,6 +127,48 @@ class AdditionalTasksFunctionalTest {
         File("$projectDir/.gitignore").writeText(".gradle")
     }
 
+    @Test
+    fun githubReleaseUploadFailsWhenAssetFileMissing() = setup(object {
+        val projectDir = createTempDirectory()
+        val addFileNames = setOf("build.gradle.kts", "settings.gradle", ".gitignore")
+    }) {
+        writeSettings(projectDir)
+        writeBuildFileWithMissingAsset(projectDir)
+        writeGitIgnore(projectDir)
+        initializeGitRepo(
+            directory = projectDir,
+            remoteUrl = projectDir,
+            addFileNames = addFileNames,
+            initialTag = "1.0.0",
+            commits = listOf("init"),
+        )
+    } exercise {
+        val runner = GradleRunner.create()
+        runner.withProjectDir(File(projectDir))
+        runner.withArguments("githubReleaseUpload", "-Pversion=1.0.1")
+        runCatching { runner.build() }
+    } verifyAnd { result ->
+        result.isFailure
+            .assertIsEqualTo(true, "Expected githubReleaseUpload to fail when asset file missing")
+    } teardown {
+        removeDirectory(projectDir)
+    }
+
+    private fun writeBuildFileWithMissingAsset(projectDir: String) {
+        File("$projectDir/build.gradle.kts").writeText(
+            """
+            plugins {
+                id("com.zegreatrob.tools.tagger")
+            }
+            tagger {
+                releaseBranch = "master"
+                githubReleaseEnabled.set(true)
+                githubReleaseAssets.from(file("does-not-exist.txt"))
+            }
+            """.trimIndent(),
+        )
+    }
+
     private fun runGradle(
         projectDir: String,
         task: String,
