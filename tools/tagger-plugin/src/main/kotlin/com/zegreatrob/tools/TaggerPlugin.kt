@@ -182,10 +182,14 @@ class TaggerPlugin : Plugin<Project> {
         echo "DEBUG: Current directory: ${'$'}(pwd)"
         echo "DEBUG: Listing command-line-tools directory:"
         ls -la command-line-tools/ 2>&1 || echo "command-line-tools/ not found"
-        echo "DEBUG: Checking if tagger-cli/build exists:"
-        ls -la command-line-tools/tagger-cli/ 2>&1 | head -20
-        echo "DEBUG: Checking if digger-cli/build exists:"
-        ls -la command-line-tools/digger-cli/ 2>&1 | head -20
+        echo "DEBUG: Checking tagger-cli/build contents:"
+        ls -la command-line-tools/tagger-cli/build/ 2>&1 | head -25
+        echo "DEBUG: Checking if tagger-cli/build/distributions exists:"
+        ls -la command-line-tools/tagger-cli/build/distributions/ 2>&1 || echo "distributions/ not found"
+        echo "DEBUG: Checking digger-cli/build contents:"
+        ls -la command-line-tools/digger-cli/build/ 2>&1 | head -25
+        echo "DEBUG: Checking if digger-cli/build/distributions exists:"
+        ls -la command-line-tools/digger-cli/build/distributions/ 2>&1 || echo "distributions/ not found"
         echo "DEBUG: Asset files to upload:"
         for asset_file in ${assets.joinToString(" ") { it.relativeTo(projectDir).path }}; do
             echo "  - ${'$'}asset_file"
