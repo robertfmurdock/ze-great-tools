@@ -395,7 +395,7 @@ class TaggerPluginTest {
     }
 
     @Test
-    fun `githubReleaseUpload task disabled when githubReleaseAssets is empty`() = setup(object {
+    fun `githubReleaseUpload task generates valid script when no assets configured`() = setup(object {
         val project = ProjectBuilder.builder().build()
     }) exercise {
         project.version = "1.2.3"
@@ -405,7 +405,41 @@ class TaggerPluginTest {
         project.tasks.findByName("githubReleaseUpload") as org.gradle.api.tasks.Exec
     } verify { task ->
         task.enabled
-            .assertIsEqualTo(false, "Expected githubReleaseUpload to be disabled when no assets configured")
+            .assertIsEqualTo(true, "Expected githubReleaseUpload to be enabled even with no assets")
+        val commandLine = task.commandLine
+        val script = commandLine.getOrNull(2)
+        script
+            .assertIsNotEqualTo(null, "Expected script to be generated")
+        script!!.contains("No assets configured")
+            .assertIsEqualTo(true, "Expected script to handle empty assets gracefully, not generate bash syntax error")
+        script.contains("for file in ;")
+            .assertIsEqualTo(false, "Expected script to avoid empty for loop syntax error")
+    }
+
+    @Test
+    fun `githubReleaseUpload task generates loop script when assets configured`() = setup(object {
+        val project = ProjectBuilder.builder().build()
+        val testFile = java.io.File.createTempFile("test", ".txt")
+    }) {
+        testFile.deleteOnExit()
+    } exercise {
+        project.version = "1.2.3"
+        project.plugins.apply("com.zegreatrob.tools.tagger")
+        val tagger = project.extensions.getByType(TaggerExtension::class.java)
+        tagger.githubReleaseEnabled.set(true)
+        tagger.githubReleaseAssets.from(testFile)
+        project.tasks.findByName("githubReleaseUpload") as org.gradle.api.tasks.Exec
+    } verify { task ->
+        val commandLine = task.commandLine
+        val script = commandLine.getOrNull(2)
+        script
+            .assertIsNotEqualTo(null, "Expected script to be generated")
+        script!!.contains("for file in")
+            .assertIsEqualTo(true, "Expected script to use for loop when assets configured")
+        script.contains(testFile.absolutePath)
+            .assertIsEqualTo(true, "Expected script to include configured asset path")
+        script.contains("gh release upload")
+            .assertIsEqualTo(true, "Expected script to contain gh release upload command")
     }
 
     @Test
