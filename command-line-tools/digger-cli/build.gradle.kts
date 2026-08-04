@@ -22,8 +22,7 @@ repositories {
 tasks.register<Checksum>("jvmDistZipChecksum") {
     group = "distribution"
     description = "Generate SHA-256 checksum for JVM distribution zip"
-    dependsOn("jvmDistZip")
-    inputFiles.from(layout.buildDirectory.file("distributions/digger-cli-jvm.zip"))
+    inputFiles.from(tasks.named("jvmDistZip"))
     outputDirectory.set(layout.buildDirectory.dir("distributions"))
     checksumAlgorithm.set(Checksum.Algorithm.SHA256)
     appendFileNameToChecksum.set(false)
