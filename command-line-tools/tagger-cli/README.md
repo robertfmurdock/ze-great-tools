@@ -227,7 +227,8 @@ tagger tag --version 1.2.3  # no --release-branch needed
 
 ## Transparency and Audit
 
-The `--show-commands` flag prints all git commands to stderr before execution, providing transparency for security audits
+The `--show-commands` flag prints all git commands to stderr before execution, providing transparency for security
+audits
 and troubleshooting:
 
 ```bash
@@ -566,7 +567,8 @@ tagger tag --help
 
 Documentation is also available as markdown files in the repository:
 
-- [Tagger Guide](../../tools/tagger-guide/src/commonMain/resources/help/tagger-guide.md) - Fit assessment, philosophy, and workflow guidance
+- [Tagger Guide](../../tools/tagger-guide/src/commonMain/resources/help/tagger-guide.md) - Fit assessment, philosophy,
+  and workflow guidance
 - [Tagger Help](src/commonMain/resources/help/tagger.md) - Main command overview and options
 - [Calculate Version Help](src/commonMain/resources/help/calculate-version.md) - Snapshot reasons, remediation, and
   version calculation details

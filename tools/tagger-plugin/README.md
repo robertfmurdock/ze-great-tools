@@ -166,7 +166,7 @@ tagger {
 
 When `githubReleaseDraft` is `false` (the default), releases are published immediately without requiring an extra step.
 
-When `githubReleaseDraft` is `true`, releases are created as drafts. Your workflow must include an additional step to 
+When `githubReleaseDraft` is `true`, releases are created as drafts. Your workflow must include an additional step to
 publish the release:
 
 ```bash
@@ -186,8 +186,8 @@ following GitHub's supply chain security best practices:
 This prevents supply chain attacks where an attacker might modify published artifacts. Once published, your release is
 permanently locked.
 
-When `githubReleaseDraft` is false (the default), releases are published immediately upon creation. While simpler, this 
-workflow loses the immutability protection benefits of the draft-first pattern since the tag and release become public 
+When `githubReleaseDraft` is false (the default), releases are published immediately upon creation. While simpler, this
+workflow loses the immutability protection benefits of the draft-first pattern since the tag and release become public
 before all assets are uploaded.
 
 For more information,

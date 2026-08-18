@@ -24,6 +24,18 @@ All user-facing documentation (README.md, guides, tutorials, etc.) MUST:
 2. **Grammar check**: Run `mcp__idea__get_file_problems` to verify grammar
 3. **Format**: Run `mcp__idea__reformat_file` for consistent formatting
 
+### IDEA Integration Recovery
+If IDEA tools report that the repository is not an open project, launch the repository in the connected JetBrains
+instance and wait for indexing/sync to finish:
+
+```bash
+PROJECT_NAME=/Users/robertfmurdock/git/ze-great-tools
+idea "$PROJECT_NAME"
+```
+
+Verify the bridge is attached by calling `mcp__idea__get_project_modules` with the same `projectPath`. If it still
+reports a different open project, wait briefly and retry after IDEA finishes loading.
+
 ### Link Verification Protocol
 Before completing documentation work:
 1. Extract all links from modified files
