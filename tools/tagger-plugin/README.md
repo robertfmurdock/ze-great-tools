@@ -112,6 +112,9 @@ tagger {
 This is useful in CI/CD pipelines where you want to enforce clean configuration and catch issues early. When enabled,
 the `calculateVersion` task will fail if any warnings are detected.
 
+Strict mode only controls warnings. Git operation failures while creating or pushing an annotated tag always fail the
+`tag` task, regardless of the `warningsAsErrors` setting.
+
 #### Keep in mind!
 
 In order to correctly generate the version number, the local git repository must be able to see the last relevant tag.
@@ -222,4 +225,3 @@ use. Since local development builds should take priority, I decided on trading s
 setup (aka, calculateVersion then release) for being able to use the configuration cache all the time.
 
 That said, its entirely possible there's a way to do it I didn't find! Open to suggestions and pull requests.
-

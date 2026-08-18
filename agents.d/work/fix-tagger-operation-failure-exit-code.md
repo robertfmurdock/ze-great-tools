@@ -40,7 +40,7 @@ Ensure `tagger tag` and the Gradle `tag` task fail whenever annotated-tag creati
   - Retain coverage for non-strict and strict policy warnings, successful tagging, and idempotent tagging
   - Agent cycle: write one test at a time -> verify expected failure -> implement if needed -> refactor-light -> verify pushable
   - Update plan if guidelines reveal new constraints
-- [ ] Clarify user-facing documentation that operational failures always fail while strict mode controls warnings
+- [x] Clarify user-facing documentation that operational failures always fail while strict mode controls warnings
   - Preserve existing examples and JSON schema
   - Verify links, grammar, and formatting according to `DOCUMENTATION.md`
   - Agent cycle: verify current behavior coverage -> update documentation -> verify pushable
@@ -57,6 +57,9 @@ Ensure `tagger tag` and the Gradle `tag` task fail whenever annotated-tag creati
 
 ## Implementation Notes
 _(newest first)_
+
+### 2026-08-18: Strict-mode documentation slice
+Clarified the CLI and Gradle plugin READMEs that `warningsAsErrors` governs policy warnings while annotated-tag creation and push failures always fail. Verified all five concrete external links returned HTTP 200, all four relative links exist, and the strict-mode anchor resolves. The required IDEA grammar and reformat integrations are unavailable in this environment, so those checks remain an explicit tooling blocker rather than being reported as passed. No new behavior was introduced by this documentation-only slice; the preceding shared and CLI-specific tests cover the documented behavior.
 
 ### 2026-08-18: Push-failure regression slice
 Added a shared non-strict push-failure scenario using a formerly valid remote changed to an unavailable path. CLI and Gradle adapters fail with an actionable `git push --tags` message while retaining the local tag and leaving the remote untagged. Added CLI JSON coverage for exit status 1, `status: "error"`, `code: "TAG_ERROR"`, and the Git failure message. These regression tests were green immediately because the preceding typed-failure slice covered both Git operations.
@@ -83,6 +86,6 @@ The user explicitly authorized the repository-required subagent for the final re
 - [x] Focused shared test demonstrates the original false-success behavior before implementation
 - [x] `./gradlew :command-line-tools:tagger-cli:check -q --console=plain`
 - [x] `./gradlew :tools-tests:tagger-plugin-test:check -q --console=plain`
-- [ ] Modified user-facing documentation passes link, grammar, and formatting checks from `DOCUMENTATION.md`
+- [ ] Modified user-facing documentation passes link, grammar, and formatting checks from `DOCUMENTATION.md` (links passed; IDEA grammar/format integrations unavailable)
 - [ ] `./gradlew check -q --console=plain`
 - **Status**: Missing-identity slice passes CLI and Gradle plugin module checks

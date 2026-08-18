@@ -416,6 +416,9 @@ workflow.
 Enable strict mode to fail builds when warnings are present. This is useful for CI/CD pipelines where you want to
 enforce clean execution.
 
+Strict mode only controls policy warnings. Git operation failures, such as an annotated tag that cannot be created or
+pushed, always exit with a nonzero status regardless of the `warningsAsErrors` setting.
+
 **Command-line flag:**
 
 ```bash
