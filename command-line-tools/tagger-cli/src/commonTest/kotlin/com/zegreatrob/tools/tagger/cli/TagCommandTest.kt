@@ -3,9 +3,11 @@ package com.zegreatrob.tools.tagger.cli
 import com.github.ajalt.clikt.testing.test
 import com.zegreatrob.minassert.assertIsEqualTo
 import com.zegreatrob.testmints.setup
+import com.zegreatrob.tools.adapter.git.GitAdapter
 import com.zegreatrob.tools.tagger.TagTestSpec
 import com.zegreatrob.tools.tagger.TestResult
 import com.zegreatrob.tools.test.git.addCommitWithMessage
+import com.zegreatrob.tools.test.git.createTempDirectory
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
@@ -109,6 +111,49 @@ class TagCommandTest : TagTestSpec {
 
         val data = json.jsonObject["data"]?.jsonObject ?: fail("Expected data object in JSON. Output: ${result.stdout}")
         data["tag"]?.jsonPrimitive?.content.assertIsEqualTo("1.2.4")
+    }
+
+    @Test
+    fun withFormatJsonPushFailureReturnsTagError() = setup(object {
+        val version = "1.2.4"
+        val originDirectory = createTempDirectory()
+    }) {
+        val originGitAdapter = GitAdapter(originDirectory)
+        originGitAdapter.init()
+        originGitAdapter.config("receive.denyCurrentBranch", "ignore")
+        originGitAdapter.config("commit.gpgsign", "false")
+        originGitAdapter.addCommitWithMessage("init")
+
+        val gitAdapter = initializeGitRepo(
+            commits = listOf("init", "[patch] commit 1"),
+            initialTag = "1.2.3",
+            remoteUrl = originDirectory,
+        )
+        gitAdapter.push()
+        gitAdapter.config("remote.origin.url", "$originDirectory/unavailable")
+        baseArguments = listOf(
+            "tag",
+            "--release-branch=master",
+            "--format=json",
+            "--user-name=Test User",
+            "--user-email=test@example.com",
+            "--warnings-as-errors=false",
+            "--version=$version",
+            projectDir,
+        )
+    } exercise {
+        cli().test(baseArguments)
+    } verify { result ->
+        result.statusCode.assertIsEqualTo(1)
+
+        val json = Json.parseToJsonElement(result.stdout).jsonObject
+        json["status"]?.jsonPrimitive?.content.assertIsEqualTo("error")
+        json["code"]?.jsonPrimitive?.content.assertIsEqualTo("TAG_ERROR")
+        json["error"]
+            ?.jsonPrimitive
+            ?.content
+            ?.contains("Command failed: git push --tags")
+            .assertIsEqualTo(true)
     }
 
     @Test

@@ -34,7 +34,7 @@ Ensure `tagger tag` and the Gradle `tag` task fail whenever annotated-tag creati
   - `TagResult.Warning` remains controlled only by `warningsAsErrors`
   - Agent cycle: write one test -> verify expected failure -> implement -> refactor-light -> verify pushable
   - Update plan if guidelines reveal new constraints
-- [ ] Add regression coverage for push failure and output contracts
+- [x] Add regression coverage for push failure and output contracts
   - Prove a rejected or unavailable push fails with `warningsAsErrors=false` across CLI and Gradle plugin
   - Add CLI-specific JSON coverage for the stable error payload and nonzero status
   - Retain coverage for non-strict and strict policy warnings, successful tagging, and idempotent tagging
@@ -57,6 +57,9 @@ Ensure `tagger tag` and the Gradle `tag` task fail whenever annotated-tag creati
 
 ## Implementation Notes
 _(newest first)_
+
+### 2026-08-18: Push-failure regression slice
+Added a shared non-strict push-failure scenario using a formerly valid remote changed to an unavailable path. CLI and Gradle adapters fail with an actionable `git push --tags` message while retaining the local tag and leaving the remote untagged. Added CLI JSON coverage for exit status 1, `status: "error"`, `code: "TAG_ERROR"`, and the Git failure message. These regression tests were green immediately because the preceding typed-failure slice covered both Git operations.
 
 ### 2026-08-18: Missing-identity failure slice
 Added the shared non-strict missing-committer-identity scenario. The red run failed on JVM and JS because each CLI adapter returned `TestResult.Success`; after adding `TagResult.Failure` and unconditional CLI/Gradle failure handling, the CLI and Gradle plugin module checks passed. Core tagging now catches only `ProcessError`, after tag creation or pushing, and allows unexpected exceptions to propagate.

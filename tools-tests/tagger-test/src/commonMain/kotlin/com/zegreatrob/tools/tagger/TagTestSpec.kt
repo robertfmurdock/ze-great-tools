@@ -382,6 +382,45 @@ interface TagTestSpec {
     }
 
     @Test
+    fun tagWillFailWhenTagsCannotBePushedAndWarningsAreNotErrors() = setup(object {
+        val version = "1.0.0"
+        val expectedError = "Command failed: git push --tags"
+        lateinit var gitAdapter: GitAdapter
+        lateinit var originGitAdapter: GitAdapter
+    }) {
+        configureWithOverrides(
+            releaseBranch = "master",
+            userName = "RoB as Test",
+            userEmail = "test@zegreatrob.com",
+            warningsAsErrors = false,
+        )
+
+        val originDirectory = createTempDirectory()
+        originGitAdapter = GitAdapter(originDirectory)
+        originGitAdapter.init()
+        originGitAdapter.config("receive.denyCurrentBranch", "ignore")
+        originGitAdapter.disableGpgSign()
+        originGitAdapter.addCommitWithMessage("init")
+        gitAdapter = initializeGitRepo(
+            listOf("init", "[patch] commit 1", "[patch] commit 2"),
+            remoteUrl = originDirectory,
+        )
+        gitAdapter.push()
+        gitAdapter.config("remote.origin.url", "$originDirectory/unavailable")
+    } exercise {
+        execute(version)
+    } verify { result ->
+        result.assertIsOfType<TestResult.Failure>().run {
+            reason.contains(expectedError).assertIsEqualTo(
+                true,
+                "Expected error to include: $expectedError\nActual:\n$reason",
+            )
+        }
+        gitAdapter.showTag("HEAD")?.name.assertIsEqualTo(version)
+        originGitAdapter.listAllTagNames().contains(version).assertIsEqualTo(false)
+    }
+
+    @Test
     fun whenTagExistsOnDifferentCommitTagWillFailWithError() = setup(object {
         val version = "1.0.0"
         lateinit var gitAdapter: GitAdapter
