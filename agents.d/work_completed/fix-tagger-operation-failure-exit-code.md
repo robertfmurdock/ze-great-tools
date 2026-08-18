@@ -44,19 +44,22 @@ Ensure `tagger tag` and the Gradle `tag` task fail whenever annotated-tag creati
   - Preserve existing examples and JSON schema
   - Verify links, grammar, and formatting according to `DOCUMENTATION.md`
   - Agent cycle: verify current behavior coverage -> update documentation -> verify pushable
-- [ ] Final refactor pass via authorized subagent (MANDATORY - see REFACTOR_AGENT.md)
-- [ ] Review all changes against applicable playbooks and run full validation
-- [ ] Move this file to `agents.d/work_completed/`
+- [x] Final refactor pass via authorized subagent (MANDATORY - see REFACTOR_AGENT.md)
+- [x] Review all changes against applicable playbooks and run full validation
+- [x] Move this file to `agents.d/work_completed/`
 
 ## Current State
-- **Commit SHA**: 9bfae02b
-- **Uncommitted work**: This work card only
-- **Blockers**: None
-- **Status**: Ready to start with the shared failing test
+- **Commit SHA**: fc4945e0
+- **Uncommitted work**: Work card completion and move only
+- **Blockers**: IDEA grammar and reformat integrations unavailable; documented validation could not be run
+- **Status**: Complete; all available validation passes and no actionable audit findings remain
 - **Date**: 2026-08-18
 
 ## Implementation Notes
 _(newest first)_
+
+### 2026-08-18: Final re-audit and validation
+The authorized subagent re-audited all nine modified files across `99e9c83a..fc4945e0`. It confirmed the production function-length and test-fixture duplication findings were resolved, accepted the documented TestMints scenario-length exception, and reported zero critical, major, minor, or otherwise actionable issues. The complete `./gradlew check -q --console=plain` validation passes. The IDEA grammar/reformat tooling blocker remains accurately recorded.
 
 ### 2026-08-18: Adversarial refactor findings addressed
 The authorized subagent reviewed all nine files across `99e9c83a..30f00c0a` and found no functional defects. It identified oversized production execution-boundary functions and duplicated new failure fixtures. Extracted focused CLI rendering, Gradle result handling, and core validation helpers, and consolidated identityless/unavailable-remote fixtures. The TestMints scenario functions remain structurally longer than ten lines because each intentionally presents one complete setup/exercise/verify behavior; their reusable fixture mechanics are now extracted. `./gradlew formatKotlin check -q --console=plain` passes after the refactor.
@@ -90,5 +93,5 @@ The user explicitly authorized the repository-required subagent for the final re
 - [x] `./gradlew :command-line-tools:tagger-cli:check -q --console=plain`
 - [x] `./gradlew :tools-tests:tagger-plugin-test:check -q --console=plain`
 - [ ] Modified user-facing documentation passes link, grammar, and formatting checks from `DOCUMENTATION.md` (links passed; IDEA grammar/format integrations unavailable)
-- [ ] `./gradlew check -q --console=plain`
-- **Status**: Missing-identity slice passes CLI and Gradle plugin module checks
+- [x] `./gradlew check -q --console=plain`
+- **Status**: All available checks pass; IDEA grammar/reformat integrations unavailable and explicitly blocked
