@@ -13,16 +13,15 @@ fun TaggerCore.tag(
 ): TagResult {
     val tagState = checkTagExistence(version)
     if (tagState.existsOnSameCommit) return TagResult.Success
-
     val branchState = checkBranchState(releaseBranch, allowDetachedHead)
     val validationErrors = buildValidationErrors(version, releaseBranch, tagState, branchState)
-
-    return if (validationErrors.isNotEmpty()) {
-        TagResult.Warning(TagErrors.wrapper(validationErrors.joinToString(", ")))
-    } else {
-        createAndPushTag(version, userName, userEmail)
-    }
+    return validationErrors.toWarning() ?: createAndPushTag(version, userName, userEmail)
 }
+
+private fun List<String>.toWarning() = takeIf { it.isNotEmpty() }
+    ?.joinToString(", ")
+    ?.let(TagErrors::wrapper)
+    ?.let(TagResult::Warning)
 
 private data class TagState(
     val existsOnSameCommit: Boolean,

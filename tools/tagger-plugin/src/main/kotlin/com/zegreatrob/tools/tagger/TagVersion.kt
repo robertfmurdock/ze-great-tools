@@ -57,21 +57,27 @@ abstract class TagVersion : DefaultTask() {
 
     @TaskAction
     fun execute() {
-        val commandLogger = if (showCommands.get()) {
-            { command: String -> logger.lifecycle(command) }
-        } else {
-            null
-        }
-        val core = TaggerCore(GitAdapter(workingDirectory.get().asFile.absolutePath, commandLogger = commandLogger))
-        when (
-            val result = core.tag(
-                version,
-                releaseBranch.orNull,
-                userName.orNull,
-                userEmail.orNull,
-                allowDetachedHead.getOrElse(false),
-            )
-        ) {
+        handle(tag())
+    }
+
+    private fun commandLogger(): ((String) -> Unit)? = if (showCommands.get()) {
+        { command: String -> logger.lifecycle(command) }
+    } else {
+        null
+    }
+
+    private fun tag() = TaggerCore(
+        GitAdapter(workingDirectory.get().asFile.absolutePath, commandLogger = commandLogger()),
+    ).tag(
+        version,
+        releaseBranch.orNull,
+        userName.orNull,
+        userEmail.orNull,
+        allowDetachedHead.getOrElse(false),
+    )
+
+    private fun handle(result: TagResult) {
+        when (result) {
             TagResult.Success -> {}
 
             is TagResult.Warning -> if (warningsAsErrors.get()) {

@@ -53,6 +53,37 @@ interface TagTestSpec {
         commits = commits,
     )
 
+    fun createOrigin(env: Map<String, String> = emptyMap()): Pair<String, GitAdapter> {
+        val directory = createTempDirectory()
+        val adapter = GitAdapter(directory, env)
+        adapter.init()
+        adapter.config("receive.denyCurrentBranch", "ignore")
+        adapter.disableGpgSign()
+        adapter.addCommitWithMessage("init")
+        return directory to adapter
+    }
+
+    fun initializeIdentitylessRepo(): GitAdapter {
+        val environment = listOf("PATH", "GIT_CONFIG_GLOBAL", "GIT_CONFIG_SYSTEM")
+            .associateWith { getEnvironmentVariable(it) ?: "" }
+        val (originDirectory) = createOrigin(environment)
+        return initializeGitRepo(
+            listOf("init", "[patch] commit 1", "[patch] commit 2"),
+            remoteUrl = originDirectory,
+        ).also(GitAdapter::push)
+    }
+
+    fun initializeRepoWithUnavailableRemote(
+        commits: List<String>,
+        initialTag: String? = null,
+    ): Pair<GitAdapter, GitAdapter> {
+        val (originDirectory, originGitAdapter) = createOrigin()
+        val gitAdapter = initializeGitRepo(commits, initialTag, originDirectory)
+        gitAdapter.push()
+        gitAdapter.config("remote.origin.url", "$originDirectory/unavailable")
+        return gitAdapter to originGitAdapter
+    }
+
     fun configureWithDefaults()
     fun configureWithOverrides(
         releaseBranch: String? = null,
@@ -134,24 +165,7 @@ interface TagTestSpec {
     }) {
         configureWithOverrides(releaseBranch = "master", warningsAsErrors = true)
 
-        val originDirectory = createTempDirectory()
-        val originGitAdapter = GitAdapter(
-            originDirectory,
-            mapOf(
-                "PATH" to (getEnvironmentVariable("PATH") ?: ""),
-                "GIT_CONFIG_GLOBAL" to (getEnvironmentVariable("GIT_CONFIG_GLOBAL") ?: ""),
-                "GIT_CONFIG_SYSTEM" to (getEnvironmentVariable("GIT_CONFIG_SYSTEM") ?: ""),
-            ),
-        )
-        originGitAdapter.init()
-        originGitAdapter.config("receive.denyCurrentBranch", "ignore")
-        originGitAdapter.disableGpgSign()
-        originGitAdapter.addCommitWithMessage("init")
-        gitAdapter = initializeGitRepo(
-            listOf("init", "[patch] commit 1", "[patch] commit 2"),
-            remoteUrl = originDirectory,
-        )
-        gitAdapter.push()
+        gitAdapter = initializeIdentitylessRepo()
     } exercise {
         execute(version)
     } verify { result ->
@@ -172,24 +186,7 @@ interface TagTestSpec {
     }) {
         configureWithOverrides(releaseBranch = "master", warningsAsErrors = false)
 
-        val originDirectory = createTempDirectory()
-        val originGitAdapter = GitAdapter(
-            originDirectory,
-            mapOf(
-                "PATH" to (getEnvironmentVariable("PATH") ?: ""),
-                "GIT_CONFIG_GLOBAL" to (getEnvironmentVariable("GIT_CONFIG_GLOBAL") ?: ""),
-                "GIT_CONFIG_SYSTEM" to (getEnvironmentVariable("GIT_CONFIG_SYSTEM") ?: ""),
-            ),
-        )
-        originGitAdapter.init()
-        originGitAdapter.config("receive.denyCurrentBranch", "ignore")
-        originGitAdapter.disableGpgSign()
-        originGitAdapter.addCommitWithMessage("init")
-        gitAdapter = initializeGitRepo(
-            listOf("init", "[patch] commit 1", "[patch] commit 2"),
-            remoteUrl = originDirectory,
-        )
-        gitAdapter.push()
+        gitAdapter = initializeIdentitylessRepo()
     } exercise {
         execute(version)
     } verify { result ->
@@ -395,18 +392,11 @@ interface TagTestSpec {
             warningsAsErrors = false,
         )
 
-        val originDirectory = createTempDirectory()
-        originGitAdapter = GitAdapter(originDirectory)
-        originGitAdapter.init()
-        originGitAdapter.config("receive.denyCurrentBranch", "ignore")
-        originGitAdapter.disableGpgSign()
-        originGitAdapter.addCommitWithMessage("init")
-        gitAdapter = initializeGitRepo(
+        val adapters = initializeRepoWithUnavailableRemote(
             listOf("init", "[patch] commit 1", "[patch] commit 2"),
-            remoteUrl = originDirectory,
         )
-        gitAdapter.push()
-        gitAdapter.config("remote.origin.url", "$originDirectory/unavailable")
+        gitAdapter = adapters.first
+        originGitAdapter = adapters.second
     } exercise {
         execute(version)
     } verify { result ->

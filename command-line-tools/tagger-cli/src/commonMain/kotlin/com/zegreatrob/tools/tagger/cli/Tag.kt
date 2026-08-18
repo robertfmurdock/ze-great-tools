@@ -40,53 +40,57 @@ class Tag : CliktCommand() {
     private val format by option("--format", help = "Output format for result")
         .enum<OutputFormat> { it.name.lowercase() }
         .default(OutputFormat.TEXT, defaultForHelp = "text")
+
     override fun run() {
-        val taggerContext = currentContext.findObject<TaggerContext>()
-        val commandLogger = if (taggerContext?.showCommands == true) {
-            { command: String -> echo(command, err = true) }
-        } else {
-            null
-        }
-        val gitAdapter = GitAdapter(workingDirectory, commandLogger = commandLogger)
-        if (dryRun) {
-            val headCommit = gitAdapter.headCommitId()
-            val headBranch = gitAdapter.status().head
-            echo("Would create annotated tag '$version' at $headCommit on branch '$headBranch'.")
-            echo("Would push to remote 'origin'.")
-            echo("(no changes made)")
-        } else {
-            TaggerCore(gitAdapter)
-                .tag(version, releaseBranch, userName, userEmail, allowDetachedHead)
-                .let {
-                    when (it) {
-                        TagResult.Success -> when (format) {
-                            OutputFormat.JSON -> echo(tagSuccessResponse(TagData(tag = version)))
-                            OutputFormat.TEXT -> echo("Success!")
-                        }
-
-                        is TagResult.Warning -> when (format) {
-                            OutputFormat.JSON -> {
-                                echo(errorResponse(it.message, "TAG_ERROR"))
-                                throw CliktError("", printError = false, statusCode = if (warningsAsErrors) 1 else 0)
-                            }
-
-                            OutputFormat.TEXT -> if (warningsAsErrors) {
-                                throw CliktError(it.message)
-                            } else {
-                                echo(it.message, err = true)
-                            }
-                        }
-
-                        is TagResult.Failure -> when (format) {
-                            OutputFormat.JSON -> {
-                                echo(errorResponse(it.message, "TAG_ERROR"))
-                                throw CliktError("", printError = false, statusCode = 1)
-                            }
-
-                            OutputFormat.TEXT -> throw CliktError(it.message)
-                        }
-                    }
-                }
-        }
+        val gitAdapter = GitAdapter(workingDirectory, commandLogger = commandLogger())
+        if (dryRun) showDryRun(gitAdapter) else handle(tag(gitAdapter))
     }
+
+    private fun commandLogger(): ((String) -> Unit)? = if (currentContext.findObject<TaggerContext>()?.showCommands == true) {
+        { command: String -> echo(command, err = true) }
+    } else {
+        null
+    }
+
+    private fun showDryRun(gitAdapter: GitAdapter) {
+        val headCommit = gitAdapter.headCommitId()
+        val headBranch = gitAdapter.status().head
+        echo("Would create annotated tag '$version' at $headCommit on branch '$headBranch'.")
+        echo("Would push to remote 'origin'.")
+        echo("(no changes made)")
+    }
+
+    private fun tag(gitAdapter: GitAdapter) = TaggerCore(gitAdapter)
+        .tag(version, releaseBranch, userName, userEmail, allowDetachedHead)
+
+    private fun handle(result: TagResult) = when (result) {
+        TagResult.Success -> handleSuccess()
+        is TagResult.Warning -> handleWarning(result.message)
+        is TagResult.Failure -> handleFailure(result.message)
+    }
+
+    private fun handleSuccess() = when (format) {
+        OutputFormat.JSON -> echo(tagSuccessResponse(TagData(tag = version)))
+        OutputFormat.TEXT -> echo("Success!")
+    }
+
+    private fun handleWarning(message: String) = when (format) {
+        OutputFormat.JSON -> {
+            echo(errorResponse(message, "TAG_ERROR"))
+            throw silentError(if (warningsAsErrors) 1 else 0)
+        }
+
+        OutputFormat.TEXT -> if (warningsAsErrors) throw CliktError(message) else echo(message, err = true)
+    }
+
+    private fun handleFailure(message: String): Nothing = when (format) {
+        OutputFormat.JSON -> {
+            echo(errorResponse(message, "TAG_ERROR"))
+            throw silentError(1)
+        }
+
+        OutputFormat.TEXT -> throw CliktError(message)
+    }
+
+    private fun silentError(statusCode: Int) = CliktError("", printError = false, statusCode = statusCode)
 }

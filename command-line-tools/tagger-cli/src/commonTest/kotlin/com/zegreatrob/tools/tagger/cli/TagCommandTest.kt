@@ -3,11 +3,9 @@ package com.zegreatrob.tools.tagger.cli
 import com.github.ajalt.clikt.testing.test
 import com.zegreatrob.minassert.assertIsEqualTo
 import com.zegreatrob.testmints.setup
-import com.zegreatrob.tools.adapter.git.GitAdapter
 import com.zegreatrob.tools.tagger.TagTestSpec
 import com.zegreatrob.tools.tagger.TestResult
 import com.zegreatrob.tools.test.git.addCommitWithMessage
-import com.zegreatrob.tools.test.git.createTempDirectory
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
@@ -116,21 +114,11 @@ class TagCommandTest : TagTestSpec {
     @Test
     fun withFormatJsonPushFailureReturnsTagError() = setup(object {
         val version = "1.2.4"
-        val originDirectory = createTempDirectory()
     }) {
-        val originGitAdapter = GitAdapter(originDirectory)
-        originGitAdapter.init()
-        originGitAdapter.config("receive.denyCurrentBranch", "ignore")
-        originGitAdapter.config("commit.gpgsign", "false")
-        originGitAdapter.addCommitWithMessage("init")
-
-        val gitAdapter = initializeGitRepo(
+        initializeRepoWithUnavailableRemote(
             commits = listOf("init", "[patch] commit 1"),
             initialTag = "1.2.3",
-            remoteUrl = originDirectory,
         )
-        gitAdapter.push()
-        gitAdapter.config("remote.origin.url", "$originDirectory/unavailable")
         baseArguments = listOf(
             "tag",
             "--release-branch=master",

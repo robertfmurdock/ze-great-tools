@@ -58,6 +58,9 @@ Ensure `tagger tag` and the Gradle `tag` task fail whenever annotated-tag creati
 ## Implementation Notes
 _(newest first)_
 
+### 2026-08-18: Adversarial refactor findings addressed
+The authorized subagent reviewed all nine files across `99e9c83a..30f00c0a` and found no functional defects. It identified oversized production execution-boundary functions and duplicated new failure fixtures. Extracted focused CLI rendering, Gradle result handling, and core validation helpers, and consolidated identityless/unavailable-remote fixtures. The TestMints scenario functions remain structurally longer than ten lines because each intentionally presents one complete setup/exercise/verify behavior; their reusable fixture mechanics are now extracted. `./gradlew formatKotlin check -q --console=plain` passes after the refactor.
+
 ### 2026-08-18: Strict-mode documentation slice
 Clarified the CLI and Gradle plugin READMEs that `warningsAsErrors` governs policy warnings while annotated-tag creation and push failures always fail. Verified all five concrete external links returned HTTP 200, all four relative links exist, and the strict-mode anchor resolves. The required IDEA grammar and reformat integrations are unavailable in this environment, so those checks remain an explicit tooling blocker rather than being reported as passed. No new behavior was introduced by this documentation-only slice; the preceding shared and CLI-specific tests cover the documented behavior.
 
