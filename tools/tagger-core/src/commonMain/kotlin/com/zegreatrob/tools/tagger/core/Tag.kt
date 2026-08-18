@@ -1,5 +1,7 @@
 package com.zegreatrob.tools.tagger.core
 
+import com.zegreatrob.tools.adapter.git.ProcessError
+
 private fun String.isSnapshot() = contains("SNAPSHOT")
 
 fun TaggerCore.tag(
@@ -73,15 +75,10 @@ private fun TaggerCore.createAndPushTag(
     version: String,
     userName: String?,
     userEmail: String?,
-): TagResult = kotlin.runCatching { adapter.newAnnotatedTag(version, "HEAD", userName, userEmail) }
-    .map {
-        adapter.pushTags()
-        TagResult.Success
-    }.getOrElse { error ->
-        TagResult.Warning(
-            when (error) {
-                is com.zegreatrob.tools.adapter.git.ProcessError -> error.toUserMessage()
-                else -> error.message ?: "Unknown error during tagging"
-            },
-        )
-    }
+): TagResult = try {
+    adapter.newAnnotatedTag(version, "HEAD", userName, userEmail)
+    adapter.pushTags()
+    TagResult.Success
+} catch (error: ProcessError) {
+    TagResult.Failure(error.toUserMessage())
+}

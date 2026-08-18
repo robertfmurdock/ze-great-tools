@@ -79,6 +79,8 @@ abstract class TagVersion : DefaultTask() {
             } else {
                 logger.warn(result.message)
             }
+
+            is TagResult.Failure -> throw GradleException(result.message)
         }
     }
 }

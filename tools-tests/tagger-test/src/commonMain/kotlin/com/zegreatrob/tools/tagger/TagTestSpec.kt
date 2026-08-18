@@ -165,6 +165,44 @@ interface TagTestSpec {
     }
 
     @Test
+    fun tagWillFailWhenUserEmailAndNameAreNotConfiguredAndWarningsAreNotErrors() = setup(object {
+        val version = "1.0.0"
+        val expectedError = "Committer identity unknown"
+        lateinit var gitAdapter: GitAdapter
+    }) {
+        configureWithOverrides(releaseBranch = "master", warningsAsErrors = false)
+
+        val originDirectory = createTempDirectory()
+        val originGitAdapter = GitAdapter(
+            originDirectory,
+            mapOf(
+                "PATH" to (getEnvironmentVariable("PATH") ?: ""),
+                "GIT_CONFIG_GLOBAL" to (getEnvironmentVariable("GIT_CONFIG_GLOBAL") ?: ""),
+                "GIT_CONFIG_SYSTEM" to (getEnvironmentVariable("GIT_CONFIG_SYSTEM") ?: ""),
+            ),
+        )
+        originGitAdapter.init()
+        originGitAdapter.config("receive.denyCurrentBranch", "ignore")
+        originGitAdapter.disableGpgSign()
+        originGitAdapter.addCommitWithMessage("init")
+        gitAdapter = initializeGitRepo(
+            listOf("init", "[patch] commit 1", "[patch] commit 2"),
+            remoteUrl = originDirectory,
+        )
+        gitAdapter.push()
+    } exercise {
+        execute(version)
+    } verify { result ->
+        result.assertIsOfType<TestResult.Failure>().run {
+            reason.contains(expectedError).assertIsEqualTo(
+                true,
+                "Expected error to include: $expectedError\nActual:\n$reason",
+            )
+        }
+        gitAdapter.showTag("HEAD")?.name.assertIsNotEqualTo(version)
+    }
+
+    @Test
     fun whenNotOnCorrectBranchAndWarningsAsErrorsTagWillNotDoAnythingAndError() = setup(object {
         val version = "1.0.0"
         val expectedError = TagErrors.wrapper(TagErrors.skipMessageNotOnReleaseBranch("trunk", "master"))

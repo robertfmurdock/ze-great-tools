@@ -16,18 +16,18 @@ Ensure `tagger tag` and the Gradle `tag` task fail whenever annotated-tag creati
 ## Checklist
 - [x] Review this work card for compliance with template and update to conform
 - [x] If this card plans subagent delegation, ask user to explicitly authorize subagents for this card and record the response in Implementation Notes
-- [ ] Add shared failing coverage for tag creation without a configured committer identity when `warningsAsErrors=false`
+- [x] Add shared failing coverage for tag creation without a configured committer identity when `warningsAsErrors=false`
   - Verify both CLI and Gradle plugin report failure and no tag is created
   - Agent cycle: write one test -> verify expected failure -> implement minimum result-model behavior -> refactor-light -> verify pushable
   - Update plan if guidelines reveal new constraints
-- [ ] Add `TagResult.Failure` and distinguish policy warnings from Git operation failures
+- [x] Add `TagResult.Failure` and distinguish policy warnings from Git operation failures
   - Catch `ProcessError` across both annotated-tag creation and tag pushing
   - Return `Failure(error.toUserMessage())` for expected subprocess failures
   - Return `Success` only after both operations complete
   - Allow unexpected exceptions to propagate
   - Agent cycle: test -> implement -> refactor-light -> verify pushable
   - Update plan if guidelines reveal new constraints
-- [ ] Make CLI and Gradle execution boundaries fail unconditionally for `TagResult.Failure`
+- [x] Make CLI and Gradle execution boundaries fail unconditionally for `TagResult.Failure`
   - CLI text output remains actionable and exits nonzero
   - CLI JSON output remains `status: "error"` with `code: "TAG_ERROR"` and exits nonzero
   - Gradle task throws `GradleException` with the failure message
@@ -58,6 +58,9 @@ Ensure `tagger tag` and the Gradle `tag` task fail whenever annotated-tag creati
 ## Implementation Notes
 _(newest first)_
 
+### 2026-08-18: Missing-identity failure slice
+Added the shared non-strict missing-committer-identity scenario. The red run failed on JVM and JS because each CLI adapter returned `TestResult.Success`; after adding `TagResult.Failure` and unconditional CLI/Gradle failure handling, the CLI and Gradle plugin module checks passed. Core tagging now catches only `ProcessError`, after tag creation or pushing, and allows unexpected exceptions to propagate.
+
 ### 2026-08-18: Plan captured
 Issue #353 reports that `git tag` exits 128 when committer identity is unavailable, but Tagger converts the subprocess failure to `TagResult.Warning`. The CLI then applies `warningsAsErrors=false` and exits 0 even though no tag exists.
 
@@ -74,9 +77,9 @@ The existing same-commit early success remains unchanged for this issue. Whether
 The user explicitly authorized the repository-required subagent for the final refactor review in this thread.
 
 ## Validation
-- [ ] Focused shared test demonstrates the original false-success behavior before implementation
-- [ ] `./gradlew :command-line-tools:tagger-cli:check -q --console=plain`
-- [ ] `./gradlew :tools-tests:tagger-plugin-test:check -q --console=plain`
+- [x] Focused shared test demonstrates the original false-success behavior before implementation
+- [x] `./gradlew :command-line-tools:tagger-cli:check -q --console=plain`
+- [x] `./gradlew :tools-tests:tagger-plugin-test:check -q --console=plain`
 - [ ] Modified user-facing documentation passes link, grammar, and formatting checks from `DOCUMENTATION.md`
 - [ ] `./gradlew check -q --console=plain`
-- **Status**: Not yet run; implementation has not started
+- **Status**: Missing-identity slice passes CLI and Gradle plugin module checks

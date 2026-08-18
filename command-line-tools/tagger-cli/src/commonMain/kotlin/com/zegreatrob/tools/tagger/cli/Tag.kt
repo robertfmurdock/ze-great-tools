@@ -76,6 +76,15 @@ class Tag : CliktCommand() {
                                 echo(it.message, err = true)
                             }
                         }
+
+                        is TagResult.Failure -> when (format) {
+                            OutputFormat.JSON -> {
+                                echo(errorResponse(it.message, "TAG_ERROR"))
+                                throw CliktError("", printError = false, statusCode = 1)
+                            }
+
+                            OutputFormat.TEXT -> throw CliktError(it.message)
+                        }
                     }
                 }
         }
