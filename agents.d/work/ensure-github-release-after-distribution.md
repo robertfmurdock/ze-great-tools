@@ -64,6 +64,10 @@ Context from discussion:
 - Solution: Use mustRunAfter to ensure publications complete before GitHub release
 - Benefit: GitHub release becomes a reliable "success signal" for complete distribution
 
+### 2026-08-20: Subagent authorization
+
+User explicitly authorized the mandatory final refactor subagent.
+
 Key consideration: Use `mustRunAfter` not `dependsOn` so that:
 - When githubReleaseEnabled=false, publications still run
 - When publications are skipped (snapshots), GitHub tasks don't force them to run
