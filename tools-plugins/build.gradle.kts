@@ -17,6 +17,15 @@ plugins {
     alias(libs.plugins.org.jmailen.kotlinter)
 }
 
+gradlePlugin {
+    plugins {
+        register("npm-cli") {
+            id = "com.zegreatrob.tools.plugins.npm-cli"
+            implementationClass = "com.zegreatrob.tools.plugins.NpmCliPlugin"
+        }
+    }
+}
+
 dependencies {
     implementation(kotlin("stdlib", embeddedKotlinVersion))
     implementation(kotlin("gradle-plugin", embeddedKotlinVersion))

@@ -3,6 +3,17 @@ package com.zegreatrob.tools.cli
 import kotlin.js.json
 
 actual fun loadHelpResource(path: String): String {
+    val candidates = listOf(
+        NodePath.join(nodeDirname, path),
+        NodePath.join(nodeDirname, "help", path),
+        NodePath.join(nodeDirname, "..", "help", path),
+        NodePath.join(nodeDirname, "..", "..", "help", path),
+    )
+    for (candidate in candidates) {
+        if (NodeFs.existsSync(candidate)) {
+            return NodeFs.readFileSync(candidate, json("encoding" to "utf-8"))
+        }
+    }
     val resourcePath = NodePath.join(nodeDirname, path)
     return NodeFs.readFileSync(resourcePath, json("encoding" to "utf-8"))
 }

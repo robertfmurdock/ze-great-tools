@@ -7,7 +7,7 @@ import kotlin.test.Test
 class ProcessErrorTest {
 
     @Test
-    fun `formats Azure DevOps permission error with remediation guidance`() = setup(object {
+    fun formatsAzureDevOpsPermissionErrorWithRemediationGuidance() = setup(object {
         val exitCode = 128
         val stderr = """
             remote: TF401027: You need the Git 'GenericContribute' permission to perform this action.
@@ -33,7 +33,7 @@ class ProcessErrorTest {
     }
 
     @Test
-    fun `formats GitHub Actions permission error with remediation guidance`() = setup(object {
+    fun formatsGitHubActionsPermissionErrorWithRemediationGuidance() = setup(object {
         val exitCode = 403
         val stderr = """
             remote: Permission to user/repo.git denied to github-actions[bot].
@@ -57,7 +57,7 @@ class ProcessErrorTest {
     }
 
     @Test
-    fun `detects permission errors from exit codes`() = setup(object {
+    fun detectsPermissionErrorsFromExitCodes() = setup(object {
         val error128 = ProcessError(128, "some error", "git push")
         val error403 = ProcessError(403, "some error", "git push")
         val error1 = ProcessError(1, "some error", "git push")
@@ -77,7 +77,7 @@ class ProcessErrorTest {
     }
 
     @Test
-    fun `detects permission errors from stderr content`() = setup(object {
+    fun detectsPermissionErrorsFromStderrContent() = setup(object {
         val error = ProcessError(1, "Permission denied", "git push")
     }) exercise {
         error.isPermissionError

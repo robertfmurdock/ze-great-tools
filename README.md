@@ -61,9 +61,11 @@ A program for extracting contribution information from a git repository.
 
 See its [README](command-line-tools/digger-cli/README.md) for more.
 
-## Security
+## Security & Provenance
 
-Socket.dev flags shellAccess because these tools execute git commands — this is intentional and necessary. See [SECURITY.md](SECURITY.md) for details.
+NPM packages are published directly from CI with cryptographic build provenance (`--provenance`) signed by Sigstore via GitHub Actions OIDC.
+
+Socket.dev flags shellAccess because these tools execute git commands — this is intentional, bounded (non-shell execution with structured argument lists), and documented in `socket.yml`. See [SECURITY.md](SECURITY.md) for full details on security boundaries and provenance verification.
 
 ## License
 

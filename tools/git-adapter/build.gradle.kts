@@ -16,7 +16,15 @@ repositories {
 
 kotlin {
     jvm()
-    js { nodejs() }
+    js {
+        nodejs {
+            testTask {
+                useMocha { timeout = "10s" }
+                environment("GIT_CONFIG_GLOBAL", "/dev/null")
+                environment("GIT_CONFIG_SYSTEM", "/dev/null")
+            }
+        }
+    }
     sourceSets.all { languageSettings.optIn("kotlin.time.ExperimentalTime") }
 }
 

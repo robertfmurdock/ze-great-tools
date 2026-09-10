@@ -12,6 +12,7 @@ plugins {
     alias(libs.plugins.org.jmailen.kotlinter)
     alias(libs.plugins.io.sdkman.vendors)
     alias(libs.plugins.org.gradle.crypto.checksum)
+    id("com.zegreatrob.tools.plugins.npm-cli")
 }
 
 repositories {
@@ -28,6 +29,33 @@ tasks.register<Checksum>("jvmDistZipChecksum") {
 }
 
 val generatedDirectory = project.layout.buildDirectory.dir("generated-sources/templates/kotlin/main")
+
+npmCli {
+    packageName.set("@continuous-excellence/tagger")
+    description.set("Deterministic semantic versioning from git history. Platform-neutral CLI for calculating versions based on commit messages, with zero configuration required.")
+    binaryName.set("tagger")
+    directory.set("command-line-tools/tagger-cli")
+    guideResourcesDir.set(rootProject.layout.projectDirectory.dir("../tools/tagger-guide/src/commonMain/resources"))
+    guideFile.set("help/tagger-guide.md")
+    keywords.set(
+        listOf(
+            "semantic-versioning",
+            "semver",
+            "git-tags",
+            "release-automation",
+            "version-management",
+            "gradle-plugin",
+            "ci-cd",
+            "devops",
+            "git",
+            "contribution",
+            "pair",
+            "agile",
+            "coaching",
+            "statistics",
+        ),
+    )
+}
 
 kotlin {
     jvm {
@@ -48,29 +76,12 @@ kotlin {
                 environment("GIT_CONFIG_SYSTEM", "/dev/null")
             }
         }
-        compilations {
-            "main" {
-                packageJson {
-                    name = "@continuous-excellence/tagger"
-                    customField("package-name", "@continuous-excellence/tagger")
-                    customField("description", "Deterministic semantic versioning from git history. Platform-neutral CLI for calculating versions based on commit messages, with zero configuration required.")
-                    customField("author", "rob@continuousexcellence.io")
-                    customField("license", "MIT")
-                    customField("keywords", arrayOf("semantic-versioning", "semver", "git-tags", "release-automation", "version-management", "gradle-plugin", "ci-cd", "devops", "git", "contribution", "pair", "agile", "coaching", "statistics"))
-                    customField("bin", mapOf("tagger" to "kotlin/bin/tagger"))
-                    customField("homepage", "https://github.com/robertfmurdock/ze-great-tools")
-                    customField("repository", "github:robertfmurdock/ze-great-tools")
-                }
-            }
-        }
     }
     @OptIn(ExperimentalKotlinGradlePluginApi::class)
     compilerOptions {
         allWarningsAsErrors = true
     }
 }
-
-val mainNpmProjectDir = kotlin.js().compilations.getByName("main").npmProject.dir
 
 dependencies {
     commonMainImplementation(platform(libs.org.jetbrains.kotlinx.kotlinx.serialization.bom))
@@ -94,57 +105,12 @@ tasks {
         environment("GIT_CONFIG_GLOBAL", "/dev/null")
         environment("GIT_CONFIG_SYSTEM", "/dev/null")
     }
-    named("jsProcessResources") {
-        dependsOn("copyGuideResources")
-    }
     withType<CreateStartScripts> {
         applicationName = "tagger"
     }
-    val copyReadme = register<Copy>("copyReadme") {
-        dependsOn("jsPackageJson", ":kotlinNpmInstall")
-        from(layout.projectDirectory.file("README.md"))
-        into(mainNpmProjectDir)
-    }
-    val copyGuideResources = register<Copy>("copyGuideResources") {
-        group = "build"
-        description = "Copy guide resources from tagger-guide module source"
-        from(rootProject.layout.projectDirectory.dir("../tools/tagger-guide/src/commonMain/resources"))
-        into(layout.buildDirectory.dir("generated/resources/commonMain"))
-        include("help/tagger-guide.md")
-    }
-    withType<ProcessResources>().configureEach {
-        dependsOn(copyGuideResources)
-    }
-    val copyHelpResources = register<Copy>("copyHelpResources") {
-        dependsOn("jsProcessResources", "jsPackageJson", ":kotlinNpmInstall")
-        from(layout.buildDirectory.dir("processedResources/js/main"))
-        into(mainNpmProjectDir)
-    }
-    val jsCliTar = register<Tar>("jsCliTar") {
-        dependsOn(
-            copyReadme,
-            copyHelpResources,
-            "jsPackageJson",
-            ":kotlinNpmInstall",
-            "compileKotlinJs",
-            "jsProcessResources",
-            "compileProductionExecutableKotlinJs",
-            "jsProductionExecutableCompileSync",
-        )
-        from(mainNpmProjectDir)
-        compression = Compression.GZIP
-        archiveFileName.set("tagger-cli-js.tgz")
-    }
-    register("jsLink", Exec::class) {
-        group = "build setup"
-        description = "Link tagger CLI to local npm for development testing"
-        dependsOn(jsCliTar)
-        workingDir(mainNpmProjectDir)
-        commandLine("npm", "link")
-    }
     val confirmJsTaggerCanRun = register<Exec>("confirmJsTaggerCanRun") {
-        dependsOn(jsCliTar)
-        workingDir(mainNpmProjectDir)
+        dependsOn("jsCliTar")
+        workingDir(kotlin.js().compilations.getByName("main").npmProject.dir)
         commandLine("kotlin/bin/tagger", "calculate-version")
     }
     val confirmJvmTaggerCanRun = register<Exec>("confirmJvmTaggerCanRun") {
@@ -152,25 +118,9 @@ tasks {
         workingDir(layout.projectDirectory)
         commandLine("build/install/tagger-cli-jvm/bin/tagger", "--version")
     }
-    val jsPublish = register<Exec>("jsPublish") {
-        dependsOn(jsCliTar)
-        mustRunAfter(check)
-        workingDir(mainNpmProjectDir)
-        if (isSnapshot()) {
-            commandLine("npm", "publish", "--dry-run", "--access", "public", "--tag", "snapshot")
-        } else {
-            commandLine("npm", "publish", "--access", "public")
-        }
-    }
     check {
         dependsOn(confirmJsTaggerCanRun)
         dependsOn(confirmJvmTaggerCanRun)
-    }
-    register("publish") {
-        group = "publishing"
-        description = "Publish tagger CLI to npm registry"
-        dependsOn(jsPublish)
-        mustRunAfter(check)
     }
     val copyTemplates = register<Copy>("copyTemplates") {
         inputs.property("version", rootProject.version)
@@ -186,9 +136,6 @@ tasks {
     kotlin.sourceSets {
         commonMain {
             kotlin.srcDir(copyTemplates)
-            resources.srcDir(copyGuideResources.map { it.destinationDir })
         }
     }
 }
-
-fun Project.isSnapshot() = version.toString().contains("SNAPSHOT")

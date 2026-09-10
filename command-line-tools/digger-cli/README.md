@@ -329,3 +329,14 @@ Documentation is also available as markdown files in the repository:
   output format
 - [All Contribution Data Help](src/commonMain/resources/help/all-contribution-data.md) - Command details and output
   format
+
+## Security & Provenance
+
+- **NPM Build Provenance**: Published releases of `@continuous-excellence/digger` include cryptographic build provenance attestations (`--provenance`) signed by Sigstore via GitHub Actions OIDC.
+- **Git CLI Execution Safety**: Process execution is strictly bounded. Git commands are invoked directly without intermediate shells (`shell: false`, `windowsHide: true`) and arguments are structured as immutable lists rather than interpolated strings.
+- **Runtime Auditing**: Use `--show-commands` to log every Git command executed to `stderr`.
+- **Details**: See [SECURITY.md](../../SECURITY.md) and [socket.yml](../../socket.yml) for repository capability declarations.
+
+## License
+
+MIT - see [LICENSE](../../LICENSE) for details.

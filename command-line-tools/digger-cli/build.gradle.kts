@@ -13,6 +13,7 @@ plugins {
     alias(libs.plugins.org.jmailen.kotlinter)
     alias(libs.plugins.io.sdkman.vendors)
     alias(libs.plugins.org.gradle.crypto.checksum)
+    id("com.zegreatrob.tools.plugins.npm-cli")
 }
 
 repositories {
@@ -29,6 +30,32 @@ tasks.register<Checksum>("jvmDistZipChecksum") {
 }
 
 val generatedDirectory = project.layout.buildDirectory.dir("generated-sources/templates/kotlin/main")
+
+npmCli {
+    packageName.set("@continuous-excellence/digger")
+    description.set("Privacy-controlled git analytics for team insights. CLI for extracting contribution statistics, commit analysis, and developer metrics from git repositories.")
+    binaryName.set("digger")
+    directory.set("command-line-tools/digger-cli")
+    guideResourcesDir.set(rootProject.layout.projectDirectory.dir("../tools/digger-guide/src/commonMain/resources"))
+    guideFile.set("help/digger-guide.md")
+    keywords.set(
+        listOf(
+            "git-analytics",
+            "contribution-tracking",
+            "team-metrics",
+            "git-statistics",
+            "commit-analysis",
+            "developer-metrics",
+            "code-statistics",
+            "git",
+            "contribution",
+            "pair",
+            "agile",
+            "coaching",
+            "statistics",
+        ),
+    )
+}
 
 kotlin {
     jvm {
@@ -49,29 +76,12 @@ kotlin {
                 environment("GIT_CONFIG_SYSTEM", "/dev/null")
             }
         }
-        compilations {
-            "main" {
-                packageJson {
-                    name = "@continuous-excellence/digger"
-                    customField("package-name", "@continuous-excellence/digger")
-                    customField("description", "Privacy-controlled git analytics for team insights. CLI for extracting contribution statistics, commit analysis, and developer metrics from git repositories.")
-                    customField("author", "rob@continuousexcellence.io")
-                    customField("license", "MIT")
-                    customField("keywords", arrayOf("git-analytics", "contribution-tracking", "team-metrics", "git-statistics", "commit-analysis", "developer-metrics", "code-statistics", "git", "contribution", "pair", "agile", "coaching", "statistics"))
-                    customField("bin", mapOf("digger" to "kotlin/bin/digger"))
-                    customField("homepage", "https://github.com/robertfmurdock/ze-great-tools")
-                    customField("repository", "github:robertfmurdock/ze-great-tools")
-                }
-            }
-        }
     }
     @OptIn(ExperimentalKotlinGradlePluginApi::class)
     compilerOptions {
         allWarningsAsErrors = true
     }
 }
-
-val mainNpmProjectDir = kotlin.js().compilations.getByName("main").npmProject.dir
 
 dependencies {
     commonMainImplementation(platform(libs.org.jetbrains.kotlinx.kotlinx.serialization.bom))
@@ -94,16 +104,6 @@ dependencies {
 }
 
 tasks {
-    val copyGuideResources = register<Copy>("copyGuideResources") {
-        group = "build"
-        description = "Copy guide resources from digger-guide module source"
-        from(rootProject.layout.projectDirectory.dir("../tools/digger-guide/src/commonMain/resources"))
-        into(layout.buildDirectory.dir("generated/resources/commonMain"))
-        include("help/digger-guide.md")
-    }
-    withType<ProcessResources>().configureEach {
-        dependsOn(copyGuideResources)
-    }
     withType(Test::class) {
         useJUnitPlatform()
         environment("EXPECTED_VERSION", project.version)
@@ -113,32 +113,6 @@ tasks {
     withType<CreateStartScripts> {
         applicationName = "digger"
     }
-    val copyReadme = register<Copy>("copyReadme") {
-        dependsOn("jsPackageJson", ":kotlinNpmInstall")
-        from(layout.projectDirectory.file("README.md"))
-        into(mainNpmProjectDir)
-    }
-    val jsCliTar = register<Tar>("jsCliTar") {
-        dependsOn(
-            copyReadme,
-            "jsPackageJson",
-            ":kotlinNpmInstall",
-            "compileKotlinJs",
-            "jsProcessResources",
-            "compileProductionExecutableKotlinJs",
-            "jsProductionExecutableCompileSync",
-        )
-        from(mainNpmProjectDir)
-        compression = Compression.GZIP
-        archiveFileName.set("digger-cli-js.tgz")
-    }
-    register<Exec>("jsLink") {
-        group = "build setup"
-        description = "Link digger CLI to local npm for development testing"
-        dependsOn(jsCliTar)
-        workingDir(mainNpmProjectDir)
-        commandLine("npm", "link")
-    }
     val confirmJvmDiggerCanRun = register<Exec>("confirmJvmDiggerCanRun") {
         dependsOn("installJvmDist")
         workingDir(layout.projectDirectory)
@@ -146,22 +120,6 @@ tasks {
     }
     check {
         dependsOn(confirmJvmDiggerCanRun)
-    }
-    val jsPublish = register<Exec>("jsPublish") {
-        dependsOn(jsCliTar)
-        mustRunAfter(check)
-        workingDir(mainNpmProjectDir)
-        if (isSnapshot()) {
-            commandLine("npm", "publish", "--dry-run", "--access", "public", "--tag", "snapshot")
-        } else {
-            commandLine("npm", "publish", "--access", "public")
-        }
-    }
-    register("publish") {
-        group = "publishing"
-        description = "Publish digger CLI to npm registry"
-        dependsOn(jsPublish)
-        mustRunAfter(check)
     }
     val copyTemplates = register<Copy>("copyTemplates") {
         inputs.property("version", rootProject.version)
@@ -177,12 +135,9 @@ tasks {
     kotlin.sourceSets {
         commonMain {
             kotlin.srcDir(copyTemplates)
-            resources.srcDir(copyGuideResources.map { it.destinationDir })
         }
     }
 }
-
-fun Project.isSnapshot() = version.toString().contains("SNAPSHOT")
 
 NodeJsRootPlugin.apply(project.rootProject)
 project.rootProject.tasks.named("kotlinNpmInstall") {

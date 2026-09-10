@@ -1,5 +1,6 @@
 package com.zegreatrob.tools.tagger.core
 
+import com.zegreatrob.tools.adapter.git.GitException
 import com.zegreatrob.tools.adapter.git.ProcessError
 
 private fun String.isSnapshot() = contains("SNAPSHOT")
@@ -78,6 +79,8 @@ private fun TaggerCore.createAndPushTag(
     adapter.newAnnotatedTag(version, "HEAD", userName, userEmail)
     adapter.pushTags()
     TagResult.Success
+} catch (error: GitException) {
+    TagResult.Failure(error.toUserMessage())
 } catch (error: ProcessError) {
     TagResult.Failure(error.toUserMessage())
 }

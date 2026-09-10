@@ -20,7 +20,11 @@ class GitAdapter(
     private fun runProcess(args: List<String>, env: Map<String, String> = emptyMap()): String {
         val command = args.joinToString(" ")
         commandLogger?.invoke(command)
-        return runProcess(args, workingDirectory, env.plus(this.env))
+        return try {
+            runProcess(args, workingDirectory, env.plus(this.env))
+        } catch (e: ProcessError) {
+            throw parseGitError(e)
+        }
     }
 
     fun newAnnotatedTag(name: String, ref: String, userName: String?, userEmail: String?) {

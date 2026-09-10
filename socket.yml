@@ -1,0 +1,18 @@
+version: 2
+
+# Socket.dev policy configuration for ze-great-tools monorepo.
+# Documents intentional capabilities and policies for published packages and repository tools.
+
+issueRules:
+  # shellAccess: Intentional and bounded. Tagger and Digger CLI tools execute Git commands
+  # (e.g., git tag, git log, git describe, git rev-parse) to inspect repository metadata.
+  # Process execution is strictly bounded via list-based argument arrays without shell
+  # interpolation (explicit shell: false, windowsHide: true).
+  shellAccess: warn
+
+projectIgnorePaths:
+  - "build"
+  - "**/build"
+  - ".gradle"
+  - "**/node_modules"
+  - ".junie"
