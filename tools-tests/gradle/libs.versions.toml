@@ -1,5 +1,5 @@
 [versions]
-com-zegreatrob-testmints = "12.6.56"
+com-zegreatrob-testmints = "12.6.57"
 kotlin = "2.4.20"
 kotlinx-coroutines = "1.11.0"
 
