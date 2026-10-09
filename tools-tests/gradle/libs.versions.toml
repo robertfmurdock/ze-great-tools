@@ -1,6 +1,6 @@
 [versions]
-com-zegreatrob-testmints = "12.6.57"
-kotlin = "2.4.20"
+com-zegreatrob-testmints = "12.6.58"
+kotlin = "2.4.21"
 kotlinx-coroutines = "1.11.0"
 
 [libraries]
@@ -16,5 +16,5 @@ org-jetbrains-kotlinx-kotlinx-serialization-bom = { module = "org.jetbrains.kotl
 
 [plugins]
 nl-littlerobots-version-catalog-update = "nl.littlerobots.version-catalog-update:1.1.1"
-org-jetbrains-kotlin-jvm = "org.jetbrains.kotlin.jvm:2.4.20"
-org-jetbrains-kotlin-multiplatform = "org.jetbrains.kotlin.multiplatform:2.4.20"
+org-jetbrains-kotlin-jvm = "org.jetbrains.kotlin.jvm:2.4.21"
+org-jetbrains-kotlin-multiplatform = "org.jetbrains.kotlin.multiplatform:2.4.21"
