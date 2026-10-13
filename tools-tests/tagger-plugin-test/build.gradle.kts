@@ -34,6 +34,8 @@ dependencies {
 tasks {
     "functionalTest" {
         dependsOn(gradle.includedBuild("tools").task(":tagger-plugin:assemble"))
+        // Both suites launch TestKit builds that share tools → tools-plugins outputs; parallel runs can corrupt them.
+        mustRunAfter(":digger-plugin-test:functionalTest")
     }
     check {
         dependsOn(testing.suites.named("functionalTest"))
