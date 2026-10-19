@@ -1,6 +1,6 @@
 [versions]
 com-github-ajalt-clikt = "5.1.0"
-com-zegreatrob-testmints = "12.6.59"
+com-zegreatrob-testmints = "12.6.60"
 kotlin = "2.4.21"
 
 [libraries]
@@ -12,7 +12,7 @@ com-zegreatrob-testmints-standard = { module = "com.zegreatrob.testmints:standar
 org-jetbrains-kotlin-kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin" }
 org-jetbrains-kotlin-kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 org-jetbrains-kotlin-kotlin-test-junit5 = { module = "org.jetbrains.kotlin:kotlin-test-junit5", version.ref = "kotlin" }
-org-jetbrains-kotlinx-kotlinx-serialization-bom = "org.jetbrains.kotlinx:kotlinx-serialization-bom:1.11.0"
+org-jetbrains-kotlinx-kotlinx-serialization-bom = "org.jetbrains.kotlinx:kotlinx-serialization-bom:1.12.0"
 
 [plugins]
 io-sdkman-vendors = "io.sdkman.vendors:3.0.0"
