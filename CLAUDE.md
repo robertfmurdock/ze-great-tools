@@ -8,10 +8,10 @@ override: all default behaviors
 
 ## Execution Protocol
 - **Context**: BEFORE starting work, load `agents.d/context/index.md` and any task-gated documents that match current work
-- **Build tool**: `./gradlew` for all tasks — no ad hoc shell scripts
+- **Build tool**: Use `./gradlew` for build and test tasks — no ad hoc shell scripts
 - **Automation**: Express repository automation as Gradle tasks
 - **Scope**: Start module-scoped, expand only if needed
-- **Validation**: Run `./gradlew check -q --console=plain` before completing any task
+- **Validation**: Run `./gradlew check -q --console=plain` before completing changes that can affect tool behavior or the build. Skip the Gradle check for read-only research and documentation-only changes unless requested.
 - **Agent flags**: `-q --console=plain` minimize output tokens (errors only, no ANSI); omit if diagnostics needed
 
 ## Documentation Protocol
