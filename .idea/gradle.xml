@@ -19,6 +19,7 @@
                   <project path="$PROJECT_DIR$/tools" />
                   <project path="$PROJECT_DIR$/tools/certifier-plugin" />
                   <project path="$PROJECT_DIR$/tools/cli-tools" />
+                  <project path="$PROJECT_DIR$/tools/dashboard-test-summary" />
                   <project path="$PROJECT_DIR$/tools/dependency-bom" />
                   <project path="$PROJECT_DIR$/tools/digger-core" />
                   <project path="$PROJECT_DIR$/tools/digger-gradle" />
@@ -58,8 +59,6 @@
             </builds>
           </compositeBuild>
         </compositeConfiguration>
-        <option name="delegatedBuild" value="true" />
-        <option name="distributionType" value="DEFAULT_WRAPPED" />
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
         <option name="gradleJvm" value="#JAVA_HOME" />
         <option name="modules">
@@ -80,6 +79,7 @@
             <option value="$PROJECT_DIR$/tools-tests/tagger-test" />
             <option value="$PROJECT_DIR$/tools/certifier-plugin" />
             <option value="$PROJECT_DIR$/tools/cli-tools" />
+            <option value="$PROJECT_DIR$/tools/dashboard-test-summary" />
             <option value="$PROJECT_DIR$/tools/dependency-bom" />
             <option value="$PROJECT_DIR$/tools/digger-core" />
             <option value="$PROJECT_DIR$/tools/digger-gradle" />
