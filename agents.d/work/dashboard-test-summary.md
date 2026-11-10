@@ -14,16 +14,23 @@ Publish a Gradle settings plugin that aggregates JUnit XML across participating 
 - [x] Add and validate standalone XML-to-summary behavior.
 - [x] Prove composite discovery, deduplication, configuration cache, and failure behavior.
 - [x] Wire publication, fingerprinting, and consumer documentation. Validate and commit the opt-in plugin.
+- [x] Separate the root wiring and strengthen the composite fixture before adoption.
 - [ ] After the published marker resolves, pin it and enroll the repository composite. Verify CI artifact and commit separately.
 - [ ] Complete final refactor review and move card after the work is pushed.
 
 ## Current State
-- **Commit SHA**: 3e751cbf (baseline); the commit carrying this checkpoint adds the plugin.
+- **Commit SHA**: 86f21d7b adds the plugin. The next checkpoint refactors its wiring and tests.
 - **Uncommitted work**: None in this work card's scope after the plugin checkpoint.
 - **Blockers**: The dogfood slice starts after the first published plugin marker resolves.
 - **Date**: 2026-11-10
 
 ## Implementation Notes
+
+### 2026-11-10: Focused refactor
+- Split local count collection, variant export, and summary registration at their existing Gradle boundaries.
+- Build expected JSON and the stale summary fixture with the Kotlin JSON DSL. Keep the wire fields independent of the production writer.
+- Negative control: omitted one passing case and duplicated the shared build's skipped case. The total stayed at five and the test failed on the passed and skipped counts. Restored the fixture.
+- Focused plugin tests and the full Gradle check passed after the refactor.
 
 ### 2026-11-10: Plugin checkpoint
 - Full Gradle check passed with five plugin tests. With fail-fast, the failed-assertion fixture produced no summary; with `--continue`, it recorded both tests and preserved the failed build. The crash fixture caught a disabled stale-summary cleanup. The malformed XML test caught a parser that accepted truncated input.

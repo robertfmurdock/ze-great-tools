@@ -6,8 +6,10 @@ import org.gradle.api.artifacts.Configuration
 import org.gradle.api.attributes.Category
 import org.gradle.api.attributes.VerificationType
 import org.gradle.api.file.ConfigurableFileCollection
+import org.gradle.api.file.RegularFile
 import org.gradle.api.initialization.ProjectDescriptor
 import org.gradle.api.initialization.Settings
+import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Delete
 import org.gradle.api.tasks.testing.AbstractTestTask
 
@@ -69,28 +71,40 @@ private fun configureProject(project: Project) = with(project) {
 }
 
 private fun configureBuild(project: Project, paths: List<String>, modules: List<String>) = with(project) {
+    val localCounts = collectBuildCounts(paths)
+    val includedBuilds = configurations.dependencyScope("dashboardIncludedTestCountsDependencies")
+    modules.forEach { module -> dependencies.add(includedBuilds.name, module) }
+    exportBuildCounts(localCounts, includedBuilds.get())
+    val includedCounts = verificationInputs("dashboardBuildTestCounts", "dashboard-build-test-counts", includedBuilds.get())
+    registerSummary(localCounts, includedCounts)
+}
+
+private fun Project.collectBuildCounts(paths: List<String>): Provider<RegularFile> {
     val projects = configurations.dependencyScope("dashboardProjectTestCountsDependencies")
     paths.forEach { path -> dependencies.add(projects.name, dependencies.project(mapOf("path" to path))) }
     val projectInputs = verificationInputs("dashboardProjectTestCounts", "dashboard-project-test-counts", projects.get())
-    val buildCounts = tasks.register("collectDashboardBuildTestCounts", MergeJUnitCounts::class.java) { task ->
+    return tasks.register("collectDashboardBuildTestCounts", MergeJUnitCounts::class.java) { task ->
         task.countsFiles.from(projectInputs)
         task.countsFile.set(layout.buildDirectory.file("dashboard/build-test-counts.json"))
-    }
-    val includedBuilds = configurations.dependencyScope("dashboardIncludedTestCountsDependencies")
-    modules.forEach { module -> dependencies.add(includedBuilds.name, module) }
+    }.flatMap { it.countsFile }
+}
+
+private fun Project.exportBuildCounts(localCounts: Provider<RegularFile>, includedBuilds: Configuration) {
     configurations.consumable("dashboardBuildTestCountsElements") { configuration ->
-        configuration.extendsFrom(includedBuilds.get())
-        configuration.verificationVariant(project, "dashboard-build-test-counts")
-        configuration.outgoing.artifact(buildCounts.flatMap { it.countsFile })
+        configuration.extendsFrom(includedBuilds)
+        configuration.verificationVariant(this, "dashboard-build-test-counts")
+        configuration.outgoing.artifact(localCounts)
     }
-    val buildInputs = verificationInputs("dashboardBuildTestCounts", "dashboard-build-test-counts", includedBuilds.get())
+}
+
+private fun Project.registerSummary(localCounts: Provider<RegularFile>, includedCounts: Configuration) {
     val summaryPath = layout.buildDirectory.file("dashboard/test-summary.json")
     val clearSummary = tasks.register("clearDashboardTestSummary", Delete::class.java) { it.delete(summaryPath) }
     tasks.register("dashboardTestSummary", WriteDashboardTestSummary::class.java) { task ->
         task.group = "reporting"
         task.description = "Writes the aggregate JUnit test summary for Ze Great Dashboard."
         task.dependsOn(clearSummary)
-        task.countsFiles.from(buildCounts.flatMap { it.countsFile }, buildInputs)
+        task.countsFiles.from(localCounts, includedCounts)
         task.runId.convention(providers.gradleProperty("dashboardRunId").orElse(providers.environmentVariable("GITHUB_RUN_ID")))
         task.runAttempt.convention(
             providers.gradleProperty("dashboardRunAttempt").orElse(providers.environmentVariable("GITHUB_RUN_ATTEMPT")),
