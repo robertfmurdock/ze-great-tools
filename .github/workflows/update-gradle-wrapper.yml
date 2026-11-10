@@ -18,11 +18,17 @@ jobs:
           distribution: 'zulu'
           java-version: '21'
       - name: Setup Current Gradle
+        id: gradle
         uses: gradle/actions/setup-gradle@v6
         with:
           gradle-version: current
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
-      - run: gradle wrapper --distribution-type all
+      - name: Update wrapper
+        env:
+          GRADLE_VERSION: ${{ steps.gradle.outputs.gradle-version }}
+        run: gradle wrapper --gradle-version "$GRADLE_VERSION" --distribution-type bin --gradle-distribution-sha256-sum "$(curl -fsSL "https://services.gradle.org/distributions/gradle-$GRADLE_VERSION-bin.zip.sha256")"
+      - name: Validate updated wrapper
+        uses: gradle/actions/wrapper-validation@v6
       - name: Update Yarn Lock
         run: ./gradlew kotlinUpgradeYarnLock --no-configuration-cache --no-build-cache
       - name: Create Pull Request

@@ -66,13 +66,21 @@ Resolve all 24 Gradle audit findings and verify both standing advisories across 
 
 - **Date** 2026-11-10
 - **Branch and baseline commit** `main` at `29fca6d5206eef625e58a24e02e7a797e9cc89a1`
-- **Last verified commit** No Gradle validation recorded yet.
-- **Uncommitted work** This card and 36 pre-existing unrelated changes under `.idea/` at creation.
-- **Status** Audit recorded. Remediation pending.
+- **Last verified commit** `4d42e320`, followed by the uncommitted wrapper change validated below.
+- **Uncommitted work** Wrapper distribution and checksum, wrapper update workflow, and this progress update.
+- **Status** W1 and W2 implemented and validated locally. They remain open until committed and pushed.
 - **Blockers** None recorded.
-- **Next** W1, pin the wrapper distribution checksum.
+- **Next** Commit and push W1 and W2, mark them complete, then proceed to W3.
 
 ## Implementation Notes
+
+### 2026-11-10 · Wrapper remediation
+
+- The work card and IDEA changes were committed and pushed as `4d42e320`. GitHub reported that the push bypassed the required Build status check.
+- W1 and W2 use the Gradle wrapper task to select Gradle 9.9.0 `-bin` with the published SHA-256 `0b00b0ffe07c4d4789c12d4935a44a7057d55774b7540bd4a3f76f336deb177a`. The wrapper task ran twice. Configuration-only changes are validated through wrapper bootstrap and the build check rather than a new test.
+- Baseline and post-change `./gradlew --console=plain tasks` passed. `./gradlew check -q --console=plain` passed after the change. An empty Gradle user home successfully downloaded and verified the binary distribution with `./gradlew --version`.
+- The scheduled wrapper update now selects the setup action's concrete Gradle version, fetches its binary distribution checksum, and passes both to the wrapper task. GitHub Actions execution remains to verify after the workflow is pushed.
+- A1 local verification passed. `shasum -a 256 gradle/wrapper/gradle-wrapper.jar` matched Gradle's published 9.9.0 wrapper JAR checksum, `621008afc4f5d59357fcf06ffa644dd5aade5e091bdc363742710445f73cdaf8`. The update job now validates the generated wrapper JAR before opening a pull request.
 
 ### 2026-11-10 · Audit captured
 
