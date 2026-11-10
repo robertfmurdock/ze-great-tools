@@ -30,9 +30,14 @@ dependencies {
     implementation(kotlin("stdlib", embeddedKotlinVersion))
     implementation(kotlin("gradle-plugin", embeddedKotlinVersion))
     implementation(libs.org.jmailen.gradle.kotlinter.gradle)
+    testImplementation(gradleTestKit())
+    testImplementation(kotlin("test-junit5"))
+    testImplementation("com.zegreatrob.testmints:standard:12.6.67")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.13.4")
 }
 
 tasks {
+    test { useJUnitPlatform() }
     assemble { dependsOn(provider { (getTasksByName("assemble", true) - this).toList() }) }
     clean { dependsOn(provider { (getTasksByName("clean", true) - this).toList() }) }
     withType<FormatTask> {

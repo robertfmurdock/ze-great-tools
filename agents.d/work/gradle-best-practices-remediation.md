@@ -19,7 +19,7 @@ Resolve all 24 Gradle audit findings and verify both standing advisories across 
 
 - [x] **W1 · High · Distribution checksum.** `gradle/wrapper/gradle-wrapper.properties:3`. Pin the published SHA-256 for the archive in `distributionUrl`. Verify the URL and digest pair against Gradle's published checksums and exercise wrapper bootstrap with an empty distribution cache. [Gradle](https://docs.gradle.org/current/userguide/best_practices_security.html#validate_gradle_checksum)
 - [x] **W2 · Recommendation · Binary distribution.** `gradle/wrapper/gradle-wrapper.properties:3`. Use the wrapper skill to regenerate the current version as `-bin` and pin its digest in the same change. Verify the generated URL, SHA-256, and reported Gradle version. W1 and W2 can share a commit if the resulting binary archive is pinned. [Gradle](https://docs.gradle.org/current/userguide/best_practices_performance.html#prefer_bin_distribution)
-- [ ] **W3 · Medium · UTF-8.** `gradle.properties:4`. Append `-Dfile.encoding=UTF-8` to the existing daemon JVM arguments. Verify the daemon sees UTF-8 and the existing heap setting is retained. [Gradle](https://docs.gradle.org/current/userguide/best_practices_performance.html#use_utf8_encoding)
+- [x] **W3 · Medium · UTF-8.** `gradle.properties:4`. Append `-Dfile.encoding=UTF-8` to the existing daemon JVM arguments. Verify the daemon sees UTF-8 and the existing heap setting is retained. [Gradle](https://docs.gradle.org/current/userguide/best_practices_performance.html#use_utf8_encoding)
 - [ ] **A1 · Advisory · Wrapper JAR verification.** `gradle/wrapper/gradle-wrapper.jar`. Compare its digest against the trusted published checksum or byte-compare with a wrapper regenerated using a trusted Gradle installation. Record the result and verify the upgrade workflow checks future wrapper JAR changes. [Gradle](https://docs.gradle.org/current/userguide/best_practices_security.html#validate_wrapper_checksum)
 
 ### 2. Task wiring and outputs `[patch]`
@@ -58,7 +58,7 @@ Resolve all 24 Gradle audit findings and verify both standing advisories across 
 
 ### Closeout
 
-- [ ] Obtain explicit authorization for the mandatory final refactor subagent in the thread that will spawn it. Record the response in Implementation Notes.
+- [x] Obtain explicit authorization for the mandatory final refactor subagent in the thread that will spawn it. Record the response in Implementation Notes.
 - [ ] Complete the final refactor review of all remediation commits and files per [REFACTOR_AGENT.md](../context/REFACTOR_AGENT.md). Rerun applicable detection checks and the full Gradle check.
 - [ ] Confirm the completed remediation is pushed, then move this card to `agents.d/work_completed/`.
 
@@ -66,13 +66,23 @@ Resolve all 24 Gradle audit findings and verify both standing advisories across 
 
 - **Date** 2026-11-10
 - **Branch and baseline commit** `main` at `29fca6d5206eef625e58a24e02e7a797e9cc89a1`
-- **Last verified commit** `3a42308c` (wrapper slice).
-- **Uncommitted work** Card progress and W3 in progress.
-- **Status** W1 and W2 pushed. Wrapper workflow execution and A1 remain to verify.
+- **Last verified commit** `a552faf5` (UTF-8 slice).
+- **Uncommitted work** T1 report-copy implementation, regression test, and card progress. IDEA artifact files were regenerated independently.
+- **Status** W1, W2, and W3 pushed. Wrapper workflow execution and A1 remain to verify.
 - **Blockers** None recorded.
-- **Next** W3, configure UTF-8 for the Gradle daemon.
+- **Next** T1, separate overlapping report and npm task outputs.
 
 ## Implementation Notes
+
+### 2026-11-10 · Final review authorization
+
+- The user explicitly authorized one subagent for the final refactor review after implementation is complete.
+
+### 2026-11-10 · T1 report-copy progress
+
+- A TestKit regression demonstrated that `cleanCopyReportsToRootDirectory` deleted copied test results. The focused test failed at that assertion before the fix and passes with per-file task outputs. Collected paths and both existing task names are retained.
+- `./gradlew -p tools-plugins test --tests '*ReportsPluginTest' --console=plain` passed after the change. The full `./gradlew check --console=plain` passed. The initial quiet run was interrupted for diagnostics before the successful rerun.
+- T1 remains open for npm staging and for checking colliding relative paths. Changes await commit and push.
 
 ### 2026-11-10 · W3 preparation
 

@@ -11,15 +11,17 @@ tasks {
         )
 
     val check = getByName("check")
-    val copyReportsToRootDirectory = register<Copy>("copyReportsToRootDirectory") {
+    val copyReportsToRootDirectory = register<CopyReportFiles>("copyReportsToRootDirectory") {
         mustRunAfter(check)
-        from("build/reports")
-        into(projectResultPath)
+        sourceDirectory.set(layout.buildDirectory.dir("reports"))
+        sourceFiles.from(sourceDirectory.asFileTree)
+        destinationDirectory.set(projectResultPath)
     }
-    val copyTestResultsToRootDirectory = register<Copy>("copyTestResultsToRootDirectory") {
+    val copyTestResultsToRootDirectory = register<CopyReportFiles>("copyTestResultsToRootDirectory") {
         mustRunAfter(check)
-        from("build/test-results")
-        into(projectResultPath)
+        sourceDirectory.set(layout.buildDirectory.dir("test-results"))
+        sourceFiles.from(sourceDirectory.asFileTree)
+        destinationDirectory.set(projectResultPath)
     }
     register("collectResults") {
         dependsOn(copyReportsToRootDirectory, copyTestResultsToRootDirectory)
