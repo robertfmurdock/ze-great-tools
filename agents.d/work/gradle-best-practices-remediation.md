@@ -17,8 +17,8 @@ Resolve all 24 Gradle audit findings and verify both standing advisories across 
 
 ### 1. Wrapper and build defaults `[none]`
 
-- [ ] **W1 · High · Distribution checksum.** `gradle/wrapper/gradle-wrapper.properties:3`. Pin the published SHA-256 for the archive in `distributionUrl`. Verify the URL and digest pair against Gradle's published checksums and exercise wrapper bootstrap with an empty distribution cache. [Gradle](https://docs.gradle.org/current/userguide/best_practices_security.html#validate_gradle_checksum)
-- [ ] **W2 · Recommendation · Binary distribution.** `gradle/wrapper/gradle-wrapper.properties:3`. Use the wrapper skill to regenerate the current version as `-bin` and pin its digest in the same change. Verify the generated URL, SHA-256, and reported Gradle version. W1 and W2 can share a commit if the resulting binary archive is pinned. [Gradle](https://docs.gradle.org/current/userguide/best_practices_performance.html#prefer_bin_distribution)
+- [x] **W1 · High · Distribution checksum.** `gradle/wrapper/gradle-wrapper.properties:3`. Pin the published SHA-256 for the archive in `distributionUrl`. Verify the URL and digest pair against Gradle's published checksums and exercise wrapper bootstrap with an empty distribution cache. [Gradle](https://docs.gradle.org/current/userguide/best_practices_security.html#validate_gradle_checksum)
+- [x] **W2 · Recommendation · Binary distribution.** `gradle/wrapper/gradle-wrapper.properties:3`. Use the wrapper skill to regenerate the current version as `-bin` and pin its digest in the same change. Verify the generated URL, SHA-256, and reported Gradle version. W1 and W2 can share a commit if the resulting binary archive is pinned. [Gradle](https://docs.gradle.org/current/userguide/best_practices_performance.html#prefer_bin_distribution)
 - [ ] **W3 · Medium · UTF-8.** `gradle.properties:4`. Append `-Dfile.encoding=UTF-8` to the existing daemon JVM arguments. Verify the daemon sees UTF-8 and the existing heap setting is retained. [Gradle](https://docs.gradle.org/current/userguide/best_practices_performance.html#use_utf8_encoding)
 - [ ] **A1 · Advisory · Wrapper JAR verification.** `gradle/wrapper/gradle-wrapper.jar`. Compare its digest against the trusted published checksum or byte-compare with a wrapper regenerated using a trusted Gradle installation. Record the result and verify the upgrade workflow checks future wrapper JAR changes. [Gradle](https://docs.gradle.org/current/userguide/best_practices_security.html#validate_wrapper_checksum)
 
@@ -66,13 +66,18 @@ Resolve all 24 Gradle audit findings and verify both standing advisories across 
 
 - **Date** 2026-11-10
 - **Branch and baseline commit** `main` at `29fca6d5206eef625e58a24e02e7a797e9cc89a1`
-- **Last verified commit** `4d42e320`, followed by the uncommitted wrapper change validated below.
-- **Uncommitted work** Wrapper distribution and checksum, wrapper update workflow, and this progress update.
-- **Status** W1 and W2 implemented and validated locally. They remain open until committed and pushed.
+- **Last verified commit** `3a42308c` (wrapper slice).
+- **Uncommitted work** Card progress and W3 in progress.
+- **Status** W1 and W2 pushed. Wrapper workflow execution and A1 remain to verify.
 - **Blockers** None recorded.
-- **Next** Commit and push W1 and W2, mark them complete, then proceed to W3.
+- **Next** W3, configure UTF-8 for the Gradle daemon.
 
 ## Implementation Notes
+
+### 2026-11-10 · W3 preparation
+
+- W3 is a build configuration change with no intended output impact. Validate the daemon JVM arguments directly and run the full check rather than adding a test that only mirrors the property.
+- W3 validation passed. `./gradlew help --info --console=plain` started daemon 89893, whose log records both `-Xmx3g` and `-Dfile.encoding=UTF-8`. `./gradlew check -q --console=plain` passed. The change awaits commit and push.
 
 ### 2026-11-10 · Wrapper remediation
 
