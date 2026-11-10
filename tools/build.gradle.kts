@@ -18,6 +18,7 @@ plugins {
 fingerprintConfig {
     includedProjects = setOf(
         "certifier-plugin",
+        "dashboard-test-summary",
         "digger-core",
         "digger-json",
         "digger-model",

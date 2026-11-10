@@ -10,6 +10,7 @@ rootProject.name = "tools"
 
 include("certifier-plugin")
 include("cli-tools")
+include("dashboard-test-summary")
 include("dependency-bom")
 include("plugin-dependency-bom")
 include("digger-core")

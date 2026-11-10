@@ -41,6 +41,12 @@ An plugin extracting contribution information from a git repository.
 
 See its [README](tools/digger-plugin/README.md) for more.
 
+### Dashboard Test Summary
+
+Aggregates JUnit XML across Gradle projects and included builds for Ze Great Dashboard.
+
+See its [README](tools/dashboard-test-summary/README.md) for setup.
+
 ## NPM Utilities
 
 ### Tagger CLI
