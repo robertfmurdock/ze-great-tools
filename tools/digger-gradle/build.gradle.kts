@@ -11,7 +11,6 @@ java {
 dependencies {
     api(project(":digger-core"))
     api(project(":digger-json"))
-    api(project(":git-adapter"))
 }
 
 tasks {

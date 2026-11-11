@@ -27,7 +27,7 @@ Resolve all 24 Gradle audit findings and verify both standing advisories across 
 - [x] **T1 · Medium · Unique outputs.** `tools-plugins/src/main/kotlin/com/zegreatrob/tools/plugins/reports.gradle.kts:14` and `NpmCliPlugin.kt:120` in the same directory. Consolidate producers or stage distinct outputs. Verify one owner per destination and compare collected report paths and npm package contents with the baseline. [Gradle](https://docs.gradle.org/current/userguide/best_practices_tasks.html#use_unique_output_files_and_directories)
 - [x] **T2 · High · Configuration-time filesystem work.** `tools-plugins/src/main/kotlin/com/zegreatrob/tools/plugins/reports.gradle.kts:29`. Move report directory creation to execution. From a clean output tree, verify `help` leaves the report output absent and `collectResults` creates it as needed. [Gradle](https://docs.gradle.org/current/userguide/best_practices_performance.html#avoid_computations_in_configuration_phase)
 - [x] **T3 · Medium · Explicit action-task dependencies.** `command-line-tools/{digger-cli,tagger-cli}/build.gradle.kts` at the template-copy and JVM smoke-test wiring, and `tools/fingerprint-plugin/src/main/kotlin/com/zegreatrob/tools/FingerprintPlugin.kt:103`. Connect producer outputs to consumer inputs and remove redundant edges. Request the consumers alone and verify the required templates, distributions, and fingerprints are built first. Preserve lifecycle and mandatory ordering semantics. [Gradle](https://docs.gradle.org/current/userguide/best_practices_tasks.html#avoid_depends_on)
-- [ ] **T4 · Medium · Lazy output composition.** `tools-plugins/dashboard-test-summary/src/main/kotlin/com/zegreatrob/tools/dashboard/DashboardTestSummaryPlugin.kt`. Lazily compose JUnit XML output locations while preserving the producing task dependency. Verify the collector reads a customized XML directory and respects disabled XML reporting. [Gradle](https://docs.gradle.org/current/userguide/best_practices_tasks.html#map_versus_flatmap)
+- [x] **T4 · Medium · Lazy output composition.** `tools-plugins/dashboard-test-summary/src/main/kotlin/com/zegreatrob/tools/dashboard/DashboardTestSummaryPlugin.kt`. Lazily compose JUnit XML output locations while preserving the producing task dependency. Verify the collector reads a customized XML directory and respects disabled XML reporting. [Gradle](https://docs.gradle.org/current/userguide/best_practices_tasks.html#map_versus_flatmap)
 - [x] **T5 · Recommendation · Task metadata.** `tools-plugins/src/main/kotlin/com/zegreatrob/tools/plugins/{reports.gradle.kts,NpmCliPlugin.kt}` and `command-line-tools/tagger-cli/build.gradle.kts:111`. Add groups and descriptions to report, npm, and CLI smoke tasks that lack them. Confirm both fields in Gradle task help. [Gradle](https://docs.gradle.org/current/userguide/best_practices_tasks.html#group_describe_tasks)
 - [x] **T6 · Recommendation · Hardcoded plugin task names.** `command-line-tools/digger-cli/build.gradle.kts:142`. Prefer the Kotlin DSL, typed providers, or documented task API for Node setup and npm install wiring. Verify a clean Digger JS build still runs the required setup and install tasks. [Gradle](https://docs.gradle.org/current/userguide/best_practices_tasks.html#dont_hardcode_task_names)
 
@@ -66,13 +66,18 @@ Resolve all 24 Gradle audit findings and verify both standing advisories across 
 
 - **Date** 2026-11-11
 - **Branch and baseline commit** `main` at `29fca6d5206eef625e58a24e02e7a797e9cc89a1`
-- **Last verified commit** `5f0d8528` (dashboard plugin relocation and fingerprint update).
-- **Uncommitted work** T4 dashboard report wiring, Git test environment isolation, and card progress.
-- **Status** W1, W2, W3, A1, T1, T2, T3, T5, T6, L2, L3, and L5 pushed. L1 is partially complete. T4 and Git test environment isolation pass focused tests and await full validation.
+- **Last verified commit** `7db640ea` (dashboard wiring and Git test isolation).
+- **Uncommitted work** D3 dependency cleanup and card progress.
+- **Status** W1, W2, W3, A1, T1, T2, T3, T5, T6, L2, L3, and L5 pushed. L1 is partially complete. T4 and Git test environment isolation pushed. D3 is under validation.
 - **Blockers** None recorded.
-- **Next** Complete and commit T4, then address remaining L1 provider reads and later slices.
+- **Next** Complete D3 validation, then address remaining L1 provider reads and later slices.
 
 ## Implementation Notes
+
+### 2026-11-11 · D3 redundant dependencies
+
+- T4 and Git test isolation were pushed as agent-signed commit `7db640ea`. Digger Gradle already receives Git Adapter through Digger Core’s API. The generated JVM POM confirms that transitive compile dependency.
+- Removed the redundant direct API edge and duplicate JVM Testmints declarations. Dependency insight still resolves both Testmints JVM variants at 12.6.70, and Digger Gradle still resolves Git Adapter through Digger Core. Generated JVM POMs retain that transitive compile dependency. `./gradlew check -q --console=plain` passed. D3 awaits commit and push.
 
 ### 2026-11-11 · Git test environment isolation
 
