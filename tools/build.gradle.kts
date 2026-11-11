@@ -15,6 +15,8 @@ plugins {
     base
 }
 
+group = "com.zegreatrob.tools"
+
 fingerprintConfig {
     includedProjects = setOf(
         "certifier-plugin",

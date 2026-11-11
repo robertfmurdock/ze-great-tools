@@ -45,7 +45,7 @@ See its [README](tools/digger-plugin/README.md) for more.
 
 Aggregates JUnit XML across Gradle projects and included builds for Ze Great Dashboard.
 
-See its [README](tools/dashboard-test-summary/README.md) for setup.
+See its [README](tools-plugins/dashboard-test-summary/README.md) for setup.
 
 ## NPM Utilities
 

@@ -1,20 +1,23 @@
 plugins {
-    id("com.zegreatrob.tools.plugins.jvm")
+    kotlin("jvm")
     `java-gradle-plugin`
     alias(libs.plugins.com.gradle.plugin.publish)
-    id("com.zegreatrob.tools.plugins.publish")
+}
+
+repositories {
+    mavenCentral()
+    gradlePluginPortal()
 }
 
 dependencies {
-    implementation(platform(libs.org.jetbrains.kotlinx.kotlinx.serialization.bom))
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0")
+    implementation(gradleApi())
     testImplementation(gradleTestKit())
     testImplementation(kotlin("test-junit5", embeddedKotlinVersion))
-    testImplementation(libs.com.zegreatrob.testmints.minassert)
-    testImplementation(libs.com.zegreatrob.testmints.standard)
-    testRuntimeOnly(platform(libs.org.junit.junit.bom))
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    testImplementation("com.zegreatrob.testmints:minassert:12.6.70")
+    testImplementation("com.zegreatrob.testmints:standard:12.6.70")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.13.4")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.13.4")
 }
 
 gradlePlugin {
