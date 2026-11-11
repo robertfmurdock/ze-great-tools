@@ -117,20 +117,20 @@ class NpmCliPlugin : Plugin<Project> {
                 }
             }
 
-            val copyReadme = project.tasks.register<Copy>("copyReadme") {
+            val copyReadme = project.tasks.register<CopyPackageFile>("copyReadme") {
                 dependsOn("jsPackageJson", ":kotlinNpmInstall")
-                from(project.layout.projectDirectory.file("README.md"))
-                into(mainNpmProjectDir)
+                source.from(project.layout.projectDirectory.file("README.md"))
+                destination.set(mainNpmProjectDir.map { it.file("README.md") })
             }
 
             val rootLicense = project.rootProject.layout.projectDirectory.file("LICENSE")
             val parentLicense = project.rootProject.layout.projectDirectory.file("../LICENSE")
             val licenseFile = if (rootLicense.asFile.exists()) rootLicense else parentLicense
 
-            val copyLicense = project.tasks.register<Copy>("copyLicense") {
+            val copyLicense = project.tasks.register<CopyPackageFile>("copyLicense") {
                 dependsOn("jsPackageJson", ":kotlinNpmInstall")
-                from(licenseFile)
-                into(mainNpmProjectDir)
+                source.from(licenseFile)
+                destination.set(mainNpmProjectDir.map { it.file("LICENSE") })
             }
 
             val jsCliTar = project.tasks.register<Tar>("jsCliTar") {

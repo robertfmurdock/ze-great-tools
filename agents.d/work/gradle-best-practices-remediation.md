@@ -64,15 +64,23 @@ Resolve all 24 Gradle audit findings and verify both standing advisories across 
 
 ## Current State
 
-- **Date** 2026-11-10
+- **Date** 2026-11-11
 - **Branch and baseline commit** `main` at `29fca6d5206eef625e58a24e02e7a797e9cc89a1`
-- **Last verified commit** `a552faf5` (UTF-8 slice).
-- **Uncommitted work** T1 report-copy implementation, regression test, and card progress. IDEA artifact files were regenerated independently.
-- **Status** W1, W2, and W3 pushed. Wrapper workflow execution and A1 remain to verify.
+- **Last verified commit** `950753b0` (report-copy slice), followed by user commit `61c7df93`.
+- **Uncommitted work** T1 npm staging changes, regression test, and card progress.
+- **Status** W1, W2, and W3 pushed. T1 report-copy fix pushed, npm staging in progress. Wrapper workflow execution and A1 remain to verify.
 - **Blockers** None recorded.
 - **Next** T1, separate overlapping report and npm task outputs.
 
 ## Implementation Notes
+
+### 2026-11-11 · T1 npm staging
+
+- Resumed at `61c7df93` with a clean working tree. The required baseline `./gradlew check -q --console=plain` passed.
+- A TestKit regression showed that cleaning `copyReadme` also removed the staged license. It failed at the license assertion before the fix and passed after assigning individual output files to the README and license tasks.
+- `./gradlew :command-line-tools:tagger-cli:jsCliTar :command-line-tools:digger-cli:jsCliTar -q --console=plain` passed. Both archives contain README and LICENSE bytes matching their sources. A scan of existing report and test-result directories found no colliding relative file paths.
+- `./gradlew check -q --console=plain` passed after the npm change. Existing report collections can still collide if a report and a test result have the same relative filename, so that case remains open.
+- The report-copy changes were committed and pushed as `950753b0`. T1 remains open until npm changes are validated, committed, and pushed.
 
 ### 2026-11-10 · Final review authorization
 
