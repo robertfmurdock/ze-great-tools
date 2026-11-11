@@ -95,8 +95,8 @@ dependencies {
 
     commonTestImplementation("com.zegreatrob.tools:digger-test")
     commonTestImplementation(libs.org.jetbrains.kotlin.kotlin.test)
-    commonTestImplementation(libs.com.zegreatrob.testmints.minassert)
-    commonTestImplementation(libs.com.zegreatrob.testmints.standard)
+    commonTestImplementation(libs.testmints.minassert)
+    commonTestImplementation(libs.testmints.standard)
     "jvmTestImplementation"(libs.org.jetbrains.kotlin.kotlin.test.junit5)
     "jvmTestImplementation"("org.junit.jupiter:junit-jupiter-api")
     "jvmTestImplementation"("org.junit.jupiter:junit-jupiter-engine")

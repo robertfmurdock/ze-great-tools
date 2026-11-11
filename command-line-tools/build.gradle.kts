@@ -16,7 +16,7 @@ group = "com.zegreatrob.tools"
 subprojects {
     plugins.withId("org.jetbrains.kotlin.multiplatform") {
         dependencies {
-            add("commonTestImplementation", platform(libs.com.zegreatrob.testmints.bom))
+            add("commonTestImplementation", platform(libs.testmints.bom))
         }
         extensions.configure<KotlinMultiplatformExtension>("kotlin") {
             @OptIn(ExperimentalKotlinGradlePluginApi::class)
@@ -44,7 +44,6 @@ tasks {
     matching { it.name == "kotlinUpgradeYarnLock" }.configureEach {
         mustRunAfter("resetYarnLock")
     }
-
     register("collectResults") {
         group = "verification"
         description = "Collects test results from CLI modules"

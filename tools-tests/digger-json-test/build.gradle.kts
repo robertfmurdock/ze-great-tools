@@ -15,8 +15,8 @@ dependencies {
     commonTestImplementation("com.zegreatrob.tools:digger-json")
     commonTestImplementation(platform(libs.org.jetbrains.kotlinx.kotlinx.serialization.bom))
     commonTestImplementation("org.jetbrains.kotlinx:kotlinx-serialization-json")
-    commonTestImplementation(libs.com.zegreatrob.testmints.minassert)
-    commonTestImplementation(libs.com.zegreatrob.testmints.standard)
+    commonTestImplementation(libs.testmints.minassert)
+    commonTestImplementation(libs.testmints.standard)
     commonTestImplementation(libs.org.jetbrains.kotlin.kotlin.test)
     "jvmTestImplementation"(libs.org.jetbrains.kotlin.kotlin.test.junit5)
 }
