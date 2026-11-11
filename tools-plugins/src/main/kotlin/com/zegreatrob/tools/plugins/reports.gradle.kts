@@ -27,8 +27,3 @@ tasks {
         dependsOn(copyReportsToRootDirectory, copyTestResultsToRootDirectory)
     }
 }
-
-afterEvaluate {
-    val testOutputPath = rootProject.layout.buildDirectory.dir("test-output")
-    mkdir(testOutputPath.get().asFile)
-}

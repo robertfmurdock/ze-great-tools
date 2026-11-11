@@ -66,13 +66,18 @@ Resolve all 24 Gradle audit findings and verify both standing advisories across 
 
 - **Date** 2026-11-11
 - **Branch and baseline commit** `main` at `29fca6d5206eef625e58a24e02e7a797e9cc89a1`
-- **Last verified commit** `950753b0` (report-copy slice), followed by user commit `61c7df93`.
-- **Uncommitted work** T1 npm staging changes, regression test, and card progress.
-- **Status** W1, W2, and W3 pushed. T1 report-copy fix pushed, npm staging in progress. Wrapper workflow execution and A1 remain to verify.
+- **Last verified commit** `8f092c6e` (npm staging slice).
+- **Uncommitted work** T2 report directory fix, regression test, and card progress.
+- **Status** W1, W2, and W3 pushed. T1 report and npm fixes pushed, with colliding report filenames still to resolve. T2 validated locally. Wrapper workflow execution and A1 remain to verify.
 - **Blockers** None recorded.
 - **Next** T1, separate overlapping report and npm task outputs.
 
 ## Implementation Notes
+
+### 2026-11-11 · T2 report directory creation
+
+- A TestKit test showed that `help` created `build/test-output` during configuration. The test failed before removal of the `afterEvaluate` directory creation and passed afterward. The existing report collection test confirms that collecting actual files creates the destination as needed.
+- `./gradlew -p tools-plugins test --tests '*ReportsPluginTest' -q --console=plain` and `./gradlew check -q --console=plain` passed. T2 awaits commit and push.
 
 ### 2026-11-11 · T1 npm staging
 
