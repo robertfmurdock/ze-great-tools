@@ -7,50 +7,35 @@ import org.gradle.api.attributes.Category
 import org.gradle.api.attributes.VerificationType
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.RegularFile
-import org.gradle.api.initialization.ProjectDescriptor
-import org.gradle.api.initialization.Settings
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Delete
 import org.gradle.api.tasks.testing.AbstractTestTask
 
-open class DashboardTestSummarySettings(private val settings: Settings) {
-    internal val includedBuilds = linkedSetOf<String>()
-
-    fun includeBuild(path: String, module: String) {
-        require(module.split(':').let { it.size == 2 && it.all(String::isNotBlank) }) {
-            "Expected group:name for dashboard test reports from '$path'."
-        }
-        settings.includeBuild(path)
-        includedBuilds.add(module)
-    }
-}
-
-abstract class DashboardTestSummaryReports {
+abstract class DashboardTestSummaryExtension {
     abstract val reports: ConfigurableFileCollection
+    abstract val includedCounts: ConfigurableFileCollection
 }
 
-class DashboardTestSummaryPlugin : Plugin<Settings> {
-    override fun apply(settings: Settings) {
-        val options = settings.extensions.create(
+class DashboardTestSummaryPlugin : Plugin<Project> {
+    override fun apply(project: Project) {
+        if (project.tasks.findByName("collectDashboardProjectTestCounts") != null) return
+        val options = project.extensions.create(
             "dashboardTestSummary",
-            DashboardTestSummarySettings::class.java,
-            settings,
+            DashboardTestSummaryExtension::class.java,
         )
-        settings.gradle.settingsEvaluated {
-            val projectPaths = settings.rootProject.projectPaths()
-            val modules = options.includedBuilds.toList()
-            settings.gradle.lifecycle.beforeProject { project ->
-                configureProject(project)
-                if (project.path == ":") configureBuild(project, projectPaths, modules)
-            }
+        configureProject(project, project.extensions.getByType(DashboardTestSummaryExtension::class.java))
+        project.subprojects { child ->
+            val childOptions = child.extensions.findByType(DashboardTestSummaryExtension::class.java)
+                ?: child.extensions.create("dashboardTestSummary", DashboardTestSummaryExtension::class.java)
+            configureProject(child, childOptions)
+        }
+        if (project == project.rootProject) {
+            configureBuild(project, options)
         }
     }
 }
 
-private fun ProjectDescriptor.projectPaths(): List<String> = listOf(path) + children.flatMap { it.projectPaths() }
-
-private fun configureProject(project: Project) = with(project) {
-    val options = extensions.create("dashboardTestSummary", DashboardTestSummaryReports::class.java)
+private fun configureProject(project: Project, options: DashboardTestSummaryExtension) = with(project) {
     val tests = tasks.withType(AbstractTestTask::class.java)
     val projectCounts = tasks.register("collectDashboardProjectTestCounts", CollectJUnitCounts::class.java) { task ->
         task.reportFiles.from(options.reports)
@@ -70,34 +55,27 @@ private fun configureProject(project: Project) = with(project) {
     }
 }
 
-private fun configureBuild(project: Project, paths: List<String>, modules: List<String>) = with(project) {
-    val localCounts = collectBuildCounts(paths)
-    val includedBuilds = configurations.dependencyScope("dashboardIncludedTestCountsDependencies")
-    modules.forEach { module -> dependencies.add(includedBuilds.name, module) }
-    exportBuildCounts(localCounts, includedBuilds.get())
-    val includedCounts = verificationInputs("dashboardBuildTestCounts", "dashboard-build-test-counts", includedBuilds.get())
-    registerSummary(localCounts, includedCounts)
+private fun configureBuild(project: Project, options: DashboardTestSummaryExtension) = with(project) {
+    val localCounts = collectBuildCounts()
+    tasks.register("dashboardTestSummaryCounts", MergeJUnitCounts::class.java) { task ->
+        task.countsFiles.from(localCounts)
+        task.countsFiles.from(options.includedCounts)
+        task.countsFile.set(layout.buildDirectory.file("dashboard/build-test-counts.json"))
+    }
+    registerSummary(localCounts, options.includedCounts)
 }
 
-private fun Project.collectBuildCounts(paths: List<String>): Provider<RegularFile> {
-    val projects = configurations.dependencyScope("dashboardProjectTestCountsDependencies")
-    paths.forEach { path -> dependencies.add(projects.name, dependencies.project(mapOf("path" to path))) }
-    val projectInputs = verificationInputs("dashboardProjectTestCounts", "dashboard-project-test-counts", projects.get())
+private fun Project.collectBuildCounts(): Provider<RegularFile> {
     return tasks.register("collectDashboardBuildTestCounts", MergeJUnitCounts::class.java) { task ->
-        task.countsFiles.from(projectInputs)
+        task.countsFiles.from(tasks.named("collectDashboardProjectTestCounts", CollectJUnitCounts::class.java).flatMap { it.countsFile })
+        subprojects.forEach { child ->
+            task.countsFiles.from(child.tasks.named("collectDashboardProjectTestCounts", CollectJUnitCounts::class.java).flatMap { it.countsFile })
+        }
         task.countsFile.set(layout.buildDirectory.file("dashboard/build-test-counts.json"))
     }.flatMap { it.countsFile }
 }
 
-private fun Project.exportBuildCounts(localCounts: Provider<RegularFile>, includedBuilds: Configuration) {
-    configurations.consumable("dashboardBuildTestCountsElements") { configuration ->
-        configuration.extendsFrom(includedBuilds)
-        configuration.verificationVariant(this, "dashboard-build-test-counts")
-        configuration.outgoing.artifact(localCounts)
-    }
-}
-
-private fun Project.registerSummary(localCounts: Provider<RegularFile>, includedCounts: Configuration) {
+private fun Project.registerSummary(localCounts: Provider<RegularFile>, includedCounts: ConfigurableFileCollection) {
     val summaryPath = layout.buildDirectory.file("dashboard/test-summary.json")
     val clearSummary = tasks.register("clearDashboardTestSummary", Delete::class.java) { it.delete(summaryPath) }
     tasks.register("dashboardTestSummary", WriteDashboardTestSummary::class.java) { task ->

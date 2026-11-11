@@ -7,6 +7,7 @@ repositories {
 }
 
 plugins {
+    id("com.zegreatrob.tools.dashboard-test-summary")
     id("com.zegreatrob.tools.plugins.lint")
     id("com.zegreatrob.tools.plugins.versioning")
     id("com.zegreatrob.tools.fingerprint") version "1.8.74"

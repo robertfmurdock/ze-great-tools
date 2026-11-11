@@ -3,6 +3,7 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 
 plugins {
+    id("com.zegreatrob.tools.dashboard-test-summary")
     base
     id("com.zegreatrob.tools.plugins.lint")
     id("com.zegreatrob.tools.plugins.testmints") apply false

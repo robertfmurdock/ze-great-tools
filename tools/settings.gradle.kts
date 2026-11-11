@@ -7,7 +7,6 @@ pluginManagement {
 }
 
 plugins {
-    id("com.zegreatrob.tools.dashboard-test-summary")
 }
 
 rootProject.name = "tools"

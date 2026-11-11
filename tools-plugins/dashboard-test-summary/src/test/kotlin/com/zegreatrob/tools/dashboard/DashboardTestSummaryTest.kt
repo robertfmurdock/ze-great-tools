@@ -24,7 +24,7 @@ class DashboardTestSummaryTest {
         val build = fixture(
             """
             dashboardTestSummary.reports.from(files("first.xml", "second.xml"))
-            """.trimIndent(),
+            """.trimIndent() + "\n",
         )
     }) exercise {
         build.build()
@@ -91,11 +91,19 @@ class DashboardTestSummaryTest {
         testBody: String = "",
         testConfiguration: String = "",
     ): GradleRunner {
-        settings(directory, "fixture", """dashboardTestSummary.includeBuild("producer", "example:producer")""")
+        settings(directory, "fixture", """includeBuild("producer")""")
         report(directory)
         val producer = directory.resolve("producer")
         settings(producer, "producer")
         javaTest(producer, testBody, testConfiguration)
+        directory.resolve("build.gradle.kts").appendText(
+            """
+            dashboardTestSummary.includedCounts.from(layout.projectDirectory.file("producer/build/dashboard/build-test-counts.json"))
+            tasks.named("dashboardTestSummary") {
+                dependsOn(gradle.includedBuild("producer").task(":dashboardTestSummaryCounts"))
+            }
+            """.trimIndent(),
+        )
         return runner()
     }
 
@@ -105,18 +113,16 @@ class DashboardTestSummaryTest {
             "fixture",
             """
             include("sub")
-            dashboardTestSummary {
-                includeBuild("left", "example:left")
-                includeBuild("right", "example:right")
-                includeBuild("empty", "example:empty")
-            }
+            includeBuild("left")
+            includeBuild("right")
+            includeBuild("shared")
             """.trimIndent(),
         )
         report(directory)
         javaTest(directory.resolve("sub"))
         for (name in listOf("left", "right")) {
             val child = directory.resolve(name)
-            settings(child, name, """dashboardTestSummary.includeBuild("../shared", "example:shared")""")
+            settings(child, name, """includeBuild("../shared")""")
             report(child)
         }
         val shared = directory.resolve("shared")
@@ -125,15 +131,32 @@ class DashboardTestSummaryTest {
         val empty = directory.resolve("empty")
         settings(empty, "empty")
         empty.resolve("build.gradle.kts").writeText("""group = "example"""".trimIndent())
+        directory.resolve("build.gradle.kts").appendText(
+            """
+            dashboardTestSummary.includedCounts.from(
+                layout.projectDirectory.file("left/build/dashboard/build-test-counts.json"),
+                layout.projectDirectory.file("right/build/dashboard/build-test-counts.json"),
+                layout.projectDirectory.file("shared/build/dashboard/build-test-counts.json"),
+            )
+            tasks.named("dashboardTestSummary") {
+                dependsOn(
+                    gradle.includedBuild("left").task(":dashboardTestSummaryCounts"),
+                    gradle.includedBuild("right").task(":dashboardTestSummaryCounts"),
+                    gradle.includedBuild("shared").task(":dashboardTestSummaryCounts"),
+                )
+            }
+            """.trimIndent(),
+        )
         return runner()
     }
 
     private fun report(project: File, cases: String = """<testcase name="passes"/>""") {
         project.resolve("build.gradle.kts").writeText(
             """
+            plugins { id("com.zegreatrob.tools.dashboard-test-summary") }
             group = "example"
             dashboardTestSummary.reports.from(files("report.xml"))
-            """.trimIndent(),
+            """.trimIndent() + "\n",
         )
         project.resolve("report.xml").writeText("<testsuite>$cases</testsuite>")
     }
@@ -142,7 +165,10 @@ class DashboardTestSummaryTest {
         project.mkdirs()
         project.resolve("build.gradle.kts").writeText(
             """
-            plugins { java }
+            plugins {
+                id("com.zegreatrob.tools.dashboard-test-summary")
+                java
+            }
             group = "example"
             repositories { mavenCentral() }
             dependencies { testImplementation("junit:junit:4.13.2") }
@@ -168,7 +194,6 @@ class DashboardTestSummaryTest {
         project.mkdirs()
         project.resolve("settings.gradle.kts").writeText(
             """
-            plugins { id("com.zegreatrob.tools.dashboard-test-summary") }
             rootProject.name = "$name"
             """.trimIndent() + "\n" + script,
         )
@@ -176,7 +201,9 @@ class DashboardTestSummaryTest {
 
     private fun fixture(buildScript: String): GradleRunner {
         settings(directory, "fixture")
-        directory.resolve("build.gradle.kts").writeText(buildScript)
+        directory.resolve("build.gradle.kts").writeText(
+            "plugins { id(\"com.zegreatrob.tools.dashboard-test-summary\") }\n$buildScript",
+        )
         directory.resolve("first.xml").writeText(
             """<testsuite tests="99"><testcase/><testcase><error/></testcase><testcase><skipped/></testcase></testsuite>""",
         )

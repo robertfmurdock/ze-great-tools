@@ -7,10 +7,10 @@ pluginManagement {
 }
 
 plugins {
-    id("com.zegreatrob.tools.dashboard-test-summary")
 }
 
 rootProject.name = "tools-tests"
+includeBuild("../tools")
 
 include("tagger-test")
 include("tagger-core-test")
@@ -20,6 +20,4 @@ include("digger-json-test")
 include("digger-test")
 include("digger-plugin-test")
 
-dashboardTestSummary {
-    includeBuild("../tools", "com.zegreatrob.tools:tools")
-}
+

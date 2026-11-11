@@ -10,6 +10,7 @@ repositories {
 }
 
 plugins {
+    id("com.zegreatrob.tools.dashboard-test-summary")
     base
     alias(libs.plugins.org.jetbrains.kotlin.multiplatform) apply false
     alias(libs.plugins.nl.littlerobots.version.catalog.update)

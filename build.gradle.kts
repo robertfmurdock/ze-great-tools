@@ -5,11 +5,28 @@ repositories {
 }
 
 plugins {
+    id("com.zegreatrob.tools.dashboard-test-summary")
     id("com.zegreatrob.tools.tagger")
     id("com.zegreatrob.tools.digger")
     id("com.zegreatrob.tools.plugins.lint")
     id("com.zegreatrob.tools.fingerprint")
     base
+}
+
+dashboardTestSummary {
+    includedCounts.from(
+        layout.projectDirectory.file("tools/build/dashboard/build-test-counts.json"),
+        layout.projectDirectory.file("tools-tests/build/dashboard/build-test-counts.json"),
+        layout.projectDirectory.file("command-line-tools/build/dashboard/build-test-counts.json"),
+    )
+}
+
+tasks.named("dashboardTestSummary") {
+    dependsOn(
+        gradle.includedBuild("tools").task(":dashboardTestSummaryCounts"),
+        gradle.includedBuild("tools-tests").task(":dashboardTestSummaryCounts"),
+        gradle.includedBuild("command-line-tools").task(":dashboardTestSummaryCounts"),
+    )
 }
 
 tagger {
