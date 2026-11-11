@@ -66,8 +66,8 @@ Resolve all 24 Gradle audit findings and verify both standing advisories across 
 
 - **Date** 2026-11-11
 - **Branch and baseline commit** `main` at `29fca6d5206eef625e58a24e02e7a797e9cc89a1`
-- **Last verified commit** `8fac0c51` (unstable API inventory).
-- **Uncommitted work** IDEA files have unrelated changes.
+- **Last verified commit** `78343062` (remediation handoff).
+- **Uncommitted work** IDEA files and existing build-file changes have unrelated ownership; no remediation source changes are pending.
 - **Status** W1, W2, W3, A1, T1, T2, T3, T5, T6, L2, L3, and L5 pushed. L1 is partially complete. T4, Git test environment isolation, D1, D2, D3, D4, D5, S1, S4, and S5 pushed. L4 library ordering partially complete.
 - **Blockers** None recorded.
 - **Next** S2 duplicated convention extraction.
@@ -100,6 +100,10 @@ Resolve all 24 Gradle audit findings and verify both standing advisories across 
 
 - Added `agents.d/context/GRADLE_UNSTABLE_APIS.md` documenting the Kotlin compiler-options opt-ins, Gradle plugin API suppression, and Kotlin/JS task-name coupling, with upgrade checks for each.
 - Pushed signed commit `8fac0c51`; GitHub again reported that its required Build status check was bypassed.
+
+### 2026-11-11 · L4 npm lifecycle investigation
+
+- A callback on `org.jetbrains.kotlin.multiplatform` was tested as a replacement for the npm plugin's `afterEvaluate` hook. It ran before the Kotlin JS target registered the `kotlinNodeJs` extension and failed all three npm convention tests. The change was reverted without committing; the hook remains open until it can be attached to the JS target lifecycle itself.
 
 ### 2026-11-11 · L4 library signing order
 
