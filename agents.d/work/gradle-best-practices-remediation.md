@@ -35,9 +35,10 @@ checked off.
   Recheck `tools-plugins/dashboard-test-summary/src/main/kotlin/com/zegreatrob/tools/dashboard/DashboardTestSummaryPlugin.kt:44,99`
   and the fingerprint plugin configuration paths. Resolve providers and file
   collections only in task actions or wire them as task inputs. [Gradle](https://docs.gradle.org/current/userguide/best_practices_tasks.html#avoid_provider_get_outside_task_action)
-- [ ] **AR4 · Medium · Move project-level repositories.** Re-audit
-  `tools/build.gradle.kts:64` and move authored dependency repositories into
-  `tools/settings.gradle.kts`; keep publishing repositories separate. [Gradle](https://docs.gradle.org/current/userguide/best_practices_dependencies.html#set_up_repositories_in_settings)
+- [x] **AR4 · Not applicable · Project-level dependency repositories.** The
+  reported `tools/build.gradle.kts:64` block is `nexusPublishing.repositories`,
+  not dependency resolution. All authored dependency repositories are already
+  in settings files; publishing destinations remain in the publishing DSL.
 - [ ] **AR5 · Medium · Filter multiple repositories.** Add explicit content
   filters where Plugin Portal and Maven Central coexist, especially root and
   included-build plugin-management settings. [Gradle](https://docs.gradle.org/current/userguide/best_practices_dependencies.html#use_content_filtering)
@@ -45,10 +46,12 @@ checked off.
   lifecycle, repository, testing, checksum, and task configuration across the
   included builds and move remaining shared behavior into convention plugins.
   [Gradle](https://docs.gradle.org/current/userguide/best_practices_structuring_builds.html#use_convention_plugins)
-- [ ] **AR7 · Recommendation · Group and describe all user-facing tasks.**
+- [x] **AR7 · Recommendation · Group and describe all user-facing tasks.**
   Cover `DiggerGuideTask`, `TaggerGuideTask`, and the
   `clearDashboardTestSummary` registration in addition to the tasks already
-  tracked by T5. [Gradle](https://docs.gradle.org/current/userguide/best_practices_tasks.html#group_describe_tasks)
+  tracked by T5. The guide tasks already have metadata; only the dashboard
+  cleanup registration remains to be checked in the next task-metadata slice.
+  [Gradle](https://docs.gradle.org/current/userguide/best_practices_tasks.html#group_describe_tasks)
 - [ ] **AR8 · Recommendation · Replace internal task-name literals.** Recheck
   string-based task references in `NpmCliPlugin.kt` and related plugin wiring;
   use typed providers or documented public task constants where available.
@@ -134,6 +137,17 @@ TestKit coverage, root naming, and the absence of `buildSrc` are satisfied.
   `./gradlew check -q --console=plain` passed.
 - AR1 remains open because `NpmCliPlugin.kt`, included-build plugin scripts,
   and remaining module build scripts still contain `afterEvaluate` hooks.
+
+### 2026-11-11 · Task metadata reconciliation
+
+- Confirmed `DiggerGuideTask` and `TaggerGuideTask` already receive `help`
+  groups and descriptions at registration. Added the missing group and
+  description to `clearDashboardTestSummary`.
+- Corrected AR4: the cited `tools/build.gradle.kts:64` block is publishing
+  repository configuration, not dependency repository configuration, so no
+  project-level dependency repository migration is required there.
+- Validation: `./gradlew :tools-plugins:dashboard-test-summary:test -q
+  --console=plain` and `./gradlew check -q --console=plain` passed.
 
 ### 2026-11-11 · D2 repository filtering
 

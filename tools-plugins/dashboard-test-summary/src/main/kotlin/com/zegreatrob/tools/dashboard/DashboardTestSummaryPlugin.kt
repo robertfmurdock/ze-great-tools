@@ -78,7 +78,11 @@ private fun Project.collectBuildCounts(): Provider<RegularFile> {
 
 private fun Project.registerSummary(localCounts: Provider<RegularFile>, includedCounts: ConfigurableFileCollection) {
     val summaryPath = layout.buildDirectory.file("dashboard/test-summary.json")
-    val clearSummary = tasks.register("clearDashboardTestSummary", Delete::class.java) { it.delete(summaryPath) }
+    val clearSummary = tasks.register("clearDashboardTestSummary", Delete::class.java) {
+        it.group = "reporting"
+        it.description = "Clears the aggregate JUnit test summary"
+        it.delete(summaryPath)
+    }
     tasks.register("dashboardTestSummary", WriteDashboardTestSummary::class.java) { task ->
         task.group = "reporting"
         task.description = "Writes the aggregate JUnit test summary for Ze Great Dashboard."
