@@ -1,17 +1,17 @@
 [versions]
 com-github-ajalt-clikt = "5.1.0"
-testmints = "12.6.70"
 kotlin = "2.4.21"
+testmints = "12.6.70"
 
 [libraries]
 com-github-ajalt-clikt-clikt = { module = "com.github.ajalt.clikt:clikt", version.ref = "com-github-ajalt-clikt" }
 com-github-ajalt-clikt-clikt-markdown = { module = "com.github.ajalt.clikt:clikt-markdown", version.ref = "com-github-ajalt-clikt" }
+org-jetbrains-kotlin-kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
+org-jetbrains-kotlin-kotlin-test-junit5 = { module = "org.jetbrains.kotlin:kotlin-test-junit5", version.ref = "kotlin" }
+org-jetbrains-kotlinx-kotlinx-serialization-bom = "org.jetbrains.kotlinx:kotlinx-serialization-bom:1.13.0"
 testmints-bom = { module = "com.zegreatrob.testmints:testmints-bom", version.ref = "testmints" }
 testmints-minassert = { module = "com.zegreatrob.testmints:minassert" }
 testmints-standard = { module = "com.zegreatrob.testmints:standard" }
-org-jetbrains-kotlin-kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
-org-jetbrains-kotlin-kotlin-test-junit5 = { module = "org.jetbrains.kotlin:kotlin-test-junit5", version.ref = "kotlin" }
-org-jetbrains-kotlinx-kotlinx-serialization-bom = "org.jetbrains.kotlinx:kotlinx-serialization-bom:1.12.0"
 
 [plugins]
 io-sdkman-vendors = "io.sdkman.vendors:3.0.0"
