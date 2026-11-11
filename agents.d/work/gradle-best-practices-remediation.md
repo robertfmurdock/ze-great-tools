@@ -20,7 +20,7 @@ Resolve all 24 Gradle audit findings and verify both standing advisories across 
 - [x] **W1 · High · Distribution checksum.** `gradle/wrapper/gradle-wrapper.properties:3`. Pin the published SHA-256 for the archive in `distributionUrl`. Verify the URL and digest pair against Gradle's published checksums and exercise wrapper bootstrap with an empty distribution cache. [Gradle](https://docs.gradle.org/current/userguide/best_practices_security.html#validate_gradle_checksum)
 - [x] **W2 · Recommendation · Binary distribution.** `gradle/wrapper/gradle-wrapper.properties:3`. Use the wrapper skill to regenerate the current version as `-bin` and pin its digest in the same change. Verify the generated URL, SHA-256, and reported Gradle version. W1 and W2 can share a commit if the resulting binary archive is pinned. [Gradle](https://docs.gradle.org/current/userguide/best_practices_performance.html#prefer_bin_distribution)
 - [x] **W3 · Medium · UTF-8.** `gradle.properties:4`. Append `-Dfile.encoding=UTF-8` to the existing daemon JVM arguments. Verify the daemon sees UTF-8 and the existing heap setting is retained. [Gradle](https://docs.gradle.org/current/userguide/best_practices_performance.html#use_utf8_encoding)
-- [ ] **A1 · Advisory · Wrapper JAR verification.** `gradle/wrapper/gradle-wrapper.jar`. Compare its digest against the trusted published checksum or byte-compare with a wrapper regenerated using a trusted Gradle installation. Record the result and verify the upgrade workflow checks future wrapper JAR changes. [Gradle](https://docs.gradle.org/current/userguide/best_practices_security.html#validate_wrapper_checksum)
+- [x] **A1 · Advisory · Wrapper JAR verification.** `gradle/wrapper/gradle-wrapper.jar`. Compare its digest against the trusted published checksum or byte-compare with a wrapper regenerated using a trusted Gradle installation. Record the result and verify the upgrade workflow checks future wrapper JAR changes. [Gradle](https://docs.gradle.org/current/userguide/best_practices_security.html#validate_wrapper_checksum)
 
 ### 2. Task wiring and outputs `[patch]`
 
@@ -28,7 +28,7 @@ Resolve all 24 Gradle audit findings and verify both standing advisories across 
 - [x] **T2 · High · Configuration-time filesystem work.** `tools-plugins/src/main/kotlin/com/zegreatrob/tools/plugins/reports.gradle.kts:29`. Move report directory creation to execution. From a clean output tree, verify `help` leaves the report output absent and `collectResults` creates it as needed. [Gradle](https://docs.gradle.org/current/userguide/best_practices_performance.html#avoid_computations_in_configuration_phase)
 - [x] **T3 · Medium · Explicit action-task dependencies.** `command-line-tools/{digger-cli,tagger-cli}/build.gradle.kts` at the template-copy and JVM smoke-test wiring, and `tools/fingerprint-plugin/src/main/kotlin/com/zegreatrob/tools/FingerprintPlugin.kt:103`. Connect producer outputs to consumer inputs and remove redundant edges. Request the consumers alone and verify the required templates, distributions, and fingerprints are built first. Preserve lifecycle and mandatory ordering semantics. [Gradle](https://docs.gradle.org/current/userguide/best_practices_tasks.html#avoid_depends_on)
 - [ ] **T4 · Medium · Lazy output composition.** `tools/dashboard-test-summary/src/main/kotlin/com/zegreatrob/tools/dashboard/DashboardTestSummaryPlugin.kt:61`. Lazily compose JUnit XML output locations while preserving the producing task dependency. Verify the collector reads a customized XML directory and respects disabled XML reporting. [Gradle](https://docs.gradle.org/current/userguide/best_practices_tasks.html#map_versus_flatmap)
-- [ ] **T5 · Recommendation · Task metadata.** `tools-plugins/src/main/kotlin/com/zegreatrob/tools/plugins/{reports.gradle.kts,NpmCliPlugin.kt}` and `command-line-tools/tagger-cli/build.gradle.kts:111`. Add groups and descriptions to report, npm, and CLI smoke tasks that lack them. Confirm both fields in Gradle task help. [Gradle](https://docs.gradle.org/current/userguide/best_practices_tasks.html#group_describe_tasks)
+- [x] **T5 · Recommendation · Task metadata.** `tools-plugins/src/main/kotlin/com/zegreatrob/tools/plugins/{reports.gradle.kts,NpmCliPlugin.kt}` and `command-line-tools/tagger-cli/build.gradle.kts:111`. Add groups and descriptions to report, npm, and CLI smoke tasks that lack them. Confirm both fields in Gradle task help. [Gradle](https://docs.gradle.org/current/userguide/best_practices_tasks.html#group_describe_tasks)
 - [ ] **T6 · Recommendation · Hardcoded plugin task names.** `command-line-tools/digger-cli/build.gradle.kts:142`. Prefer the Kotlin DSL, typed providers, or documented task API for Node setup and npm install wiring. Verify a clean Digger JS build still runs the required setup and install tasks. [Gradle](https://docs.gradle.org/current/userguide/best_practices_tasks.html#dont_hardcode_task_names)
 
 ### 3. Lazy release and plugin configuration `[patch]`
@@ -66,13 +66,19 @@ Resolve all 24 Gradle audit findings and verify both standing advisories across 
 
 - **Date** 2026-11-11
 - **Branch and baseline commit** `main` at `29fca6d5206eef625e58a24e02e7a797e9cc89a1`
-- **Last verified commit** `64976f22` (task wiring slice).
-- **Uncommitted work** T4 dashboard regression test, T5 task descriptions, and card progress.
-- **Status** W1, W2, and W3 pushed. T1 report and npm fixes pushed, with colliding report filenames still to resolve. T2 and T3 pushed. T4 requires a producer-aware lazy report provider. T5 validated locally. Wrapper workflow execution and A1 remain to verify.
+- **Last verified commit** `5d00a71b` (task metadata and dashboard regression).
+- **Uncommitted work** T1 collection layout, regression test, and card progress.
+- **Status** W1, W2, W3, A1, T2, T3, and T5 verified and pushed. T1 collision fix validated locally. T4 requires producer-aware lazy report wiring.
 - **Blockers** None recorded.
-- **Next** Find producer-aware lazy wiring for T4, then resolve the remaining T1 filename-collision case.
+- **Next** Commit and push T1, then continue investigating T4 and subsequent slices.
 
 ## Implementation Notes
+
+### 2026-11-11 · T1 distinct collection directories
+
+- The user chose a comprehensible layout that retains directory distinctions. Per project, collection now separates `results/reports/` from `results/test-results/`. The root collector separates included builds under `tools/` and `tools-tests/` and synchronizes its generated output to remove obsolete layout entries. This intentionally changes the collected artifact layout.
+- A TestKit regression with matching relative XML filenames failed before the change and passed afterward. The other report tests passed. `./gradlew collectResults -q --console=plain` produced the expected build and project directories, and `./gradlew check -q --console=plain` passed. T1 awaits commit and push.
+- A1 is verified. GitHub Actions run 42897436491 completed successfully on `950753b0`, including both Update wrapper and Validate updated wrapper steps. T5 was pushed as `5d00a71b`.
 
 ### 2026-11-11 · T5 task metadata
 

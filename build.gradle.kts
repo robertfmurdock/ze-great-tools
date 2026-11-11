@@ -107,12 +107,17 @@ tasks {
         gradle.includedBuild("tools"),
         gradle.includedBuild("tools-tests"),
     )
-    register<Copy>("collectResults") {
+    register<Sync>("collectResults") {
         group = "verification"
         description = "Collects test results from all test builds into root build directory"
         dependsOn(provider { (getTasksByName("collectResults", true) - this).toList() })
         dependsOn(provider { testBuilds.map { it.task(":collectResults") } })
-        from(testBuilds.map { it.projectDir.resolve("build/test-output") })
+        testBuilds.forEach { build ->
+            from(build.projectDir.resolve("build/test-output")) {
+                include("**/results/reports/**", "**/results/test-results/**")
+                into(build.name)
+            }
+        }
         into(rootProject.layout.buildDirectory.file("test-output/${project.path}".replace(":", "/")))
     }
 }

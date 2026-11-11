@@ -11,21 +11,19 @@ tasks {
         )
 
     val check = getByName("check")
-    val copyReportsToRootDirectory = register<CopyReportFiles>("copyReportsToRootDirectory") {
+    val copyReportsToRootDirectory = register<Copy>("copyReportsToRootDirectory") {
         group = "verification"
         description = "Copies reports to the root test output directory"
         mustRunAfter(check)
-        sourceDirectory.set(layout.buildDirectory.dir("reports"))
-        sourceFiles.from(sourceDirectory.asFileTree)
-        destinationDirectory.set(projectResultPath)
+        from(layout.buildDirectory.dir("reports"))
+        into(projectResultPath.map { it.dir("reports") })
     }
-    val copyTestResultsToRootDirectory = register<CopyReportFiles>("copyTestResultsToRootDirectory") {
+    val copyTestResultsToRootDirectory = register<Copy>("copyTestResultsToRootDirectory") {
         group = "verification"
         description = "Copies test results to the root test output directory"
         mustRunAfter(check)
-        sourceDirectory.set(layout.buildDirectory.dir("test-results"))
-        sourceFiles.from(sourceDirectory.asFileTree)
-        destinationDirectory.set(projectResultPath)
+        from(layout.buildDirectory.dir("test-results"))
+        into(projectResultPath.map { it.dir("test-results") })
     }
     register("collectResults") {
         group = "verification"
