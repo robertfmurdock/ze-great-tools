@@ -163,6 +163,7 @@ class NpmCliPlugin : Plugin<Project> {
                 commandLine("npm", "link")
             }
 
+            val isSnapshot = project.isSnapshot()
             val jsPublish = project.tasks.register<Exec>("jsPublish") {
                 group = "publishing"
                 description = "Publishes the JavaScript CLI to npm"
@@ -170,7 +171,7 @@ class NpmCliPlugin : Plugin<Project> {
                 mustRunAfter(project.tasks.named("check"))
                 workingDir(mainNpmProjectDir)
                 doFirst {
-                    if (project.isSnapshot()) {
+                    if (isSnapshot) {
                         commandLine("npm", "publish", "--dry-run", "--access", "public", "--tag", "snapshot")
                     } else {
                         commandLine("npm", "publish", "--access", "public", "--provenance")

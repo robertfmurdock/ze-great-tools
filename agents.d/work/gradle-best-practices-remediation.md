@@ -29,7 +29,7 @@ Resolve all 24 Gradle audit findings and verify both standing advisories across 
 - [x] **T3 · Medium · Explicit action-task dependencies.** `command-line-tools/{digger-cli,tagger-cli}/build.gradle.kts` at the template-copy and JVM smoke-test wiring, and `tools/fingerprint-plugin/src/main/kotlin/com/zegreatrob/tools/FingerprintPlugin.kt:103`. Connect producer outputs to consumer inputs and remove redundant edges. Request the consumers alone and verify the required templates, distributions, and fingerprints are built first. Preserve lifecycle and mandatory ordering semantics. [Gradle](https://docs.gradle.org/current/userguide/best_practices_tasks.html#avoid_depends_on)
 - [ ] **T4 · Medium · Lazy output composition.** `tools/dashboard-test-summary/src/main/kotlin/com/zegreatrob/tools/dashboard/DashboardTestSummaryPlugin.kt:61`. Lazily compose JUnit XML output locations while preserving the producing task dependency. Verify the collector reads a customized XML directory and respects disabled XML reporting. [Gradle](https://docs.gradle.org/current/userguide/best_practices_tasks.html#map_versus_flatmap)
 - [x] **T5 · Recommendation · Task metadata.** `tools-plugins/src/main/kotlin/com/zegreatrob/tools/plugins/{reports.gradle.kts,NpmCliPlugin.kt}` and `command-line-tools/tagger-cli/build.gradle.kts:111`. Add groups and descriptions to report, npm, and CLI smoke tasks that lack them. Confirm both fields in Gradle task help. [Gradle](https://docs.gradle.org/current/userguide/best_practices_tasks.html#group_describe_tasks)
-- [ ] **T6 · Recommendation · Hardcoded plugin task names.** `command-line-tools/digger-cli/build.gradle.kts:142`. Prefer the Kotlin DSL, typed providers, or documented task API for Node setup and npm install wiring. Verify a clean Digger JS build still runs the required setup and install tasks. [Gradle](https://docs.gradle.org/current/userguide/best_practices_tasks.html#dont_hardcode_task_names)
+- [x] **T6 · Recommendation · Hardcoded plugin task names.** `command-line-tools/digger-cli/build.gradle.kts:142`. Prefer the Kotlin DSL, typed providers, or documented task API for Node setup and npm install wiring. Verify a clean Digger JS build still runs the required setup and install tasks. [Gradle](https://docs.gradle.org/current/userguide/best_practices_tasks.html#dont_hardcode_task_names)
 
 ### 3. Lazy release and plugin configuration `[patch]`
 
@@ -66,13 +66,18 @@ Resolve all 24 Gradle audit findings and verify both standing advisories across 
 
 - **Date** 2026-11-11
 - **Branch and baseline commit** `main` at `29fca6d5206eef625e58a24e02e7a797e9cc89a1`
-- **Last verified commit** `ced64363` (distinct report collection layout).
-- **Uncommitted work** T6 typed Node and npm task wiring and card progress.
-- **Status** W1, W2, W3, A1, T1, T2, T3, and T5 verified and pushed. T4 requires producer-aware lazy report wiring. T6 is under validation.
+- **Last verified commit** `2b28624e` (typed Node and npm wiring).
+- **Uncommitted work** L3 npm publish configuration-cache fix, tests, and card progress.
+- **Status** W1, W2, W3, A1, T1, T2, T3, and T5 verified and pushed. T4 requires producer-aware lazy report wiring. T6 pushed. L3 is under validation.
 - **Blockers** None recorded.
-- **Next** Complete T6 validation, then continue investigating T4 and later slices.
+- **Next** Complete L3 validation, then continue investigating T4 and later slices.
 
 ## Implementation Notes
+
+### 2026-11-11 · L3 npm publish action
+
+- T6 was pushed as `2b28624e`. A TestKit regression reproduced the npm task configuration-cache failure from capturing `Project`; it passed after capturing the snapshot decision during configuration instead. Snapshot and release tests use a stub executable, verify the exact arguments, and rerun with configuration-cache reuse. No package was published.
+- The snapshot decision is fixed when the npm plugin configures the publish task after evaluation. `./gradlew -p tools-plugins test --tests '*NpmCliPluginTest' -q --console=plain` and `./gradlew check -q --console=plain` passed. L3 awaits commit and push.
 
 ### 2026-11-11 · T6 Node and npm task wiring
 
