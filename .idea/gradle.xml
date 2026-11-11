@@ -19,7 +19,6 @@
                   <project path="$PROJECT_DIR$/tools" />
                   <project path="$PROJECT_DIR$/tools/certifier-plugin" />
                   <project path="$PROJECT_DIR$/tools/cli-tools" />
-                  <project path="$PROJECT_DIR$/tools/dashboard-test-summary" />
                   <project path="$PROJECT_DIR$/tools/dependency-bom" />
                   <project path="$PROJECT_DIR$/tools/digger-core" />
                   <project path="$PROJECT_DIR$/tools/digger-gradle" />
@@ -42,6 +41,7 @@
               <build path="$PROJECT_DIR$/tools-plugins" name="tools-plugins">
                 <projects>
                   <project path="$PROJECT_DIR$/tools-plugins" />
+                  <project path="$PROJECT_DIR$/tools-plugins/dashboard-test-summary" />
                 </projects>
               </build>
               <build path="$PROJECT_DIR$/tools-tests" name="tools-tests">
@@ -69,6 +69,7 @@
             <option value="$PROJECT_DIR$/command-line-tools/tagger-cli" />
             <option value="$PROJECT_DIR$/tools" />
             <option value="$PROJECT_DIR$/tools-plugins" />
+            <option value="$PROJECT_DIR$/tools-plugins/dashboard-test-summary" />
             <option value="$PROJECT_DIR$/tools-tests" />
             <option value="$PROJECT_DIR$/tools-tests/digger-core-test" />
             <option value="$PROJECT_DIR$/tools-tests/digger-json-test" />
@@ -79,7 +80,6 @@
             <option value="$PROJECT_DIR$/tools-tests/tagger-test" />
             <option value="$PROJECT_DIR$/tools/certifier-plugin" />
             <option value="$PROJECT_DIR$/tools/cli-tools" />
-            <option value="$PROJECT_DIR$/tools/dashboard-test-summary" />
             <option value="$PROJECT_DIR$/tools/dependency-bom" />
             <option value="$PROJECT_DIR$/tools/digger-core" />
             <option value="$PROJECT_DIR$/tools/digger-gradle" />

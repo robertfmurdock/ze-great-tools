@@ -1,6 +1,95 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="CompilerConfiguration">
-    <bytecodeTargetLevel target="1.6" />
+    <bytecodeTargetLevel target="1.6">
+      <module name="command-line-tools.digger-cli" target="22" />
+      <module name="command-line-tools.digger-cli.jvmMain" target="22" />
+      <module name="command-line-tools.digger-cli.jvmTest" target="22" />
+      <module name="command-line-tools.tagger-cli" target="22" />
+      <module name="command-line-tools.tagger-cli.jvmMain" target="22" />
+      <module name="command-line-tools.tagger-cli.jvmTest" target="22" />
+      <module name="tools-plugins" target="22" />
+      <module name="tools-plugins.dashboard-test-summary" target="22" />
+      <module name="tools-plugins.dashboard-test-summary.main" target="22" />
+      <module name="tools-plugins.dashboard-test-summary.test" target="22" />
+      <module name="tools-plugins.main" target="22" />
+      <module name="tools-plugins.test" target="22" />
+      <module name="tools-tests.digger-core-test" target="22" />
+      <module name="tools-tests.digger-core-test.jvmMain" target="22" />
+      <module name="tools-tests.digger-core-test.jvmTest" target="22" />
+      <module name="tools-tests.digger-json-test" target="22" />
+      <module name="tools-tests.digger-json-test.jvmMain" target="22" />
+      <module name="tools-tests.digger-json-test.jvmTest" target="22" />
+      <module name="tools-tests.digger-plugin-test" target="22" />
+      <module name="tools-tests.digger-plugin-test.functionalTest" target="22" />
+      <module name="tools-tests.digger-plugin-test.main" target="22" />
+      <module name="tools-tests.digger-plugin-test.test" target="22" />
+      <module name="tools-tests.digger-test" target="22" />
+      <module name="tools-tests.digger-test.jvmMain" target="22" />
+      <module name="tools-tests.digger-test.jvmTest" target="22" />
+      <module name="tools-tests.tagger-core-test" target="22" />
+      <module name="tools-tests.tagger-core-test.jvmMain" target="22" />
+      <module name="tools-tests.tagger-core-test.jvmTest" target="22" />
+      <module name="tools-tests.tagger-plugin-test" target="22" />
+      <module name="tools-tests.tagger-plugin-test.functionalTest" target="22" />
+      <module name="tools-tests.tagger-plugin-test.main" target="22" />
+      <module name="tools-tests.tagger-plugin-test.test" target="22" />
+      <module name="tools-tests.tagger-test" target="22" />
+      <module name="tools-tests.tagger-test.jvmMain" target="22" />
+      <module name="tools-tests.tagger-test.jvmTest" target="22" />
+      <module name="tools.certifier-plugin" target="21" />
+      <module name="tools.certifier-plugin.functionalTest" target="21" />
+      <module name="tools.certifier-plugin.main" target="21" />
+      <module name="tools.certifier-plugin.test" target="21" />
+      <module name="tools.cli-tools" target="21" />
+      <module name="tools.cli-tools.jvmMain" target="21" />
+      <module name="tools.cli-tools.jvmTest" target="21" />
+      <module name="tools.dashboard-test-summary" target="21" />
+      <module name="tools.dashboard-test-summary.main" target="21" />
+      <module name="tools.dashboard-test-summary.test" target="21" />
+      <module name="tools.digger-core" target="21" />
+      <module name="tools.digger-core.jvmMain" target="21" />
+      <module name="tools.digger-core.jvmTest" target="21" />
+      <module name="tools.digger-gradle" target="21" />
+      <module name="tools.digger-gradle.main" target="21" />
+      <module name="tools.digger-gradle.test" target="21" />
+      <module name="tools.digger-guide" target="21" />
+      <module name="tools.digger-guide.jvmMain" target="21" />
+      <module name="tools.digger-guide.jvmTest" target="21" />
+      <module name="tools.digger-json" target="21" />
+      <module name="tools.digger-json.jvmMain" target="21" />
+      <module name="tools.digger-json.jvmTest" target="21" />
+      <module name="tools.digger-model" target="21" />
+      <module name="tools.digger-model.jvmMain" target="21" />
+      <module name="tools.digger-model.jvmTest" target="21" />
+      <module name="tools.digger-plugin" target="21" />
+      <module name="tools.digger-plugin.main" target="21" />
+      <module name="tools.digger-plugin.test" target="21" />
+      <module name="tools.fingerprint-plugin" target="21" />
+      <module name="tools.fingerprint-plugin.functionalTest" target="21" />
+      <module name="tools.fingerprint-plugin.main" target="21" />
+      <module name="tools.fingerprint-plugin.test" target="21" />
+      <module name="tools.git-adapter" target="21" />
+      <module name="tools.git-adapter.jvmMain" target="21" />
+      <module name="tools.git-adapter.jvmTest" target="21" />
+      <module name="tools.git-test" target="21" />
+      <module name="tools.git-test.jvmMain" target="21" />
+      <module name="tools.git-test.jvmTest" target="21" />
+      <module name="tools.tagger-core" target="21" />
+      <module name="tools.tagger-core.jvmMain" target="21" />
+      <module name="tools.tagger-core.jvmTest" target="21" />
+      <module name="tools.tagger-gradle" target="21" />
+      <module name="tools.tagger-gradle.main" target="21" />
+      <module name="tools.tagger-gradle.test" target="21" />
+      <module name="tools.tagger-guide" target="21" />
+      <module name="tools.tagger-guide.jvmMain" target="21" />
+      <module name="tools.tagger-guide.jvmTest" target="21" />
+      <module name="tools.tagger-json" target="21" />
+      <module name="tools.tagger-json.jvmMain" target="21" />
+      <module name="tools.tagger-json.jvmTest" target="21" />
+      <module name="tools.tagger-plugin" target="21" />
+      <module name="tools.tagger-plugin.main" target="21" />
+      <module name="tools.tagger-plugin.test" target="21" />
+    </bytecodeTargetLevel>
   </component>
 </project>
