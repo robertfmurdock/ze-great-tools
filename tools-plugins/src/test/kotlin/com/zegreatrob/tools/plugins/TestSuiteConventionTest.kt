@@ -25,7 +25,7 @@ class TestSuiteConventionTest {
             directory.resolve("gradle/libs.versions.toml").writeText(
                 """
                 [libraries]
-                com-zegreatrob-testmints-bom = "com.zegreatrob.testmints:testmints-bom:12.6.70"
+                testmints-bom = "com.zegreatrob.testmints:testmints-bom:12.6.70"
                 """.trimIndent(),
             )
             directory.resolve("build.gradle.kts").writeText(

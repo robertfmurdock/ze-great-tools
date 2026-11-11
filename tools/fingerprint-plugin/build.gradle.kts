@@ -24,8 +24,8 @@ configurations["functionalTestImplementation"].extendsFrom(configurations["testI
 dependencies {
     compileOnly(gradleApi())
     testImplementation(kotlin("test-junit5", embeddedKotlinVersion))
-    testImplementation(libs.com.zegreatrob.testmints.minassert)
-    testImplementation(libs.com.zegreatrob.testmints.standard)
+    testImplementation(libs.testmints.minassert)
+    testImplementation(libs.testmints.standard)
     "functionalTestImplementation"(gradleTestKit())
     "functionalTestImplementation"(platform(libs.org.junit.junit.bom))
 }
