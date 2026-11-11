@@ -85,9 +85,7 @@ signing {
     sign(publishing.publications)
 }
 
-afterEvaluate {
-    publishing.publications.withType<MavenPublication>().forEach {
-        with(it) {
+publishing.publications.withType<MavenPublication>().configureEach {
             val scmUrl = "https://github.com/robertfmurdock/ze-great-tools"
 
             pom.name.set(project.name)
@@ -113,6 +111,4 @@ afterEvaluate {
                 connection.set("git@github.com:robertfmurdock/ze-great-tools.git")
                 developerConnection.set("git@github.com:robertfmurdock/ze-great-tools.git")
             }
-        }
-    }
 }

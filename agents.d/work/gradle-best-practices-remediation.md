@@ -149,6 +149,16 @@ TestKit coverage, root naming, and the absence of `buildSrc` are satisfied.
 - Validation: `./gradlew :tools-plugins:dashboard-test-summary:test -q
   --console=plain` and `./gradlew check -q --console=plain` passed.
 
+### 2026-11-11 · Included-build publication hooks
+
+- Replaced the inline publication `afterEvaluate` hooks in the Certifier,
+  Digger, Fingerprint, and Tagger build scripts with
+  `publishing.publications.withType<MavenPublication>().configureEach`.
+  POM metadata remains inline and unchanged; the NPM and remaining lifecycle
+  hooks are still open under AR1/L4.
+- Validation: `./gradlew formatKotlin -q --console=plain` and
+  `./gradlew check -q --console=plain` passed.
+
 ### 2026-11-11 · D2 repository filtering
 
 - This is repository configuration with no intended output change. Test the real composite with a fresh Gradle user home, since a synthetic fixture cannot cover the plugin markers and transitive dependencies used across these builds.
