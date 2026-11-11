@@ -73,6 +73,11 @@ tasks {
         dependsOn("check")
         dependsOn(provider { gradle.includedBuild("command-line-tools").task(":release") })
         dependsOn(provider { gradle.includedBuild("tools").task(":release") })
+        if (!version.contains("SNAPSHOT")) {
+            dependsOn(provider {
+                gradle.includedBuild("tools-plugins").task(":dashboard-test-summary:publishPlugins")
+            })
+        }
         finalizedBy(currentContributionData)
     }
     check {
