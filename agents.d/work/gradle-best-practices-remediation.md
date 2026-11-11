@@ -43,7 +43,7 @@ Resolve all 24 Gradle audit findings and verify both standing advisories across 
 
 - [ ] **D1 · Medium · Repository location.** `build.gradle.kts:1`, `tools/build.gradle.kts:3`, and `tools-plugins/src/main/kotlin/com/zegreatrob/tools/plugins/versioning.gradle.kts:6` illustrate project-level repository declarations. Move dependency repositories to each build's settings. Verify dependency and plugin resolution in the root composite and each included build, and preserve publishing destinations. [Gradle](https://docs.gradle.org/current/userguide/best_practices_dependencies.html#set_up_repositories_in_settings)
 - [ ] **D2 · Medium · Repository content filtering.** `settings.gradle.kts:1` and `tools-plugins/build.gradle.kts:7` illustrate unfiltered lists and the duplicate Plugin Portal. Deduplicate and filter repositories. Verify plugin markers and library coordinates still resolve from the intended repositories with an empty dependency cache. [Gradle](https://docs.gradle.org/current/userguide/best_practices_dependencies.html#use_content_filtering)
-- [ ] **D3 · Medium · Redundant dependencies.** `tools-tests/digger-core-test/build.gradle.kts:16`, `tools/digger-gradle/build.gradle.kts:11`, and `tools/digger-core/build.gradle.kts:23`. Remove redundant Testmints declarations and confirm whether the direct Git adapter API edge is required. Compare dependency reports and compile consumers before and after. [Gradle](https://docs.gradle.org/current/userguide/best_practices_dependencies.html#avoid_duplicate_dependencies)
+- [x] **D3 · Medium · Redundant dependencies.** `tools-tests/digger-core-test/build.gradle.kts:16`, `tools/digger-gradle/build.gradle.kts:11`, and `tools/digger-core/build.gradle.kts:23`. Remove redundant Testmints declarations and confirm whether the direct Git adapter API edge is required. Compare dependency reports and compile consumers before and after. [Gradle](https://docs.gradle.org/current/userguide/best_practices_dependencies.html#avoid_duplicate_dependencies)
 - [ ] **D4 · Recommendation · Catalog aliases.** `tools/gradle/libs.versions.toml:2` and `tools-plugins/src/main/kotlin/com/zegreatrob/tools/plugins/testmints.gradle.kts:7`. Rename repetitive aliases and update both generated accessor uses and string lookups in all affected builds. Verify catalog resolution and BOM injection with the new names. [Gradle](https://docs.gradle.org/current/userguide/best_practices_dependencies.html#name_version_catalog_entries)
 - [ ] **D5 · Recommendation · Explicit Kotlin stdlib.** `tools-plugins/build.gradle.kts:29`, `command-line-tools/digger-cli/build.gradle.kts:97`, and the strict pins in `tools/{digger-json,tagger-json}/build.gradle.kts`. Inventory explicit stdlib declarations and remove redundant ones. Verify resolved versions on affected targets and preserve necessary alignment before removing strict pins. [Gradle](https://docs.gradle.org/current/userguide/best_practices_dependencies.html#dont_depend_on_kotlin_stdlib)
 
@@ -66,13 +66,18 @@ Resolve all 24 Gradle audit findings and verify both standing advisories across 
 
 - **Date** 2026-11-11
 - **Branch and baseline commit** `main` at `29fca6d5206eef625e58a24e02e7a797e9cc89a1`
-- **Last verified commit** `7db640ea` (dashboard wiring and Git test isolation).
-- **Uncommitted work** D3 dependency cleanup and card progress.
-- **Status** W1, W2, W3, A1, T1, T2, T3, T5, T6, L2, L3, and L5 pushed. L1 is partially complete. T4 and Git test environment isolation pushed. D3 is under validation.
+- **Last verified commit** `75f316ef` (Digger dependency cleanup).
+- **Uncommitted work** D5 Kotlin standard library declarations and card progress. IDEA files have unrelated changes.
+- **Status** W1, W2, W3, A1, T1, T2, T3, T5, T6, L2, L3, and L5 pushed. L1 is partially complete. T4, Git test environment isolation, and D3 pushed. D5 is under validation.
 - **Blockers** None recorded.
-- **Next** Complete D3 validation, then address remaining L1 provider reads and later slices.
+- **Next** Complete D5 validation, then address remaining L1 provider reads and later slices.
 
 ## Implementation Notes
+
+### 2026-11-11 · D5 Kotlin standard library dependencies
+
+- D3 was pushed as signed commit `75f316ef`. Removed explicit Kotlin stdlib dependencies from the convention build, Git test library, and Digger CLI test source set. The JSON test strict pins remain as dependency constraints.
+- Removing the convention build dependency alone selected Kotlin 2.4.10 through Kotlinter instead of 2.4.21, so an embedded-Kotlin version constraint retains the prior selection. Dependency insight confirms 2.4.21 on affected JVM and JS configurations and retains the JSON strict pin. The unused Digger CLI catalog alias was removed. `./gradlew check -q --console=plain` passed. D5 awaits commit and push.
 
 ### 2026-11-11 · D3 redundant dependencies
 

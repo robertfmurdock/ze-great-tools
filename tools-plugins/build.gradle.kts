@@ -32,9 +32,11 @@ gradlePlugin {
 }
 
 dependencies {
-    implementation(kotlin("stdlib", embeddedKotlinVersion))
     implementation(kotlin("gradle-plugin", embeddedKotlinVersion))
     implementation(libs.org.jmailen.gradle.kotlinter.gradle)
+    constraints {
+        implementation("org.jetbrains.kotlin:kotlin-stdlib:$embeddedKotlinVersion")
+    }
     testImplementation(gradleTestKit())
     testImplementation(kotlin("test-junit5"))
     testImplementation("com.zegreatrob.testmints:standard:12.6.67")

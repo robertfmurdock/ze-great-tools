@@ -25,9 +25,11 @@ dependencies {
     commonMainApi(project(":tagger-core"))
     commonMainImplementation("org.jetbrains.kotlinx:kotlinx-serialization-json")
     commonTestImplementation(kotlin("test"))
-    "commonTestImplementation"("org.jetbrains.kotlin:kotlin-stdlib") {
-        version {
-            strictly(embeddedKotlinVersion)
+    constraints {
+        add("commonTestImplementation", "org.jetbrains.kotlin:kotlin-stdlib") {
+            version {
+                strictly(embeddedKotlinVersion)
+            }
         }
     }
     "jvmTestImplementation"(kotlin("test-junit5", embeddedKotlinVersion))

@@ -9,7 +9,6 @@ com-github-ajalt-clikt-clikt-markdown = { module = "com.github.ajalt.clikt:clikt
 com-zegreatrob-testmints-bom = { module = "com.zegreatrob.testmints:testmints-bom", version.ref = "com-zegreatrob-testmints" }
 com-zegreatrob-testmints-minassert = { module = "com.zegreatrob.testmints:minassert" }
 com-zegreatrob-testmints-standard = { module = "com.zegreatrob.testmints:standard" }
-org-jetbrains-kotlin-kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin" }
 org-jetbrains-kotlin-kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 org-jetbrains-kotlin-kotlin-test-junit5 = { module = "org.jetbrains.kotlin:kotlin-test-junit5", version.ref = "kotlin" }
 org-jetbrains-kotlinx-kotlinx-serialization-bom = "org.jetbrains.kotlinx:kotlinx-serialization-bom:1.12.0"
