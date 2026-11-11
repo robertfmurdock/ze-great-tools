@@ -57,6 +57,7 @@ npmCli {
 }
 
 kotlin {
+    jvmToolchain(21)
     jvm {
         binaries {
             executable {

@@ -45,7 +45,7 @@ Resolve all 24 Gradle audit findings and verify both standing advisories across 
 - [ ] **D2 · Medium · Repository content filtering.** `settings.gradle.kts:1` and `tools-plugins/build.gradle.kts:7` illustrate unfiltered lists and the duplicate Plugin Portal. Deduplicate and filter repositories. Verify plugin markers and library coordinates still resolve from the intended repositories with an empty dependency cache. [Gradle](https://docs.gradle.org/current/userguide/best_practices_dependencies.html#use_content_filtering)
 - [x] **D3 · Medium · Redundant dependencies.** `tools-tests/digger-core-test/build.gradle.kts:16`, `tools/digger-gradle/build.gradle.kts:11`, and `tools/digger-core/build.gradle.kts:23`. Remove redundant Testmints declarations and confirm whether the direct Git adapter API edge is required. Compare dependency reports and compile consumers before and after. [Gradle](https://docs.gradle.org/current/userguide/best_practices_dependencies.html#avoid_duplicate_dependencies)
 - [ ] **D4 · Recommendation · Catalog aliases.** `tools/gradle/libs.versions.toml:2` and `tools-plugins/src/main/kotlin/com/zegreatrob/tools/plugins/testmints.gradle.kts:7`. Rename repetitive aliases and update both generated accessor uses and string lookups in all affected builds. Verify catalog resolution and BOM injection with the new names. [Gradle](https://docs.gradle.org/current/userguide/best_practices_dependencies.html#name_version_catalog_entries)
-- [ ] **D5 · Recommendation · Explicit Kotlin stdlib.** `tools-plugins/build.gradle.kts:29`, `command-line-tools/digger-cli/build.gradle.kts:97`, and the strict pins in `tools/{digger-json,tagger-json}/build.gradle.kts`. Inventory explicit stdlib declarations and remove redundant ones. Verify resolved versions on affected targets and preserve necessary alignment before removing strict pins. [Gradle](https://docs.gradle.org/current/userguide/best_practices_dependencies.html#dont_depend_on_kotlin_stdlib)
+- [x] **D5 · Recommendation · Explicit Kotlin stdlib.** `tools-plugins/build.gradle.kts:29`, `command-line-tools/digger-cli/build.gradle.kts:97`, and the strict pins in `tools/{digger-json,tagger-json}/build.gradle.kts`. Inventory explicit stdlib declarations and remove redundant ones. Verify resolved versions on affected targets and preserve necessary alignment before removing strict pins. [Gradle](https://docs.gradle.org/current/userguide/best_practices_dependencies.html#dont_depend_on_kotlin_stdlib)
 
 ### 5. Build structure and reproducibility `[patch]`
 
@@ -66,13 +66,19 @@ Resolve all 24 Gradle audit findings and verify both standing advisories across 
 
 - **Date** 2026-11-11
 - **Branch and baseline commit** `main` at `29fca6d5206eef625e58a24e02e7a797e9cc89a1`
-- **Last verified commit** `75f316ef` (Digger dependency cleanup).
-- **Uncommitted work** D5 Kotlin standard library declarations and card progress. IDEA files have unrelated changes.
-- **Status** W1, W2, W3, A1, T1, T2, T3, T5, T6, L2, L3, and L5 pushed. L1 is partially complete. T4, Git test environment isolation, and D3 pushed. D5 is under validation.
+- **Last verified commit** `7670e641` (Kotlin standard library cleanup).
+- **Uncommitted work** S4 CLI toolchain verification and card progress. IDEA files have unrelated changes.
+- **Status** W1, W2, W3, A1, T1, T2, T3, T5, T6, L2, L3, and L5 pushed. L1 is partially complete. T4, Git test environment isolation, and D3 and D5 pushed. S4 is under investigation.
 - **Blockers** None recorded.
-- **Next** Complete D5 validation, then address remaining L1 provider reads and later slices.
+- **Next** Pin and verify the CLI JVM toolchains, then address remaining L1 provider reads and later slices.
 
 ## Implementation Notes
+
+### 2026-11-11 · S4 CLI toolchain preparation
+
+- D5 was pushed as signed commit `7670e641`. S4 changes build configuration and archive outputs. Verify the selected compiler and distribution hashes with independent builds launched under JDK 21 and JDK 22, followed by the full check. These Gradle build and artifact comparisons exercise the behavior directly; a new test that merely checks the configuration would duplicate the implementation.
+- Pinned both Kotlin JVM toolchains to JDK 21. Under a JDK 22 launcher, Kotlin compilation logged the JDK 21 home for both CLIs. Clean CLI-module builds with the build cache disabled under JDK 21 and JDK 22 produced matching distribution SHA-256 values, `526a9f3727f0866ec02e8942af0e7b43c76a1606fe714142e65d40399ab75a3c` for Tagger and `61f7f47f9ba4d593e0dfd5b3f103b9e5b6ecc60379b58d1e2d9e8b8c8fb48584` for Digger. The other included modules retained their existing outputs. Full validation is running.
+- The first full check failed because the shared Tagger and Digger test libraries had been compiled for JDK 22 while the CLI test JVMs now run on JDK 21. Pinned both shared test libraries to JDK 21. The focused JVM test tasks and `./gradlew check -q --console=plain` passed afterward. S4 awaits commit and push.
 
 ### 2026-11-11 · D5 Kotlin standard library dependencies
 
