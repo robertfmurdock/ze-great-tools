@@ -43,7 +43,8 @@ private fun configureProject(project: Project, options: DashboardTestSummaryExte
             provider {
                 tests.filter { it.enabled && it.reports.junitXml.required.get() }
                     .map { test ->
-                        tasks.named(test.name, AbstractTestTask::class.java).map { it.reports.junitXml.outputLocation.get().asFile }
+                        val testTask = tasks.named(test.name, AbstractTestTask::class.java)
+                        files(testTask.flatMap { it.reports.junitXml.outputLocation.locationOnly }).builtBy(testTask)
                     }
             },
         )

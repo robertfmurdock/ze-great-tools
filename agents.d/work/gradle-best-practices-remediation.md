@@ -27,7 +27,7 @@ Resolve all 24 Gradle audit findings and verify both standing advisories across 
 - [x] **T1 · Medium · Unique outputs.** `tools-plugins/src/main/kotlin/com/zegreatrob/tools/plugins/reports.gradle.kts:14` and `NpmCliPlugin.kt:120` in the same directory. Consolidate producers or stage distinct outputs. Verify one owner per destination and compare collected report paths and npm package contents with the baseline. [Gradle](https://docs.gradle.org/current/userguide/best_practices_tasks.html#use_unique_output_files_and_directories)
 - [x] **T2 · High · Configuration-time filesystem work.** `tools-plugins/src/main/kotlin/com/zegreatrob/tools/plugins/reports.gradle.kts:29`. Move report directory creation to execution. From a clean output tree, verify `help` leaves the report output absent and `collectResults` creates it as needed. [Gradle](https://docs.gradle.org/current/userguide/best_practices_performance.html#avoid_computations_in_configuration_phase)
 - [x] **T3 · Medium · Explicit action-task dependencies.** `command-line-tools/{digger-cli,tagger-cli}/build.gradle.kts` at the template-copy and JVM smoke-test wiring, and `tools/fingerprint-plugin/src/main/kotlin/com/zegreatrob/tools/FingerprintPlugin.kt:103`. Connect producer outputs to consumer inputs and remove redundant edges. Request the consumers alone and verify the required templates, distributions, and fingerprints are built first. Preserve lifecycle and mandatory ordering semantics. [Gradle](https://docs.gradle.org/current/userguide/best_practices_tasks.html#avoid_depends_on)
-- [ ] **T4 · Medium · Lazy output composition.** `tools/dashboard-test-summary/src/main/kotlin/com/zegreatrob/tools/dashboard/DashboardTestSummaryPlugin.kt:61`. Lazily compose JUnit XML output locations while preserving the producing task dependency. Verify the collector reads a customized XML directory and respects disabled XML reporting. [Gradle](https://docs.gradle.org/current/userguide/best_practices_tasks.html#map_versus_flatmap)
+- [ ] **T4 · Medium · Lazy output composition.** `tools-plugins/dashboard-test-summary/src/main/kotlin/com/zegreatrob/tools/dashboard/DashboardTestSummaryPlugin.kt`. Lazily compose JUnit XML output locations while preserving the producing task dependency. Verify the collector reads a customized XML directory and respects disabled XML reporting. [Gradle](https://docs.gradle.org/current/userguide/best_practices_tasks.html#map_versus_flatmap)
 - [x] **T5 · Recommendation · Task metadata.** `tools-plugins/src/main/kotlin/com/zegreatrob/tools/plugins/{reports.gradle.kts,NpmCliPlugin.kt}` and `command-line-tools/tagger-cli/build.gradle.kts:111`. Add groups and descriptions to report, npm, and CLI smoke tasks that lack them. Confirm both fields in Gradle task help. [Gradle](https://docs.gradle.org/current/userguide/best_practices_tasks.html#group_describe_tasks)
 - [x] **T6 · Recommendation · Hardcoded plugin task names.** `command-line-tools/digger-cli/build.gradle.kts:142`. Prefer the Kotlin DSL, typed providers, or documented task API for Node setup and npm install wiring. Verify a clean Digger JS build still runs the required setup and install tasks. [Gradle](https://docs.gradle.org/current/userguide/best_practices_tasks.html#dont_hardcode_task_names)
 
@@ -66,13 +66,24 @@ Resolve all 24 Gradle audit findings and verify both standing advisories across 
 
 - **Date** 2026-11-11
 - **Branch and baseline commit** `main` at `29fca6d5206eef625e58a24e02e7a797e9cc89a1`
-- **Last verified commit** `dad5399b` (lazy release creation arguments).
-- **Uncommitted work** L1 draft publication wiring, regression tests, and card progress; validation is complete and ready to commit.
-- **Status** W1, W2, W3, A1, T1, T2, T3, and T5 verified and pushed. T4 requires producer-aware lazy report wiring. T6, L2, L3, and L5 pushed. L1 draft publication is under validation.
+- **Last verified commit** `5f0d8528` (dashboard plugin relocation and fingerprint update).
+- **Uncommitted work** T4 dashboard report wiring, Git test environment isolation, and card progress.
+- **Status** W1, W2, W3, A1, T1, T2, T3, T5, T6, L2, L3, and L5 pushed. L1 is partially complete. T4 and Git test environment isolation pass focused tests and await full validation.
 - **Blockers** None recorded.
-- **Next** Complete the L1 draft publication slice, then address remaining L1 provider reads and T4.
+- **Next** Complete and commit T4, then address remaining L1 provider reads and later slices.
 
 ## Implementation Notes
+
+### 2026-11-11 · Git test environment isolation
+
+- The agent signing configuration uses `GIT_CONFIG_COUNT` overrides. Tagger identity-less tests inherited those overrides despite isolating global and system config, causing false successes. A shared prerequisite assertion failed with count 6 before the fix.
+- Test tasks that isolate global and system Git config now also set `GIT_CONFIG_COUNT=0` and clear `GIT_CONFIG_PARAMETERS`. The focused JVM regression, the Tagger JavaScript suite, and `./gradlew check -q --console=plain` passed with signing still configured for the parent process.
+
+### 2026-11-11 · T4 report location wiring
+
+- Resumed at `5f0d8528` after the dashboard plugin was relocated to `tools-plugins/dashboard-test-summary`. The baseline `./gradlew check -q --console=plain` passed. Draft publication was committed as `16471e6f`.
+- Replaced the nested output `get()` with `flatMap` on the report location-only provider and attached the producing test task using `builtBy`. This avoids Gradle’s report-property producer error while retaining task execution. `./gradlew :tools-plugins:dashboard-test-summary:test -q --console=plain` passed, including custom output locations, disabled XML, failing tests, and configuration-cache reuse. The full check passed after isolating Git test configuration.
+- The user supplied a dedicated Codex SSH signing key and identity under the machine-wide agent instructions. Signing was verified with `ssh-keygen -Y sign`; subsequent commits must use that configuration and the human co-author trailer.
 
 ### 2026-11-11 · L1 draft publication decision
 

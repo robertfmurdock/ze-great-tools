@@ -73,6 +73,8 @@ kotlin {
                 environment("EXPECTED_VERSION", "${project.version}")
                 environment("GIT_CONFIG_GLOBAL", "/dev/null")
                 environment("GIT_CONFIG_SYSTEM", "/dev/null")
+                environment("GIT_CONFIG_COUNT", "0")
+                environment("GIT_CONFIG_PARAMETERS", "")
             }
         }
     }
@@ -103,6 +105,8 @@ tasks {
         environment("EXPECTED_VERSION", project.version)
         environment("GIT_CONFIG_GLOBAL", "/dev/null")
         environment("GIT_CONFIG_SYSTEM", "/dev/null")
+        environment("GIT_CONFIG_COUNT", "0")
+        environment("GIT_CONFIG_PARAMETERS", "")
     }
     withType<CreateStartScripts> {
         applicationName = "tagger"

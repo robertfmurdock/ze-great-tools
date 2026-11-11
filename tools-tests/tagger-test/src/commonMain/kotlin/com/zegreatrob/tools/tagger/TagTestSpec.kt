@@ -39,6 +39,14 @@ interface TagTestSpec {
             "/dev/null",
             "Ensure this is set for the test to work as intended",
         )
+        getEnvironmentVariable("GIT_CONFIG_COUNT").assertIsEqualTo(
+            "0",
+            "Git configuration overrides must not supply a test identity",
+        )
+        getEnvironmentVariable("GIT_CONFIG_PARAMETERS").assertIsEqualTo(
+            "",
+            "Git command-line configuration must not leak into tests",
+        )
     }
 
     fun initializeGitRepo(

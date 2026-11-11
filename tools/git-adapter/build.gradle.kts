@@ -22,6 +22,8 @@ kotlin {
                 useMocha { timeout = "10s" }
                 environment("GIT_CONFIG_GLOBAL", "/dev/null")
                 environment("GIT_CONFIG_SYSTEM", "/dev/null")
+                environment("GIT_CONFIG_COUNT", "0")
+                environment("GIT_CONFIG_PARAMETERS", "")
             }
         }
     }
@@ -44,6 +46,8 @@ tasks {
         useJUnitPlatform()
         environment("GIT_CONFIG_GLOBAL", "/dev/null")
         environment("GIT_CONFIG_SYSTEM", "/dev/null")
+        environment("GIT_CONFIG_COUNT", "0")
+        environment("GIT_CONFIG_PARAMETERS", "")
     }
     withType<FormatTask> {
         exclude { spec -> spec.file.absolutePath.contains("generated-sources") }
