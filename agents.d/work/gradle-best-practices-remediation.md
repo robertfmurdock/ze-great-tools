@@ -53,7 +53,7 @@ Resolve all 24 Gradle audit findings and verify both standing advisories across 
 - [ ] **S2 · Medium · Duplicated conventions.** `command-line-tools/build.gradle.kts:40`, `tools-tests/build.gradle.kts:47`, and the checksum setups in `command-line-tools/{digger-cli,tagger-cli}/build.gradle.kts`. Consolidate shared lifecycle, Yarn, checksum, and packaging logic in `tools-plugins`. Verify each behavior has one implementation and both CLIs still produce the same deliverables. [Gradle](https://docs.gradle.org/current/userguide/best_practices_structuring_builds.html#use_convention_plugins)
 - [ ] **S3 · Medium · Sources at an included build root.** `tools-plugins/build.gradle.kts:13` and `tools-plugins/src/main/`. Move convention and npm plugin sources to a subproject of the included build. Verify all existing plugin IDs resolve from the root composite and independently from the consuming builds. [Gradle](https://docs.gradle.org/current/userguide/best_practices_structuring_builds.html#no_source_in_root)
 - [x] **S4 · Medium · Unpinned CLI toolchains.** `command-line-tools/{digger-cli,tagger-cli}/build.gradle.kts:60`. Pin JDK 21 for both CLI archive producers. Verify the selected toolchain and compare JVM distribution SHA-256 hashes across clean builds with different launcher JDKs. [Gradle](https://docs.gradle.org/current/userguide/best_practices_security.html#builds_should_be_reproducible)
-- [ ] **S5 · Recommendation · Unstable API inventory.** `tools-plugins/src/main/kotlin/com/zegreatrob/tools/plugins/jvm.gradle.kts:19` and `tools/fingerprint-plugin/build.gradle.kts:1`. Record the experimental Kotlin APIs and unstable Gradle APIs the build relies on, why they are needed, and what to recheck on upgrades. [Gradle](https://docs.gradle.org/current/userguide/best_practices_general.html#consider_use_of_incubating_apis_carefully)
+- [x] **S5 · Recommendation · Unstable API inventory.** `tools-plugins/src/main/kotlin/com/zegreatrob/tools/plugins/jvm.gradle.kts:19` and `tools/fingerprint-plugin/build.gradle.kts:1`. Record the experimental Kotlin APIs and unstable Gradle APIs the build relies on, why they are needed, and what to recheck on upgrades. [Gradle](https://docs.gradle.org/current/userguide/best_practices_general.html#consider_use_of_incubating_apis_carefully)
 - [ ] **A2 · Advisory · Isolated publishing.** `tools/build.gradle.kts:53` and `tools-plugins/src/main/kotlin/com/zegreatrob/tools/plugins/publish.gradle.kts:6` establish publication scope. Verify the publishing environment starts fresh and isolated with build caching disabled and without reused outputs. Record the configuration evidence and close any gap without triggering an external publication during validation. [Gradle](https://docs.gradle.org/current/userguide/best_practices_security.html#build-published-artifacts-securely)
 
 ### Closeout
@@ -95,6 +95,10 @@ Resolve all 24 Gradle audit findings and verify both standing advisories across 
 
 - Renamed repetitive Testmints aliases to `testmints.*` in the tools, tests, and CLI catalogs, and updated all generated accessor usages plus the convention plugin's BOM lookup. The dependency coordinates and versions are unchanged.
 - The focused tools, tests, CLI, and convention checks passed, followed by the full `./gradlew check -q --console=plain`.
+
+### 2026-11-11 · S5 unstable API inventory
+
+- Added `agents.d/context/GRADLE_UNSTABLE_APIS.md` documenting the Kotlin compiler-options opt-ins, Gradle plugin API suppression, and Kotlin/JS task-name coupling, with upgrade checks for each.
 
 ### 2026-11-11 · L4 library signing order
 
