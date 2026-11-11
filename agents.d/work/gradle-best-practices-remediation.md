@@ -27,6 +27,18 @@ checked off.
   and `tools-plugins/src/main/kotlin/com/zegreatrob/tools/plugins/NpmCliPlugin.kt:52`.
   Replace deferred evaluation with plugin callbacks or lazy configuration, then
   rerun the full `afterEvaluate` scan. [Gradle](https://docs.gradle.org/current/userguide/best_practices_general.html#avoid_after_evaluate)
+- [ ] **AR1a · High · Replace NPM lifecycle bridge with a package-metadata task.**
+  Prefer a dedicated cacheable task over another Kotlin/Node lifecycle hook. The
+  task must consume the generated `jsPackageJson` output, take all `NpmCliExtension`
+  values as declared inputs, write the finalized package metadata as a declared
+  output, and become the producer consumed by `copyReadme`, `copyLicense`, and
+  `jsCliTar`. Preserve the public `npmCli {}` DSL, existing task names, package
+  fields, publish arguments, and configuration-cache reuse. Extend the NPM
+  TestKit suite with a package-metadata regression test. Alternatives considered:
+  task/target lifecycle callbacks, a narrowly scoped compatibility bridge, and
+  splitting setup/finalization into separate plugins; the package-metadata task
+  is the selected approach because it avoids undocumented Kotlin/Node timing.
+  [Gradle](https://docs.gradle.org/current/userguide/best_practices_tasks.html#use_cacheability_annotations)
 - [ ] **AR2 · Medium · Make Kotlin plugin configuration order-safe.** In
   `NpmCliPlugin.kt:53-55`, replace the eager `findByType`/early return with
   `pluginManager.withPlugin("org.jetbrains.kotlin.multiplatform")` and preserve
@@ -158,6 +170,19 @@ TestKit coverage, root naming, and the absence of `buildSrc` are satisfied.
   hooks are still open under AR1/L4.
 - Validation: `./gradlew formatKotlin -q --console=plain` and
   `./gradlew check -q --console=plain` passed.
+
+### 2026-11-11 · NPM lifecycle solution decision
+
+- A direct `pluginManager.withPlugin("org.jetbrains.kotlin.multiplatform")`
+  replacement was tested and reverted. The Kotlin plugin is present, but the
+  `kotlinNodeJs` extension is not registered when the callback runs.
+- Evaluated alternatives: task/target lifecycle callbacks, a narrowly scoped
+  compatibility bridge, splitting the plugin into setup/finalize plugins, and a
+  dedicated package-metadata task. The selected approach is the dedicated task:
+  it gives package metadata explicit inputs/outputs and avoids relying on
+  undocumented Kotlin/Node extension timing.
+- Implementation must preserve the existing NPM DSL, task entry points,
+  generated package contents, publish arguments, and configuration-cache tests.
 
 ### 2026-11-11 · D2 repository filtering
 
