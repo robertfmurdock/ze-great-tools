@@ -109,6 +109,10 @@ Resolve all 24 Gradle audit findings and verify both standing advisories across 
 
 - Ran `:tools:git-adapter:publishToMavenLocal --dry-run` with a fresh temporary Gradle user home, `--no-build-cache`, and `--no-configuration-cache`. The complete local publication graph resolved, including POM, metadata, sources, Javadoc, signing, and all three publications. No external repository or publication was contacted.
 
+### 2026-11-11 · S2 convention extraction investigation
+
+- A shared precompiled convention was tested for the duplicate lifecycle and Yarn task wiring. Applying an included-build convention placed Kotlinter on the classpath with an unknown version, which conflicted with the versioned Kotlinter requests in CLI subprojects. The experiment was removed without committing source changes; S2 remains open until the convention boundary can preserve plugin resolution.
+
 ### 2026-11-11 · L4 library signing order
 
 - S1 was pushed as signed commit `efe87aea`. The library convention’s `afterEvaluate` block only configures ordering between signing and publishing tasks. A baseline dry run of Git Adapter’s JVM publication and JS signing tasks placed both sign tasks before publication.
