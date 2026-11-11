@@ -26,8 +26,8 @@ Resolve all 24 Gradle audit findings and verify both standing advisories across 
 
 - [ ] **T1 · Medium · Unique outputs.** `tools-plugins/src/main/kotlin/com/zegreatrob/tools/plugins/reports.gradle.kts:14` and `NpmCliPlugin.kt:120` in the same directory. Consolidate producers or stage distinct outputs. Verify one owner per destination and compare collected report paths and npm package contents with the baseline. [Gradle](https://docs.gradle.org/current/userguide/best_practices_tasks.html#use_unique_output_files_and_directories)
 - [x] **T2 · High · Configuration-time filesystem work.** `tools-plugins/src/main/kotlin/com/zegreatrob/tools/plugins/reports.gradle.kts:29`. Move report directory creation to execution. From a clean output tree, verify `help` leaves the report output absent and `collectResults` creates it as needed. [Gradle](https://docs.gradle.org/current/userguide/best_practices_performance.html#avoid_computations_in_configuration_phase)
-- [ ] **T3 · Medium · Explicit action-task dependencies.** `command-line-tools/{digger-cli,tagger-cli}/build.gradle.kts` at the template-copy and JVM smoke-test wiring, and `tools/fingerprint-plugin/src/main/kotlin/com/zegreatrob/tools/FingerprintPlugin.kt:103`. Connect producer outputs to consumer inputs and remove redundant edges. Request the consumers alone and verify the required templates, distributions, and fingerprints are built first. Preserve lifecycle and mandatory ordering semantics. [Gradle](https://docs.gradle.org/current/userguide/best_practices_tasks.html#avoid_depends_on)
-- [ ] **T4 · Medium · Lazy output composition.** `tools/dashboard-test-summary/src/main/kotlin/com/zegreatrob/tools/dashboard/DashboardTestSummaryPlugin.kt:61`. Compose JUnit XML output locations with `flatMap`. Verify the collector reads a customized XML directory and respects disabled XML reporting. [Gradle](https://docs.gradle.org/current/userguide/best_practices_tasks.html#map_versus_flatmap)
+- [x] **T3 · Medium · Explicit action-task dependencies.** `command-line-tools/{digger-cli,tagger-cli}/build.gradle.kts` at the template-copy and JVM smoke-test wiring, and `tools/fingerprint-plugin/src/main/kotlin/com/zegreatrob/tools/FingerprintPlugin.kt:103`. Connect producer outputs to consumer inputs and remove redundant edges. Request the consumers alone and verify the required templates, distributions, and fingerprints are built first. Preserve lifecycle and mandatory ordering semantics. [Gradle](https://docs.gradle.org/current/userguide/best_practices_tasks.html#avoid_depends_on)
+- [ ] **T4 · Medium · Lazy output composition.** `tools/dashboard-test-summary/src/main/kotlin/com/zegreatrob/tools/dashboard/DashboardTestSummaryPlugin.kt:61`. Lazily compose JUnit XML output locations while preserving the producing task dependency. Verify the collector reads a customized XML directory and respects disabled XML reporting. [Gradle](https://docs.gradle.org/current/userguide/best_practices_tasks.html#map_versus_flatmap)
 - [ ] **T5 · Recommendation · Task metadata.** `tools-plugins/src/main/kotlin/com/zegreatrob/tools/plugins/{reports.gradle.kts,NpmCliPlugin.kt}` and `command-line-tools/tagger-cli/build.gradle.kts:111`. Add groups and descriptions to report, npm, and CLI smoke tasks that lack them. Confirm both fields in Gradle task help. [Gradle](https://docs.gradle.org/current/userguide/best_practices_tasks.html#group_describe_tasks)
 - [ ] **T6 · Recommendation · Hardcoded plugin task names.** `command-line-tools/digger-cli/build.gradle.kts:142`. Prefer the Kotlin DSL, typed providers, or documented task API for Node setup and npm install wiring. Verify a clean Digger JS build still runs the required setup and install tasks. [Gradle](https://docs.gradle.org/current/userguide/best_practices_tasks.html#dont_hardcode_task_names)
 
@@ -66,13 +66,22 @@ Resolve all 24 Gradle audit findings and verify both standing advisories across 
 
 - **Date** 2026-11-11
 - **Branch and baseline commit** `main` at `29fca6d5206eef625e58a24e02e7a797e9cc89a1`
-- **Last verified commit** `ec48fded` (report configuration slice).
-- **Uncommitted work** T3 dependency wiring and card progress.
-- **Status** W1, W2, and W3 pushed. T1 report and npm fixes pushed, with colliding report filenames still to resolve. T2 pushed. T3 validation in progress. Wrapper workflow execution and A1 remain to verify.
+- **Last verified commit** `64976f22` (task wiring slice).
+- **Uncommitted work** T4 dashboard regression test, T5 task descriptions, and card progress.
+- **Status** W1, W2, and W3 pushed. T1 report and npm fixes pushed, with colliding report filenames still to resolve. T2 and T3 pushed. T4 requires a producer-aware lazy report provider. T5 validated locally. Wrapper workflow execution and A1 remain to verify.
 - **Blockers** None recorded.
-- **Next** Finish T3 validation, then resolve the remaining T1 filename-collision case.
+- **Next** Find producer-aware lazy wiring for T4, then resolve the remaining T1 filename-collision case.
 
 ## Implementation Notes
+
+### 2026-11-11 · T5 task metadata
+
+- Added groups and descriptions to report, npm, and CLI tasks, including the included-build `collectResults` aggregators. This is metadata with no intended build output change. Gradle task help confirmed the report and JVM smoke task metadata, and `./gradlew check -q --console=plain` passed. T5 awaits commit and push.
+
+### 2026-11-11 · T4 dashboard report outputs
+
+- T3 was pushed as `64976f22`. A direct `flatMap` of Gradle’s report output property failed because the report property has no associated task. Wrapping that output without `builtBy` lost test execution. An explicitly built file collection passed the tests but still calls `get()` from a provider, so it does not resolve the catalog finding. The production code remains unchanged.
+- A disabled-XML test failed as expected when the reporting guard was temporarily removed, and passed after restoring the guard. `./gradlew :tools:dashboard-test-summary:test -q --console=plain` passed, including custom XML locations and configuration-cache reuse. `./gradlew check -q --console=plain` passed. T4 remains open.
 
 ### 2026-11-11 · T3 task dependency wiring
 

@@ -113,6 +113,8 @@ tasks {
         applicationName = "digger"
     }
     val confirmJvmDiggerCanRun = register<Exec>("confirmJvmDiggerCanRun") {
+        group = "verification"
+        description = "Checks that the installed JVM Digger CLI runs"
         inputs.files(project.tasks.named("installJvmDist"))
         workingDir(layout.projectDirectory)
         commandLine("build/install/digger-cli-jvm/bin/digger", "--version")
@@ -121,6 +123,8 @@ tasks {
         dependsOn(confirmJvmDiggerCanRun)
     }
     val copyTemplates = register<Copy>("copyTemplates") {
+        group = "build"
+        description = "Generates Digger source files from versioned templates"
         inputs.property("version", rootProject.version)
         filteringCharset = "UTF-8"
         from(project.projectDir.resolve("src/commonMain/templates")) {

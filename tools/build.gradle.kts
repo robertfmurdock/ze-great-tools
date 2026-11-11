@@ -43,6 +43,8 @@ tasks {
         mustRunAfter("resetYarnLock")
     }
     register("collectResults") {
+        group = "verification"
+        description = "Collects test results from tool modules"
         dependsOn(provider { (getTasksByName("collectResults", true) - this).toList() })
     }
     register("formatKotlin") {

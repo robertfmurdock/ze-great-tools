@@ -51,6 +51,8 @@ tasks {
     }
 
     register("collectResults") {
+        group = "verification"
+        description = "Collects test results from CLI modules"
         dependsOn(provider { (getTasksByName("collectResults", true) - this).toList() })
     }
     register("formatKotlin") {

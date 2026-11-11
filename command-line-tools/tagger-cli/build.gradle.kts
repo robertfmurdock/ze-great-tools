@@ -108,11 +108,15 @@ tasks {
         applicationName = "tagger"
     }
     val confirmJsTaggerCanRun = register<Exec>("confirmJsTaggerCanRun") {
+        group = "verification"
+        description = "Checks that the JavaScript Tagger CLI runs"
         dependsOn("jsCliTar")
         workingDir(kotlin.js().compilations.getByName("main").npmProject.dir)
         commandLine("kotlin/bin/tagger", "calculate-version")
     }
     val confirmJvmTaggerCanRun = register<Exec>("confirmJvmTaggerCanRun") {
+        group = "verification"
+        description = "Checks that the installed JVM Tagger CLI runs"
         inputs.files(project.tasks.named("installJvmDist"))
         workingDir(layout.projectDirectory)
         commandLine("build/install/tagger-cli-jvm/bin/tagger", "--version")
@@ -122,6 +126,8 @@ tasks {
         dependsOn(confirmJvmTaggerCanRun)
     }
     val copyTemplates = register<Copy>("copyTemplates") {
+        group = "build"
+        description = "Generates Tagger source files from versioned templates"
         inputs.property("version", rootProject.version)
         filteringCharset = "UTF-8"
         from(project.projectDir.resolve("src/commonMain/templates")) {

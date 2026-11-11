@@ -73,6 +73,20 @@ class DashboardTestSummaryTest {
         previousSummary.exists().assertIsEqualTo(false)
     }
 
+    @Test
+    fun `ignores stale XML when a test task disables XML reporting`() = setup(object {
+        val build = compositeWithProducer(testConfiguration = "reports.junitXml.required.set(false)")
+        val expected = summaryJson(total = 1, passed = 1, failed = 0, skipped = 0)
+        val staleXml = directory.resolve("producer/build/custom-junit/TEST-stale.xml").apply {
+            parentFile.mkdirs()
+            writeText("""<testsuite><testcase name="stale"/></testsuite>""")
+        }
+    }) exercise {
+        build.build()
+    } verify {
+        summary().assertIsEqualTo(expected)
+    }
+
     private fun compositeWithProducer(
         testBody: String = "",
         testConfiguration: String = "",

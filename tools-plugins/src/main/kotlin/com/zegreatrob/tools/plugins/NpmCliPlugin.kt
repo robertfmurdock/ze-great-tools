@@ -118,6 +118,8 @@ class NpmCliPlugin : Plugin<Project> {
             }
 
             val copyReadme = project.tasks.register<CopyPackageFile>("copyReadme") {
+                group = "distribution"
+                description = "Copies the README into the npm package"
                 dependsOn("jsPackageJson", ":kotlinNpmInstall")
                 source.from(project.layout.projectDirectory.file("README.md"))
                 destination.set(mainNpmProjectDir.map { it.file("README.md") })
@@ -128,12 +130,16 @@ class NpmCliPlugin : Plugin<Project> {
             val licenseFile = if (rootLicense.asFile.exists()) rootLicense else parentLicense
 
             val copyLicense = project.tasks.register<CopyPackageFile>("copyLicense") {
+                group = "distribution"
+                description = "Copies the license into the npm package"
                 dependsOn("jsPackageJson", ":kotlinNpmInstall")
                 source.from(licenseFile)
                 destination.set(mainNpmProjectDir.map { it.file("LICENSE") })
             }
 
             val jsCliTar = project.tasks.register<Tar>("jsCliTar") {
+                group = "distribution"
+                description = "Packages the JavaScript CLI for npm"
                 dependsOn(
                     copyReadme,
                     copyLicense,
@@ -158,6 +164,8 @@ class NpmCliPlugin : Plugin<Project> {
             }
 
             val jsPublish = project.tasks.register<Exec>("jsPublish") {
+                group = "publishing"
+                description = "Publishes the JavaScript CLI to npm"
                 dependsOn(jsCliTar)
                 mustRunAfter(project.tasks.named("check"))
                 workingDir(mainNpmProjectDir)
