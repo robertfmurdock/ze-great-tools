@@ -2,6 +2,7 @@ package com.zegreatrob.tools
 
 import com.zegreatrob.tools.tagger.CalculateVersion
 import com.zegreatrob.tools.tagger.CommitReport
+import com.zegreatrob.tools.tagger.GithubReleaseCreateArguments
 import com.zegreatrob.tools.tagger.GithubReleaseUploadArguments
 import com.zegreatrob.tools.tagger.PreviousVersion
 import com.zegreatrob.tools.tagger.ReleaseVersion
@@ -146,16 +147,12 @@ class TaggerPlugin : Plugin<Project> {
             "Side effect: create GitHub release (published by default, configurable via githubReleaseDraft) via gh CLI. Requires tag to run first. Disabled for -SNAPSHOT versions. Idempotent - skips if release exists."
         task.enabled = isGithubReleaseEnabled(isSnapshot, tagger)
         task.dependsOn(tag)
-        task.commandLine("sh", "-c", draftReleaseScript(project.version, tagger.githubReleaseDraft.get()))
+        val arguments = project.objects.newInstance(GithubReleaseCreateArguments::class.java)
+        arguments.version.set(project.version.toString())
+        arguments.draft.set(tagger.githubReleaseDraft)
+        task.commandLine("sh")
+        task.argumentProviders.add(arguments)
     }
-
-    private fun draftReleaseScript(version: Any, draft: Boolean) = """
-        if gh release view $version >/dev/null 2>&1; then
-            echo "Release $version already exists, skipping creation"
-        else
-            gh release create $version ${if (draft) "--draft " else ""}--title $version --notes $version
-        fi
-    """.trimIndent()
 
     private fun registerGithubReleaseUploadTask(
         project: Project,

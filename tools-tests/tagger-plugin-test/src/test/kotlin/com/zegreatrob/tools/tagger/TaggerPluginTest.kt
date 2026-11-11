@@ -223,7 +223,7 @@ class TaggerPluginTest {
         project.plugins.apply("com.zegreatrob.tools.tagger")
         project.tasks.findByName("githubRelease") as org.gradle.api.tasks.Exec
     } verify { task ->
-        val commandLine = task.commandLine
+        val commandLine = task.argumentProviders.single().asArguments()
         val script = commandLine.joinToString(" ")
         script.contains("gh release view")
             .assertIsEqualTo(true, "Expected idempotency check with 'gh release view'")
@@ -241,7 +241,7 @@ class TaggerPluginTest {
         project.plugins.apply("com.zegreatrob.tools.tagger")
         project.tasks.findByName("githubRelease") as org.gradle.api.tasks.Exec
     } verify { task ->
-        val commandLine = task.commandLine
+        val commandLine = task.argumentProviders.single().asArguments()
         val script = commandLine.joinToString(" ")
         script.contains("generate_release_notes")
             .assertIsEqualTo(false, "Expected no generate_release_notes parameter with gh release create")
@@ -255,7 +255,7 @@ class TaggerPluginTest {
         project.plugins.apply("com.zegreatrob.tools.tagger")
         project.tasks.findByName("githubRelease") as org.gradle.api.tasks.Exec
     } verify { task ->
-        val commandLine = task.commandLine
+        val commandLine = task.argumentProviders.single().asArguments()
         val script = commandLine.joinToString(" ")
         script.contains("--draft")
             .assertIsEqualTo(false, "Expected no --draft flag when githubReleaseDraft not explicitly set (default false)")
@@ -273,7 +273,7 @@ class TaggerPluginTest {
         tagger.githubReleaseDraft.set(true)
         project.tasks.findByName("githubRelease") as org.gradle.api.tasks.Exec
     } verify { task ->
-        val commandLine = task.commandLine
+        val commandLine = task.argumentProviders.single().asArguments()
         val script = commandLine.joinToString(" ")
         script.contains("--draft")
             .assertIsEqualTo(true, "Expected --draft flag when githubReleaseDraft.set(true)")
