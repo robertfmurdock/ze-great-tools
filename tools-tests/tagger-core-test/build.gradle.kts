@@ -1,4 +1,5 @@
 plugins {
+    id("com.zegreatrob.tools.plugins.test-suite")
     id("org.jetbrains.kotlin.multiplatform")
 }
 

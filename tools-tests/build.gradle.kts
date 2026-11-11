@@ -6,7 +6,6 @@ plugins {
     id("com.zegreatrob.tools.dashboard-test-summary")
     base
     id("com.zegreatrob.tools.plugins.lint")
-    id("com.zegreatrob.tools.plugins.testmints") apply false
     alias(libs.plugins.org.jetbrains.kotlin.multiplatform) apply false
     alias(libs.plugins.nl.littlerobots.version.catalog.update)
 }
@@ -19,13 +18,7 @@ repositories {
 group = "com.zegreatrob.tools"
 
 subprojects {
-    apply(plugin = "base")
-    apply(plugin = "com.zegreatrob.tools.plugins.lint")
-    apply(plugin = "com.zegreatrob.tools.plugins.reports")
-
     plugins.withId("org.jetbrains.kotlin.multiplatform") {
-        apply(plugin = "com.zegreatrob.tools.plugins.testmints")
-        extra["testmints.includeCommonMain"] = true
         extensions.configure<KotlinMultiplatformExtension>("kotlin") {
             @OptIn(ExperimentalKotlinGradlePluginApi::class)
             compilerOptions {
@@ -34,8 +27,6 @@ subprojects {
         }
     }
     plugins.withId("org.jetbrains.kotlin.jvm") {
-        apply(plugin = "com.zegreatrob.tools.plugins.testmints")
-        extra["testmints.includeCommonMain"] = true
         extensions.configure<KotlinJvmProjectExtension>("kotlin") {
             @OptIn(ExperimentalKotlinGradlePluginApi::class)
             compilerOptions {

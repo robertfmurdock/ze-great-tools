@@ -52,7 +52,7 @@ Resolve all 24 Gradle audit findings and verify both standing advisories across 
 - [ ] **S1 · Medium · Imperative plugin application.** `tools-tests/build.gradle.kts:20`. Apply the test conventions through consuming projects' `plugins` blocks. Verify JVM and multiplatform test setup, including Testmints BOM placement. [Gradle](https://docs.gradle.org/current/userguide/best_practices_general.html#use_the_plugins_block)
 - [ ] **S2 · Medium · Duplicated conventions.** `command-line-tools/build.gradle.kts:40`, `tools-tests/build.gradle.kts:47`, and the checksum setups in `command-line-tools/{digger-cli,tagger-cli}/build.gradle.kts`. Consolidate shared lifecycle, Yarn, checksum, and packaging logic in `tools-plugins`. Verify each behavior has one implementation and both CLIs still produce the same deliverables. [Gradle](https://docs.gradle.org/current/userguide/best_practices_structuring_builds.html#use_convention_plugins)
 - [ ] **S3 · Medium · Sources at an included build root.** `tools-plugins/build.gradle.kts:13` and `tools-plugins/src/main/`. Move convention and npm plugin sources to a subproject of the included build. Verify all existing plugin IDs resolve from the root composite and independently from the consuming builds. [Gradle](https://docs.gradle.org/current/userguide/best_practices_structuring_builds.html#no_source_in_root)
-- [ ] **S4 · Medium · Unpinned CLI toolchains.** `command-line-tools/{digger-cli,tagger-cli}/build.gradle.kts:60`. Pin JDK 21 for both CLI archive producers. Verify the selected toolchain and compare JVM distribution SHA-256 hashes across clean builds with different launcher JDKs. [Gradle](https://docs.gradle.org/current/userguide/best_practices_security.html#builds_should_be_reproducible)
+- [x] **S4 · Medium · Unpinned CLI toolchains.** `command-line-tools/{digger-cli,tagger-cli}/build.gradle.kts:60`. Pin JDK 21 for both CLI archive producers. Verify the selected toolchain and compare JVM distribution SHA-256 hashes across clean builds with different launcher JDKs. [Gradle](https://docs.gradle.org/current/userguide/best_practices_security.html#builds_should_be_reproducible)
 - [ ] **S5 · Recommendation · Unstable API inventory.** `tools-plugins/src/main/kotlin/com/zegreatrob/tools/plugins/jvm.gradle.kts:19` and `tools/fingerprint-plugin/build.gradle.kts:1`. Record the experimental Kotlin APIs and unstable Gradle APIs the build relies on, why they are needed, and what to recheck on upgrades. [Gradle](https://docs.gradle.org/current/userguide/best_practices_general.html#consider_use_of_incubating_apis_carefully)
 - [ ] **A2 · Advisory · Isolated publishing.** `tools/build.gradle.kts:53` and `tools-plugins/src/main/kotlin/com/zegreatrob/tools/plugins/publish.gradle.kts:6` establish publication scope. Verify the publishing environment starts fresh and isolated with build caching disabled and without reused outputs. Record the configuration evidence and close any gap without triggering an external publication during validation. [Gradle](https://docs.gradle.org/current/userguide/best_practices_security.html#build-published-artifacts-securely)
 
@@ -66,13 +66,18 @@ Resolve all 24 Gradle audit findings and verify both standing advisories across 
 
 - **Date** 2026-11-11
 - **Branch and baseline commit** `main` at `29fca6d5206eef625e58a24e02e7a797e9cc89a1`
-- **Last verified commit** `7670e641` (Kotlin standard library cleanup).
-- **Uncommitted work** S4 CLI toolchain verification and card progress. IDEA files have unrelated changes.
-- **Status** W1, W2, W3, A1, T1, T2, T3, T5, T6, L2, L3, and L5 pushed. L1 is partially complete. T4, Git test environment isolation, and D3 and D5 pushed. S4 is under investigation.
+- **Last verified commit** `823823d2` (CLI and shared-test JVM toolchains).
+- **Uncommitted work** S1 test-suite convention, consuming build scripts, tests, and card progress. IDEA files have unrelated changes.
+- **Status** W1, W2, W3, A1, T1, T2, T3, T5, T6, L2, L3, and L5 pushed. L1 is partially complete. T4, Git test environment isolation, and D3, D5, and S4 pushed. S1 is under validation.
 - **Blockers** None recorded.
-- **Next** Pin and verify the CLI JVM toolchains, then address remaining L1 provider reads and later slices.
+- **Next** Validate the explicit test-suite convention, then address remaining L1 provider reads and later slices.
 
 ## Implementation Notes
+
+### 2026-11-11 · S1 explicit test-suite convention
+
+- S4 was pushed as signed commit `823823d2`. A new TestKit test failed because the test-suite convention did not exist. The convention applies lint, reports, and Testmints and sets the shared-main BOM option. The seven test modules now apply it explicitly; root cross-project Kotlin compiler configuration remains.
+- The convention TestKit test passed with the Kotlin multiplatform plugin applied after the convention and verifies the BOM, report task, and lint task. Dependency insight confirms the JVM plugin test module still receives the Testmints BOM. `./gradlew check -q --console=plain` passed. S1 awaits commit and push.
 
 ### 2026-11-11 · S4 CLI toolchain preparation
 

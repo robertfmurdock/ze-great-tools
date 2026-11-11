@@ -22,6 +22,7 @@ Guide for Gradle build logic, dependencies, tasks, and repository automation.
 - Module: `:module/build.gradle.kts` (module-specific config)
 - Convention: `build-logic/` (shared behavior)
 - Versions: `gradle/libs.versions.toml` (dependency versions)
+- Test modules in `tools-tests`: apply `com.zegreatrob.tools.plugins.test-suite` in each module's `plugins` block for lint, reports, and Testmints.
 
 **Task Implementation**
 - Use typed tasks and Kotlin DSL over shell scripts

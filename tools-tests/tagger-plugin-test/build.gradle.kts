@@ -1,6 +1,7 @@
 @file:Suppress("UnstableApiUsage")
 
 plugins {
+    id("com.zegreatrob.tools.plugins.test-suite")
     `java-gradle-plugin`
     id("org.jetbrains.kotlin.jvm")
 }
