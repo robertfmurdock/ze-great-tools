@@ -103,7 +103,6 @@ class FingerprintPlugin : Plugin<Project> {
     private fun setLocalTaskDependencies(task: AggregateFingerprintsTask, localTask: org.gradle.api.tasks.TaskProvider<FingerprintTask>) {
         task.localFingerprint.set(localTask.flatMap { it.outputFile })
         task.localManifest.set(localTask.flatMap { it.manifestFile })
-        task.dependsOn(localTask)
     }
 
     private fun setAggregateOutputPaths(task: AggregateFingerprintsTask, project: Project) {
@@ -119,15 +118,14 @@ class FingerprintPlugin : Plugin<Project> {
 
     private fun addIncludedBuild(task: AggregateFingerprintsTask, project: Project, buildName: String) {
         val includedBuild = project.gradle.includedBuild(buildName)
-        task.dependsOn(includedBuild.task(":generateFingerprint"))
-        task.includedFingerprints.from(includedBuild.projectDir.resolve("build/fingerprint.txt"))
-        task.includedManifests.from(includedBuild.projectDir.resolve("build/fingerprint-manifest.log"))
+        val fingerprintTask = includedBuild.task(":generateFingerprint")
+        task.includedFingerprints.from(project.files(includedBuild.projectDir.resolve("build/fingerprint.txt")).builtBy(fingerprintTask))
+        task.includedManifests.from(project.files(includedBuild.projectDir.resolve("build/fingerprint-manifest.log")).builtBy(fingerprintTask))
     }
 
     private fun registerCompareAggregateFingerprints(project: Project, extension: FingerprintExtension) {
         project.tasks.register("compareAggregateFingerprints", CompareAggregateFingerprintsTask::class.java) { task ->
             val aggregateTask = project.tasks.named("aggregateFingerprints", AggregateFingerprintsTask::class.java)
-            task.dependsOn(aggregateTask)
             task.currentFingerprint.set(aggregateTask.flatMap { it.outputFile })
             task.expectedFingerprint.set(extension.compareToFile)
         }

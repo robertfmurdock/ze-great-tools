@@ -4,7 +4,6 @@ import org.apache.tools.ant.filters.ReplaceTokens
 import org.gradle.crypto.checksum.Checksum
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.targets.js.npm.npmProject
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     id("org.jetbrains.kotlin.multiplatform")
@@ -114,7 +113,7 @@ tasks {
         commandLine("kotlin/bin/tagger", "calculate-version")
     }
     val confirmJvmTaggerCanRun = register<Exec>("confirmJvmTaggerCanRun") {
-        dependsOn("installJvmDist")
+        inputs.files(project.tasks.named("installJvmDist"))
         workingDir(layout.projectDirectory)
         commandLine("build/install/tagger-cli-jvm/bin/tagger", "--version")
     }
@@ -129,9 +128,6 @@ tasks {
             filter<ReplaceTokens>("tokens" to mapOf("TAGGER_VERSION" to rootProject.version))
         }
         into(generatedDirectory)
-    }
-    withType<KotlinCompile> {
-        dependsOn(copyTemplates)
     }
     kotlin.sourceSets {
         commonMain {

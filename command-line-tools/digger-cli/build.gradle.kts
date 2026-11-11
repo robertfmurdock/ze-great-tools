@@ -5,7 +5,6 @@ import org.gradle.crypto.checksum.Checksum
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootPlugin
 import org.jetbrains.kotlin.gradle.targets.js.npm.npmProject
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     id("org.jetbrains.kotlin.multiplatform")
@@ -114,7 +113,7 @@ tasks {
         applicationName = "digger"
     }
     val confirmJvmDiggerCanRun = register<Exec>("confirmJvmDiggerCanRun") {
-        dependsOn("installJvmDist")
+        inputs.files(project.tasks.named("installJvmDist"))
         workingDir(layout.projectDirectory)
         commandLine("build/install/digger-cli-jvm/bin/digger", "--version")
     }
@@ -128,9 +127,6 @@ tasks {
             filter<ReplaceTokens>("tokens" to mapOf("DIGGER_VERSION" to rootProject.version))
         }
         into(generatedDirectory)
-    }
-    withType<KotlinCompile> {
-        dependsOn(copyTemplates)
     }
     kotlin.sourceSets {
         commonMain {
