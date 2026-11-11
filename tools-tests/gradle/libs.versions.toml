@@ -1,18 +1,18 @@
 [versions]
-testmints = "12.6.70"
 kotlin = "2.4.21"
 kotlinx-coroutines = "1.11.0"
+testmints = "12.6.70"
 
 [libraries]
-testmints-async = { module = "com.zegreatrob.testmints:async" }
-testmints-bom = { module = "com.zegreatrob.testmints:testmints-bom", version.ref = "testmints" }
-testmints-minassert = { module = "com.zegreatrob.testmints:minassert" }
-testmints-standard = { module = "com.zegreatrob.testmints:standard" }
 org-jetbrains-kotlin-kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin" }
 org-jetbrains-kotlin-kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 org-jetbrains-kotlin-kotlin-test-junit5 = { module = "org.jetbrains.kotlin:kotlin-test-junit5", version.ref = "kotlin" }
 org-jetbrains-kotlinx-kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinx-coroutines" }
-org-jetbrains-kotlinx-kotlinx-serialization-bom = "org.jetbrains.kotlinx:kotlinx-serialization-bom:1.12.0"
+org-jetbrains-kotlinx-kotlinx-serialization-bom = "org.jetbrains.kotlinx:kotlinx-serialization-bom:1.13.0"
+testmints-async = { module = "com.zegreatrob.testmints:async" }
+testmints-bom = { module = "com.zegreatrob.testmints:testmints-bom", version.ref = "testmints" }
+testmints-minassert = { module = "com.zegreatrob.testmints:minassert" }
+testmints-standard = { module = "com.zegreatrob.testmints:standard" }
 
 [plugins]
 nl-littlerobots-version-catalog-update = "nl.littlerobots.version-catalog-update:1.1.2"
