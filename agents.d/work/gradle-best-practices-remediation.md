@@ -37,7 +37,7 @@ Resolve all 24 Gradle audit findings and verify both standing advisories across 
 - [ ] **L2 · High · Eager release asset inspection.** `tools/tagger-plugin/src/main/kotlin/com/zegreatrob/tools/TaggerPlugin.kt:169`. Keep the asset collection as a declared input and construct upload arguments during execution. Test empty assets and generated assets with a stubbed upload command, including producer ordering. [Gradle](https://docs.gradle.org/current/userguide/best_practices_tasks.html#avoid_eager_file_collection_apis)
 - [x] **L3 · High · Project access during npm publish.** `tools-plugins/src/main/kotlin/com/zegreatrob/tools/plugins/NpmCliPlugin.kt:164`. Pass the snapshot decision or command arguments through task inputs. With a stubbed npm command, verify both snapshot and release arguments and configuration-cache reuse. [Gradle](https://docs.gradle.org/current/userguide/best_practices_tasks.html#dont_access_project_instance_inside_task)
 - [ ] **L4 · High · `afterEvaluate` hooks.** `tools-plugins/src/main/kotlin/com/zegreatrob/tools/plugins/{publish.gradle.kts,testmints.gradle.kts,library.gradle.kts,reports.gradle.kts,NpmCliPlugin.kt}` and `tools/{certifier-plugin,digger-plugin,fingerprint-plugin,tagger-plugin}/build.gradle.kts`. Replace callbacks with plugin reactions and lazy collection configuration. Recheck all hooks and validate POMs, Javadoc artifacts, signing order, BOM wiring, report collection, and npm metadata before closing. [Gradle](https://docs.gradle.org/current/userguide/best_practices_general.html#avoid_after_evaluate)
-- [ ] **L5 · Medium · Plugin prerequisites.** `tools-plugins/src/main/kotlin/com/zegreatrob/tools/plugins/reports.gradle.kts:13`. Declare the `base` prerequisite or configure lazily when it is applied. Verify report setup through the supported plugin application paths. [Gradle](https://docs.gradle.org/current/userguide/best_practices_general.html#dont_assume_plugin_order)
+- [x] **L5 · Medium · Plugin prerequisites.** `tools-plugins/src/main/kotlin/com/zegreatrob/tools/plugins/reports.gradle.kts:13`. Declare the `base` prerequisite or configure lazily when it is applied. Verify report setup through the supported plugin application paths. [Gradle](https://docs.gradle.org/current/userguide/best_practices_general.html#dont_assume_plugin_order)
 
 ### 4. Repositories and dependencies `[none]`
 
@@ -66,13 +66,18 @@ Resolve all 24 Gradle audit findings and verify both standing advisories across 
 
 - **Date** 2026-11-11
 - **Branch and baseline commit** `main` at `29fca6d5206eef625e58a24e02e7a797e9cc89a1`
-- **Last verified commit** `e6d6e6dc` (npm publish configuration-cache fix).
-- **Uncommitted work** L5 reports convention prerequisite, regression test, and card progress.
-- **Status** W1, W2, W3, A1, T1, T2, T3, and T5 verified and pushed. T4 requires producer-aware lazy report wiring. T6 and L3 pushed. L5 is under validation.
+- **Last verified commit** `82e8c09f` (reports prerequisite fix).
+- **Uncommitted work** L2 lazy release asset wiring, regression tests, and card progress.
+- **Status** W1, W2, W3, A1, T1, T2, T3, and T5 verified and pushed. T4 requires producer-aware lazy report wiring. T6, L3, and L5 pushed. L2 is under validation.
 - **Blockers** None recorded.
-- **Next** Complete L5 validation, then continue investigating T4 and later slices.
+- **Next** Complete L2 validation, then continue investigating T4 and later slices.
 
 ## Implementation Notes
+
+### 2026-11-11 · L2 release asset wiring
+
+- L5 was pushed as `82e8c09f`. A generated file-tree asset regression showed that eager emptiness checks skipped upload before its producer ran. The task now retains the producer dependency through declared inputs and evaluates emptiness at execution. An argument provider builds the upload command from resolved inputs, passing filenames as shell arguments so spaces survive.
+- The generated-asset and empty-asset functional tests passed, including configuration-cache reuse. The upload task remains eligible for an empty collection and is skipped during execution, so its configuration-time `enabled` value differs from the old behavior. The targeted unit suite and `./gradlew check -q --console=plain` passed. L2 awaits commit and push.
 
 ### 2026-11-11 · L5 reports convention prerequisite
 

@@ -11,6 +11,86 @@ import kotlin.test.Test
 
 class AdditionalTasksFunctionalTest {
     @Test
+    fun uploadSkipsWhenNoReleaseAssetsExist() = setup(object {
+        val projectDir = createTempDirectory()
+    }) {
+        writeSettings(projectDir)
+        File(projectDir, "build.gradle.kts").writeText(
+            """
+            plugins { id("com.zegreatrob.tools.tagger") }
+            tagger {
+                releaseBranch = "master"
+                githubReleaseEnabled.set(true)
+            }
+            """.trimIndent(),
+        )
+    } exercise {
+        GradleRunner.create()
+            .withProjectDir(File(projectDir))
+            .withArguments("githubReleaseUpload", "-x", "githubRelease", "-Pversion=1.2.3", "--console=plain")
+            .build()
+    } verifyAnd { result ->
+        result.task(":githubReleaseUpload")?.outcome?.name.assertIsEqualTo("SKIPPED")
+    } teardown {
+        removeDirectory(projectDir)
+    }
+
+    @Test
+    fun generatedReleaseAssetIsUploaded() = setup(object {
+        val projectDir = createTempDirectory()
+        val output = File(projectDir, "gh-arguments.txt")
+    }) {
+        writeSettings(projectDir)
+        val bin = File(projectDir, "bin").apply { mkdirs() }
+        File(bin, "gh").apply {
+            writeText(
+                """
+                #!/bin/sh
+                if [ "$2" = "view" ]; then exit 1; fi
+                printf '%s\n' "$@" > "${output.absolutePath}"
+                """.trimIndent(),
+            )
+            setExecutable(true)
+        }
+        File(projectDir, "build.gradle.kts").writeText(
+            """
+            plugins { id("com.zegreatrob.tools.tagger") }
+            val generateAsset = tasks.register("generateReleaseAsset") {
+                val asset = layout.buildDirectory.file("assets/generated asset.zip")
+                outputs.file(asset)
+                doLast {
+                    asset.get().asFile.apply {
+                        parentFile.mkdirs()
+                        writeText("generated asset")
+                    }
+                }
+            }
+            tagger {
+                releaseBranch = "master"
+                githubReleaseEnabled.set(true)
+                githubReleaseAssets.from(files(fileTree("build/assets")).builtBy(generateAsset))
+            }
+            tasks.named<Exec>("githubReleaseUpload") {
+                environment("PATH", "$projectDir/bin:" + System.getenv("PATH"))
+            }
+            """.trimIndent(),
+        )
+    } exercise {
+        val runner = GradleRunner.create()
+            .withProjectDir(File(projectDir))
+            .withArguments("githubReleaseUpload", "-x", "githubRelease", "-Pversion=1.2.3", "--configuration-cache", "--console=plain")
+        val first = runner.build()
+        first to runner.build()
+    } verifyAnd { (first, second) ->
+        first.task(":generateReleaseAsset")?.outcome?.name.assertIsEqualTo("SUCCESS")
+        first.task(":githubReleaseUpload")?.outcome?.name.assertIsEqualTo("SUCCESS")
+        second.output.contains("Reusing configuration cache.").assertIsEqualTo(true)
+        output.readLines().assertIsEqualTo(listOf("release", "upload", "1.2.3", "build/assets/generated asset.zip"))
+    } teardown {
+        removeDirectory(projectDir)
+    }
+
+    @Test
     fun previousVersionOutputsLastTag() = setup(object {
         val projectDir = createTempDirectory()
         val addFileNames = setOf("build.gradle.kts", "settings.gradle", ".gitignore")

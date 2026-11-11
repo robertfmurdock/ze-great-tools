@@ -395,7 +395,7 @@ class TaggerPluginTest {
     }
 
     @Test
-    fun `githubReleaseUpload task disabled when githubReleaseAssets is empty`() = setup(object {
+    fun `githubReleaseUpload defers checking empty assets until execution`() = setup(object {
         val project = ProjectBuilder.builder().build()
     }) exercise {
         project.version = "1.2.3"
@@ -405,7 +405,7 @@ class TaggerPluginTest {
         project.tasks.findByName("githubReleaseUpload") as org.gradle.api.tasks.Exec
     } verify { task ->
         task.enabled
-            .assertIsEqualTo(false, "Expected githubReleaseUpload to be disabled when no assets configured")
+            .assertIsEqualTo(true, "Expected the task to remain eligible until assets are checked at execution")
     }
 
     @Test
@@ -563,7 +563,7 @@ class TaggerPluginTest {
     }
 
     @Test
-    fun `githubReleaseUpload validates files exist before upload`() = setup(object {
+    fun `githubReleaseUpload supplies configured asset paths to its command`() = setup(object {
         val project = ProjectBuilder.builder().build()
         val nonExistentFile = java.io.File("/tmp/does-not-exist-${System.currentTimeMillis()}.txt")
     }) exercise {
@@ -574,11 +574,7 @@ class TaggerPluginTest {
         tagger.githubReleaseAssets.from(nonExistentFile)
         project.tasks.findByName("githubReleaseUpload") as org.gradle.api.tasks.Exec
     } verify { task ->
-        val commandLine = task.commandLine
-        val script = commandLine.getOrNull(2)
-        script
-            .assertIsNotEqualTo(null, "Expected script to be generated")
-        script!!.contains(nonExistentFile.absolutePath)
-            .assertIsEqualTo(true, "Expected script to reference configured file even if it doesn't exist - will fail at execution time with clear error from gh CLI")
+        task.argumentProviders.single().asArguments().last().endsWith(nonExistentFile.name)
+            .assertIsEqualTo(true, "Expected the upload command to receive the configured asset path")
     }
 }

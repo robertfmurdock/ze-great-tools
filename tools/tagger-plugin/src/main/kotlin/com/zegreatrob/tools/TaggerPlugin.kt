@@ -2,6 +2,7 @@ package com.zegreatrob.tools
 
 import com.zegreatrob.tools.tagger.CalculateVersion
 import com.zegreatrob.tools.tagger.CommitReport
+import com.zegreatrob.tools.tagger.GithubReleaseUploadArguments
 import com.zegreatrob.tools.tagger.PreviousVersion
 import com.zegreatrob.tools.tagger.ReleaseVersion
 import com.zegreatrob.tools.tagger.TagVersion
@@ -166,27 +167,18 @@ class TaggerPlugin : Plugin<Project> {
         task.group = "versioning"
         task.description =
             "Side effect: upload assets to GitHub release via gh CLI. Requires githubRelease to run first. Disabled for -SNAPSHOT versions or when no assets configured. Idempotent - skips files already uploaded."
-        task.enabled = isGithubReleaseEnabled(isSnapshot, tagger) && !tagger.githubReleaseAssets.isEmpty
+        task.enabled = isGithubReleaseEnabled(isSnapshot, tagger)
+        task.onlyIf("GitHub release assets are configured") { it.inputs.files.isEmpty.not() }
         task.dependsOn(githubRelease)
         task.dependsOn(validateAssets)
         task.inputs.files(tagger.githubReleaseAssets)
-        task.commandLine(
-            "sh",
-            "-c",
-            uploadAssetsScript(project.version, tagger.githubReleaseAssets.files, project.projectDir),
-        )
+        val arguments = project.objects.newInstance(GithubReleaseUploadArguments::class.java)
+        arguments.version.set(project.version.toString())
+        arguments.projectDirectory.set(project.layout.projectDirectory)
+        arguments.assets.from(tagger.githubReleaseAssets)
+        task.commandLine("sh")
+        task.argumentProviders.add(arguments)
     }
-
-    private fun uploadAssetsScript(version: Any, assets: Set<java.io.File>, projectDir: java.io.File) = """
-        for asset_file in ${assets.joinToString(" ") { it.relativeTo(projectDir).path }}; do
-            asset_name=${'$'}(basename "${'$'}asset_file")
-            if gh release view $version --json assets --jq ".assets[].name" | grep -q "^${'$'}asset_name${'$'}"; then
-                echo "Asset ${'$'}asset_name already uploaded to release $version, skipping"
-            else
-                gh release upload $version "${'$'}asset_file"
-            fi
-        done
-    """.trimIndent()
 
     private fun registerGithubReleasePublishTask(
         project: Project,
