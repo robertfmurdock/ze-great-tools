@@ -41,8 +41,8 @@ Resolve all 24 Gradle audit findings and verify both standing advisories across 
 
 ### 4. Repositories and dependencies `[none]`
 
-- [ ] **D1 · Medium · Repository location.** `build.gradle.kts:1`, `tools/build.gradle.kts:3`, and `tools-plugins/src/main/kotlin/com/zegreatrob/tools/plugins/versioning.gradle.kts:6` illustrate project-level repository declarations. Move dependency repositories to each build's settings. Verify dependency and plugin resolution in the root composite and each included build, and preserve publishing destinations. [Gradle](https://docs.gradle.org/current/userguide/best_practices_dependencies.html#set_up_repositories_in_settings)
-- [ ] **D2 · Medium · Repository content filtering.** `settings.gradle.kts:1` and `tools-plugins/build.gradle.kts:7` illustrate unfiltered lists and the duplicate Plugin Portal. Deduplicate and filter repositories. Verify plugin markers and library coordinates still resolve from the intended repositories with an empty dependency cache. [Gradle](https://docs.gradle.org/current/userguide/best_practices_dependencies.html#use_content_filtering)
+- [x] **D1 · Medium · Repository location.** `build.gradle.kts:1`, `tools/build.gradle.kts:3`, and `tools-plugins/src/main/kotlin/com/zegreatrob/tools/plugins/versioning.gradle.kts:6` illustrate project-level repository declarations. Move dependency repositories to each build's settings. Verify dependency and plugin resolution in the root composite and each included build, and preserve publishing destinations. [Gradle](https://docs.gradle.org/current/userguide/best_practices_dependencies.html#set_up_repositories_in_settings)
+- [x] **D2 · Medium · Repository content filtering.** `settings.gradle.kts:1` and `tools-plugins/build.gradle.kts:7` illustrate unfiltered lists and the duplicate Plugin Portal. Deduplicate and filter repositories. Verify plugin markers and library coordinates still resolve from the intended repositories with an empty dependency cache. [Gradle](https://docs.gradle.org/current/userguide/best_practices_dependencies.html#use_content_filtering)
 - [x] **D3 · Medium · Redundant dependencies.** `tools-tests/digger-core-test/build.gradle.kts:16`, `tools/digger-gradle/build.gradle.kts:11`, and `tools/digger-core/build.gradle.kts:23`. Remove redundant Testmints declarations and confirm whether the direct Git adapter API edge is required. Compare dependency reports and compile consumers before and after. [Gradle](https://docs.gradle.org/current/userguide/best_practices_dependencies.html#avoid_duplicate_dependencies)
 - [ ] **D4 · Recommendation · Catalog aliases.** `tools/gradle/libs.versions.toml:2` and `tools-plugins/src/main/kotlin/com/zegreatrob/tools/plugins/testmints.gradle.kts:7`. Rename repetitive aliases and update both generated accessor uses and string lookups in all affected builds. Verify catalog resolution and BOM injection with the new names. [Gradle](https://docs.gradle.org/current/userguide/best_practices_dependencies.html#name_version_catalog_entries)
 - [x] **D5 · Recommendation · Explicit Kotlin stdlib.** `tools-plugins/build.gradle.kts:29`, `command-line-tools/digger-cli/build.gradle.kts:97`, and the strict pins in `tools/{digger-json,tagger-json}/build.gradle.kts`. Inventory explicit stdlib declarations and remove redundant ones. Verify resolved versions on affected targets and preserve necessary alignment before removing strict pins. [Gradle](https://docs.gradle.org/current/userguide/best_practices_dependencies.html#dont_depend_on_kotlin_stdlib)
@@ -66,19 +66,30 @@ Resolve all 24 Gradle audit findings and verify both standing advisories across 
 
 - **Date** 2026-11-11
 - **Branch and baseline commit** `main` at `29fca6d5206eef625e58a24e02e7a797e9cc89a1`
-- **Last verified commit** `c1e64b42` (lazy library signing order).
-- **Uncommitted work** D1 settings repository migration and card progress. IDEA files have unrelated changes.
-- **Status** W1, W2, W3, A1, T1, T2, T3, T5, T6, L2, L3, and L5 pushed. L1 is partially complete. T4, Git test environment isolation, and D3, D5, S4, and S1 pushed. L4 library ordering partially complete. D1 implementation and full check passed; awaiting commit and push.
+- **Last verified commit** `c9594b5a` (settings repositories).
+- **Uncommitted work** D2 repository filtering and card progress. IDEA files have unrelated changes.
+- **Status** W1, W2, W3, A1, T1, T2, T3, T5, T6, L2, L3, and L5 pushed. L1 is partially complete. T4, Git test environment isolation, and D1, D3, D5, S4, and S1 pushed. L4 library ordering partially complete. D2 is verified and ready to push.
 - **Blockers** None recorded.
-- **Next** Centralize dependency repositories in each build’s settings and verify resolution.
+- **Next** D4 catalog alias simplification.
 
 ## Implementation Notes
+
+### 2026-11-11 · D2 repository filtering
+
+- This is repository configuration with no intended output change. Test the real composite with a fresh Gradle user home, since a synthetic fixture cannot cover the plugin markers and transitive dependencies used across these builds.
+- Maven Central does not host `org.jmailen.gradle:kotlinter-gradle:5.7.0`; the convention build retains the Plugin Portal only for that group. The other dependency repository lists use Maven Central alone. Plugin-resolution repositories remain separate because plugin markers and implementations span multiple groups.
 
 ### 2026-11-11 · D1 repository migration preparation
 
 - The L4 library signing-order cleanup was pushed as signed commit `c1e64b42`. The publishing convention’s POM block remains subject to the Sonatype incident constraint in `agents.d/context/GRADLE_PLUGIN_CONSTRAINTS.md`.
 - Kotlin’s Node setup temporarily adds an Ivy repository to a project during execution, so global `FAIL_ON_PROJECT_REPOS` or `PREFER_SETTINGS` may break Node provisioning. Preserve Gradle’s default repository mode while moving authored dependency repositories to settings, and verify Node setup along with JVM dependency resolution.
 - Moved authored dependency repositories to the five builds' settings, leaving publishing destinations intact. A convention fixture first failed under `FAIL_ON_PROJECT_REPOS` and then passed after migration. Regenerating stale precompiled-script accessors resolved a local compilation failure. The full `./gradlew check -q --console=plain` and Kotlin Node setup passed; no top-level project repository blocks remain. Dependency caches were warm; empty-cache verification belongs to D2.
+- Pushed signed commit `c9594b5a`; GitHub reported bypassing its required Build status check. Each build also configured independently with `help`.
+
+### 2026-11-11 · D2 repository filtering
+
+- Removed duplicate dependency-resolution Plugin Portal entries from the root, CLI, tools, and test builds. The convention build retains a filtered Plugin Portal repository for `org.jmailen.gradle`, whose Kotlinter plugin is not available from Maven Central.
+- Fresh-cache root resolution and `./gradlew check -q --console=plain` passed after retrying one corrupted temporary Node archive. Plugin-management repositories remain separate from dependency repositories so plugin markers continue to resolve.
 
 ### 2026-11-11 · L4 library signing order
 

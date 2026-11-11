@@ -1,7 +1,9 @@
 dependencyResolutionManagement {
     repositories {
         mavenCentral()
-        gradlePluginPortal()
+        gradlePluginPortal {
+            content { includeGroup("org.jmailen.gradle") }
+        }
     }
 }
 
