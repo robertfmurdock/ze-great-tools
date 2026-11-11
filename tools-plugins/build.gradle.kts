@@ -13,8 +13,13 @@ repositories {
 plugins {
     `kotlin-dsl`
     id("java-gradle-plugin")
+    id("com.zegreatrob.tools.fingerprint") version "1.8.74"
     alias(libs.plugins.nl.littlerobots.version.catalog.update)
     alias(libs.plugins.org.jmailen.kotlinter)
+}
+
+fingerprintConfig {
+    includedProjects = setOf("dashboard-test-summary")
 }
 
 gradlePlugin {
