@@ -66,13 +66,19 @@ Resolve all 24 Gradle audit findings and verify both standing advisories across 
 
 - **Date** 2026-11-11
 - **Branch and baseline commit** `main` at `29fca6d5206eef625e58a24e02e7a797e9cc89a1`
-- **Last verified commit** `efe87aea` (explicit test-suite convention).
-- **Uncommitted work** L4 library publishing ordering cleanup and card progress. IDEA files have unrelated changes.
-- **Status** W1, W2, W3, A1, T1, T2, T3, T5, T6, L2, L3, and L5 pushed. L1 is partially complete. T4, Git test environment isolation, and D3, D5, S4, and S1 pushed. L4 library ordering is under investigation.
+- **Last verified commit** `c1e64b42` (lazy library signing order).
+- **Uncommitted work** D1 settings repository migration and card progress. IDEA files have unrelated changes.
+- **Status** W1, W2, W3, A1, T1, T2, T3, T5, T6, L2, L3, and L5 pushed. L1 is partially complete. T4, Git test environment isolation, and D3, D5, S4, and S1 pushed. L4 library ordering partially complete. D1 implementation and full check passed; awaiting commit and push.
 - **Blockers** None recorded.
-- **Next** Remove the library publishing ordering hook and verify the existing task graph.
+- **Next** Centralize dependency repositories in each build’s settings and verify resolution.
 
 ## Implementation Notes
+
+### 2026-11-11 · D1 repository migration preparation
+
+- The L4 library signing-order cleanup was pushed as signed commit `c1e64b42`. The publishing convention’s POM block remains subject to the Sonatype incident constraint in `agents.d/context/GRADLE_PLUGIN_CONSTRAINTS.md`.
+- Kotlin’s Node setup temporarily adds an Ivy repository to a project during execution, so global `FAIL_ON_PROJECT_REPOS` or `PREFER_SETTINGS` may break Node provisioning. Preserve Gradle’s default repository mode while moving authored dependency repositories to settings, and verify Node setup along with JVM dependency resolution.
+- Moved authored dependency repositories to the five builds' settings, leaving publishing destinations intact. A convention fixture first failed under `FAIL_ON_PROJECT_REPOS` and then passed after migration. Regenerating stale precompiled-script accessors resolved a local compilation failure. The full `./gradlew check -q --console=plain` and Kotlin Node setup passed; no top-level project repository blocks remain. Dependency caches were warm; empty-cache verification belongs to D2.
 
 ### 2026-11-11 · L4 library signing order
 

@@ -11,10 +11,6 @@ plugins {
     alias(libs.plugins.com.gradle.plugin.publish)
 }
 
-repositories {
-    mavenCentral()
-}
-
 dependencies {
     implementation(project(":digger-gradle"))
     implementation(project(":digger-guide"))

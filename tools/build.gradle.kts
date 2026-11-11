@@ -1,11 +1,5 @@
 import nl.littlerobots.vcu.plugin.versionSelector
 
-repositories {
-    maven { url = uri("https://plugins.gradle.org/m2/") }
-    mavenCentral()
-    gradlePluginPortal()
-}
-
 plugins {
     id("com.zegreatrob.tools.dashboard-test-summary")
     id("com.zegreatrob.tools.plugins.lint")

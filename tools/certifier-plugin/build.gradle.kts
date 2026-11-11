@@ -10,10 +10,6 @@ plugins {
     id("com.zegreatrob.tools.plugins.jvm")
 }
 
-repositories {
-    mavenCentral()
-}
-
 testing {
     suites {
         register<JvmTestSuite>("functionalTest") {

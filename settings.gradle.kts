@@ -10,6 +10,13 @@ plugins {
     id("com.gradle.develocity") version "3.17.6"
 }
 
+dependencyResolutionManagement {
+    repositories {
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
+
 rootProject.name = "ze-great-tools"
 includeBuild("tools-plugins")
 includeBuild("tools")

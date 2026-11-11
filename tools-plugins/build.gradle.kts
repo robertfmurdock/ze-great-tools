@@ -4,12 +4,6 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jmailen.gradle.kotlinter.tasks.FormatTask
 import org.jmailen.gradle.kotlinter.tasks.LintTask
 
-repositories {
-    maven { url = uri("https://plugins.gradle.org/m2/") }
-    mavenCentral()
-    gradlePluginPortal()
-}
-
 plugins {
     `kotlin-dsl`
     id("java-gradle-plugin")

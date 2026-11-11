@@ -10,11 +10,6 @@ plugins {
     alias(libs.plugins.nl.littlerobots.version.catalog.update)
 }
 
-repositories {
-    mavenCentral()
-    gradlePluginPortal()
-}
-
 group = "com.zegreatrob.tools"
 
 subprojects {

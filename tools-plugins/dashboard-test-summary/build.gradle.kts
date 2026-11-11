@@ -4,11 +4,6 @@ plugins {
     alias(libs.plugins.com.gradle.plugin.publish)
 }
 
-repositories {
-    mavenCentral()
-    gradlePluginPortal()
-}
-
 dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0")
     implementation(gradleApi())

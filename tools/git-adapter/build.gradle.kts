@@ -10,10 +10,6 @@ plugins {
 
 group = "com.zegreatrob.tools"
 
-repositories {
-    mavenCentral()
-}
-
 kotlin {
     jvm()
     js {

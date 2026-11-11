@@ -4,10 +4,6 @@ plugins {
     base
 }
 
-repositories {
-    mavenCentral()
-}
-
 tasks {
     val projectResultPath =
         rootProject.layout.buildDirectory.dir(

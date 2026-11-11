@@ -3,12 +3,6 @@ import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 
 
-repositories {
-    maven { url = uri("https://plugins.gradle.org/m2/") }
-    mavenCentral()
-    gradlePluginPortal()
-}
-
 plugins {
     id("com.zegreatrob.tools.dashboard-test-summary")
     base

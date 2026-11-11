@@ -12,7 +12,15 @@ class TestSuiteConventionTest {
         val directory = Files.createTempDirectory("test-suite-convention").toFile()
 
         init {
-            directory.resolve("settings.gradle.kts").writeText("rootProject.name = \"fixture\"")
+            directory.resolve("settings.gradle.kts").writeText(
+                """
+                rootProject.name = "fixture"
+                dependencyResolutionManagement {
+                    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+                    repositories { mavenCentral() }
+                }
+                """.trimIndent(),
+            )
             directory.resolve("gradle").mkdirs()
             directory.resolve("gradle/libs.versions.toml").writeText(
                 """
@@ -26,7 +34,6 @@ class TestSuiteConventionTest {
                     id("com.zegreatrob.tools.plugins.test-suite")
                     id("org.jetbrains.kotlin.multiplatform")
                 }
-                repositories { mavenCentral() }
                 kotlin { jvm() }
                 """.trimIndent(),
             )

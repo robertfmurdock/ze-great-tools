@@ -8,10 +8,6 @@ plugins {
     signing
 }
 
-repositories {
-    mavenCentral()
-}
-
 group = "com.zegreatrob.tools"
 
 // WARNING: Do NOT refactor this afterEvaluate block to extract top-level helper functions.

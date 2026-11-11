@@ -11,10 +11,6 @@ plugins {
     alias(libs.plugins.com.gradle.plugin.publish)
 }
 
-repositories {
-    mavenCentral()
-}
-
 testing {
     suites {
         register<JvmTestSuite>("functionalTest") {

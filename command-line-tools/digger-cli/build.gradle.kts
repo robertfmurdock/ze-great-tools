@@ -17,10 +17,6 @@ plugins {
     id("com.zegreatrob.tools.plugins.npm-cli")
 }
 
-repositories {
-    mavenCentral()
-}
-
 tasks.register<Checksum>("jvmDistZipChecksum") {
     group = "distribution"
     description = "Generate SHA-256 checksum for JVM distribution zip"

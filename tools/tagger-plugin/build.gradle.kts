@@ -12,10 +12,6 @@ plugins {
     id("org.jetbrains.kotlin.plugin.serialization") version embeddedKotlinVersion
 }
 
-repositories {
-    mavenCentral()
-}
-
 dependencies {
     implementation(platform(project(":dependency-bom")))
     implementation(project(":tagger-gradle"))

@@ -4,10 +4,6 @@ plugins {
     id("com.zegreatrob.tools.plugins.library")
 }
 
-repositories {
-    mavenCentral()
-}
-
 kotlin {
     jvm {
         @OptIn(ExperimentalKotlinGradlePluginApi::class)

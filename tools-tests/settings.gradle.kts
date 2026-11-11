@@ -9,6 +9,13 @@ pluginManagement {
 plugins {
 }
 
+dependencyResolutionManagement {
+    repositories {
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
+
 rootProject.name = "tools-tests"
 includeBuild("../tools")
 
