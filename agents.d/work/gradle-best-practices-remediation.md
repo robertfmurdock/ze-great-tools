@@ -15,6 +15,49 @@ Resolve all 24 Gradle audit findings and verify both standing advisories across 
 
 - [x] Review this card against the work-card template and reconcile it with the audit inventory.
 
+### Audit reconciliation from 2026-11-11
+
+The latest bundled-catalog audit confirmed the following open or insufficiently
+tracked work. These items supplement the historical 24-finding inventory above;
+they are not treated as resolved merely because a related remediation slice is
+checked off.
+
+- [ ] **AR1 · Medium · Remove remaining `afterEvaluate` usage.** Re-audit
+  `tools-plugins/src/main/kotlin/com/zegreatrob/tools/plugins/testmints.gradle.kts:9`
+  and `tools-plugins/src/main/kotlin/com/zegreatrob/tools/plugins/NpmCliPlugin.kt:52`.
+  Replace deferred evaluation with plugin callbacks or lazy configuration, then
+  rerun the full `afterEvaluate` scan. [Gradle](https://docs.gradle.org/current/userguide/best_practices_general.html#avoid_after_evaluate)
+- [ ] **AR2 · Medium · Make Kotlin plugin configuration order-safe.** In
+  `NpmCliPlugin.kt:53-55`, replace the eager `findByType`/early return with
+  `pluginManager.withPlugin("org.jetbrains.kotlin.multiplatform")` and preserve
+  the JS target lifecycle behavior. [Gradle](https://docs.gradle.org/current/userguide/best_practices_general.html#dont_assume_plugin_order)
+- [ ] **AR3 · High · Remove configuration-time provider and file-collection reads.**
+  Recheck `tools-plugins/dashboard-test-summary/src/main/kotlin/com/zegreatrob/tools/dashboard/DashboardTestSummaryPlugin.kt:44,99`
+  and the fingerprint plugin configuration paths. Resolve providers and file
+  collections only in task actions or wire them as task inputs. [Gradle](https://docs.gradle.org/current/userguide/best_practices_tasks.html#avoid_provider_get_outside_task_action)
+- [ ] **AR4 · Medium · Move project-level repositories.** Re-audit
+  `tools/build.gradle.kts:64` and move authored dependency repositories into
+  `tools/settings.gradle.kts`; keep publishing repositories separate. [Gradle](https://docs.gradle.org/current/userguide/best_practices_dependencies.html#set_up_repositories_in_settings)
+- [ ] **AR5 · Medium · Filter multiple repositories.** Add explicit content
+  filters where Plugin Portal and Maven Central coexist, especially root and
+  included-build plugin-management settings. [Gradle](https://docs.gradle.org/current/userguide/best_practices_dependencies.html#use_content_filtering)
+- [ ] **AR6 · Medium · Extract duplicated conventions.** Compare repeated
+  lifecycle, repository, testing, checksum, and task configuration across the
+  included builds and move remaining shared behavior into convention plugins.
+  [Gradle](https://docs.gradle.org/current/userguide/best_practices_structuring_builds.html#use_convention_plugins)
+- [ ] **AR7 · Recommendation · Group and describe all user-facing tasks.**
+  Cover `DiggerGuideTask`, `TaggerGuideTask`, and the
+  `clearDashboardTestSummary` registration in addition to the tasks already
+  tracked by T5. [Gradle](https://docs.gradle.org/current/userguide/best_practices_tasks.html#group_describe_tasks)
+- [ ] **AR8 · Recommendation · Replace internal task-name literals.** Recheck
+  string-based task references in `NpmCliPlugin.kt` and related plugin wiring;
+  use typed providers or documented public task constants where available.
+  [Gradle](https://docs.gradle.org/current/userguide/best_practices_tasks.html#dont_hardcode_task_names)
+
+The audit also reconfirmed that wrapper checksums, Kotlin DSL usage, build and
+configuration caching, task cacheability annotations, path sensitivities,
+TestKit coverage, root naming, and the absence of `buildSrc` are satisfied.
+
 ### 1. Wrapper and build defaults `[none]`
 
 - [x] **W1 · High · Distribution checksum.** `gradle/wrapper/gradle-wrapper.properties:3`. Pin the published SHA-256 for the archive in `distributionUrl`. Verify the URL and digest pair against Gradle's published checksums and exercise wrapper bootstrap with an empty distribution cache. [Gradle](https://docs.gradle.org/current/userguide/best_practices_security.html#validate_gradle_checksum)
@@ -73,6 +116,24 @@ Resolve all 24 Gradle audit findings and verify both standing advisories across 
 - **Next** S2 duplicated convention extraction.
 
 ## Implementation Notes
+
+### 2026-11-11 · Initial lazy-convention slice
+
+- Replaced the `afterEvaluate` blocks in `tools-plugins` Testmints dependency
+  injection and the publishing convention with `configureEach`, preserving the
+  inline POM configuration required by the publishing incident constraint.
+- The first implementation passed `:tools-plugins:compileKotlin` but failed the
+  full check because BOM versions were not available to JS dependency
+  resolution. The dependency is now materialized from the version-catalog
+  provider before being added to each matching configuration; this is dependency
+  configuration, not task execution.
+- Validation: `./gradlew :tools-plugins:compileKotlin -q --console=plain`
+  passed; `./gradlew :tools-plugins:test --tests '*NpmCliPluginTest' -q
+  --console=plain` passed; the initial `./gradlew check -q --console=plain`
+  failed on missing Testmints versions; after correction and formatting,
+  `./gradlew check -q --console=plain` passed.
+- AR1 remains open because `NpmCliPlugin.kt`, included-build plugin scripts,
+  and remaining module build scripts still contain `afterEvaluate` hooks.
 
 ### 2026-11-11 · D2 repository filtering
 
@@ -252,7 +313,7 @@ Resolve all 24 Gradle audit findings and verify both standing advisories across 
 
 ## Validation
 
-- **Card inventory** 24 findings (6 high, 12 medium, 6 recommendations) and 2 advisories.
+- **Card inventory** Historical inventory: 24 findings (6 high, 12 medium, 6 recommendations) and 2 advisories. The reconciliation above adds 8 current audit work items, with overlap intentionally preserved until each detection recipe is rerun.
 - **Per slice** Rerun the catalog detection for every affected ID and its acceptance check. For behavior changes, show the focused check failing for the expected reason before the fix. Run `./gradlew check -q --console=plain` before marking the slice verified. Log the ID, exact commands, result, and SHA here.
 - **Publication changes** Generate and compare marker and implementation POMs, inspect local artifacts for required Javadoc and metadata, and check the release task graph with `--dry-run`.
 - **Baseline status** Gradle checks and publication validation pending. Card creation is documentation-only.
