@@ -35,7 +35,7 @@ Resolve all 24 Gradle audit findings and verify both standing advisories across 
 
 - [ ] **L1 · High · Early provider reads.** `tools/fingerprint-plugin/src/main/kotlin/com/zegreatrob/tools/FingerprintPlugin.kt:63`, `tools/tagger-plugin/src/main/kotlin/com/zegreatrob/tools/TaggerPlugin.kt:148`, and `tools-plugins/src/main/kotlin/com/zegreatrob/tools/plugins/NpmCliPlugin.kt:102`. Defer reads through typed inputs and resolve concrete command arguments during execution. Verify configured project selections, draft flags, and optional guide paths reach their consumers as concrete values. [Gradle](https://docs.gradle.org/current/userguide/best_practices_tasks.html#avoid_provider_get_outside_task_action)
 - [ ] **L2 · High · Eager release asset inspection.** `tools/tagger-plugin/src/main/kotlin/com/zegreatrob/tools/TaggerPlugin.kt:169`. Keep the asset collection as a declared input and construct upload arguments during execution. Test empty assets and generated assets with a stubbed upload command, including producer ordering. [Gradle](https://docs.gradle.org/current/userguide/best_practices_tasks.html#avoid_eager_file_collection_apis)
-- [ ] **L3 · High · Project access during npm publish.** `tools-plugins/src/main/kotlin/com/zegreatrob/tools/plugins/NpmCliPlugin.kt:164`. Pass the snapshot decision or command arguments through task inputs. With a stubbed npm command, verify both snapshot and release arguments and configuration-cache reuse. [Gradle](https://docs.gradle.org/current/userguide/best_practices_tasks.html#dont_access_project_instance_inside_task)
+- [x] **L3 · High · Project access during npm publish.** `tools-plugins/src/main/kotlin/com/zegreatrob/tools/plugins/NpmCliPlugin.kt:164`. Pass the snapshot decision or command arguments through task inputs. With a stubbed npm command, verify both snapshot and release arguments and configuration-cache reuse. [Gradle](https://docs.gradle.org/current/userguide/best_practices_tasks.html#dont_access_project_instance_inside_task)
 - [ ] **L4 · High · `afterEvaluate` hooks.** `tools-plugins/src/main/kotlin/com/zegreatrob/tools/plugins/{publish.gradle.kts,testmints.gradle.kts,library.gradle.kts,reports.gradle.kts,NpmCliPlugin.kt}` and `tools/{certifier-plugin,digger-plugin,fingerprint-plugin,tagger-plugin}/build.gradle.kts`. Replace callbacks with plugin reactions and lazy collection configuration. Recheck all hooks and validate POMs, Javadoc artifacts, signing order, BOM wiring, report collection, and npm metadata before closing. [Gradle](https://docs.gradle.org/current/userguide/best_practices_general.html#avoid_after_evaluate)
 - [ ] **L5 · Medium · Plugin prerequisites.** `tools-plugins/src/main/kotlin/com/zegreatrob/tools/plugins/reports.gradle.kts:13`. Declare the `base` prerequisite or configure lazily when it is applied. Verify report setup through the supported plugin application paths. [Gradle](https://docs.gradle.org/current/userguide/best_practices_general.html#dont_assume_plugin_order)
 
@@ -66,13 +66,17 @@ Resolve all 24 Gradle audit findings and verify both standing advisories across 
 
 - **Date** 2026-11-11
 - **Branch and baseline commit** `main` at `29fca6d5206eef625e58a24e02e7a797e9cc89a1`
-- **Last verified commit** `2b28624e` (typed Node and npm wiring).
-- **Uncommitted work** L3 npm publish configuration-cache fix, tests, and card progress.
-- **Status** W1, W2, W3, A1, T1, T2, T3, and T5 verified and pushed. T4 requires producer-aware lazy report wiring. T6 pushed. L3 is under validation.
+- **Last verified commit** `e6d6e6dc` (npm publish configuration-cache fix).
+- **Uncommitted work** L5 reports convention prerequisite, regression test, and card progress.
+- **Status** W1, W2, W3, A1, T1, T2, T3, and T5 verified and pushed. T4 requires producer-aware lazy report wiring. T6 and L3 pushed. L5 is under validation.
 - **Blockers** None recorded.
-- **Next** Complete L3 validation, then continue investigating T4 and later slices.
+- **Next** Complete L5 validation, then continue investigating T4 and later slices.
 
 ## Implementation Notes
+
+### 2026-11-11 · L5 reports convention prerequisite
+
+- L3 was pushed as `e6d6e6dc`. A TestKit fixture applying the reports convention without `base` failed because `check` was absent. Declaring the base plugin in the convention made that test and the report suite pass. `./gradlew check -q --console=plain` passed. L5 awaits commit and push.
 
 ### 2026-11-11 · L3 npm publish action
 

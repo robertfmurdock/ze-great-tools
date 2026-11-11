@@ -1,5 +1,9 @@
 package com.zegreatrob.tools.plugins
 
+plugins {
+    base
+}
+
 repositories {
     mavenCentral()
 }

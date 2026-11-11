@@ -10,6 +10,28 @@ import kotlin.test.assertTrue
 
 class ReportsPluginTest {
     @Test
+    fun reportsConventionProvidesItsCheckTaskPrerequisite() = setup(object {
+        val directory = Files.createTempDirectory("reports-plugin-prerequisite").toFile()
+
+        init {
+            directory.resolve("settings.gradle.kts").writeText("rootProject.name = \"fixture\"")
+            directory.resolve("build.gradle.kts").writeText(
+                """plugins { id("com.zegreatrob.tools.plugins.reports") }""",
+            )
+        }
+    }) exercise {
+        GradleRunner.create()
+            .withProjectDir(directory)
+            .withPluginClasspath()
+            .withArguments("help", "--task", "collectResults")
+            .build()
+    } verifyAnd { result ->
+        assertTrue(result.output.contains("Collects reports and test results"))
+    } teardown {
+        directory.deleteRecursively()
+    }
+
+    @Test
     fun collectionPreservesFilesWithMatchingRelativeNames() = setup(object {
         val directory = Files.createTempDirectory("reports-plugin-collision").toFile()
 
