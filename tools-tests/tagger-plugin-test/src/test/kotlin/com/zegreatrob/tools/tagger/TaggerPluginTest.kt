@@ -482,7 +482,7 @@ class TaggerPluginTest {
     }
 
     @Test
-    fun `githubReleasePublish task disabled when githubReleaseDraft is false`() = setup(object {
+    fun `githubReleasePublish defers checking draft status until execution`() = setup(object {
         val project = ProjectBuilder.builder().build()
     }) exercise {
         project.version = "1.2.3"
@@ -493,7 +493,7 @@ class TaggerPluginTest {
         project.tasks.findByName("githubReleasePublish") as org.gradle.api.tasks.Exec
     } verify { task ->
         task.enabled
-            .assertIsEqualTo(false, "Expected githubReleasePublish to be disabled when githubReleaseDraft is false (nothing to publish)")
+            .assertIsEqualTo(true, "Expected the task to remain eligible until draft status is checked at execution")
     }
 
     @Test

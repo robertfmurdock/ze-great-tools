@@ -186,7 +186,9 @@ class TaggerPlugin : Plugin<Project> {
         task.group = "versioning"
         task.description =
             "Side effect: publish draft GitHub release via gh CLI. Requires githubReleaseUpload to run first. Disabled for -SNAPSHOT versions or when githubReleaseDraft is false. Idempotent - skips if already published."
-        task.enabled = isGithubReleaseEnabled(isSnapshot, tagger) && tagger.githubReleaseDraft.get()
+        task.enabled = isGithubReleaseEnabled(isSnapshot, tagger)
+        task.inputs.property("githubReleaseDraft", tagger.githubReleaseDraft)
+        task.onlyIf("GitHub release is a draft") { it.inputs.properties["githubReleaseDraft"] == true }
         task.dependsOn(githubReleaseUpload)
         task.commandLine("sh", "-c", publishReleaseScript(project.version))
     }

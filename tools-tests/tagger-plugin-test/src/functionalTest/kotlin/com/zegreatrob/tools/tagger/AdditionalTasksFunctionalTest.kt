@@ -11,6 +11,72 @@ import kotlin.test.Test
 
 class AdditionalTasksFunctionalTest {
     @Test
+    fun generatedNonDraftSettingSkipsDraftPublication() = publicationWithGeneratedDraftSetting(
+        false,
+        "SKIPPED",
+        emptyList(),
+    )
+
+    @Test
+    fun generatedDraftSettingEnablesDraftPublication() = publicationWithGeneratedDraftSetting(
+        true,
+        "SUCCESS",
+        listOf("release", "edit", "1.2.3", "--draft=false"),
+    )
+
+    private fun publicationWithGeneratedDraftSetting(
+        draft: Boolean,
+        expectedOutcome: String,
+        expectedArguments: List<String>,
+    ) = setup(object {
+        val projectDir = createTempDirectory()
+        val output = File(projectDir, "gh-called.txt")
+    }) {
+        writeSettings(projectDir)
+        val bin = File(projectDir, "bin").apply { mkdirs() }
+        File(bin, "gh").apply {
+            writeText(
+                """
+                #!/bin/sh
+                if [ "$2" = "view" ]; then echo true; exit 0; fi
+                printf '%s\n' "$@" > "${output.absolutePath}"
+                """.trimIndent(),
+            )
+            setExecutable(true)
+        }
+        File(projectDir, "build.gradle.kts").writeText(
+            """
+            plugins { id("com.zegreatrob.tools.tagger") }
+            val setting = layout.buildDirectory.file("draft-setting.txt")
+            val generateSetting = tasks.register<WriteProperties>("generateDraftSetting") {
+                destinationFile.set(setting)
+                property("draft", "$draft")
+            }
+            tagger {
+                releaseBranch = "master"
+                githubReleaseEnabled.set(true)
+                githubReleaseDraft.set(providers.fileContents(setting).asText.map { it.contains("draft=true") })
+            }
+            tasks.named<Exec>("githubReleasePublish") {
+                dependsOn(generateSetting)
+                environment("PATH", "$projectDir/bin:" + System.getenv("PATH"))
+            }
+            """.trimIndent(),
+        )
+    } exercise {
+        GradleRunner.create()
+            .withProjectDir(File(projectDir))
+            .withArguments("githubReleasePublish", "-x", "githubReleaseUpload", "-Pversion=1.2.3", "--configuration-cache", "--console=plain")
+            .build()
+    } verifyAnd { result ->
+        result.task(":generateDraftSetting")?.outcome?.name.assertIsEqualTo("SUCCESS")
+        result.task(":githubReleasePublish")?.outcome?.name.assertIsEqualTo(expectedOutcome)
+        (output.takeIf { it.exists() }?.readLines() ?: emptyList()).assertIsEqualTo(expectedArguments)
+    } teardown {
+        removeDirectory(projectDir)
+    }
+
+    @Test
     fun generatedDraftSettingControlsReleaseCreation() = setup(object {
         val projectDir = createTempDirectory()
         val output = File(projectDir, "gh-create-arguments.txt")

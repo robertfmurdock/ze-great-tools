@@ -66,13 +66,24 @@ Resolve all 24 Gradle audit findings and verify both standing advisories across 
 
 - **Date** 2026-11-11
 - **Branch and baseline commit** `main` at `29fca6d5206eef625e58a24e02e7a797e9cc89a1`
-- **Last verified commit** `f4f43063` (lazy release asset wiring).
-- **Uncommitted work** L1 release creation arguments, regression tests, and card progress.
-- **Status** W1, W2, W3, A1, T1, T2, T3, and T5 verified and pushed. T4 requires producer-aware lazy report wiring. T6, L2, L3, and L5 pushed. L1 release creation is under validation.
+- **Last verified commit** `dad5399b` (lazy release creation arguments).
+- **Uncommitted work** L1 draft publication wiring, regression tests, and card progress; validation is complete and ready to commit.
+- **Status** W1, W2, W3, A1, T1, T2, T3, and T5 verified and pushed. T4 requires producer-aware lazy report wiring. T6, L2, L3, and L5 pushed. L1 draft publication is under validation.
 - **Blockers** None recorded.
-- **Next** Complete the L1 release creation slice, then address remaining L1 provider reads and T4.
+- **Next** Complete the L1 draft publication slice, then address remaining L1 provider reads and T4.
 
 ## Implementation Notes
+
+### 2026-11-11 · L1 draft publication decision
+
+- Release creation arguments were pushed as `dad5399b`. A generated non-draft setting reproduced the publication task’s eager draft read. Publication now evaluates the declared input at execution and skips a non-draft release. Its configuration-time `enabled` value remains true until that execution-time check.
+- Targeted tagger unit tests and generated draft/non-draft functional tests passed with a stubbed `gh` executable. An initial targeted run was interrupted by a Gradle daemon stop; the retry passed. Full validation is in progress.
+
+### 2026-11-11 · L1 draft publication validation
+
+- `./gradlew :tools-tests:tagger-plugin-test:functionalTest --tests '*AdditionalTasksFunctionalTest*' -q --console=plain` passed for generated draft and non-draft settings, including configuration-cache reuse.
+- `./gradlew check -q --console=plain` passed. The release task remains eligible during configuration and skips at execution when the generated draft setting is false; draft publication executes with the resolved setting and expected `gh release edit` arguments.
+- This slice is ready to commit. Remaining L1 provider reads and the other unchecked audit items remain open.
 
 ### 2026-11-11 · L1 release creation arguments
 
