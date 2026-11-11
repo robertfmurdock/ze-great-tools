@@ -4,7 +4,9 @@ import org.apache.tools.ant.filters.ReplaceTokens
 import org.gradle.crypto.checksum.Checksum
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootPlugin
+import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsSetupTask
 import org.jetbrains.kotlin.gradle.targets.js.npm.npmProject
+import org.jetbrains.kotlin.gradle.targets.js.npm.tasks.KotlinNpmInstallTask
 
 plugins {
     id("org.jetbrains.kotlin.multiplatform")
@@ -140,9 +142,9 @@ tasks {
 }
 
 NodeJsRootPlugin.apply(project.rootProject)
-project.rootProject.tasks.named("kotlinNpmInstall") {
+project.rootProject.tasks.withType<KotlinNpmInstallTask>().configureEach {
     dependsOn(gradle.includedBuild("tools").task(":kotlinNpmInstall"))
 }
-project.rootProject.tasks.named("kotlinNodeJsSetup") {
-    dependsOn(provider { gradle.includedBuild("tools").task(":kotlinNodeJsSetup") })
+project.rootProject.tasks.withType<NodeJsSetupTask>().configureEach {
+    dependsOn(gradle.includedBuild("tools").task(":kotlinNodeJsSetup"))
 }

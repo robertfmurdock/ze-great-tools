@@ -24,7 +24,7 @@ Resolve all 24 Gradle audit findings and verify both standing advisories across 
 
 ### 2. Task wiring and outputs `[patch]`
 
-- [ ] **T1 · Medium · Unique outputs.** `tools-plugins/src/main/kotlin/com/zegreatrob/tools/plugins/reports.gradle.kts:14` and `NpmCliPlugin.kt:120` in the same directory. Consolidate producers or stage distinct outputs. Verify one owner per destination and compare collected report paths and npm package contents with the baseline. [Gradle](https://docs.gradle.org/current/userguide/best_practices_tasks.html#use_unique_output_files_and_directories)
+- [x] **T1 · Medium · Unique outputs.** `tools-plugins/src/main/kotlin/com/zegreatrob/tools/plugins/reports.gradle.kts:14` and `NpmCliPlugin.kt:120` in the same directory. Consolidate producers or stage distinct outputs. Verify one owner per destination and compare collected report paths and npm package contents with the baseline. [Gradle](https://docs.gradle.org/current/userguide/best_practices_tasks.html#use_unique_output_files_and_directories)
 - [x] **T2 · High · Configuration-time filesystem work.** `tools-plugins/src/main/kotlin/com/zegreatrob/tools/plugins/reports.gradle.kts:29`. Move report directory creation to execution. From a clean output tree, verify `help` leaves the report output absent and `collectResults` creates it as needed. [Gradle](https://docs.gradle.org/current/userguide/best_practices_performance.html#avoid_computations_in_configuration_phase)
 - [x] **T3 · Medium · Explicit action-task dependencies.** `command-line-tools/{digger-cli,tagger-cli}/build.gradle.kts` at the template-copy and JVM smoke-test wiring, and `tools/fingerprint-plugin/src/main/kotlin/com/zegreatrob/tools/FingerprintPlugin.kt:103`. Connect producer outputs to consumer inputs and remove redundant edges. Request the consumers alone and verify the required templates, distributions, and fingerprints are built first. Preserve lifecycle and mandatory ordering semantics. [Gradle](https://docs.gradle.org/current/userguide/best_practices_tasks.html#avoid_depends_on)
 - [ ] **T4 · Medium · Lazy output composition.** `tools/dashboard-test-summary/src/main/kotlin/com/zegreatrob/tools/dashboard/DashboardTestSummaryPlugin.kt:61`. Lazily compose JUnit XML output locations while preserving the producing task dependency. Verify the collector reads a customized XML directory and respects disabled XML reporting. [Gradle](https://docs.gradle.org/current/userguide/best_practices_tasks.html#map_versus_flatmap)
@@ -66,13 +66,19 @@ Resolve all 24 Gradle audit findings and verify both standing advisories across 
 
 - **Date** 2026-11-11
 - **Branch and baseline commit** `main` at `29fca6d5206eef625e58a24e02e7a797e9cc89a1`
-- **Last verified commit** `5d00a71b` (task metadata and dashboard regression).
-- **Uncommitted work** T1 collection layout, regression test, and card progress.
-- **Status** W1, W2, W3, A1, T2, T3, and T5 verified and pushed. T1 collision fix validated locally. T4 requires producer-aware lazy report wiring.
+- **Last verified commit** `ced64363` (distinct report collection layout).
+- **Uncommitted work** T6 typed Node and npm task wiring and card progress.
+- **Status** W1, W2, W3, A1, T1, T2, T3, and T5 verified and pushed. T4 requires producer-aware lazy report wiring. T6 is under validation.
 - **Blockers** None recorded.
-- **Next** Commit and push T1, then continue investigating T4 and subsequent slices.
+- **Next** Complete T6 validation, then continue investigating T4 and later slices.
 
 ## Implementation Notes
+
+### 2026-11-11 · T6 Node and npm task wiring
+
+- T1 was pushed as `ced64363`. A clean Digger JavaScript package build passed after replacing local name-based task lookups with Kotlin task type configuration. Included-build task paths remain strings because the composite-build API requires task paths.
+- A dry run without the wiring omitted the included build’s Node and npm setup tasks. After type-based wiring, `./gradlew :command-line-tools:kotlinNpmInstall --dry-run --console=plain` included both. Full validation is in progress.
+- `./gradlew check -q --console=plain` passed. Gradle printed a local FSEvents stream warning but completed successfully. T6 awaits commit and push.
 
 ### 2026-11-11 · T1 distinct collection directories
 
