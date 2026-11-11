@@ -1,7 +1,7 @@
 # Dashboard Test Summaries
 
 ## Goal
-Publish a Gradle settings plugin that aggregates JUnit XML across participating builds and use it for Ze Great Tools' CI evidence.
+Publish a Gradle project plugin that aggregates JUnit XML per build, with explicit top-level wiring for participating composite builds, and use it for Ze Great Tools' CI evidence.
 
 ## Constraints
 - Semver intent: `[minor]` for the opt-in plugin, `[none]` for CI adoption.
@@ -15,14 +15,24 @@ Publish a Gradle settings plugin that aggregates JUnit XML across participating 
 - [x] Prove composite discovery, deduplication, configuration cache, and failure behavior.
 - [x] Wire publication, fingerprinting, and consumer documentation. Validate and commit the opt-in plugin.
 - [x] Separate the root wiring and strengthen the composite fixture before adoption.
-- [x] Relocate the dashboard settings plugin into the shared `tools-plugins` build so CI resolves the current checkout like the other repository plugins; enroll the repository composite, verify the CI artifact, and commit separately.
+- [x] Relocate the dashboard plugin into the shared `tools-plugins` build so CI resolves the current checkout like the other repository plugins.
+- [x] Replace the settings-plugin design with a project plugin and explicit included-build aggregation wiring.
 - [ ] Complete final refactor review and move card after the work is pushed.
 
 ## Current State
 - **Commit SHA**: 86f21d7b adds the plugin. The next checkpoint refactors its wiring and tests.
-- **Uncommitted work**: None after the source-resolved adoption commit.
+- **Uncommitted work**: Project-plugin migration and work-card updates are uncommitted.
 - **Blockers**: Full validation currently reports four pre-existing `tagger-cli` JS/JVM test failures. The implementation and focused dashboard validation pass; the unrelated tagger failures remain for a separate follow-up.
 - **Date**: 2026-11-10
+
+### 2026-11-11: Design direction changed to project plugin
+- The settings-plugin design was limiting because settings evaluation has awkward access to consumer version catalogs and combines build registration, project configuration, and aggregation in one lifecycle scope.
+- The plugin now applies to `Project`. Applying it to a build root configures that build's projects, writes `build/dashboard/build-test-counts.json`, and registers the local `dashboardTestSummary` task.
+- Composite builds remain explicit: the top-level build supplies included-build count files through `dashboardTestSummary.includedCounts` and depends on each included build's `dashboardTestSummaryCounts` task via `gradle.includedBuild(...).task(...)`.
+- Each participating build applies the plugin in its root `build.gradle.kts`; settings files retain only ordinary `includeBuild(...)` declarations needed by the repository's existing composite/plugin wiring.
+- This gives consumers normal project-plugin and version-catalog ergonomics at the cost of requiring explicit root/CI wiring for included builds.
+- Focused TestKit coverage passes 5/5, including failed tests, stale XML handling, explicit included-build aggregation, and configuration-cache reuse.
+- The full check still reaches the four existing unrelated `tagger-cli` JS/JVM failures.
 
 ## Implementation Notes
 
