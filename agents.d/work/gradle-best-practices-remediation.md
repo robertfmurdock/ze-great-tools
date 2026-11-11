@@ -54,7 +54,7 @@ Resolve all 24 Gradle audit findings and verify both standing advisories across 
 - [ ] **S3 · Medium · Sources at an included build root.** `tools-plugins/build.gradle.kts:13` and `tools-plugins/src/main/`. Move convention and npm plugin sources to a subproject of the included build. Verify all existing plugin IDs resolve from the root composite and independently from the consuming builds. [Gradle](https://docs.gradle.org/current/userguide/best_practices_structuring_builds.html#no_source_in_root)
 - [x] **S4 · Medium · Unpinned CLI toolchains.** `command-line-tools/{digger-cli,tagger-cli}/build.gradle.kts:60`. Pin JDK 21 for both CLI archive producers. Verify the selected toolchain and compare JVM distribution SHA-256 hashes across clean builds with different launcher JDKs. [Gradle](https://docs.gradle.org/current/userguide/best_practices_security.html#builds_should_be_reproducible)
 - [x] **S5 · Recommendation · Unstable API inventory.** `tools-plugins/src/main/kotlin/com/zegreatrob/tools/plugins/jvm.gradle.kts:19` and `tools/fingerprint-plugin/build.gradle.kts:1`. Record the experimental Kotlin APIs and unstable Gradle APIs the build relies on, why they are needed, and what to recheck on upgrades. [Gradle](https://docs.gradle.org/current/userguide/best_practices_general.html#consider_use_of_incubating_apis_carefully)
-- [ ] **A2 · Advisory · Isolated publishing.** `tools/build.gradle.kts:53` and `tools-plugins/src/main/kotlin/com/zegreatrob/tools/plugins/publish.gradle.kts:6` establish publication scope. Verify the publishing environment starts fresh and isolated with build caching disabled and without reused outputs. Record the configuration evidence and close any gap without triggering an external publication during validation. [Gradle](https://docs.gradle.org/current/userguide/best_practices_security.html#build-published-artifacts-securely)
+- [x] **A2 · Advisory · Isolated publishing.** `tools/build.gradle.kts:53` and `tools-plugins/src/main/kotlin/com/zegreatrob/tools/plugins/publish.gradle.kts:6` establish publication scope. Verify the publishing environment starts fresh and isolated with build caching disabled and without reused outputs. Record the configuration evidence and close any gap without triggering an external publication during validation. [Gradle](https://docs.gradle.org/current/userguide/best_practices_security.html#build-published-artifacts-securely)
 
 ### Closeout
 
@@ -68,7 +68,7 @@ Resolve all 24 Gradle audit findings and verify both standing advisories across 
 - **Branch and baseline commit** `main` at `29fca6d5206eef625e58a24e02e7a797e9cc89a1`
 - **Last verified commit** `78343062` (remediation handoff).
 - **Uncommitted work** IDEA files and existing build-file changes have unrelated ownership; no remediation source changes are pending.
-- **Status** W1, W2, W3, A1, T1, T2, T3, T5, T6, L2, L3, and L5 pushed. L1 is partially complete. T4, Git test environment isolation, D1, D2, D3, D4, D5, S1, S4, and S5 pushed. L4 library ordering partially complete.
+- **Status** W1, W2, W3, A1, T1, T2, T3, T5, T6, L2, L3, L5, and A2 pushed. L1 is partially complete. T4, Git test environment isolation, D1, D2, D3, D4, D5, S1, S4, and S5 pushed. L4 library ordering partially complete.
 - **Blockers** None recorded.
 - **Next** S2 duplicated convention extraction.
 
@@ -104,6 +104,10 @@ Resolve all 24 Gradle audit findings and verify both standing advisories across 
 ### 2026-11-11 · L4 npm lifecycle investigation
 
 - A callback on `org.jetbrains.kotlin.multiplatform` was tested as a replacement for the npm plugin's `afterEvaluate` hook. It ran before the Kotlin JS target registered the `kotlinNodeJs` extension and failed all three npm convention tests. The change was reverted without committing; the hook remains open until it can be attached to the JS target lifecycle itself.
+
+### 2026-11-11 · A2 isolated publishing
+
+- Ran `:tools:git-adapter:publishToMavenLocal --dry-run` with a fresh temporary Gradle user home, `--no-build-cache`, and `--no-configuration-cache`. The complete local publication graph resolved, including POM, metadata, sources, Javadoc, signing, and all three publications. No external repository or publication was contacted.
 
 ### 2026-11-11 · L4 library signing order
 
