@@ -17,10 +17,6 @@ tasks {
     }
 }
 
-afterEvaluate {
-    tasks {
-        withType<PublishToMavenRepository> {
-            mustRunAfter(withType<Sign>())
-        }
-    }
+tasks.withType<PublishToMavenRepository>().configureEach {
+    mustRunAfter(tasks.withType<Sign>())
 }

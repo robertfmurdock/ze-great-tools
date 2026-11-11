@@ -49,7 +49,7 @@ Resolve all 24 Gradle audit findings and verify both standing advisories across 
 
 ### 5. Build structure and reproducibility `[patch]`
 
-- [ ] **S1 · Medium · Imperative plugin application.** `tools-tests/build.gradle.kts:20`. Apply the test conventions through consuming projects' `plugins` blocks. Verify JVM and multiplatform test setup, including Testmints BOM placement. [Gradle](https://docs.gradle.org/current/userguide/best_practices_general.html#use_the_plugins_block)
+- [x] **S1 · Medium · Imperative plugin application.** `tools-tests/build.gradle.kts:20`. Apply the test conventions through consuming projects' `plugins` blocks. Verify JVM and multiplatform test setup, including Testmints BOM placement. [Gradle](https://docs.gradle.org/current/userguide/best_practices_general.html#use_the_plugins_block)
 - [ ] **S2 · Medium · Duplicated conventions.** `command-line-tools/build.gradle.kts:40`, `tools-tests/build.gradle.kts:47`, and the checksum setups in `command-line-tools/{digger-cli,tagger-cli}/build.gradle.kts`. Consolidate shared lifecycle, Yarn, checksum, and packaging logic in `tools-plugins`. Verify each behavior has one implementation and both CLIs still produce the same deliverables. [Gradle](https://docs.gradle.org/current/userguide/best_practices_structuring_builds.html#use_convention_plugins)
 - [ ] **S3 · Medium · Sources at an included build root.** `tools-plugins/build.gradle.kts:13` and `tools-plugins/src/main/`. Move convention and npm plugin sources to a subproject of the included build. Verify all existing plugin IDs resolve from the root composite and independently from the consuming builds. [Gradle](https://docs.gradle.org/current/userguide/best_practices_structuring_builds.html#no_source_in_root)
 - [x] **S4 · Medium · Unpinned CLI toolchains.** `command-line-tools/{digger-cli,tagger-cli}/build.gradle.kts:60`. Pin JDK 21 for both CLI archive producers. Verify the selected toolchain and compare JVM distribution SHA-256 hashes across clean builds with different launcher JDKs. [Gradle](https://docs.gradle.org/current/userguide/best_practices_security.html#builds_should_be_reproducible)
@@ -66,13 +66,19 @@ Resolve all 24 Gradle audit findings and verify both standing advisories across 
 
 - **Date** 2026-11-11
 - **Branch and baseline commit** `main` at `29fca6d5206eef625e58a24e02e7a797e9cc89a1`
-- **Last verified commit** `823823d2` (CLI and shared-test JVM toolchains).
-- **Uncommitted work** S1 test-suite convention, consuming build scripts, tests, and card progress. IDEA files have unrelated changes.
-- **Status** W1, W2, W3, A1, T1, T2, T3, T5, T6, L2, L3, and L5 pushed. L1 is partially complete. T4, Git test environment isolation, and D3, D5, and S4 pushed. S1 is under validation.
+- **Last verified commit** `efe87aea` (explicit test-suite convention).
+- **Uncommitted work** L4 library publishing ordering cleanup and card progress. IDEA files have unrelated changes.
+- **Status** W1, W2, W3, A1, T1, T2, T3, T5, T6, L2, L3, and L5 pushed. L1 is partially complete. T4, Git test environment isolation, and D3, D5, S4, and S1 pushed. L4 library ordering is under investigation.
 - **Blockers** None recorded.
-- **Next** Validate the explicit test-suite convention, then address remaining L1 provider reads and later slices.
+- **Next** Remove the library publishing ordering hook and verify the existing task graph.
 
 ## Implementation Notes
+
+### 2026-11-11 · L4 library signing order
+
+- S1 was pushed as signed commit `efe87aea`. The library convention’s `afterEvaluate` block only configures ordering between signing and publishing tasks. A baseline dry run of Git Adapter’s JVM publication and JS signing tasks placed both sign tasks before publication.
+- This slice preserves task behavior and output. Compare the real Gradle task graph before and after rather than adding a test that mirrors the configuration. Publishing is exercised with dry-run only.
+- Replaced the hook with lazy task configuration. The dry-run order remained JS signing, JVM signing, then JVM publication. Git Adapter's generated JVM POM retains its name, description, URL, license, developer, and SCM fields, and its Javadoc JAR was generated. `./gradlew check -q --console=plain` passed. This partial L4 slice awaits commit and push.
 
 ### 2026-11-11 · S1 explicit test-suite convention
 
