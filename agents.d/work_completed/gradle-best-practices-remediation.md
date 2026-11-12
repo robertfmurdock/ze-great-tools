@@ -135,11 +135,11 @@ TestKit coverage, root naming, and the absence of `buildSrc` are satisfied.
 
 - **Date** 2026-11-12
 - **Branch and source baseline commit** `main`, `14b2a847` (`origin/main` before this remediation slice).
-- **Last verified and pushed commit** `6dc893ae`; fresh-home and normal-home composite checks passed before the documentation-only state update.
-- **Uncommitted work** Final relocation of this card to `agents.d/work_completed/`.
+- **Last verified implementation commit** `21c816ab`; fresh-home and normal-home composite checks passed. The review/state record (`6dc893ae`) and completed-card move (`b7863def`) are also pushed.
+- **Uncommitted work** None.
 - **Status** All historical findings and advisories have a completed or not-implemented disposition. AR5 is newly complete. Remaining NPM lifecycle/provider reads, plugin repository convention extraction, task-name constants, and source-at-root restructuring are explicitly not implemented with evidence below.
 - **Blockers** None.
-- **Next** Move this pushed card to `agents.d/work_completed/`.
+- **Next** None; card is complete and filed in `agents.d/work_completed/`.
 
 ## Implementation Notes
 
@@ -159,7 +159,7 @@ TestKit coverage, root naming, and the absence of `buildSrc` are satisfied.
 
 ### 2026-11-12 · Push confirmation
 
-- Commits `21c816ab` and `6dc893ae` were pushed to `origin/main`. SSH authentication was unavailable, so the authorized push used the authenticated GitHub CLI credential helper over HTTPS without changing the saved remote. GitHub reported the expected bypass of its required `Build` status check; local full checks and the fresh-cache check passed.
+- Commits `21c816ab`, `6dc893ae`, and `b7863def` were pushed to `origin/main`; GitHub API confirmed remote `main` at `b7863def`. SSH authentication was unavailable, so the authorized pushes used the authenticated GitHub CLI credential helper over HTTPS without changing the saved remote. GitHub reported the expected bypass of its required `Build` status check; local full checks and the fresh-cache check passed.
 
 ### 2026-11-12 · Lazy NPM target experiment
 
