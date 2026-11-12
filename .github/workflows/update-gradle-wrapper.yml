@@ -4,22 +4,28 @@ on:
   schedule:
     - cron: "0 14 * * *"
   workflow_dispatch:
+permissions:
+  contents: read
+
 jobs:
   update-gradle-wrapper:
+    permissions:
+      contents: write
+      pull-requests: write
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
           fetch-depth: '25'
       - name: Set up JDK
-        uses: actions/setup-java@v5
+        uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
         with:
           distribution: 'zulu'
           java-version: '21'
       - name: Setup Current Gradle
         id: gradle
-        uses: gradle/actions/setup-gradle@v6
+        uses: gradle/actions/setup-gradle@8da46b539cd8fe6ab27ca75128919a18d757604c # v6
         with:
           gradle-version: current
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
@@ -28,12 +34,12 @@ jobs:
           GRADLE_VERSION: ${{ steps.gradle.outputs.gradle-version }}
         run: gradle wrapper --gradle-version "$GRADLE_VERSION" --distribution-type bin --gradle-distribution-sha256-sum "$(curl -fsSL "https://services.gradle.org/distributions/gradle-$GRADLE_VERSION-bin.zip.sha256")"
       - name: Validate updated wrapper
-        uses: gradle/actions/wrapper-validation@v6
+        uses: gradle/actions/wrapper-validation@8da46b539cd8fe6ab27ca75128919a18d757604c # v6
       - name: Update Yarn Lock
         run: ./gradlew kotlinUpgradeYarnLock --no-configuration-cache --no-build-cache
       - name: Create Pull Request
         id: cpr
-        uses: peter-evans/create-pull-request@v8
+        uses: peter-evans/create-pull-request@3ffccacd46053766916f087ce41d627c0b8cf2d1 # v8
         with:
           branch: "create-pull-request/${{github.job}}/${{github.run_id}}"
           commit-message: "[patch] ${{github.workflow}}"
