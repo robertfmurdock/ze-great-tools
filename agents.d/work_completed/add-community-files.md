@@ -22,7 +22,6 @@ Add standard community files (CONTRIBUTING.md, CODE_OF_CONDUCT.md, issue templat
 - Added Contributor Covenant 2.1 in `CODE_OF_CONDUCT.md`; reports can be directed through the maintainer's GitHub contact links.
 - Added bug report and feature request issue forms in `.github/ISSUE_TEMPLATE/`. Both parse as YAML and use GitHub's documented location and required form metadata.
 - Verified local links, the Contributor Covenant and maintainer profile links, Markdown formatting, grammar (IDEA: no reported problems), YAML parsing, and `git diff --check`.
-- The GitHub new-issue chooser cannot display these uncommitted local files. GitHub documents that forms appear after they are committed to the default branch; confirm the chooser after merge before closing this card.
+- GitHub's contents API confirms both YAML forms are present on `main`. The unauthenticated new-issue chooser redirects to sign-in, so its rendered choices could not be inspected from this session.
+- Maintainer confirmed both forms appear in GitHub's authenticated new-issue chooser.
 
-## Resume Note
-Implementation is ready for review. After these files reach the default branch, open the repository's new-issue chooser and confirm both forms appear, then move this card to `agents.d/work_completed/`.
