@@ -121,12 +121,12 @@ TestKit coverage, root naming, and the absence of `buildSrc` are satisfied.
 ## Current State
 
 - **Date** 2026-11-12
-- **Branch and baseline commit** `main` at `7838f055` (`origin/main` is one commit behind).
-- **Last verified commit** `7838f055` (baseline `./gradlew check -q --console=plain` passed).
-- **Uncommitted work** AR1a decision, an NPM plugin-order regression test, and early `copyReadme` registration plus task-provider wiring in `NpmCliPlugin.kt`. Focused NPM tests and the full check pass.
+- **Branch and source baseline commit** `main`, `02d1f12f` (pushed to `origin/main`; this handoff note follows it).
+- **Last verified commit** `02d1f12f` (focused NPM tests and `./gradlew check -q --console=plain` passed before commit).
+- **Uncommitted work** None after this handoff note is committed.
 - **Status** W1, W2, W3, A1, T1, T2, T3, T5, T6, L2, L3, L5, and A2 pushed. L1 is partially complete. T4, Git test environment isolation, D1, D2, D3, D4, D5, S1, S4, and S5 pushed. L4 library ordering partially complete.
 - **Blockers** None recorded.
-- **Next** Investigate a task-registration callback as a later Kotlin/Node hook, or retain a documented narrow `afterEvaluate` exception. The NPM source and test changes need full validation, commit, and push before related findings can close.
+- **Next** Investigate a task-registration callback as a later Kotlin/Node hook, or retain a documented narrow `afterEvaluate` exception. AR1a and the early task registration are pushed; AR1/AR2 remain open.
 
 ## Implementation Notes
 
@@ -135,6 +135,7 @@ TestKit coverage, root naming, and the absence of `buildSrc` are satisfied.
 - Added a TestKit regression applying the NPM plugin before Kotlin, configuring `copyReadme` during project evaluation, then generating package metadata twice with the configuration cache. It failed first because `copyReadme` was not registered until `afterEvaluate`; early registration via `pluginManager.withPlugin` made it pass. The fixture needed a normal Maven Central dependency repository to run `jsPackageJson`.
 - Tried replacing `afterEvaluate` with `KotlinMultiplatformExtension.targets.withType<KotlinJsIrTarget>().configureEach`. The real Digger CLI build failed while configuring its JS target because the `kotlinNodeJs` extension was not registered yet. Restored the existing hook; the focused NPM suite passes again. The target callback is too early for this package setup, but a later task callback remains an untested alternative. AR1/AR2 remain open.
 - `./gradlew :tools-plugins:formatKotlin -q --console=plain`, `./gradlew :tools-plugins:test --tests '*NpmCliPluginTest' -q --console=plain`, and `./gradlew check -q --console=plain` passed after restoring the working hook. `git diff --check` passed.
+- The source, regression test, and AR1a decision were committed as `02d1f12f` and pushed to `origin/main`. GitHub reported bypass of its required Build status check.
 
 ### 2026-11-12 · AR1a decision
 
