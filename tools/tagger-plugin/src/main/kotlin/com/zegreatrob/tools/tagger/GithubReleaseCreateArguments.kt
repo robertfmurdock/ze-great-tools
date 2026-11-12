@@ -15,11 +15,41 @@ abstract class GithubReleaseCreateArguments : CommandLineArgumentProvider {
         val draftFlag = if (draft.get()) "--draft " else ""
         val script = """
             version="$1"
-            if gh release view "${'$'}version" >/dev/null 2>&1; then
-                echo "Release ${'$'}version already exists, skipping creation"
-            else
-                gh release create "${'$'}version" $draftFlag--title "${'$'}version" --notes "${'$'}version"
-            fi
+
+            attempt_release() {
+                if diagnostic=$(gh release view "${'$'}version" 2>&1); then
+                    echo "Release ${'$'}version already exists, skipping creation"
+                    return 0
+                fi
+                [ "${'$'}diagnostic" = "release not found" ] || return 1
+                diagnostic=$(gh release create "${'$'}version" --verify-tag $draftFlag--title "${'$'}version" --notes "${'$'}version" 2>&1) || return 1
+                printf '%s\n' "${'$'}diagnostic"
+            }
+
+            matches_diagnostic() {
+                printf '%s\n' "${'$'}diagnostic" | LC_ALL=C grep -Eiq "$1"
+            }
+
+            retry_delay() {
+                if matches_diagnostic 'secondary rate limit'; then
+                    echo 60
+                elif matches_diagnostic 'HTTP (500|502|503|504)([^0-9]|$)|connection reset|i/o timeout|context deadline exceeded|connection timed out|TLS handshake timeout|remote error: tls: internal error'; then
+                    echo "$1"
+                else
+                    return 1
+                fi
+            }
+
+            for delay in 1 2 4 final; do
+                if attempt_release; then exit 0; fi
+                [ "${'$'}delay" != final ] || break
+                wait_seconds=$(retry_delay "${'$'}delay") || break
+                printf 'Retrying GitHub release %s after: %s\n' "${'$'}version" "${'$'}diagnostic" >&2
+                jitter=$(od -An -N1 -tu1 /dev/urandom | tr -d ' ')
+                sleep "${'$'}wait_seconds.${'$'}(printf '%03d' "${'$'}((jitter * 1000 / 256))")" || exit 1
+            done
+            printf '%s\n' "${'$'}diagnostic" >&2
+            exit 1
         """.trimIndent()
         return listOf("-c", script, "sh", version.get())
     }
