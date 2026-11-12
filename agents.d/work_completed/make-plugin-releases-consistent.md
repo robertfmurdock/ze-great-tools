@@ -16,5 +16,7 @@ Fix the release process so every intended plugin, including `com.zegreatrob.tool
 ## Progress
 The Plugin Portal reports `3.7.3` as the latest for `com.zegreatrob.tools.dashboard-test-summary`. The `3.8.5` releases for Digger, Fingerprint, and Tagger do not establish that the dashboard plugin was published. The task is to correct future release consistency, not to publish prior versions.
 
-## Resume note
-Inspect the current release configuration and workflow, compare how each intended plugin is included, then implement and verify a forward-looking fix. Record any release-policy decision that prevents a consistent fix and the next step needed.
+The omission was caused by the dashboard plugin living in the separate `tools-plugins` included build, which the root release did not invoke before the dashboard-specific dependency was added. Gradle's `-Pversion` is visible to included builds (confirmed as `3.8.6` in the dashboard project). Added a `tools-plugins:release` aggregate that discovers all `publishPlugins` tasks in that build; root stable releases now invoke it, following the existing `tools:release` pattern. This removes the project-specific root hook so future Portal plugins in the build join release automatically.
+
+Evidence: `./gradlew release --dry-run -q --console=plain -Pversion=3.8.6` includes dashboard marker metadata/POM generation and `publishPlugins`, as well as `tools-plugins:release`; `:tools-plugins:dashboard-test-summary:properties` reports version `3.8.6`. The pre-fix root configuration in the history had no `tools-plugins` release dependency, which is the missing-plugin case. `./gradlew :tools-plugins:check -q --console=plain` and the repository-wide `./gradlew check -q --console=plain` pass. The full check took 4m16s because it runs nested Gradle functional tests. No publication was run.
+

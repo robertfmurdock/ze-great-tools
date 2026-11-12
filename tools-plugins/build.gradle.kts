@@ -39,6 +39,13 @@ dependencies {
 
 tasks {
     test { useJUnitPlatform() }
+    register("release") {
+        group = "publishing"
+        description = "Publishes every Gradle plugin in this build to the Gradle Plugin Portal"
+        if (!project.version.toString().contains("SNAPSHOT")) {
+            dependsOn(provider { getTasksByName("publishPlugins", true) })
+        }
+    }
     assemble { dependsOn(provider { (getTasksByName("assemble", true) - this).toList() }) }
     clean { dependsOn(provider { (getTasksByName("clean", true) - this).toList() }) }
     withType<FormatTask> {

@@ -78,10 +78,8 @@ tasks {
                 listOf(
                     gradle.includedBuild("tools").task(":closeAndReleaseSonatypeStagingRepository"),
                     gradle.includedBuild("command-line-tools").task(":tagger-cli:jsPublish"),
+                    gradle.includedBuild("tools-plugins").task(":release"),
                 )
-            })
-            dependsOn(provider {
-                gradle.includedBuild("tools-plugins").task(":dashboard-test-summary:publishPlugins")
             })
         }
         finalizedBy(currentContributionData)
