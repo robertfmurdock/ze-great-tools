@@ -34,25 +34,30 @@ abstract class GithubReleaseCreateArguments : CommandLineArgumentProvider {
                 printf '%s\n' "${'$'}diagnostic" | LC_ALL=C grep -Eiq "$1"
             }
 
-            retry_delay() {
+            classify_failure() {
                 if matches_diagnostic 'secondary rate limit'; then
-                    echo 60
+                    echo rate_limited
                 elif matches_diagnostic 'HTTP (500|502|503|504)([^0-9]|$)|connection reset|i/o timeout|context deadline exceeded|connection timed out|TLS handshake timeout|remote error: tls: internal error'; then
-                    echo "$1"
+                    echo transient
                 else
                     return 1
                 fi
             }
 
+            reconcile_create() {
+                [ "${'$'}failure" = transient ] && [ "${'$'}create_attempted" = true ] || return 1
+                (release_exists)
+            }
+
             for delay in 1 2 4 final; do
                 if attempt_release; then exit 0; fi
-                wait_seconds=$(retry_delay "${'$'}delay") || break
+                failure=$(classify_failure) || break
                 if [ "${'$'}delay" = final ]; then
-                    final_diagnostic="${'$'}diagnostic"
-                    if [ "${'$'}create_attempted" = true ] && [ "${'$'}wait_seconds" != 60 ] && release_exists; then exit 0; fi
-                    diagnostic="${'$'}final_diagnostic"
+                    if reconcile_create; then exit 0; fi
                     break
                 fi
+                wait_seconds="${'$'}delay"
+                if [ "${'$'}failure" = rate_limited ]; then wait_seconds=60; fi
                 printf 'Retrying GitHub release %s after: %s\n' "${'$'}version" "${'$'}diagnostic" >&2
                 jitter=$(od -An -N1 -tu1 /dev/urandom | tr -d ' ')
                 sleep "${'$'}wait_seconds.${'$'}(printf '%03d' "${'$'}((jitter * 1000 / 256))")" || exit 1

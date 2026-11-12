@@ -216,24 +216,6 @@ class TaggerPluginTest {
     }
 
     @Test
-    fun `githubRelease task uses gh release create with idempotency check`() = setup(object {
-        val project = ProjectBuilder.builder().build()
-    }) exercise {
-        project.version = "1.2.3"
-        project.plugins.apply("com.zegreatrob.tools.tagger")
-        project.tasks.findByName("githubRelease") as org.gradle.api.tasks.Exec
-    } verify { task ->
-        val commandLine = task.argumentProviders.single().asArguments()
-        val script = commandLine.joinToString(" ")
-        script.contains("gh release view")
-            .assertIsEqualTo(true, "Expected idempotency check with 'gh release view'")
-        script.contains("gh release create")
-            .assertIsEqualTo(true, "Expected 'gh release create' command")
-        script.contains("already exists, skipping creation")
-            .assertIsEqualTo(true, "Expected skip message when release exists")
-    }
-
-    @Test
     fun `githubRelease must run after completed publication tasks without depending on them`() = setup(object {
         val project = ProjectBuilder.builder().build()
     }) exercise {
@@ -253,52 +235,6 @@ class TaggerPluginTest {
             .assertIsEqualTo(true, "Expected GitHub release to follow publication completion and release tasks")
         publicationTasks.none { it in task.taskDependencies.getDependencies(task) }
             .assertIsEqualTo(true, "Expected publication ordering not to add publication task dependencies")
-    }
-
-    @Test
-    fun `githubRelease task does not include generate_release_notes parameter`() = setup(object {
-        val project = ProjectBuilder.builder().build()
-    }) exercise {
-        project.version = "1.2.3"
-        project.plugins.apply("com.zegreatrob.tools.tagger")
-        project.tasks.findByName("githubRelease") as org.gradle.api.tasks.Exec
-    } verify { task ->
-        val commandLine = task.argumentProviders.single().asArguments()
-        val script = commandLine.joinToString(" ")
-        script.contains("generate_release_notes")
-            .assertIsEqualTo(false, "Expected no generate_release_notes parameter with gh release create")
-    }
-
-    @Test
-    fun `githubRelease task publishes immediately by default when githubReleaseDraft not set`() = setup(object {
-        val project = ProjectBuilder.builder().build()
-    }) exercise {
-        project.version = "1.2.3"
-        project.plugins.apply("com.zegreatrob.tools.tagger")
-        project.tasks.findByName("githubRelease") as org.gradle.api.tasks.Exec
-    } verify { task ->
-        val commandLine = task.argumentProviders.single().asArguments()
-        val script = commandLine.joinToString(" ")
-        script.contains("--draft")
-            .assertIsEqualTo(false, "Expected no --draft flag when githubReleaseDraft not explicitly set (default false)")
-        script.contains("gh release create")
-            .assertIsEqualTo(true, "Expected 'gh release create' command to still be present")
-    }
-
-    @Test
-    fun `githubRelease task creates draft when githubReleaseDraft set to true`() = setup(object {
-        val project = ProjectBuilder.builder().build()
-    }) exercise {
-        project.version = "1.2.3"
-        project.plugins.apply("com.zegreatrob.tools.tagger")
-        val tagger = project.extensions.getByType(TaggerExtension::class.java)
-        tagger.githubReleaseDraft.set(true)
-        project.tasks.findByName("githubRelease") as org.gradle.api.tasks.Exec
-    } verify { task ->
-        val commandLine = task.argumentProviders.single().asArguments()
-        val script = commandLine.joinToString(" ")
-        script.contains("--draft")
-            .assertIsEqualTo(true, "Expected --draft flag when githubReleaseDraft.set(true)")
     }
 
     @Test

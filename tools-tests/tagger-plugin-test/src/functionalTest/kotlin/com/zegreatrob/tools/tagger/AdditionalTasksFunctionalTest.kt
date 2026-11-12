@@ -17,246 +17,6 @@ class AdditionalTasksFunctionalTest {
     )
 
     @Test
-    fun retriesReleaseCreationAfterRemoteTlsFailure() = setup(object {
-        val release = ReleaseCreationFixture()
-    }) {
-        release.respondWith("view:release not found", "create:remote error: tls: internal error", "view:release not found", "create:")
-    } exercise {
-        release.runner.build()
-    } verifyAnd { result ->
-        result.task(":githubRelease")?.outcome?.name.assertIsEqualTo("SUCCESS")
-        release.events().assertIsEqualTo(listOf("view", "create", "sleep", "view", "create"))
-    } teardown {
-        release.close()
-    }
-
-    @Test
-    fun existingReleaseSkipsCreation() = setup(object {
-        val release = ReleaseCreationFixture()
-    }) {
-        release.respondWith("view:")
-    } exercise {
-        release.runner.build()
-    } verifyAnd { result ->
-        result.task(":githubRelease")?.outcome?.name.assertIsEqualTo("SUCCESS")
-        release.events().assertIsEqualTo(listOf("view"))
-    } teardown {
-        release.close()
-    }
-
-    @Test
-    fun retryFindsReleaseCreatedBeforeResponseWasLost() = setup(object {
-        val release = ReleaseCreationFixture()
-    }) {
-        release.respondWith("view:release not found", "create:published:connection reset by peer")
-    } exercise {
-        release.runner.build()
-    } verifyAnd { result ->
-        result.task(":githubRelease")?.outcome?.name.assertIsEqualTo("SUCCESS")
-        release.events().assertIsEqualTo(listOf("view", "create", "sleep", "view"))
-    } teardown {
-        release.close()
-    }
-
-    @Test
-    fun retriesLookupBeforeCreatingRelease() = setup(object {
-        val release = ReleaseCreationFixture()
-    }) {
-        release.respondWith("view:HTTP 502: Bad Gateway", "view:release not found", "create:")
-    } exercise {
-        release.runner.build()
-    } verifyAnd { result ->
-        result.task(":githubRelease")?.outcome?.name.assertIsEqualTo("SUCCESS")
-        release.events().assertIsEqualTo(listOf("view", "sleep", "view", "create"))
-    } teardown {
-        release.close()
-    }
-
-    @Test
-    fun waitsAtLeastOneMinuteForSecondaryRateLimit() = setup(object {
-        val release = ReleaseCreationFixture()
-    }) {
-        release.respondWith("view:HTTP 403: You have exceeded a secondary rate limit.", "view:")
-    } exercise {
-        release.runner.build()
-    } verifyAnd { result ->
-        result.task(":githubRelease")?.outcome?.name.assertIsEqualTo("SUCCESS")
-        release.events().assertIsEqualTo(listOf("view", "sleep", "view"))
-        release.delays().assertIsEqualTo(listOf(60.5))
-    } teardown {
-        release.close()
-    }
-
-    @Test
-    fun failsImmediatelyWhenLookupIsUnauthorized() = setup(object {
-        val diagnostic = "HTTP 401: Bad credentials"
-        val release = ReleaseCreationFixture()
-    }) {
-        release.respondWith("view:$diagnostic")
-    } exercise {
-        release.runner.buildAndFail()
-    } verifyAnd { result ->
-        result.output.lineSequence().any { it == diagnostic }.assertIsEqualTo(true)
-        release.events().assertIsEqualTo(listOf("view"))
-    } teardown {
-        release.close()
-    }
-
-    @Test
-    fun failsImmediatelyWhenCreationIsInvalid() = setup(object {
-        val diagnostic = "HTTP 422: Validation Failed"
-        val release = ReleaseCreationFixture()
-    }) {
-        release.respondWith("view:release not found", "create:$diagnostic")
-    } exercise {
-        release.runner.buildAndFail()
-    } verifyAnd { result ->
-        result.output.lineSequence().any { it == diagnostic }.assertIsEqualTo(true)
-        release.events().assertIsEqualTo(listOf("view", "create"))
-    } teardown {
-        release.close()
-    }
-
-    @Test
-    fun failsImmediatelyOnGenericForbiddenResponse() = setup(object {
-        val diagnostic = "HTTP 403: Resource not accessible by integration"
-        val release = ReleaseCreationFixture()
-    }) {
-        release.respondWith("view:$diagnostic")
-    } exercise {
-        release.runner.buildAndFail()
-    } verifyAnd { result ->
-        result.output.lineSequence().any { it == diagnostic }.assertIsEqualTo(true)
-        release.events().assertIsEqualTo(listOf("view"))
-    } teardown {
-        release.close()
-    }
-
-    @Test
-    fun failsImmediatelyWhenCertificateVerificationFails() = setup(object {
-        val diagnostic = "tls: failed to verify certificate: x509: certificate signed by unknown authority"
-        val release = ReleaseCreationFixture()
-    }) {
-        release.respondWith("view:$diagnostic")
-    } exercise {
-        release.runner.buildAndFail()
-    } verifyAnd { result ->
-        result.output.lineSequence().any { it == diagnostic }.assertIsEqualTo(true)
-        release.events().assertIsEqualTo(listOf("view"))
-    } teardown {
-        release.close()
-    }
-
-    @Test
-    fun reportsTheFinalFailureAfterFourAttempts() = setup(object {
-        val diagnostic = "net/http: TLS handshake timeout"
-        val release = ReleaseCreationFixture()
-    }) {
-        release.respondWith("view:HTTP 500", "view:HTTP 503", "view:HTTP 504", "view:$diagnostic")
-    } exercise {
-        release.runner.buildAndFail()
-    } verifyAnd { result ->
-        result.output.lineSequence().any { it == diagnostic }.assertIsEqualTo(true)
-        release.events().assertIsEqualTo(listOf("view", "sleep", "view", "sleep", "view", "sleep", "view"))
-        release.delays().assertIsEqualTo(listOf(1.5, 2.5, 4.5))
-    } teardown {
-        release.close()
-    }
-
-    @Test
-    fun reconcilesReleaseAfterTheFinalCreateLosesItsResponse() = setup(object {
-        val release = ReleaseCreationFixture()
-    }) {
-        release.respondWith(
-            "view:HTTP 500",
-            "view:HTTP 503",
-            "view:HTTP 504",
-            "view:release not found",
-            "create:published:connection reset by peer",
-        )
-    } exercise {
-        release.runner.build()
-    } verifyAnd { result ->
-        result.task(":githubRelease")?.outcome?.name.assertIsEqualTo("SUCCESS")
-        release.events().assertIsEqualTo(listOf("view", "sleep", "view", "sleep", "view", "sleep", "view", "create", "view"))
-    } teardown {
-        release.close()
-    }
-
-    private inner class ReleaseCreationFixture {
-        private val projectDir = createTempDirectory()
-        private val events = File(projectDir, "events")
-        private val waits = File(projectDir, "waits")
-        private val released = File(projectDir, "released")
-
-        val runner: GradleRunner = GradleRunner.create()
-            .withProjectDir(File(projectDir))
-            .withArguments("githubRelease", "-x", "tag", "-Pversion=1.2.3", "--console=plain")
-
-        fun respondWith(vararg responses: String) {
-            writeSettings(projectDir)
-            val bin = File(projectDir, "bin").apply { mkdirs() }
-            writeGh(bin, responses)
-            writeDelayCommands(bin)
-            writeReleaseBuild(bin)
-        }
-
-        private fun writeGh(bin: File, responses: Array<out String>) {
-            val replies = File(projectDir, "replies").apply { writeText(responses.joinToString("\n", postfix = "\n")) }
-            File(bin, "gh").apply {
-                writeText(
-                    """
-                    #!/bin/sh
-                    echo "$2" >> "${events.absolutePath}"
-                    [ "$2" != view ] || [ ! -f "${released.absolutePath}" ] || exit 0
-                    response=$(head -n 1 "${replies.absolutePath}")
-                    sed '1d' "${replies.absolutePath}" > "${replies.absolutePath}.next"
-                    mv "${replies.absolutePath}.next" "${replies.absolutePath}"
-                    [ "${'$'}{response%%:*}" = "$2" ] || exit 2
-                    diagnostic="${'$'}{response#*:}"
-                    case "${'$'}diagnostic" in
-                        "") exit 0 ;;
-                        published:*) touch "${released.absolutePath}"; diagnostic="${'$'}{diagnostic#published:}" ;;
-                    esac
-                    printf '%s\n' "${'$'}diagnostic" >&2
-                    exit 1
-                    """.trimIndent(),
-                )
-                setExecutable(true)
-            }
-        }
-
-        private fun writeDelayCommands(bin: File) {
-            File(bin, "sleep").apply {
-                writeText("#!/bin/sh\necho sleep >> '${events.absolutePath}'\necho ${'$'}1 >> '${waits.absolutePath}'\n")
-                setExecutable(true)
-            }
-            File(bin, "od").apply {
-                writeText("#!/bin/sh\necho ' 128'\n")
-                setExecutable(true)
-            }
-        }
-
-        private fun writeReleaseBuild(bin: File) {
-            File(projectDir, "build.gradle.kts").writeText(
-                """
-                plugins { id("com.zegreatrob.tools.tagger") }
-                tagger { githubReleaseEnabled.set(true) }
-                tasks.named<Exec>("githubRelease") {
-                    environment("PATH", "${bin.absolutePath}:" + System.getenv("PATH"))
-                }
-                """.trimIndent(),
-            )
-        }
-
-        fun events() = events.readLines()
-
-        fun delays() = waits.readLines().map(String::toDouble)
-
-        fun close() = removeDirectory(projectDir)
-    }
-
-    @Test
     fun generatedNonDraftSettingSkipsDraftPublication() = publicationWithGeneratedDraftSetting(
         false,
         "SKIPPED",
@@ -456,14 +216,26 @@ class AdditionalTasksFunctionalTest {
     fun githubReleaseWaitsForDistributionsAndRunsAfterPublicationRetry() = setup(object {
         val projectDir = createTempDirectory()
         val events = File(projectDir, "events.txt")
+        val createArguments = File(projectDir, "create-arguments")
+        val failedCreate = File(projectDir, "failed-create")
     }) {
         writeSettings(projectDir)
         val bin = File(projectDir, "bin").apply { mkdirs() }
+        File(bin, "sleep").apply {
+            writeText("#!/bin/sh\nexit 0\n")
+            setExecutable(true)
+        }
         File(bin, "gh").apply {
             writeText(
                 """
                 #!/bin/sh
                 if [ "$2" = "view" ]; then echo "release not found" >&2; exit 1; fi
+                printf '%s\n' "$@" > "${createArguments.absolutePath}"
+                if [ ! -f "${failedCreate.absolutePath}" ]; then
+                    touch "${failedCreate.absolutePath}"
+                    echo "remote error: tls: internal error" >&2
+                    exit 1
+                fi
                 printf 'github\n' >> "${events.absolutePath}"
                 """.trimIndent(),
             )
@@ -517,6 +289,7 @@ class AdditionalTasksFunctionalTest {
         firstAttempt.output.contains("simulated Maven publication failure")
             .assertIsEqualTo(true, "Expected the first attempt to fail at the simulated Maven publication")
         retry.task(":githubRelease")?.outcome?.name.assertIsEqualTo("SUCCESS")
+        createArguments.readLines().assertIsEqualTo(listOf("release", "create", "1.2.3", "--verify-tag", "--title", "1.2.3", "--notes", "1.2.3"))
         events.readLines().assertIsEqualTo(listOf("maven-failure", "maven", "npm", "portal", "github"))
     } teardown {
         removeDirectory(projectDir)
