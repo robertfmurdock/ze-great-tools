@@ -12,9 +12,7 @@ tasks {
             include("src/**/*.kt", "src/**/*.md")
         }
     }
-    publishing.publications {
-        withType<MavenPublication> { artifact(javadocJar) }
-    }
+    publishing.publications.withType<MavenPublication>().configureEach { artifact(javadocJar) }
 }
 
 tasks.withType<PublishToMavenRepository>().configureEach {
