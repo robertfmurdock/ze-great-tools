@@ -135,11 +135,11 @@ TestKit coverage, root naming, and the absence of `buildSrc` are satisfied.
 
 - **Date** 2026-11-12
 - **Branch and source baseline commit** `main`, `14b2a847` (`origin/main` before this remediation slice).
-- **Last verified state** Fresh-home and normal-home composite checks passed; the independent final refactor review found no critical or major issues.
-- **Uncommitted work** Four settings files and this card; all are ready for final review.
+- **Last verified commit** `21c816ab`; fresh-home and normal-home composite checks passed before the documentation-only state update.
+- **Uncommitted work** This card's final push/move status update only.
 - **Status** All historical findings and advisories have a completed or not-implemented disposition. AR5 is newly complete. Remaining NPM lifecycle/provider reads, plugin repository convention extraction, task-name constants, and source-at-root restructuring are explicitly not implemented with evidence below.
 - **Blockers** None.
-- **Next** Final refactor review, final full check, commit and push the reviewed changes, then move this card to `agents.d/work_completed/`.
+- **Next** Commit the state update, push both validated commits, then move this card to `agents.d/work_completed/`.
 
 ## Implementation Notes
 
