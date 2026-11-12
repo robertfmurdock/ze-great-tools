@@ -12,7 +12,7 @@ Use for active work tracked in `agents.d/work/`. A card should preserve intent a
 
 ## Version history
 
-- **Version 2** — Replaces the checklist and command-log format with task-specific acceptance evidence, consequential decisions, and concise handoffs. Shared repository rules remain in their existing instructions.
+- **Version 2** — Replaces the checklist and command-log format with task-specific acceptance evidence, consequential decisions, concise handoffs, and explicit card closeout. Shared repository rules remain in their existing instructions.
 - **Version 1** — Historical format used by cards created before version 2. Completed cards remain unchanged and are interpreted according to the version they carry, if present.
 
 ## Card format
@@ -29,4 +29,8 @@ Start each new or revised card with `**Work card protocol: 2**` below its title.
 
 Follow repository-wide testing, validation, documentation, commit, push, delegation, and review instructions in `CLAUDE.md` and the applicable context documents. Cards should link to relevant guidance and record task-specific exceptions, risks, or evidence rather than repeat generic commands and procedures. Follow project semver guidance where changes affect shipped behavior.
 
-Update the card when a decision changes the approach, scope, risk, or acceptance criteria. Do not record routine successful commands, unchanged repository state, volatile commit hashes, template-compliance steps, or generic process checkboxes. Close or move a card according to shared repository policy after its goal and acceptance evidence are satisfied.
+Update the card when a decision changes the approach, scope, risk, or acceptance criteria. Do not record routine successful commands, unchanged repository state, volatile commit hashes, template-compliance steps, or generic process checkboxes.
+
+## Closeout
+
+When the goal and acceptance evidence are satisfied, complete the required repository closeout and move the card from `agents.d/work/` to `agents.d/work_completed/`. Do not leave finished work active. If the work is incomplete or blocked, keep the card in `agents.d/work/` and add a concise resume note with what remains, blockers, and the next useful step.
