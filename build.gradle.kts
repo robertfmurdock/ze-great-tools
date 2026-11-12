@@ -71,8 +71,14 @@ tasks {
     }
     release {
         dependsOn("check")
-        dependsOn(provider { gradle.includedBuild("command-line-tools").task(":release") })
-        dependsOn(provider { gradle.includedBuild("tools").task(":release") })
+        // Temporarily pause snapshot publication through Sunday, November 15, 2026.
+        // Keeping the date gate here lets snapshot builds and checks continue to run.
+        val snapshotPublishingPaused = version.contains("SNAPSHOT") &&
+            java.time.LocalDate.now() < java.time.LocalDate.of(2026, 11, 16)
+        if (!snapshotPublishingPaused) {
+            dependsOn(provider { gradle.includedBuild("command-line-tools").task(":release") })
+            dependsOn(provider { gradle.includedBuild("tools").task(":release") })
+        }
         if (!version.contains("SNAPSHOT")) {
             dependsOn(provider {
                 listOf(
