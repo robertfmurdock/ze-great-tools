@@ -163,6 +163,26 @@ class AdditionalTasksFunctionalTest {
         release.close()
     }
 
+    @Test
+    fun reconcilesReleaseAfterTheFinalCreateLosesItsResponse() = setup(object {
+        val release = ReleaseCreationFixture()
+    }) {
+        release.respondWith(
+            "view:HTTP 500",
+            "view:HTTP 503",
+            "view:HTTP 504",
+            "view:release not found",
+            "create:published:connection reset by peer",
+        )
+    } exercise {
+        release.runner.build()
+    } verifyAnd { result ->
+        result.task(":githubRelease")?.outcome?.name.assertIsEqualTo("SUCCESS")
+        release.events().assertIsEqualTo(listOf("view", "sleep", "view", "sleep", "view", "sleep", "view", "create", "view"))
+    } teardown {
+        release.close()
+    }
+
     private inner class ReleaseCreationFixture {
         private val projectDir = createTempDirectory()
         private val events = File(projectDir, "events")
