@@ -61,6 +61,10 @@ An opinionated program for automatic semantic versioning via git tags and inform
 
 See its [README](command-line-tools/tagger-cli/README.md) for more.
 
+The Tagger CLI is also available as a [GitHub Action](examples/github-actions-action/README.md)
+for calculating versions and exposing version and snapshot outputs to later
+workflow steps.
+
 ### Digger CLI
 
 A program for extracting contribution information from a git repository.

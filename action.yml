@@ -1,0 +1,142 @@
+name: Tagger
+author: RoB Murdock
+description: Calculate a semantic version or create a Git tag with Tagger.
+branding:
+  icon: tag
+  color: blue
+inputs:
+  command:
+    description: "Operation to run: calculate-version or tag."
+    required: false
+    default: calculate-version
+  tagger-version:
+    description: NPM package version or dist-tag to install.
+    required: false
+    default: latest
+  version:
+    description: Version to tag; required when command is tag.
+    required: false
+  release-branch:
+    description: Branch on which calculated versions are releases; other branches produce snapshots.
+    required: false
+  force-snapshot:
+    description: Force a snapshot version during calculation.
+    required: false
+    default: "false"
+  allow-detached-head:
+    description: Allow version calculation or tagging from detached HEAD.
+    required: false
+    default: "false"
+  implicit-patch:
+    description: Bump the patch version when no annotated bump is found.
+    required: false
+    default: "true"
+  warnings-as-errors:
+    description: Fail when Tagger reports warnings.
+    required: false
+    default: "false"
+  major-regex:
+    description: Commit message pattern for a major version bump.
+    required: false
+  minor-regex:
+    description: Commit message pattern for a minor version bump.
+    required: false
+  patch-regex:
+    description: Commit message pattern for a patch version bump.
+    required: false
+  none-regex:
+    description: Commit message pattern for no version change.
+    required: false
+  version-regex:
+    description: Unified commit pattern with named major, minor, patch, and none groups.
+    required: false
+  user-name:
+    description: Git author name for the created tag.
+    required: false
+  user-email:
+    description: Git author email for the created tag.
+    required: false
+  tag-dry-run:
+    description: Show the tag operation without creating or pushing a tag.
+    required: false
+    default: "false"
+outputs:
+  version:
+    description: Calculated version, or the supplied version when tagging.
+    value: ${{ steps.tagger.outputs.version }}
+  snapshot:
+    description: Whether the calculated version is a snapshot (true or false).
+    value: ${{ steps.tagger.outputs.snapshot }}
+runs:
+  using: composite
+  steps:
+    - name: Set up Node.js
+      uses: actions/setup-node@v7
+      with:
+        node-version: 24
+    - id: tagger
+      name: Run Tagger
+      shell: bash
+      env:
+        INPUT_COMMAND: ${{ inputs.command }}
+        INPUT_TAGGER_VERSION: ${{ inputs.tagger-version }}
+        INPUT_VERSION: ${{ inputs.version }}
+        INPUT_RELEASE_BRANCH: ${{ inputs.release-branch }}
+        INPUT_FORCE_SNAPSHOT: ${{ inputs.force-snapshot }}
+        INPUT_ALLOW_DETACHED_HEAD: ${{ inputs.allow-detached-head }}
+        INPUT_IMPLICIT_PATCH: ${{ inputs.implicit-patch }}
+        INPUT_WARNINGS_AS_ERRORS: ${{ inputs.warnings-as-errors }}
+        INPUT_MAJOR_REGEX: ${{ inputs.major-regex }}
+        INPUT_MINOR_REGEX: ${{ inputs.minor-regex }}
+        INPUT_PATCH_REGEX: ${{ inputs.patch-regex }}
+        INPUT_NONE_REGEX: ${{ inputs.none-regex }}
+        INPUT_VERSION_REGEX: ${{ inputs.version-regex }}
+        INPUT_USER_NAME: ${{ inputs.user-name }}
+        INPUT_USER_EMAIL: ${{ inputs.user-email }}
+        INPUT_TAG_DRY_RUN: ${{ inputs.tag-dry-run }}
+      run: |
+        set -euo pipefail
+        args=()
+        add_option() {
+          if [[ -n "$2" ]]; then args+=("$1=$2"); fi
+        }
+        add_boolean() {
+          if [[ "$2" == true ]]; then args+=("$1"); fi
+        }
+        case "$INPUT_COMMAND" in
+          calculate-version)
+            args+=(calculate-version --format=json)
+            add_option --release-branch "$INPUT_RELEASE_BRANCH"
+            add_boolean --force-snapshot "$INPUT_FORCE_SNAPSHOT"
+            add_boolean --allow-detached-head "$INPUT_ALLOW_DETACHED_HEAD"
+            if [[ "$INPUT_IMPLICIT_PATCH" == false ]]; then args+=(--implicit-patch=false); fi
+            add_boolean --warnings-as-errors "$INPUT_WARNINGS_AS_ERRORS"
+            add_option --major-regex "$INPUT_MAJOR_REGEX"
+            add_option --minor-regex "$INPUT_MINOR_REGEX"
+            add_option --patch-regex "$INPUT_PATCH_REGEX"
+            add_option --none-regex "$INPUT_NONE_REGEX"
+            add_option --version-regex "$INPUT_VERSION_REGEX"
+            ;;
+          tag)
+            if [[ -z "$INPUT_VERSION" ]]; then echo 'version input is required when command is tag' >&2; exit 1; fi
+            args+=(tag --format=json "--version=$INPUT_VERSION")
+            add_option --release-branch "$INPUT_RELEASE_BRANCH"
+            add_boolean --allow-detached-head "$INPUT_ALLOW_DETACHED_HEAD"
+            add_boolean --warnings-as-errors "$INPUT_WARNINGS_AS_ERRORS"
+            add_option --user-name "$INPUT_USER_NAME"
+            add_option --user-email "$INPUT_USER_EMAIL"
+            add_boolean --dry-run "$INPUT_TAG_DRY_RUN"
+            ;;
+          *) echo "Unsupported command: $INPUT_COMMAND (expected calculate-version or tag)" >&2; exit 1 ;;
+        esac
+        if [[ "$INPUT_COMMAND" == tag ]]; then
+          npx --yes --package="@continuous-excellence/tagger@$INPUT_TAGGER_VERSION" tagger "${args[@]}"
+          version="$INPUT_VERSION"
+          snapshot=false
+        else
+          result=$(npx --yes --package="@continuous-excellence/tagger@$INPUT_TAGGER_VERSION" tagger "${args[@]}")
+          version=$(node -e 'const data=JSON.parse(process.argv[1]).data; if (!data || typeof data.version !== "string" || typeof data.snapshot !== "boolean") process.exit(1); process.stdout.write(data.version)' "$result")
+          snapshot=$(node -e 'const data=JSON.parse(process.argv[1]).data; if (!data || typeof data.snapshot !== "boolean") process.exit(1); process.stdout.write(String(data.snapshot))' "$result")
+        fi
+        echo "version=$version" >> "$GITHUB_OUTPUT"
+        echo "snapshot=$snapshot" >> "$GITHUB_OUTPUT"

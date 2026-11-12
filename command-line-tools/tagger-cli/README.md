@@ -129,6 +129,15 @@ tagger tag --version 1.2.3 --release-branch main
 
 For complete option documentation and automation guidance, run `tagger calculate-version --help` or `tagger tag --help`.
 
+### GitHub Action
+
+The repository root provides a composite action wrapping the published NPM
+package. Check out the repository with `fetch-depth: 0`, then use `uses:
+robertfmurdock/ze-great-tools/action.yml@main` with `command: calculate-version` (the
+default) or `command: tag`. The action exposes `version` and `snapshot`
+outputs. See the [GitHub Actions example](../../examples/github-actions-action/README.md)
+for a complete workflow and the action's input list.
+
 ## Configuration File
 
 Tagger supports a `.tagger` JSON configuration file at your repository root to eliminate repetitive command-line
