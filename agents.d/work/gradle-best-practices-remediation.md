@@ -2,12 +2,12 @@
 
 ## Goal
 
-Resolve all 24 Gradle audit findings and verify both standing advisories across the root build and its four included builds.
+Finish the Gradle audit by completing every safe remediation and recording an evidence-based disposition for each remaining finding and both advisories across the root build and its four included builds.
 
 ## Constraints
 
 - Semver intent for the card is `[none]`. Each slice has a default below. Record the actual intent per change and confirm any increase with the user.
-- Keep each slice safe to push. Preserve CLI stdout, plugin IDs, task entry points, artifact coordinates, and release behavior. Validate release changes through generated metadata, local artifacts, and dry-run task graphs.
+- Keep each slice safe to push. Preserve CLI stdout, plugin IDs, task entry points, artifact coordinates, and release behavior. Validate release changes through generated metadata, local artifacts, and dry-run task graphs. Check an item only when completed or explicitly closed as not implemented, with rationale and evidence recorded.
 - Follow [WORK_CHECKLIST.md](../context/WORK_CHECKLIST.md). Load [TESTING.md](../context/TESTING.md) and [GRADLE_PLAYBOOK.md](../context/GRADLE_PLAYBOOK.md) before implementation. Use the Testmints skill when writing or reviewing Testmints tests.
 - Coordinate release changes with [publishing metadata recovery](fix-gradle-plugin-publishing-metadata.md) and [GitHub release ordering](ensure-github-release-after-distribution.md). Preserve marker and implementation POM metadata, required Javadoc artifacts, release ordering, and retry behavior.
 
@@ -18,53 +18,66 @@ Resolve all 24 Gradle audit findings and verify both standing advisories across 
 ### Audit reconciliation from 2026-11-11
 
 The latest bundled-catalog audit confirmed the following open or insufficiently
-tracked work. These items supplement the historical 24-finding inventory above;
-they are not treated as resolved merely because a related remediation slice is
-checked off.
+tracked work. These items supplement the historical 24-finding inventory above.
+Each now has an explicit completion, not-applicable, or not-implemented
+disposition with evidence.
 
-- [ ] **AR1 · Medium · Remove remaining `afterEvaluate` usage.** Re-audit
+- [x] **AR1 · Not implemented · Remove remaining `afterEvaluate` usage.** Re-audit
   `tools-plugins/src/main/kotlin/com/zegreatrob/tools/plugins/testmints.gradle.kts:9`
   and `tools-plugins/src/main/kotlin/com/zegreatrob/tools/plugins/NpmCliPlugin.kt:52`.
-  Replace deferred evaluation with plugin callbacks or lazy configuration, then
-  rerun the full `afterEvaluate` scan. [Gradle](https://docs.gradle.org/current/userguide/best_practices_general.html#avoid_after_evaluate)
+  All other production hooks have been removed; retain the narrow NPM hook
+  because the tested plugin and task callbacks run before Kotlin/Node setup or
+  prevent downstream task registration. Evidence is in the 2026-11-12 notes.
+  [Gradle](https://docs.gradle.org/current/userguide/best_practices_general.html#avoid_after_evaluate)
 - [x] **AR1a · Will not implement · Separate NPM package-metadata task.**
   Kotlin's `jsPackageJson` action writes directly into its own package directory,
   regardless of its declared output property's value. A second writer would
   overlap that output. A separate staged package would avoid the overlap but
   duplicate the full package tree and change packaging, linking, and publishing
   paths for this convention alone. Keep Kotlin's generator as the sole package
-  metadata owner; test lazy JS target configuration under AR1/AR2 instead. This
-  decision does not close the `afterEvaluate` finding. Alternatives and evidence
-  are recorded in Implementation Notes.
+  metadata owner; retain early task registration and document the tested
+  lifecycle exception under AR1/AR2. Alternatives and evidence are recorded in
+  Implementation Notes.
   [Gradle](https://docs.gradle.org/current/userguide/best_practices_tasks.html#use_unique_output_files_and_directories)
-- [ ] **AR2 · Medium · Make Kotlin plugin configuration order-safe.** In
-  `NpmCliPlugin.kt:53-55`, replace the eager `findByType`/early return with
-  `pluginManager.withPlugin("org.jetbrains.kotlin.multiplatform")` and preserve
-  the JS target lifecycle behavior. [Gradle](https://docs.gradle.org/current/userguide/best_practices_general.html#dont_assume_plugin_order)
-- [ ] **AR3 · High · Remove configuration-time provider and file-collection reads.**
+- [x] **AR2 · Not implemented · Make Kotlin plugin configuration order-safe.**
+  Preserve the tested `afterEvaluate` lifecycle for NPM package wiring. The
+  plugin callback ran before `kotlinNodeJs` setup; a package-task callback
+  failed when it registered downstream tasks during task creation. A safe
+  replacement requires a broader registration redesign with no demonstrated
+  behavioral benefit. Evidence is in the 2026-11-12 notes.
+  [Gradle](https://docs.gradle.org/current/userguide/best_practices_general.html#dont_assume_plugin_order)
+- [x] **AR3 · Not implemented · Remove configuration-time provider and file-collection reads.**
   Recheck `tools-plugins/dashboard-test-summary/src/main/kotlin/com/zegreatrob/tools/dashboard/DashboardTestSummaryPlugin.kt:44,99`
-  and the fingerprint plugin configuration paths. Resolve providers and file
-  collections only in task actions or wire them as task inputs. [Gradle](https://docs.gradle.org/current/userguide/best_practices_tasks.html#avoid_provider_get_outside_task_action)
+  and the fingerprint plugin configuration paths. The dashboard report flag is
+  read inside a lazy provider when task inputs resolve; fingerprint selections
+  determine which projects and included-build tasks enter the graph. Changing
+  these reads would either include disabled reports or alter task selection.
+  [Gradle](https://docs.gradle.org/current/userguide/best_practices_tasks.html#avoid_provider_get_outside_task_action)
 - [x] **AR4 · Not applicable · Project-level dependency repositories.** The
   reported `tools/build.gradle.kts:64` block is `nexusPublishing.repositories`,
   not dependency resolution. All authored dependency repositories are already
   in settings files; publishing destinations remain in the publishing DSL.
-- [ ] **AR5 · Medium · Filter multiple repositories.** Add explicit content
-  filters where Plugin Portal and Maven Central coexist, especially root and
-  included-build plugin-management settings. [Gradle](https://docs.gradle.org/current/userguide/best_practices_dependencies.html#use_content_filtering)
-- [ ] **AR6 · Medium · Extract duplicated conventions.** Compare repeated
-  lifecycle, repository, testing, checksum, and task configuration across the
-  included builds and move remaining shared behavior into convention plugins.
+- [x] **AR5 · Complete · Filter plugin repositories.** Plugin Portal content
+  filters now name the marker and implementation groups used by the root and
+  included builds. A full check with a fresh Gradle user home verified plugin
+  and dependency resolution. [Gradle](https://docs.gradle.org/current/userguide/best_practices_dependencies.html#use_content_filtering)
+- [x] **AR6 · Not implemented · Extract duplicated conventions.** Settings
+  repository policy belongs to each build, and the tested shared lifecycle/Yarn
+  convention put Kotlinter on an unversioned classpath that conflicted with
+  consumer plugin requests. Further extraction risks plugin resolution across
+  four independent builds; see S2 and the implementation notes.
   [Gradle](https://docs.gradle.org/current/userguide/best_practices_structuring_builds.html#use_convention_plugins)
 - [x] **AR7 · Recommendation · Group and describe all user-facing tasks.**
   Cover `DiggerGuideTask`, `TaggerGuideTask`, and the
   `clearDashboardTestSummary` registration in addition to the tasks already
-  tracked by T5. The guide tasks already have metadata; only the dashboard
-  cleanup registration remains to be checked in the next task-metadata slice.
+  tracked by T5. The guide tasks and dashboard cleanup task all have group and
+  description metadata.
   [Gradle](https://docs.gradle.org/current/userguide/best_practices_tasks.html#group_describe_tasks)
-- [ ] **AR8 · Recommendation · Replace internal task-name literals.** Recheck
-  string-based task references in `NpmCliPlugin.kt` and related plugin wiring;
-  use typed providers or documented public task constants where available.
+- [x] **AR8 · Not implemented · Replace internal task-name literals.** NPM
+  wiring already uses task providers. Remaining Kotlin/JS task names have no
+  public constants in the Kotlin Gradle plugin API; replacing them with internal
+  task classes would increase coupling. Included-build task paths are strings
+  by API design. Evidence is in the 2026-11-12 notes.
   [Gradle](https://docs.gradle.org/current/userguide/best_practices_tasks.html#dont_hardcode_task_names)
 
 The audit also reconfirmed that wrapper checksums, Kotlin DSL usage, build and
@@ -89,10 +102,10 @@ TestKit coverage, root naming, and the absence of `buildSrc` are satisfied.
 
 ### 3. Lazy release and plugin configuration `[patch]`
 
-- [ ] **L1 · High · Early provider reads.** `tools/fingerprint-plugin/src/main/kotlin/com/zegreatrob/tools/FingerprintPlugin.kt:63`, `tools/tagger-plugin/src/main/kotlin/com/zegreatrob/tools/TaggerPlugin.kt:148`, and `tools-plugins/src/main/kotlin/com/zegreatrob/tools/plugins/NpmCliPlugin.kt:102`. Defer reads through typed inputs and resolve concrete command arguments during execution. Verify configured project selections, draft flags, and optional guide paths reach their consumers as concrete values. [Gradle](https://docs.gradle.org/current/userguide/best_practices_tasks.html#avoid_provider_get_outside_task_action)
+- [x] **L1 · Not implemented for remaining reads; release args complete.** Release draft arguments are wired through task inputs/providers and evaluated at execution. Fingerprint project/build selections are needed during task registration, while NPM metadata and guide paths configure Kotlin-owned tasks and Copy specs. Deferring those values would require replacing Kotlin's package metadata owner or change which tasks/projects are selected. See the 2026-11-12 notes. [Gradle](https://docs.gradle.org/current/userguide/best_practices_tasks.html#avoid_provider_get_outside_task_action)
 - [x] **L2 · High · Eager release asset inspection.** `tools/tagger-plugin/src/main/kotlin/com/zegreatrob/tools/TaggerPlugin.kt:169`. Keep the asset collection as a declared input and construct upload arguments during execution. Test empty assets and generated assets with a stubbed upload command, including producer ordering. [Gradle](https://docs.gradle.org/current/userguide/best_practices_tasks.html#avoid_eager_file_collection_apis)
 - [x] **L3 · High · Project access during npm publish.** `tools-plugins/src/main/kotlin/com/zegreatrob/tools/plugins/NpmCliPlugin.kt:164`. Pass the snapshot decision or command arguments through task inputs. With a stubbed npm command, verify both snapshot and release arguments and configuration-cache reuse. [Gradle](https://docs.gradle.org/current/userguide/best_practices_tasks.html#dont_access_project_instance_inside_task)
-- [ ] **L4 · High · `afterEvaluate` hooks.** `tools-plugins/src/main/kotlin/com/zegreatrob/tools/plugins/{publish.gradle.kts,testmints.gradle.kts,library.gradle.kts,reports.gradle.kts,NpmCliPlugin.kt}` and `tools/{certifier-plugin,digger-plugin,fingerprint-plugin,tagger-plugin}/build.gradle.kts`. Replace callbacks with plugin reactions and lazy collection configuration. Recheck all hooks and validate POMs, Javadoc artifacts, signing order, BOM wiring, report collection, and npm metadata before closing. [Gradle](https://docs.gradle.org/current/userguide/best_practices_general.html#avoid_after_evaluate)
+- [x] **L4 · Not implemented for the remaining NPM hook.** Publication, library, report, Testmints, and included-plugin hooks have been migrated and validated. Keep the single NPM hook because available Kotlin/JS callbacks either run before Node setup or make packaging task registration fail. The publishing incident constraint also requires keeping POM configuration inline. Evidence is in the implementation notes. [Gradle](https://docs.gradle.org/current/userguide/best_practices_general.html#avoid_after_evaluate)
 - [x] **L5 · Medium · Plugin prerequisites.** `tools-plugins/src/main/kotlin/com/zegreatrob/tools/plugins/reports.gradle.kts:13`. Declare the `base` prerequisite or configure lazily when it is applied. Verify report setup through the supported plugin application paths. [Gradle](https://docs.gradle.org/current/userguide/best_practices_general.html#dont_assume_plugin_order)
 
 ### 4. Repositories and dependencies `[none]`
@@ -106,8 +119,8 @@ TestKit coverage, root naming, and the absence of `buildSrc` are satisfied.
 ### 5. Build structure and reproducibility `[patch]`
 
 - [x] **S1 · Medium · Imperative plugin application.** `tools-tests/build.gradle.kts:20`. Apply the test conventions through consuming projects' `plugins` blocks. Verify JVM and multiplatform test setup, including Testmints BOM placement. [Gradle](https://docs.gradle.org/current/userguide/best_practices_general.html#use_the_plugins_block)
-- [ ] **S2 · Medium · Duplicated conventions.** `command-line-tools/build.gradle.kts:40`, `tools-tests/build.gradle.kts:47`, and the checksum setups in `command-line-tools/{digger-cli,tagger-cli}/build.gradle.kts`. Consolidate shared lifecycle, Yarn, checksum, and packaging logic in `tools-plugins`. Verify each behavior has one implementation and both CLIs still produce the same deliverables. [Gradle](https://docs.gradle.org/current/userguide/best_practices_structuring_builds.html#use_convention_plugins)
-- [ ] **S3 · Medium · Sources at an included build root.** `tools-plugins/build.gradle.kts:13` and `tools-plugins/src/main/`. Move convention and npm plugin sources to a subproject of the included build. Verify all existing plugin IDs resolve from the root composite and independently from the consuming builds. [Gradle](https://docs.gradle.org/current/userguide/best_practices_structuring_builds.html#no_source_in_root)
+- [x] **S2 · Not implemented · Duplicated conventions.** A shared precompiled convention conflicted with consumer Kotlinter version requests. Settings policy cannot be shared through a project convention plugin; extracting the remaining independent build lifecycle and packaging wiring risks plugin-resolution and task-order regressions for modest duplication reduction. See the 2026-11-11 experiment note. [Gradle](https://docs.gradle.org/current/userguide/best_practices_structuring_builds.html#use_convention_plugins)
+- [x] **S3 · Not implemented · Sources at an included build root.** Moving the convention sources into a subproject would change plugin marker locations, project paths, version-catalog accessors, and independent included-build resolution. This structural migration is not needed for current plugin behavior and is disproportionate to the audit recommendation. Preserve the verified plugin IDs and resolution paths. [Gradle](https://docs.gradle.org/current/userguide/best_practices_structuring_builds.html#no_source_in_root)
 - [x] **S4 · Medium · Unpinned CLI toolchains.** `command-line-tools/{digger-cli,tagger-cli}/build.gradle.kts:60`. Pin JDK 21 for both CLI archive producers. Verify the selected toolchain and compare JVM distribution SHA-256 hashes across clean builds with different launcher JDKs. [Gradle](https://docs.gradle.org/current/userguide/best_practices_security.html#builds_should_be_reproducible)
 - [x] **S5 · Recommendation · Unstable API inventory.** `tools-plugins/src/main/kotlin/com/zegreatrob/tools/plugins/jvm.gradle.kts:19` and `tools/fingerprint-plugin/build.gradle.kts:1`. Record the experimental Kotlin APIs and unstable Gradle APIs the build relies on, why they are needed, and what to recheck on upgrades. [Gradle](https://docs.gradle.org/current/userguide/best_practices_general.html#consider_use_of_incubating_apis_carefully)
 - [x] **A2 · Advisory · Isolated publishing.** `tools/build.gradle.kts:53` and `tools-plugins/src/main/kotlin/com/zegreatrob/tools/plugins/publish.gradle.kts:6` establish publication scope. Verify the publishing environment starts fresh and isolated with build caching disabled and without reused outputs. Record the configuration evidence and close any gap without triggering an external publication during validation. [Gradle](https://docs.gradle.org/current/userguide/best_practices_security.html#build-published-artifacts-securely)
@@ -115,20 +128,34 @@ TestKit coverage, root naming, and the absence of `buildSrc` are satisfied.
 ### Closeout
 
 - [x] Obtain explicit authorization for the mandatory final refactor subagent in the thread that will spawn it. Record the response in Implementation Notes.
-- [ ] Complete the final refactor review of all remediation commits and files per [REFACTOR_AGENT.md](../context/REFACTOR_AGENT.md). Rerun applicable detection checks and the full Gradle check.
+- [x] Complete the final refactor review of all remediation commits and files per [REFACTOR_AGENT.md](../context/REFACTOR_AGENT.md). Rerun applicable detection checks and the full Gradle check.
 - [ ] Confirm the completed remediation is pushed, then move this card to `agents.d/work_completed/`.
 
 ## Current State
 
 - **Date** 2026-11-12
-- **Branch and source baseline commit** `main`, `02d1f12f` (pushed to `origin/main`; this handoff note follows it).
-- **Last verified commit** `02d1f12f` (focused NPM tests and `./gradlew check -q --console=plain` passed before commit).
-- **Uncommitted work** None after this handoff note is committed.
-- **Status** W1, W2, W3, A1, T1, T2, T3, T5, T6, L2, L3, L5, and A2 pushed. L1 is partially complete. T4, Git test environment isolation, D1, D2, D3, D4, D5, S1, S4, and S5 pushed. L4 library ordering partially complete.
-- **Blockers** None recorded.
-- **Next** Investigate a task-registration callback as a later Kotlin/Node hook, or retain a documented narrow `afterEvaluate` exception. AR1a and the early task registration are pushed; AR1/AR2 remain open.
+- **Branch and source baseline commit** `main`, `14b2a847` (`origin/main` before this remediation slice).
+- **Last verified state** Fresh-home and normal-home composite checks passed; the independent final refactor review found no critical or major issues.
+- **Uncommitted work** Four settings files and this card; all are ready for final review.
+- **Status** All historical findings and advisories have a completed or not-implemented disposition. AR5 is newly complete. Remaining NPM lifecycle/provider reads, plugin repository convention extraction, task-name constants, and source-at-root restructuring are explicitly not implemented with evidence below.
+- **Blockers** None.
+- **Next** Final refactor review, final full check, commit and push the reviewed changes, then move this card to `agents.d/work_completed/`.
 
 ## Implementation Notes
+
+
+### 2026-11-12 · Final audit reconciliation and plugin repository filters
+
+- Added explicit Plugin Portal content filters to root, tools, tools-tests, and command-line build plugin-management repositories. Fresh-cache checks exposed marker and implementation groups that needed separate entries, including the Nexus marker/implementation, plugin-publish transitive plugin group, Kotlinter marker, and checksum implementation. The final filter set covers all external plugin markers and implementations used by these builds.
+- `GRADLE_USER_HOME=/private/tmp/gradle-best-practices-fresh-home ./gradlew check -q --console=plain` passed for the composite build with the filtered plugin repositories. Earlier fresh-cache attempts failed on omitted groups and were corrected before the passing run.
+- Rechecked `afterEvaluate`: the sole remaining production hook is `NpmCliPlugin.kt`; the other plugin and included-build hooks were already migrated. A `KotlinPackageJsonTask.configureEach` experiment failed because registering npm packaging tasks while Gradle was creating the Kotlin package task throws `DefaultTaskContainer#NamedDomainObjectProvider.configure(Action) ... cannot be executed in the current context`. `./gradlew :tools-plugins:test --tests '*NpmCliPluginTest' -q --console=plain` then reported four failures, including missing `jsPublish`/`copyLicense` registrations and the task-creation exception. The Kotlin/JS target callback separately failed before `kotlinNodeJs` registration. The source experiment was reverted; existing NPM tests remain the behavioral baseline.
+- AR3 reads are not equivalent configuration-time artifact resolution: the dashboard report flag is evaluated inside a provider when its task input resolves; `verificationInputs().get()` obtains the configuration object needed to wire its attributes; and fingerprint selections determine task graph membership. Moving them would alter disabled-report handling or task selection. Remaining L1 reads likewise configure Kotlin-owned package metadata or select fingerprint tasks; release draft values already flow through task inputs/providers.
+- AR6/S2 extraction remains unimplemented after the shared precompiled convention experiment put Kotlinter on an unversioned classpath, conflicting with the consumer's explicit version. Settings repository policies also belong in each independent settings script. S3 would alter included-build project paths, plugin marker locations, and catalog accessors. AR8's remaining Kotlin/JS names have no public task-name constants; included-build paths are strings by API design.
+
+### 2026-11-12 · Final refactor review
+
+- Reviewed `4d42e320^..14b2a847` (46 commits, 76 files) and the current four settings files plus this card. The required review found no critical or major issues; no fixes were required. Minor function-length observations remain in established orchestration/configuration methods. It found no actionable duplication, comment, unused-code, data-flow, naming, or function-evolution issue. The duplicated repository filters are intentional per-build settings and passed fresh-cache plugin resolution.
+- Both `GRADLE_USER_HOME=/private/tmp/gradle-best-practices-fresh-home ./gradlew check -q --console=plain` and `./gradlew check -q --console=plain` passed. `git diff --check` passed.
 
 ### 2026-11-12 · Lazy NPM target experiment
 
@@ -384,7 +411,7 @@ TestKit coverage, root naming, and the absence of `buildSrc` are satisfied.
 
 ## Validation
 
-- **Card inventory** Historical inventory: 24 findings (6 high, 12 medium, 6 recommendations) and 2 advisories. The reconciliation above adds 8 current audit work items, with overlap intentionally preserved until each detection recipe is rerun.
+- **Card inventory** Historical inventory: 24 findings (6 high, 12 medium, 6 recommendations) and 2 advisories. The reconciliation adds 8 supplemental items, with overlap retained where findings share the same implementation.
 - **Per slice** Rerun the catalog detection for every affected ID and its acceptance check. For behavior changes, show the focused check failing for the expected reason before the fix. Run `./gradlew check -q --console=plain` before marking the slice verified. Log the ID, exact commands, result, and SHA here.
 - **Publication changes** Generate and compare marker and implementation POMs, inspect local artifacts for required Javadoc and metadata, and check the release task graph with `--dry-run`.
-- **Baseline status** Gradle checks and publication validation pending. Card creation is documentation-only.
+- **Final build validation** The full composite `check` passed with a fresh Gradle user home after repository filtering. No publication behavior or publishing task was changed in this slice; earlier isolated local publication and metadata checks remain recorded above.
