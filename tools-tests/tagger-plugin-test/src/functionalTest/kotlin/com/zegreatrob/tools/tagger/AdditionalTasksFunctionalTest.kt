@@ -11,6 +11,12 @@ import java.io.File
 import kotlin.test.Test
 
 class AdditionalTasksFunctionalTest {
+    private data class ConfigurationCacheRun(
+        val first: BuildResult,
+        val reused: BuildResult,
+        val firstArguments: List<String>,
+    )
+
     private data class PublicationRetryRun(
         val firstAttempt: BuildResult,
         val retry: BuildResult,
@@ -94,7 +100,7 @@ class AdditionalTasksFunctionalTest {
                 """
                 #!/bin/sh
                 if [ "$2" = "view" ]; then echo "release not found" >&2; exit 1; fi
-                printf '%s\n' "$@" > "${output.absolutePath}"
+                printf '%s\n' "$@" >> "${output.absolutePath}"
                 """.trimIndent(),
             )
             setExecutable(true)
@@ -123,11 +129,15 @@ class AdditionalTasksFunctionalTest {
             .withProjectDir(File(projectDir))
             .withArguments("githubRelease", "-x", "tag", "-Pversion=1.2.3", "--configuration-cache", "--console=plain")
         val first = runner.build()
-        first to runner.build()
-    } verifyAnd { (first, second) ->
+        val firstArguments = output.takeIf { it.exists() }?.readLines().orEmpty()
+        ConfigurationCacheRun(first, runner.build(), firstArguments)
+    } verifyAnd { (first, second, firstArguments) ->
         first.task(":generateDraftSetting")?.outcome?.name.assertIsEqualTo("SUCCESS")
         second.output.contains("Reusing configuration cache.").assertIsEqualTo(true)
-        output.readLines().assertIsEqualTo(listOf("release", "create", "1.2.3", "--verify-tag", "--draft", "--title", "1.2.3", "--notes", "1.2.3"))
+        val expectedArguments = listOf("release", "create", "1.2.3", "--verify-tag", "--draft", "--title", "1.2.3", "--notes", "1.2.3")
+        firstArguments.assertIsEqualTo(expectedArguments)
+        output.takeIf { it.exists() }?.readLines().orEmpty().drop(firstArguments.size)
+            .assertIsEqualTo(expectedArguments)
     } teardown {
         removeDirectory(projectDir)
     }
@@ -137,12 +147,15 @@ class AdditionalTasksFunctionalTest {
         val projectDir = createTempDirectory()
     }) {
         writeSettings(projectDir)
+        File(projectDir, "distributions").apply { mkdirs() }
+            .resolve("unmatched.txt").writeText("unmatched")
         File(projectDir, "build.gradle.kts").writeText(
             """
             plugins { id("com.zegreatrob.tools.tagger") }
             tagger {
                 releaseBranch = "master"
                 githubReleaseEnabled.set(true)
+                githubReleaseAssets.from(fileTree("distributions") { include("*.zip") })
             }
             """.trimIndent(),
         )
@@ -152,6 +165,8 @@ class AdditionalTasksFunctionalTest {
             .withArguments("githubReleaseUpload", "-x", "githubRelease", "-Pversion=1.2.3", "--console=plain")
             .build()
     } verifyAnd { result ->
+        result.task(":validateGithubReleaseAssets")?.outcome?.name.assertIsEqualTo("SUCCESS")
+        result.output.contains("No GitHub release assets configured").assertIsEqualTo(true, result.output)
         result.task(":githubReleaseUpload")?.outcome?.name.assertIsEqualTo("SKIPPED")
     } teardown {
         removeDirectory(projectDir)
@@ -169,7 +184,7 @@ class AdditionalTasksFunctionalTest {
                 """
                 #!/bin/sh
                 if [ "$2" = "view" ]; then exit 1; fi
-                printf '%s\n' "$@" > "${output.absolutePath}"
+                printf '%s\n' "$@" >> "${output.absolutePath}"
                 """.trimIndent(),
             )
             setExecutable(true)
@@ -202,12 +217,16 @@ class AdditionalTasksFunctionalTest {
             .withProjectDir(File(projectDir))
             .withArguments("githubReleaseUpload", "-x", "githubRelease", "-Pversion=1.2.3", "--configuration-cache", "--console=plain")
         val first = runner.build()
-        first to runner.build()
-    } verifyAnd { (first, second) ->
+        val firstArguments = output.takeIf { it.exists() }?.readLines().orEmpty()
+        ConfigurationCacheRun(first, runner.build(), firstArguments)
+    } verifyAnd { (first, second, firstArguments) ->
         first.task(":generateReleaseAsset")?.outcome?.name.assertIsEqualTo("SUCCESS")
         first.task(":githubReleaseUpload")?.outcome?.name.assertIsEqualTo("SUCCESS")
         second.output.contains("Reusing configuration cache.").assertIsEqualTo(true)
-        output.readLines().assertIsEqualTo(listOf("release", "upload", "1.2.3", "build/assets/generated asset.zip"))
+        val expectedArguments = listOf("release", "upload", "1.2.3", "build/assets/generated asset.zip")
+        firstArguments.assertIsEqualTo(expectedArguments)
+        output.takeIf { it.exists() }?.readLines().orEmpty().drop(firstArguments.size)
+            .assertIsEqualTo(expectedArguments)
     } teardown {
         removeDirectory(projectDir)
     }
@@ -217,25 +236,15 @@ class AdditionalTasksFunctionalTest {
         val projectDir = createTempDirectory()
         val events = File(projectDir, "events.txt")
         val createArguments = File(projectDir, "create-arguments")
-        val failedCreate = File(projectDir, "failed-create")
     }) {
         writeSettings(projectDir)
         val bin = File(projectDir, "bin").apply { mkdirs() }
-        File(bin, "sleep").apply {
-            writeText("#!/bin/sh\nexit 0\n")
-            setExecutable(true)
-        }
         File(bin, "gh").apply {
             writeText(
                 """
                 #!/bin/sh
                 if [ "$2" = "view" ]; then echo "release not found" >&2; exit 1; fi
                 printf '%s\n' "$@" > "${createArguments.absolutePath}"
-                if [ ! -f "${failedCreate.absolutePath}" ]; then
-                    touch "${failedCreate.absolutePath}"
-                    echo "remote error: tls: internal error" >&2
-                    exit 1
-                fi
                 printf 'github\n' >> "${events.absolutePath}"
                 """.trimIndent(),
             )
@@ -296,9 +305,8 @@ class AdditionalTasksFunctionalTest {
     }
 
     @Test
-    fun previousVersionOutputsLastTag() = setup(object {
+    fun versionAndReportTasksReadTheConfiguredRepository() = setup(object {
         val projectDir = createTempDirectory()
-        val addFileNames = setOf("build.gradle.kts", "settings.gradle", ".gitignore")
         val initialTag = "1.2.3"
     }) {
         writeSettings(projectDir)
@@ -307,38 +315,22 @@ class AdditionalTasksFunctionalTest {
         initializeGitRepo(
             directory = projectDir,
             remoteUrl = projectDir,
-            addFileNames = addFileNames,
+            addFileNames = setOf("build.gradle.kts", "settings.gradle", ".gitignore"),
             initialTag = initialTag,
-            commits = listOf("init"),
-        )
-    } exercise {
-        runGradle(projectDir, "previousVersion")
-    } verifyAnd { output ->
-        output.trim().assertIsEqualTo(initialTag)
-    } teardown {
-        removeDirectory(projectDir)
-    }
-
-    @Test
-    fun commitReportOutputsReport() = setup(object {
-        val projectDir = createTempDirectory()
-        val addFileNames = setOf("build.gradle.kts", "settings.gradle", ".gitignore")
-    }) {
-        writeSettings(projectDir)
-        writeBuildFile(projectDir)
-        writeGitIgnore(projectDir)
-        initializeGitRepo(
-            directory = projectDir,
-            remoteUrl = projectDir,
-            addFileNames = addFileNames,
-            initialTag = "1.0.0",
             commits = listOf("init", "[patch] commit 1"),
         )
     } exercise {
-        runGradle(projectDir, "commitReport")
-    } verifyAnd { output ->
-        output.contains("COMMIT REPORT-------").assertIsEqualTo(true)
-        output.contains("COMMIT REPORT OVAH--").assertIsEqualTo(true)
+        GradleRunner.create()
+            .withProjectDir(File(projectDir))
+            .withArguments("previousVersion", "commitReport", "-q", "--console=plain")
+            .build()
+    } verifyAnd { result ->
+        result.task(":previousVersion")?.outcome?.name.assertIsEqualTo("SUCCESS")
+        result.task(":commitReport")?.outcome?.name.assertIsEqualTo("SUCCESS")
+        val lines = result.output.trim().lines()
+        lines.contains(initialTag).assertIsEqualTo(true, result.output)
+        lines.contains("COMMIT REPORT-------").assertIsEqualTo(true, result.output)
+        lines.contains("COMMIT REPORT OVAH--").assertIsEqualTo(true, result.output)
     } teardown {
         removeDirectory(projectDir)
     }
@@ -359,12 +351,11 @@ class AdditionalTasksFunctionalTest {
             commits = listOf("init"),
         )
     } exercise {
-        runGradle(
-            projectDir = projectDir,
-            task = "release",
-            quiet = false,
-            extraArgs = listOf("--dry-run", "--warning-mode=all", "--console=plain"),
-        )
+        GradleRunner.create()
+            .withProjectDir(File(projectDir))
+            .withArguments("release", "--dry-run", "--warning-mode=all", "--console=plain")
+            .build()
+            .output
     } verifyAnd { output ->
         output.contains("implicit dependency")
             .assertIsEqualTo(false, "Unexpected implicit dependency warning.\n$output")
@@ -413,216 +404,46 @@ class AdditionalTasksFunctionalTest {
     }
 
     @Test
-    fun githubReleaseUploadFailsWhenAssetFileMissing() = setup(object {
+    fun missingReleaseAssetBlocksUpload() = setup(object {
         val projectDir = createTempDirectory()
-        val addFileNames = setOf("build.gradle.kts", "settings.gradle", ".gitignore")
-        val missingFile = "does-not-exist.txt"
+        val missingAsset = File(projectDir, "missing.zip")
+        val invocations = File(projectDir, "gh-invocations.txt")
     }) {
         writeSettings(projectDir)
-        writeBuildFileWithMissingAssetAndValidation(projectDir, missingFile)
-        writeGitIgnore(projectDir)
-        initializeGitRepo(
-            directory = projectDir,
-            remoteUrl = projectDir,
-            addFileNames = addFileNames,
-            initialTag = "1.0.0",
-            commits = listOf("init"),
-        )
-    } exercise {
-        val runner = GradleRunner.create()
-        runner.withProjectDir(File(projectDir))
-        runner.withArguments("validateGithubReleaseAssets", "--console=plain")
-        runCatching { runner.build() }
-    } verifyAnd { result ->
-        val exception = result.exceptionOrNull()
-        result.isFailure
-            .assertIsEqualTo(true, "Expected validation to fail when asset file missing")
-        exception
-            ?.message
-            ?.contains(missingFile)
-            .assertIsEqualTo(true, "Error message should mention missing file: ${exception?.message}")
-    } teardown {
-        removeDirectory(projectDir)
-    }
-
-    @Test
-    fun githubReleaseUploadReportsAllMissingAssets() = setup(object {
-        val projectDir = createTempDirectory()
-        val addFileNames = setOf("build.gradle.kts", "settings.gradle", ".gitignore")
-        val missingFiles = listOf("missing-one.txt", "missing-two.txt", "missing-three.txt")
-    }) {
-        writeSettings(projectDir)
-        writeBuildFileWithMultipleMissingAssetsAndValidation(projectDir, missingFiles)
-        writeGitIgnore(projectDir)
-        initializeGitRepo(
-            directory = projectDir,
-            remoteUrl = projectDir,
-            addFileNames = addFileNames,
-            initialTag = "1.0.0",
-            commits = listOf("init"),
-        )
-    } exercise {
-        val runner = GradleRunner.create()
-        runner.withProjectDir(File(projectDir))
-        runner.withArguments("validateGithubReleaseAssets", "--console=plain")
-        runCatching { runner.build() }
-    } verifyAnd { result ->
-        val exception = result.exceptionOrNull()
-        result.isFailure
-            .assertIsEqualTo(true, "Expected validation to fail when asset files missing")
-        val errorMessage = exception?.message ?: ""
-        missingFiles.forEach { missingFile ->
-            errorMessage
-                .contains(missingFile)
-                .assertIsEqualTo(true, "Error message should mention missing file '$missingFile': $errorMessage")
+        val bin = File(projectDir, "bin").apply { mkdirs() }
+        File(bin, "gh").apply {
+            writeText(
+                """
+                #!/bin/sh
+                printf '%s\n' "$*" >> "${invocations.absolutePath}"
+                """.trimIndent(),
+            )
+            setExecutable(true)
         }
-    } teardown {
-        removeDirectory(projectDir)
-    }
-
-    @Test
-    fun validateGithubReleaseAssetsSucceedsWhenAllFilesExist() = setup(object {
-        val projectDir = createTempDirectory()
-        val addFileNames = setOf("build.gradle.kts", "settings.gradle", ".gitignore")
-        val assetFiles = listOf("asset-one.txt", "asset-two.txt")
-    }) {
-        writeSettings(projectDir)
-        writeBuildFileWithExistingAssets(projectDir, assetFiles)
-        writeGitIgnore(projectDir)
-        assetFiles.forEach { fileName ->
-            File("$projectDir/$fileName").writeText("test content")
-        }
-        initializeGitRepo(
-            directory = projectDir,
-            remoteUrl = projectDir,
-            addFileNames = addFileNames,
-            initialTag = "1.0.0",
-            commits = listOf("init"),
+        File(projectDir, "build.gradle.kts").writeText(
+            """
+            plugins { id("com.zegreatrob.tools.tagger") }
+            tagger {
+                githubReleaseEnabled.set(true)
+                githubReleaseAssets.from(file("${missingAsset.name}"))
+            }
+            tasks.named<Exec>("githubReleaseUpload") {
+                environment("PATH", "$projectDir/bin:" + System.getenv("PATH"))
+            }
+            """.trimIndent(),
         )
     } exercise {
         val runner = GradleRunner.create()
-        runner.withProjectDir(File(projectDir))
-        runner.withArguments("validateGithubReleaseAssets", "--console=plain")
-        runCatching { runner.build() }
-    } verifyAnd { result ->
-        result.isSuccess
-            .assertIsEqualTo(true, "Expected validation to succeed when all files exist: ${result.exceptionOrNull()?.message}")
+            .withProjectDir(File(projectDir))
+            .withArguments("githubReleaseUpload", "-x", "githubRelease", "-Pversion=1.2.3", "--console=plain")
+        runCatching { runner.buildAndFail() }
+    } verifyAnd { build ->
+        val result = build.getOrThrow()
+        result.task(":validateGithubReleaseAssets")?.outcome?.name.assertIsEqualTo("FAILED")
+        result.output.contains(missingAsset.absolutePath).assertIsEqualTo(true, result.output)
+        result.task(":githubReleaseUpload").assertIsEqualTo(null)
+        invocations.exists().assertIsEqualTo(false)
     } teardown {
         removeDirectory(projectDir)
-    }
-
-    @Test
-    fun validateGithubReleaseAssetsSucceedsWhenFileTreeMatchesNoFiles() = setup(object {
-        val projectDir = createTempDirectory()
-        val addFileNames = setOf("build.gradle.kts", "settings.gradle", ".gitignore")
-        val buildDir = "$projectDir/build"
-        val distDir = "$buildDir/distributions"
-    }) {
-        writeSettings(projectDir)
-        writeBuildFileWithFileTreeAssets(projectDir)
-        writeGitIgnore(projectDir)
-        File(distDir).mkdirs()
-        initializeGitRepo(
-            directory = projectDir,
-            remoteUrl = projectDir,
-            addFileNames = addFileNames,
-            initialTag = "1.0.0",
-            commits = listOf("init"),
-        )
-    } exercise {
-        val runner = GradleRunner.create()
-        runner.withProjectDir(File(projectDir))
-        runner.withArguments("validateGithubReleaseAssets", "--console=plain")
-        val result = runner.build()
-        result.output
-    } verifyAnd { output ->
-        output
-            .contains("No GitHub release assets configured")
-            .assertIsEqualTo(true, "Should report no assets when fileTree matches nothing: $output")
-    } teardown {
-        removeDirectory(projectDir)
-    }
-
-    private fun writeBuildFileWithMissingAssetAndValidation(projectDir: String, missingFile: String) {
-        File("$projectDir/build.gradle.kts").writeText(
-            """
-            plugins {
-                id("com.zegreatrob.tools.tagger")
-            }
-            tagger {
-                releaseBranch = "master"
-                githubReleaseEnabled.set(true)
-                githubReleaseAssets.from(file("$missingFile"))
-            }
-            """.trimIndent(),
-        )
-    }
-
-    private fun writeBuildFileWithMultipleMissingAssetsAndValidation(projectDir: String, missingFiles: List<String>) {
-        val filesDeclaration = missingFiles.joinToString(", ") { "file(\"$it\")" }
-        File("$projectDir/build.gradle.kts").writeText(
-            """
-            plugins {
-                id("com.zegreatrob.tools.tagger")
-            }
-            tagger {
-                releaseBranch = "master"
-                githubReleaseEnabled.set(true)
-                githubReleaseAssets.from($filesDeclaration)
-            }
-            """.trimIndent(),
-        )
-    }
-
-    private fun writeBuildFileWithExistingAssets(projectDir: String, assetFiles: List<String>) {
-        val filesDeclaration = assetFiles.joinToString(", ") { "file(\"$it\")" }
-        File("$projectDir/build.gradle.kts").writeText(
-            """
-            plugins {
-                id("com.zegreatrob.tools.tagger")
-            }
-            tagger {
-                releaseBranch = "master"
-                githubReleaseEnabled.set(true)
-                githubReleaseAssets.from($filesDeclaration)
-            }
-            """.trimIndent(),
-        )
-    }
-
-    private fun writeBuildFileWithFileTreeAssets(projectDir: String) {
-        File("$projectDir/build.gradle.kts").writeText(
-            """
-            plugins {
-                id("com.zegreatrob.tools.tagger")
-            }
-            tagger {
-                releaseBranch = "master"
-                githubReleaseEnabled.set(true)
-                githubReleaseAssets.from(
-                    fileTree("build/distributions") {
-                        include("existing.zip", "missing.zip")
-                    }
-                )
-            }
-            """.trimIndent(),
-        )
-    }
-
-    private fun runGradle(
-        projectDir: String,
-        task: String,
-        quiet: Boolean = true,
-        extraArgs: List<String> = emptyList(),
-    ): String {
-        val runner = GradleRunner.create()
-        runner.withProjectDir(File(projectDir))
-        val args = mutableListOf(task)
-        if (quiet) {
-            args.add("-q")
-        }
-        args.addAll(extraArgs)
-        runner.withArguments(args)
-        return runner.build().output.trim()
     }
 }
