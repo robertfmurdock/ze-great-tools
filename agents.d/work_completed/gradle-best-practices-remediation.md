@@ -129,17 +129,17 @@ TestKit coverage, root naming, and the absence of `buildSrc` are satisfied.
 
 - [x] Obtain explicit authorization for the mandatory final refactor subagent in the thread that will spawn it. Record the response in Implementation Notes.
 - [x] Complete the final refactor review of all remediation commits and files per [REFACTOR_AGENT.md](../context/REFACTOR_AGENT.md). Rerun applicable detection checks and the full Gradle check.
-- [ ] Confirm the completed remediation is pushed, then move this card to `agents.d/work_completed/`.
+- [x] Confirm the completed remediation is pushed, then move this card to `agents.d/work_completed/`.
 
 ## Current State
 
 - **Date** 2026-11-12
 - **Branch and source baseline commit** `main`, `14b2a847` (`origin/main` before this remediation slice).
-- **Last verified commit** `21c816ab`; fresh-home and normal-home composite checks passed before the documentation-only state update.
-- **Uncommitted work** This card's final push/move status update only.
+- **Last verified and pushed commit** `6dc893ae`; fresh-home and normal-home composite checks passed before the documentation-only state update.
+- **Uncommitted work** Final relocation of this card to `agents.d/work_completed/`.
 - **Status** All historical findings and advisories have a completed or not-implemented disposition. AR5 is newly complete. Remaining NPM lifecycle/provider reads, plugin repository convention extraction, task-name constants, and source-at-root restructuring are explicitly not implemented with evidence below.
 - **Blockers** None.
-- **Next** Commit the state update, push both validated commits, then move this card to `agents.d/work_completed/`.
+- **Next** Move this pushed card to `agents.d/work_completed/`.
 
 ## Implementation Notes
 
@@ -156,6 +156,10 @@ TestKit coverage, root naming, and the absence of `buildSrc` are satisfied.
 
 - Reviewed `4d42e320^..14b2a847` (46 commits, 76 files) and the current four settings files plus this card. The required review found no critical or major issues; no fixes were required. Minor function-length observations remain in established orchestration/configuration methods. It found no actionable duplication, comment, unused-code, data-flow, naming, or function-evolution issue. The duplicated repository filters are intentional per-build settings and passed fresh-cache plugin resolution.
 - Both `GRADLE_USER_HOME=/private/tmp/gradle-best-practices-fresh-home ./gradlew check -q --console=plain` and `./gradlew check -q --console=plain` passed. `git diff --check` passed.
+
+### 2026-11-12 · Push confirmation
+
+- Commits `21c816ab` and `6dc893ae` were pushed to `origin/main`. SSH authentication was unavailable, so the authorized push used the authenticated GitHub CLI credential helper over HTTPS without changing the saved remote. GitHub reported the expected bypass of its required `Build` status check; local full checks and the fresh-cache check passed.
 
 ### 2026-11-12 · Lazy NPM target experiment
 
