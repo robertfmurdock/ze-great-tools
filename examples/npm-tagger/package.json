@@ -1,0 +1,9 @@
+{
+  "name": "release-notes-demo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A small project demonstrating the Tagger CLI",
+  "devDependencies": {
+    "@continuous-excellence/tagger": "3.6.27"
+  }
+}

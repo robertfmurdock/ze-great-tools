@@ -1,0 +1,26 @@
+name: Calculate release version
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  version:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: "21"
+      - uses: gradle/actions/setup-gradle@v6
+      - name: Calculate version
+        run: ./gradlew calculateVersion -PexportToGithub=true
+      - name: Show version
+        run: echo "Calculated version is $TAGGER_VERSION"
