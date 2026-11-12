@@ -12,6 +12,11 @@ plugins {
     alias(libs.plugins.org.jmailen.kotlinter)
 }
 
+group = "com.zegreatrob.tools"
+subprojects {
+    group = rootProject.group
+}
+
 fingerprintConfig {
     includedProjects = setOf("dashboard-test-summary")
 }
