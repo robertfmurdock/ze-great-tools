@@ -8,6 +8,7 @@ Load cost: tokens shown are approximate full file size.
 - [DOCUMENTATION.md](DOCUMENTATION.md) (~400t) — user-facing docs standards, link verification, grammar/formatting. Load when modifying README, guides, or user-facing markdown.
 - [PLAYBOOK_CODE_STYLE.md](PLAYBOOK_CODE_STYLE.md) (~700t) — function size, data flow, deprecation, formatting. Load when modifying source code (not tests).
 - [GRADLE_PLAYBOOK.md](GRADLE_PLAYBOOK.md) (~600t) — build logic, task patterns, dependency management. Load when modifying build files or version catalog.
+- [GRADLE_PLUGIN_ARCHITECTURE.md](GRADLE_PLUGIN_ARCHITECTURE.md) (~800t) — plugin types, commit-triggered stable release wiring, coordinate rules, and publication traps. Load when designing, adding, moving, or publishing a Gradle plugin.
 - [GITHUB_ACTIONS_PLAYBOOK.md](GITHUB_ACTIONS_PLAYBOOK.md) (~500t) — CI/CD orchestration. Load when adding/changing workflows.
 - [GIT_WORKFLOW.md](GIT_WORKFLOW.md) (~350t) — commit standards. Load when creating commits, or analyzing git history.
 - [REFACTOR_AGENT.md](REFACTOR_AGENT.md) (~1100t) — mandatory quality audit checklist. Load only for final refactor pass (subagent required).
