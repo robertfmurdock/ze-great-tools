@@ -5,11 +5,17 @@ import com.zegreatrob.testmints.setup
 import com.zegreatrob.tools.test.git.createTempDirectory
 import com.zegreatrob.tools.test.git.initializeGitRepo
 import com.zegreatrob.tools.test.git.removeDirectory
+import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
 import java.io.File
 import kotlin.test.Test
 
 class AdditionalTasksFunctionalTest {
+    private data class PublicationRetryRun(
+        val firstAttempt: BuildResult,
+        val retry: BuildResult,
+    )
+
     @Test
     fun generatedNonDraftSettingSkipsDraftPublication() = publicationWithGeneratedDraftSetting(
         false,
@@ -202,6 +208,76 @@ class AdditionalTasksFunctionalTest {
         first.task(":githubReleaseUpload")?.outcome?.name.assertIsEqualTo("SUCCESS")
         second.output.contains("Reusing configuration cache.").assertIsEqualTo(true)
         output.readLines().assertIsEqualTo(listOf("release", "upload", "1.2.3", "build/assets/generated asset.zip"))
+    } teardown {
+        removeDirectory(projectDir)
+    }
+
+    @Test
+    fun githubReleaseWaitsForDistributionsAndRunsAfterPublicationRetry() = setup(object {
+        val projectDir = createTempDirectory()
+        val events = File(projectDir, "events.txt")
+    }) {
+        writeSettings(projectDir)
+        val bin = File(projectDir, "bin").apply { mkdirs() }
+        File(bin, "gh").apply {
+            writeText(
+                """
+                #!/bin/sh
+                if [ "$2" = "view" ]; then exit 1; fi
+                printf 'github\n' >> "${events.absolutePath}"
+                """.trimIndent(),
+            )
+            setExecutable(true)
+        }
+        File(projectDir, "build.gradle.kts").writeText(
+            """
+            plugins { id("com.zegreatrob.tools.tagger") }
+            version = "1.2.3"
+            tagger {
+                releaseBranch = "master"
+                githubReleaseEnabled.set(true)
+            }
+            val failedOnce = layout.projectDirectory.file("publication-failed-once").asFile
+            val events = layout.projectDirectory.file("events.txt").asFile
+            val maven = tasks.register("closeAndReleaseSonatypeStagingRepository") {
+                doLast {
+                    if (!failedOnce.exists()) {
+                        failedOnce.writeText("failed")
+                        events.appendText("maven-failure\n")
+                        throw GradleException("simulated Maven publication failure")
+                    }
+                    events.appendText("maven\n")
+                }
+            }
+            val npm = tasks.register("jsPublish") {
+                mustRunAfter(maven)
+                doLast { events.appendText("npm\n") }
+            }
+            val portal = tasks.register("publishPlugins") {
+                mustRunAfter(npm)
+                doLast { events.appendText("portal\n") }
+            }
+            tasks.register("mockRelease") {
+                dependsOn(maven, npm, portal)
+                finalizedBy("githubRelease")
+            }
+            tasks.named<Exec>("githubRelease") {
+                environment("PATH", "${bin.absolutePath}:" + System.getenv("PATH"))
+            }
+            """.trimIndent(),
+        )
+    } exercise {
+        val runner = GradleRunner.create()
+            .withProjectDir(File(projectDir))
+            .withArguments("mockRelease", "-x", "tag", "--console=plain")
+        val firstAttempt = runner.buildAndFail()
+        val retry = runner.build()
+        PublicationRetryRun(firstAttempt, retry)
+    } verifyAnd { (firstAttempt, retry) ->
+        firstAttempt.output.contains("simulated Maven publication failure")
+            .assertIsEqualTo(true, "Expected the first attempt to fail at the simulated Maven publication")
+        retry.task(":githubRelease")?.outcome?.name.assertIsEqualTo("SUCCESS")
+        events.readLines().assertIsEqualTo(listOf("maven-failure", "maven", "npm", "portal", "github"))
     } teardown {
         removeDirectory(projectDir)
     }

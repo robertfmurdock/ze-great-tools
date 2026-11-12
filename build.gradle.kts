@@ -75,6 +75,12 @@ tasks {
         dependsOn(provider { gradle.includedBuild("tools").task(":release") })
         if (!version.contains("SNAPSHOT")) {
             dependsOn(provider {
+                listOf(
+                    gradle.includedBuild("tools").task(":closeAndReleaseSonatypeStagingRepository"),
+                    gradle.includedBuild("command-line-tools").task(":tagger-cli:jsPublish"),
+                )
+            })
+            dependsOn(provider {
                 gradle.includedBuild("tools-plugins").task(":dashboard-test-summary:publishPlugins")
             })
         }

@@ -234,6 +234,28 @@ class TaggerPluginTest {
     }
 
     @Test
+    fun `githubRelease must run after completed publication tasks without depending on them`() = setup(object {
+        val project = ProjectBuilder.builder().build()
+    }) exercise {
+        val sonatypeRelease = project.tasks.register("closeAndReleaseSonatypeStagingRepository").get()
+        val npmPublish = project.tasks.register("jsPublish").get()
+        val pluginPortalPublish = project.tasks.register("publishPlugins").get()
+        project.plugins.apply("com.zegreatrob.tools.tagger")
+        val task = project.tasks.findByName("githubRelease")!!
+        Triple(
+            task,
+            listOf(sonatypeRelease, npmPublish, pluginPortalPublish),
+            project.tasks.named("release").get(),
+        )
+    } verify { (task, publicationTasks, releaseTask) ->
+        val orderedTasks = task.mustRunAfter.getDependencies(task)
+        (publicationTasks + releaseTask).all { it in orderedTasks }
+            .assertIsEqualTo(true, "Expected GitHub release to follow publication completion and release tasks")
+        publicationTasks.none { it in task.taskDependencies.getDependencies(task) }
+            .assertIsEqualTo(true, "Expected publication ordering not to add publication task dependencies")
+    }
+
+    @Test
     fun `githubRelease task does not include generate_release_notes parameter`() = setup(object {
         val project = ProjectBuilder.builder().build()
     }) exercise {

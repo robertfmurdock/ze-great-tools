@@ -23,7 +23,18 @@ class TaggerPlugin : Plugin<Project> {
         registerVersioningTasks(project, tagger, exportToGithub)
         val tag = registerTagTask(project, tagger)
         val githubTasks = registerGithubTasks(project, tagger, tag, isSnapshot)
+        project.tasks.named("githubRelease").configure { task ->
+            task.mustRunAfter(
+                project.provider {
+                    listOf("closeAndReleaseSonatypeStagingRepository", "jsPublish", "publishPlugins")
+                        .flatMap { taskName -> project.getTasksByName(taskName, true) }
+                },
+            )
+        }
         registerReleaseTask(project, tagger, tag, githubTasks.release, githubTasks.upload, githubTasks.publish, isSnapshot)
+        project.tasks.named("githubRelease").configure { task ->
+            task.mustRunAfter(project.tasks.named("release"))
+        }
     }
 
     private fun registerVersioningTasks(project: Project, tagger: TaggerExtension, exportToGithub: Any?) {

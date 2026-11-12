@@ -1,36 +1,39 @@
 ---
-load_when: creating work cards, executing implementation tasks, reviewing work cards
-cost: ~350 tokens
-brief: versioned work card format, decisions, evidence, and handoffs
+load_when: creating, executing, or reviewing work cards
+cost: ~300 tokens
+brief: versioned card format, test quality before commit, and closeout
 ---
 
 # Work Card Protocol
 
 **Current version: 2**
 
-Use for active work tracked in `agents.d/work/`. A card should preserve intent and help an agent make sound choices; it is not a transcript of routine work.
+Cards track intent, decisions, and evidence—not routine activity. New or revised cards start with `**Work card protocol: 2**` below the title.
 
-## Version history
+## Card content
 
-- **Version 2** — Replaces the checklist and command-log format with task-specific acceptance evidence, consequential decisions, concise handoffs, and explicit card closeout. Shared repository rules remain in their existing instructions.
-- **Version 1** — Historical format used by cards created before version 2. Completed cards remain unchanged and are interpreted according to the version they carry, if present.
+- **Goal**: intended outcome.
+- **Constraints and acceptance evidence**: task-specific boundaries and observable proof of success. For behavior changes, identify the behavior to test and follow [TESTING.md](TESTING.md) and the Testmints skill.
+- **Decisions**: consequential choices, alternatives, and rationale; omit when unnecessary.
+- **Progress**: current status or meaningful outcomes, when useful.
+- **Resume note**: only when pausing or handing off; state remaining work, blockers, relevant uncommitted changes, and next step. Git records branch and commit state.
 
-## Card format
+Use task-specific headings as needed. Link to shared repository guidance instead of copying its generic rules. Record exceptions and meaningful evidence; omit routine successful commands, volatile state, generic checklists, and activity logs.
 
-Start each new or revised card with `**Work card protocol: 2**` below its title. Keep only sections that carry useful information; task-specific headings are encouraged.
+## Before committing behavior changes
 
-- **Goal**: the intended outcome in a sentence.
-- **Constraints and acceptance evidence**: important boundaries and observable evidence that the outcome works. For behavior changes, identify the behavior that needs a test; follow [TESTING.md](TESTING.md) and the Testmints skill, including confirming a new test fails for the intended reason before implementation. Record that failure briefly when it is meaningful evidence.
-- **Decisions**: include only consequential choices, alternatives considered, and why the choice fits the goal. Omit this section if no decision needs preserving.
-- **Progress**: concise status or completed outcomes when needed to coordinate ongoing work. Avoid per-step activity logs.
-- **Resume note**: include only when pausing or handing off; state remaining work, relevant uncommitted changes, blockers, and the next useful step. Git is the source of truth for branch and commit state.
+1. Write a test for the intended behavior and confirm it fails for the expected reason before implementation.
+2. Review the test against Testmints guidance. Fix findings and repeat the review until no actionable test-quality issues remain.
+3. Review and refine the implementation, then rerun relevant validation.
+4. Commit only when no review findings remain unresolved. If a finding cannot be resolved, explain why and leave the production change uncommitted until its disposition is clear.
 
-## Shared rules
-
-Follow repository-wide testing, validation, documentation, commit, push, delegation, and review instructions in `CLAUDE.md` and the applicable context documents. Cards should link to relevant guidance and record task-specific exceptions, risks, or evidence rather than repeat generic commands and procedures. Follow project semver guidance where changes affect shipped behavior.
-
-Update the card when a decision changes the approach, scope, risk, or acceptance criteria. Do not record routine successful commands, unchanged repository state, volatile commit hashes, template-compliance steps, or generic process checkboxes.
+Passing tests alone does not establish commit readiness. Test-quality review is iterative and happens before commit, not at card closeout.
 
 ## Closeout
 
-When the goal and acceptance evidence are satisfied, complete the required repository closeout and move the card from `agents.d/work/` to `agents.d/work_completed/`. Do not leave finished work active. If the work is incomplete or blocked, keep the card in `agents.d/work/` and add a concise resume note with what remains, blockers, and the next useful step.
+After the goal and acceptance evidence are satisfied, review the completed change against the card and applicable project guidance, resolve remaining issues, and confirm the evidence still holds. Then complete required repository closeout and move the card from `agents.d/work/` to `agents.d/work_completed/`. Keep unfinished or blocked cards active with a concise resume note; do not leave finished cards active.
+
+## Versions
+
+- **2** — Replaces routine checklists and command logs with concise decisions and acceptance evidence; adds iterative pre-commit test review and explicit closeout.
+- **1** — Earlier checklist and command-log format. Completed cards remain unchanged; interpret them under their original guidance.
