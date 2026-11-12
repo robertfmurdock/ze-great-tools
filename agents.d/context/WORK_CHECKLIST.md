@@ -1,102 +1,32 @@
 ---
-load_when: creating work cards, executing implementation tasks, reviewing work card compliance
-cost: ~500 tokens
-brief: work card structure, execution protocol, handoff, semver, subagent rules
+load_when: creating work cards, executing implementation tasks, reviewing work cards
+cost: ~350 tokens
+brief: versioned work card format, decisions, evidence, and handoffs
 ---
 
 # Work Card Protocol
 
-## Purpose
-Work card structure, TDD cycle, validation for implementation tasks.
+**Current version: 2**
 
-## When To Use
-Creating/executing/reviewing work cards in `agents.d/work/*.md`.
+Use for active work tracked in `agents.d/work/`. A card should preserve intent and help an agent make sound choices; it is not a transcript of routine work.
 
-## Critical Facts
+## Version history
 
-### Template Sections
-- **Goal**: one sentence
-- **Constraints**: boundaries, semver intent
-- **Checklist**: broad feature slices (not micro-tasks)
-- **Current State**: commit SHA, uncommitted work, blockers, date
-- **Implementation Notes**: date-stamped discoveries (newest first)
-- **Validation**: commands, pass/fail status (update per item)
+- **Version 2** — Replaces the checklist and command-log format with task-specific acceptance evidence, consequential decisions, and concise handoffs. Shared repository rules remain in their existing instructions.
+- **Version 1** — Historical format used by cards created before version 2. Completed cards remain unchanged and are interpreted according to the version they carry, if present.
 
-### Execution Order (sequential, no reordering)
-1. Review card template compliance
-2. If subagents: ask user authorization, record in notes
-3. Feature slices (strict TDD per TESTING.md):
-   - Load TESTING.md BEFORE code changes
-   - Write ONE failing test, verify expected failure
-   - Minimal implementation to pass
-   - Refactor-light (just-written code only)
-   - `./gradlew check -q --console=plain` passes
-4. Final refactor: MANDATORY subagent (REFACTOR_AGENT.md), reviews ALL commits/files
-5. Move to `agents.d/work_completed/`
+## Card format
 
-### Semver Annotations
-- `[major]`: breaking change
-- `[minor]`: new backward-compatible feature
-- `[patch]`: bug fix, refactor, build output changes
-- `[none]`: docs, work cards, build config
+Start each new or revised card with `**Work card protocol: 2**` below its title. Keep only sections that carry useful information; task-specific headings are encouraged.
 
-CLI: stdout = API (changes = `[major]`), stderr = diagnostic (changes = `[patch]`)
+- **Goal**: the intended outcome in a sentence.
+- **Constraints and acceptance evidence**: important boundaries and observable evidence that the outcome works. For behavior changes, identify the behavior that needs a test; follow [TESTING.md](TESTING.md) and the Testmints skill, including confirming a new test fails for the intended reason before implementation. Record that failure briefly when it is meaningful evidence.
+- **Decisions**: include only consequential choices, alternatives considered, and why the choice fits the goal. Omit this section if no decision needs preserving.
+- **Progress**: concise status or completed outcomes when needed to coordinate ongoing work. Avoid per-step activity logs.
+- **Resume note**: include only when pausing or handing off; state remaining work, relevant uncommitted changes, blockers, and the next useful step. Git is the source of truth for branch and commit state.
 
-Deprecation: build new → mark old deprecated → test both → remove at major boundary
+## Shared rules
 
-## Constraints
+Follow repository-wide testing, validation, documentation, commit, push, delegation, and review instructions in `CLAUDE.md` and the applicable context documents. Cards should link to relevant guidance and record task-specific exceptions, risks, or evidence rather than repeat generic commands and procedures. Follow project semver guidance where changes affect shipped behavior.
 
-### Subagents
-- Ask user authorization BEFORE spawn (every thread, even if previously authorized)
-- Record authorization in Implementation Notes with date
-- No explicit "yes" = single-agent mode
-
-### Repository State
-- Every checklist item = pushable state
-- **Every commit must be safe to push to main** — this is the basic test of commit quality
-- Run `./gradlew check -q --console=plain` before marking complete
-- **Goal verification**: When checklist states explicit goal/principle (DRY, SOLID, performance), verify implementation achieves goal before complete
-  - Example: "DRY: single source" means reading from ONE location, not synchronized copies
-  - Ask: "Does this achieve stated goal, or just solve tactical problem?"
-  - Implementation convenience does not override explicit requirements
-- Mark complete only after commit pushed
-- Update Validation incrementally
-- Never commit failing tests
-
-### Handoff
-Before pause: update Current State (SHA, uncommitted changes, status, blockers)
-
-Resume: read Current State, verify git (`git log -1`, `git status`), run `./gradlew check -q --console=plain`, log handoff in notes
-
-### Adaptation
-Project guidelines override work card. Update plan when constraints discovered. Ask user if semver impact increases. Log discoveries in Implementation Notes.
-
-## Key Files
-Required reads:
-- `agents.d/context/PERSONA.md`
-- `agents.d/context/TESTING.md` (MANDATORY before any feature slice)
-- `agents.d/context/DOCUMENTATION.md` (user-facing docs: README, guides)
-- `agents.d/context/PLAYBOOK_CODE_STYLE.md` (code changes)
-- `agents.d/context/GRADLE_PLAYBOOK.md` (build changes)
-- `agents.d/context/GIT_WORKFLOW.md` (commits, PRs)
-- `agents.d/context/GITHUB_ACTIONS_PLAYBOOK.md` (workflow changes)
-- `agents.d/context/REFACTOR_AGENT.md` (final refactor)
-
-## Decisions
-Use `./gradlew` only. Module-scoped validation. Focused changes per module. Follow existing patterns. Fix pre-existing violations during refactor.
-
-## Common Mistakes
-- Implementing code before writing test (violates TDD)
-- Pattern-matching work as "just metadata" and skipping test (if behavior changes, test first)
-- Not loading TESTING.md before implementation
-- Using generic "Review changes" instead of "Final refactor via MANDATORY subagent (REFACTOR_AGENT.md)"
-- Marking complete without goal verification (see Repository State section)
-- Spawning subagents without authorization
-- Marking items out of order
-- Batching checklist updates
-- Final refactor reviewing only recent changes (must review ALL)
-- Skipping final refactor
-- Not updating Current State before pause
-- Not updating Validation incrementally
-- Marking complete before push
-- Resuming without verifying git state
+Update the card when a decision changes the approach, scope, risk, or acceptance criteria. Do not record routine successful commands, unchanged repository state, volatile commit hashes, template-compliance steps, or generic process checkboxes. Close or move a card according to shared repository policy after its goal and acceptance evidence are satisfied.
