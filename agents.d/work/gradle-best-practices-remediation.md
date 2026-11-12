@@ -27,18 +27,16 @@ checked off.
   and `tools-plugins/src/main/kotlin/com/zegreatrob/tools/plugins/NpmCliPlugin.kt:52`.
   Replace deferred evaluation with plugin callbacks or lazy configuration, then
   rerun the full `afterEvaluate` scan. [Gradle](https://docs.gradle.org/current/userguide/best_practices_general.html#avoid_after_evaluate)
-- [ ] **AR1a · High · Replace NPM lifecycle bridge with a package-metadata task.**
-  Prefer a dedicated cacheable task over another Kotlin/Node lifecycle hook. The
-  task must consume the generated `jsPackageJson` output, take all `NpmCliExtension`
-  values as declared inputs, write the finalized package metadata as a declared
-  output, and become the producer consumed by `copyReadme`, `copyLicense`, and
-  `jsCliTar`. Preserve the public `npmCli {}` DSL, existing task names, package
-  fields, publish arguments, and configuration-cache reuse. Extend the NPM
-  TestKit suite with a package-metadata regression test. Alternatives considered:
-  task/target lifecycle callbacks, a narrowly scoped compatibility bridge, and
-  splitting setup/finalization into separate plugins; the package-metadata task
-  is the selected approach because it avoids undocumented Kotlin/Node timing.
-  [Gradle](https://docs.gradle.org/current/userguide/best_practices_tasks.html#use_cacheability_annotations)
+- [x] **AR1a · Will not implement · Separate NPM package-metadata task.**
+  Kotlin's `jsPackageJson` action writes directly into its own package directory,
+  regardless of its declared output property's value. A second writer would
+  overlap that output. A separate staged package would avoid the overlap but
+  duplicate the full package tree and change packaging, linking, and publishing
+  paths for this convention alone. Keep Kotlin's generator as the sole package
+  metadata owner; test lazy JS target configuration under AR1/AR2 instead. This
+  decision does not close the `afterEvaluate` finding. Alternatives and evidence
+  are recorded in Implementation Notes.
+  [Gradle](https://docs.gradle.org/current/userguide/best_practices_tasks.html#use_unique_output_files_and_directories)
 - [ ] **AR2 · Medium · Make Kotlin plugin configuration order-safe.** In
   `NpmCliPlugin.kt:53-55`, replace the eager `findByType`/early return with
   `pluginManager.withPlugin("org.jetbrains.kotlin.multiplatform")` and preserve
@@ -122,15 +120,38 @@ TestKit coverage, root naming, and the absence of `buildSrc` are satisfied.
 
 ## Current State
 
-- **Date** 2026-11-11
-- **Branch and baseline commit** `main` at `29fca6d5206eef625e58a24e02e7a797e9cc89a1`
-- **Last verified commit** `78343062` (remediation handoff).
-- **Uncommitted work** IDEA files and existing build-file changes have unrelated ownership; no remediation source changes are pending.
+- **Date** 2026-11-12
+- **Branch and baseline commit** `main` at `7838f055` (`origin/main` is one commit behind).
+- **Last verified commit** `7838f055` (baseline `./gradlew check -q --console=plain` passed).
+- **Uncommitted work** AR1a decision, an NPM plugin-order regression test, and early `copyReadme` registration plus task-provider wiring in `NpmCliPlugin.kt`. Focused NPM tests and the full check pass.
 - **Status** W1, W2, W3, A1, T1, T2, T3, T5, T6, L2, L3, L5, and A2 pushed. L1 is partially complete. T4, Git test environment isolation, D1, D2, D3, D4, D5, S1, S4, and S5 pushed. L4 library ordering partially complete.
 - **Blockers** None recorded.
-- **Next** S2 duplicated convention extraction.
+- **Next** Investigate a task-registration callback as a later Kotlin/Node hook, or retain a documented narrow `afterEvaluate` exception. The NPM source and test changes need full validation, commit, and push before related findings can close.
 
 ## Implementation Notes
+
+### 2026-11-12 · Lazy NPM target experiment
+
+- Added a TestKit regression applying the NPM plugin before Kotlin, configuring `copyReadme` during project evaluation, then generating package metadata twice with the configuration cache. It failed first because `copyReadme` was not registered until `afterEvaluate`; early registration via `pluginManager.withPlugin` made it pass. The fixture needed a normal Maven Central dependency repository to run `jsPackageJson`.
+- Tried replacing `afterEvaluate` with `KotlinMultiplatformExtension.targets.withType<KotlinJsIrTarget>().configureEach`. The real Digger CLI build failed while configuring its JS target because the `kotlinNodeJs` extension was not registered yet. Restored the existing hook; the focused NPM suite passes again. The target callback is too early for this package setup, but a later task callback remains an untested alternative. AR1/AR2 remain open.
+- `./gradlew :tools-plugins:formatKotlin -q --console=plain`, `./gradlew :tools-plugins:test --tests '*NpmCliPluginTest' -q --console=plain`, and `./gradlew check -q --console=plain` passed after restoring the working hook. `git diff --check` passed.
+
+### 2026-11-12 · AR1a decision
+
+- The user agreed that the dedicated cacheable package-metadata task is disproportionate for this build and asked for the smaller lazy-configuration alternative. AR1a is closed as "will not implement" for the reasons above; AR1 and AR2 remain open pending behavior tests.
+
+### 2026-11-12 · NPM output ownership investigation
+
+- Replaced string `dependsOn` references in `NpmCliPlugin.kt` with task providers. `./gradlew :tools-plugins:test --tests '*NpmCliPluginTest' -q --console=plain` and `./gradlew check -q --console=plain` passed. AR8 remains open until all references are checked and this slice is committed and pushed.
+- Inspected Kotlin Gradle plugin 2.4.21 sources. `KotlinPackageJsonTask.packageJson` is annotated `@OutputFile`, and its action calls `KotlinCompilationNpmResolution.createPackageJson`, which writes directly to the Kotlin npm project directory. Changing the task's output property alone would not redirect that write.
+- Considered overwriting the same `package.json` from a second task; rejected because two tasks would claim the same output and break the unique-output requirement. Considered redirecting `KotlinPackageJsonTask.packageJson`; rejected because the action ignores that property when writing. Considered publishing the tar archive directly; that changes the required npm publish arguments.
+- The viable route is separate staging: generate finalized metadata as its own output, have the README/license producers consume it, then assemble a complete package in an independently owned staging directory for `jsCliTar`, `jsLink`, and `jsPublish`. Keep the existing task names and npm command arguments; verify package contents and configuration-cache reuse before accepting the change. This route has not yet been implemented.
+
+### 2026-11-12 · Resume and baseline
+
+- `git log -1 --oneline` reported `7838f055 [patch] Force Maven Central republish`; `git status --short --branch` reported a clean `main` branch one commit ahead of `origin/main` before this card update.
+- `./gradlew check -q --console=plain` passed. Its output reported the expected local branch and release-branch warnings.
+- Inspected the NPM plugin and Kotlin Gradle plugin sources before changing its lifecycle wiring. Kotlin's `jsPackageJson` task owns its package JSON output, while the current npm archive and publish tasks consume that same package directory. AR1a needs distinct output ownership and an explicit producer chain; no NPM implementation was changed during this resume.
 
 ### 2026-11-11 · Initial lazy-convention slice
 

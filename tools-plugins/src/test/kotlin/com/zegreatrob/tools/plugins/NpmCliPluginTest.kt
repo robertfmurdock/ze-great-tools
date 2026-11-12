@@ -1,6 +1,7 @@
 package com.zegreatrob.tools.plugins
 
 import com.zegreatrob.testmints.setup
+import groovy.json.JsonSlurper
 import org.gradle.testkit.runner.GradleRunner
 import java.nio.file.Files
 import kotlin.test.Test
@@ -8,6 +9,52 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 class NpmCliPluginTest {
+    @Test
+    fun npmTasksCanBeConfiguredBeforeKotlinTargetsAreDeclared() = setup(object {
+        val directory = Files.createTempDirectory("npm-cli-plugin-order").toFile()
+
+        init {
+            directory.resolve("settings.gradle.kts").writeText(
+                """
+                rootProject.name = "fixture"
+                dependencyResolutionManagement { repositories { mavenCentral() } }
+                """.trimIndent(),
+            )
+            directory.resolve("build.gradle.kts").writeText(
+                """
+                plugins {
+                    id("com.zegreatrob.tools.plugins.npm-cli")
+                    id("org.jetbrains.kotlin.multiplatform")
+                }
+                npmCli {
+                    packageName.set("@continuous-excellence/fixture")
+                    description.set("Fixture CLI")
+                }
+                tasks.named("copyReadme") {
+                    description = "Configured during project evaluation"
+                }
+                kotlin {
+                    js { nodejs() }
+                }
+                """.trimIndent(),
+            )
+        }
+        val build = GradleRunner.create()
+            .withProjectDir(directory)
+            .withPluginClasspath()
+            .withArguments("jsPackageJson", "--configuration-cache")
+    }) exercise {
+        build.build()
+        build.build()
+    } verifyAnd { result ->
+        assertTrue(result.output.contains("Reusing configuration cache."))
+        val packageJson = JsonSlurper().parse(directory.resolve("build/js/packages/fixture/package.json")) as Map<*, *>
+        assertEquals("@continuous-excellence/fixture", packageJson["name"])
+        assertEquals("Fixture CLI", packageJson["description"])
+    } teardown {
+        directory.deleteRecursively()
+    }
+
     @Test
     fun snapshotPublishReusesConfigurationCache() = publishReusesConfigurationCache(
         "1.2.3-SNAPSHOT",

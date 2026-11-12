@@ -48,11 +48,16 @@ abstract class NpmCliExtension {
 class NpmCliPlugin : Plugin<Project> {
     override fun apply(project: Project) {
         val npmCli = project.extensions.create<NpmCliExtension>("npmCli")
+        project.pluginManager.withPlugin("org.jetbrains.kotlin.multiplatform") {
+            project.tasks.register<CopyPackageFile>("copyReadme")
+        }
 
         project.afterEvaluate {
             val kotlin = project.extensions.findByType<KotlinMultiplatformExtension>() ?: return@afterEvaluate
             val mainCompilation = kotlin.js().compilations.getByName("main")
             val mainNpmProjectDir = mainCompilation.npmProject.dir
+            val packageJson = project.tasks.named("jsPackageJson")
+            val npmInstall = project.rootProject.tasks.named("kotlinNpmInstall")
 
             mainCompilation.packageJson {
                 if (npmCli.packageName.isPresent) {
@@ -117,10 +122,11 @@ class NpmCliPlugin : Plugin<Project> {
                 }
             }
 
-            val copyReadme = project.tasks.register<CopyPackageFile>("copyReadme") {
+            val copyReadme = project.tasks.named("copyReadme", CopyPackageFile::class.java)
+            copyReadme.configure {
                 group = "distribution"
                 description = "Copies the README into the npm package"
-                dependsOn("jsPackageJson", ":kotlinNpmInstall")
+                dependsOn(packageJson, npmInstall)
                 source.from(project.layout.projectDirectory.file("README.md"))
                 destination.set(mainNpmProjectDir.map { it.file("README.md") })
             }
@@ -132,7 +138,7 @@ class NpmCliPlugin : Plugin<Project> {
             val copyLicense = project.tasks.register<CopyPackageFile>("copyLicense") {
                 group = "distribution"
                 description = "Copies the license into the npm package"
-                dependsOn("jsPackageJson", ":kotlinNpmInstall")
+                dependsOn(packageJson, npmInstall)
                 source.from(licenseFile)
                 destination.set(mainNpmProjectDir.map { it.file("LICENSE") })
             }
@@ -143,12 +149,12 @@ class NpmCliPlugin : Plugin<Project> {
                 dependsOn(
                     copyReadme,
                     copyLicense,
-                    "jsPackageJson",
-                    ":kotlinNpmInstall",
-                    "compileKotlinJs",
-                    "jsProcessResources",
-                    "compileProductionExecutableKotlinJs",
-                    "jsProductionExecutableCompileSync",
+                    packageJson,
+                    npmInstall,
+                    project.tasks.named("compileKotlinJs"),
+                    project.tasks.named("jsProcessResources"),
+                    project.tasks.named("compileProductionExecutableKotlinJs"),
+                    project.tasks.named("jsProductionExecutableCompileSync"),
                 )
                 from(mainNpmProjectDir)
                 compression = Compression.GZIP
