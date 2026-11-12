@@ -35,6 +35,12 @@ Reduce GitHub Actions supply-chain risk while preserving direct pushes to main a
 
 Dependency advisories and the floating npm installation are deferred. Job-level write access remains necessary for the existing release and wrapper PR workflows.
 
+## Hosted verification
+
+- [Build on the hardening commit](https://github.com/robertfmurdock/ze-great-tools/actions/runs/43306318419) passed. The release step succeeded and the stable release summary was skipped, so signing and npm provenance still need evidence from a normal release.
+- [Scorecard rerun](https://github.com/robertfmurdock/ze-great-tools/actions/runs/43306654638) passed. The SARIF dropped from 30 findings to nine. The three token-permission findings and all action-pin findings cleared. Pinned-Dependencies rose from 1/10 to 9/10, with the floating npm install still flagged. The report emitted no findings for the retained job-level permissions.
+- The [Tagger action smoke test](https://github.com/robertfmurdock/ze-great-tools/actions/runs/43306318421) failed with `option --force-snapshot requires a value`. The [previous smoke test](https://github.com/robertfmurdock/ze-great-tools/actions/runs/43281504161) had the same error before the hardening. See the [Tagger wrapper work card](../work_completed/create-github-action-wrapper.md#tagger-smoke-test-addendum) for the fix.
+
 ## Resume note
 
-After landing on main, verify Build and the next maintenance runs that have changes to submit. Verify signing and npm provenance on the next normal release. Dispatch Scorecard and record the before-and-after findings, including any remaining job-level write findings. Move this card to work_completed once hosted acceptance evidence is recorded.
+Verify the first post-hardening maintenance runs that have changes to submit, plus signing and npm provenance on the next normal release. Move this card to work_completed after recording that evidence.

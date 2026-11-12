@@ -79,6 +79,18 @@ jobs:
           name: ci-evidence
           path: build/dashboard/test-summary.json
           if-no-files-found: error
+      - name: Calculate snapshot with the Tagger action
+        id: tagger-smoke-test
+        uses: ./
+        with:
+          force-snapshot: 'true'
+      - name: Verify Tagger action outputs
+        env:
+          SMOKE_TEST_VERSION: ${{ steps.tagger-smoke-test.outputs.version }}
+          SMOKE_TEST_SNAPSHOT: ${{ steps.tagger-smoke-test.outputs.snapshot }}
+        run: |
+          test -n "$SMOKE_TEST_VERSION"
+          test "$SMOKE_TEST_SNAPSHOT" = true
       - name: Release 🔨
         env:
           ORG_GRADLE_PROJECT_signingKey: ${{ secrets.SIGNING_KEY }}

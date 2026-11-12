@@ -21,3 +21,11 @@ Package Tagger as a GitHub Action for direct repository use in GitHub Actions wo
 ## References
 - [Creating GitHub Actions](https://docs.github.com/en/actions/creating-actions)
 - [Creating a composite action](https://docs.github.com/en/actions/creating-actions/creating-a-composite-action)
+
+## Tagger smoke test addendum
+
+- Fixed the root composite action to pass an explicit value for `--force-snapshot`.
+- Moved the snapshot calculation and output assertions into Build before the Gradle release step, and removed the standalone smoke-test workflow. Build now fails and skips publishing if the action fails or returns an empty version or a snapshot value other than `true`.
+- Workflow lint and Gradle checks passed locally. The published Tagger CLI returned a nonempty snapshot version and `snapshot=true` with `--force-snapshot=true`.
+
+- Hosted verification is pending. Confirm both Tagger steps pass in the first Build with this change before the Gradle release step runs.

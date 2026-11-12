@@ -107,7 +107,7 @@ runs:
           calculate-version)
             args+=(calculate-version --format=json)
             add_option --release-branch "$INPUT_RELEASE_BRANCH"
-            add_boolean --force-snapshot "$INPUT_FORCE_SNAPSHOT"
+            add_option --force-snapshot "$INPUT_FORCE_SNAPSHOT"
             add_boolean --allow-detached-head "$INPUT_ALLOW_DETACHED_HEAD"
             if [[ "$INPUT_IMPLICIT_PATCH" == false ]]; then args+=(--implicit-patch=false); fi
             add_boolean --warnings-as-errors "$INPUT_WARNINGS_AS_ERRORS"
