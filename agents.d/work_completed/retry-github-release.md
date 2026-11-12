@@ -15,3 +15,9 @@ Recover from transient GitHub CLI failures in `githubRelease` by default. [Issue
 ## Decisions
 
 Keep the existing Exec task and CLI. Scope retries to release creation. Semver intent is patch.
+
+## Completion evidence
+
+- TestKit reproduced the reported TLS failure before the fix. The final suite verifies release recovery, read-before-write ordering, permanent errors, retry exhaustion, deterministic jitter, draft arguments, and configuration-cache reuse.
+- Final audit found a lost-response gap on the fourth create. A final read-only lookup resolves that case. An explicit secondary-rate-limit rejection at the attempt limit ends without another request.
+- `./gradlew check -q --console=plain` passed after the audit fixes. The additional-tasks functional suite passed all 24 tests.
