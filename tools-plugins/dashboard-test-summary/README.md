@@ -51,9 +51,11 @@ dashboardTestSummary {
 failing build status. The report is written to `build/dashboard/test-summary.json` when valid
 JUnit evidence is available.
 
-The task reads `GITHUB_RUN_ID`, `GITHUB_RUN_ATTEMPT`, and `GITHUB_SHA`. To run locally, set
-`-PdashboardRunId=1 -PdashboardRunAttempt=1 -PdashboardHeadSha=local`. Use `dashboardHeadSha`
-to supply the PR head commit when the workflow checks out a merge commit.
+The task detects GitHub Actions through `GITHUB_ACTIONS`. In Actions it reads
+`GITHUB_RUN_ID`, `GITHUB_RUN_ATTEMPT`, and `GITHUB_SHA` automatically and writes the schema
+version 1 report consumed by the dashboard. Locally, it writes the same test totals without
+GitHub run identity fields. The local report is for inspection; only upload a report generated
+in GitHub Actions to the dashboard artifact.
 
 Upload only `test-summary.json` to the artifact selected by your
 [dashboard board configuration](https://github.com/robertfmurdock/ze-great-dashboard/blob/main/docs/board-configuration.md#github-actions-test-totals).

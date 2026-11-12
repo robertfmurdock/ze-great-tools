@@ -57,11 +57,14 @@ abstract class MergeJUnitCounts : DefaultTask() {
     fun merge() = countsFile.writeCounts(countsFiles.sumCounts())
 }
 
-@DisableCachingByDefault(because = "The report is bound to a single workflow run and attempt")
+@DisableCachingByDefault(because = "The report depends on the current execution context")
 abstract class WriteDashboardTestSummary : DefaultTask() {
     @get:InputFiles
     @get:PathSensitive(PathSensitivity.NONE)
     abstract val countsFiles: ConfigurableFileCollection
+
+    @get:Input
+    abstract val githubActions: Property<Boolean>
 
     @get:Input
     @get:Optional
@@ -82,18 +85,22 @@ abstract class WriteDashboardTestSummary : DefaultTask() {
     fun write() {
         val counts = countsFiles.sumCounts()
         require(counts.reports > 0) { "No JUnit XML reports found for this build." }
-        val id = requireNotNull(runId.orNull?.toLongOrNull()?.takeIf { it > 0 }) { "A positive GitHub run ID is required." }
-        val attempt = requireNotNull(runAttempt.orNull?.toIntOrNull()?.takeIf { it > 0 }) { "A positive GitHub run attempt is required." }
-        val sha = requireNotNull(headSha.orNull?.takeIf { it.isNotBlank() }) { "A GitHub head SHA is required." }
         summaryFile.writeJson(
             buildJsonObject {
                 put("schemaVersion", 1)
-                put("runId", id)
-                put("runAttempt", attempt)
-                put("headSha", sha)
+                if (githubActions.get()) addGithubRunIdentity()
                 counts.addTotals(this)
             },
         )
+    }
+
+    private fun kotlinx.serialization.json.JsonObjectBuilder.addGithubRunIdentity() {
+        val id = requireNotNull(runId.orNull?.toLongOrNull()?.takeIf { it > 0 }) { "A positive GitHub run ID is required in GitHub Actions." }
+        val attempt = requireNotNull(runAttempt.orNull?.toIntOrNull()?.takeIf { it > 0 }) { "A positive GitHub run attempt is required in GitHub Actions." }
+        val sha = requireNotNull(headSha.orNull?.takeIf { it.isNotBlank() }) { "A GitHub head SHA is required in GitHub Actions." }
+        put("runId", id)
+        put("runAttempt", attempt)
+        put("headSha", sha)
     }
 }
 

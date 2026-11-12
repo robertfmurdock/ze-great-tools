@@ -33,6 +33,25 @@ class DashboardTestSummaryTest {
     }
 
     @Test
+    fun `writes counts without workflow identity outside GitHub Actions`() = setup(object {
+        val expected = buildJsonObject {
+            put("schemaVersion", 1)
+            put("total", 5)
+            put("passed", 1)
+            put("failed", 2)
+            put("skipped", 2)
+        }
+        val build = fixture(
+            "dashboardTestSummary.reports.from(files(\"first.xml\", \"second.xml\"))\n",
+            githubEnvironment = false,
+        )
+    }) exercise {
+        build.build()
+    } verify {
+        summary().assertIsEqualTo(expected)
+    }
+
+    @Test
     fun `counts a shared included build once and reuses configuration cache`() = setup(object {
         val build = composite()
         val expected = summaryJson(total = 5, passed = 4, failed = 0, skipped = 1)
@@ -199,7 +218,7 @@ class DashboardTestSummaryTest {
         )
     }
 
-    private fun fixture(buildScript: String): GradleRunner {
+    private fun fixture(buildScript: String, githubEnvironment: Boolean = true): GradleRunner {
         settings(directory, "fixture")
         directory.resolve("build.gradle.kts").writeText(
             "plugins { id(\"com.zegreatrob.tools.dashboard-test-summary\") }\n$buildScript",
@@ -210,18 +229,19 @@ class DashboardTestSummaryTest {
         directory.resolve("second.xml").writeText(
             """<testsuites><testsuite><testcase><failure/></testcase><testcase><property name="skip"/></testcase></testsuite></testsuites>""",
         )
-        return runner()
+        return runner(githubEnvironment)
     }
 
-    private fun runner() = GradleRunner.create()
+    private fun runner(githubEnvironment: Boolean = true) = GradleRunner.create()
         .withProjectDir(directory)
         .withPluginClasspath()
         .withEnvironment(
-            System.getenv() + mapOf(
+            (System.getenv() - setOf("GITHUB_ACTIONS", "GITHUB_RUN_ID", "GITHUB_RUN_ATTEMPT", "GITHUB_SHA")) + if (githubEnvironment) mapOf(
+                "GITHUB_ACTIONS" to "true",
                 "GITHUB_RUN_ID" to runId.toString(),
                 "GITHUB_RUN_ATTEMPT" to runAttempt.toString(),
                 "GITHUB_SHA" to headSha,
-            ),
+            ) else mapOf("GITHUB_ACTIONS" to "false"),
         )
         .withArguments("dashboardTestSummary", "--continue", "--configuration-cache", "--console=plain")
 

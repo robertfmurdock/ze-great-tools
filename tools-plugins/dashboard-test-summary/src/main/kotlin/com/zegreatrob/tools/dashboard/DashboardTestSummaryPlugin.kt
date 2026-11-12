@@ -88,11 +88,10 @@ private fun Project.registerSummary(localCounts: Provider<RegularFile>, included
         task.description = "Writes the aggregate JUnit test summary for Ze Great Dashboard."
         task.dependsOn(clearSummary)
         task.countsFiles.from(localCounts, includedCounts)
-        task.runId.convention(providers.gradleProperty("dashboardRunId").orElse(providers.environmentVariable("GITHUB_RUN_ID")))
-        task.runAttempt.convention(
-            providers.gradleProperty("dashboardRunAttempt").orElse(providers.environmentVariable("GITHUB_RUN_ATTEMPT")),
-        )
-        task.headSha.convention(providers.gradleProperty("dashboardHeadSha").orElse(providers.environmentVariable("GITHUB_SHA")))
+        task.githubActions.convention(providers.environmentVariable("GITHUB_ACTIONS").map(String::toBoolean).orElse(false))
+        task.runId.convention(providers.environmentVariable("GITHUB_RUN_ID"))
+        task.runAttempt.convention(providers.environmentVariable("GITHUB_RUN_ATTEMPT"))
+        task.headSha.convention(providers.environmentVariable("GITHUB_SHA"))
         task.summaryFile.set(summaryPath)
     }
 }
