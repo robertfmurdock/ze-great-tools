@@ -2,17 +2,19 @@ package com.zegreatrob.tools.plugins
 
 import com.zegreatrob.testmints.setup
 import org.gradle.testkit.runner.GradleRunner
-import java.nio.file.Files
+import org.junit.jupiter.api.io.TempDir
+import java.io.File
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class ReportsPluginTest {
-    @Test
-    fun reportsConventionProvidesItsCheckTaskPrerequisite() = setup(object {
-        val directory = Files.createTempDirectory("reports-plugin-prerequisite").toFile()
+    @TempDir
+    lateinit var directory: File
 
+    @Test
+    fun reportsConventionRegistersTheCollectionTask() = setup(object {
         init {
             directory.resolve("settings.gradle.kts").writeText("rootProject.name = \"fixture\"")
             directory.resolve("build.gradle.kts").writeText(
@@ -25,16 +27,12 @@ class ReportsPluginTest {
             .withPluginClasspath()
             .withArguments("help", "--task", "collectResults")
             .build()
-    } verifyAnd { result ->
+    } verify { result ->
         assertTrue(result.output.contains("Collects reports and test results"))
-    } teardown {
-        directory.deleteRecursively()
     }
 
     @Test
     fun collectionPreservesFilesWithMatchingRelativeNames() = setup(object {
-        val directory = Files.createTempDirectory("reports-plugin-collision").toFile()
-
         init {
             directory.resolve("settings.gradle.kts").writeText("rootProject.name = \"fixture\"")
             directory.resolve("build.gradle.kts").writeText(
@@ -56,17 +54,13 @@ class ReportsPluginTest {
             .withPluginClasspath()
             .withArguments("collectResults")
             .build()
-    } verifyAnd {
+    } verify {
         assertEquals("report", directory.resolve("build/test-output/results/reports/jvmTest/shared.xml").readText())
         assertEquals("result", directory.resolve("build/test-output/results/test-results/jvmTest/shared.xml").readText())
-    } teardown {
-        directory.deleteRecursively()
     }
 
     @Test
     fun helpDoesNotCreateReportOutputDirectory() = setup(object {
-        val directory = Files.createTempDirectory("reports-plugin-help").toFile()
-
         init {
             directory.resolve("settings.gradle.kts").writeText("rootProject.name = \"fixture\"")
             directory.resolve("build.gradle.kts").writeText(
@@ -84,15 +78,14 @@ class ReportsPluginTest {
             .withPluginClasspath()
             .withArguments("help")
             .build()
-    } verifyAnd {
+    } verify {
         assertFalse(directory.resolve("build/test-output").exists())
-    } teardown {
-        directory.deleteRecursively()
     }
 
     @Test
-    fun cleaningCopiedReportsPreservesCopiedTestResults() = setup(object {
-        val directory = Files.createTempDirectory("reports-plugin-test").toFile()
+    fun cleaningCopiedReportsRemovesReportsAndPreservesTestResults() = setup(object {
+        val cleanedCopy = directory.resolve("build/test-output/results/reports/report.txt")
+        val preservedCopy = directory.resolve("build/test-output/results/test-results/TEST.xml")
 
         init {
             directory.resolve("settings.gradle.kts").writeText("rootProject.name = \"fixture\"")
@@ -113,6 +106,8 @@ class ReportsPluginTest {
                 .withPluginClasspath()
                 .withArguments("collectResults")
                 .build()
+            check(cleanedCopy.isFile) { "Expected a copied file at $cleanedCopy" }
+            check(preservedCopy.readText() == "results") { "Expected original contents at $preservedCopy" }
         }
     }) exercise {
         GradleRunner.create()
@@ -120,9 +115,8 @@ class ReportsPluginTest {
             .withPluginClasspath()
             .withArguments("cleanCopyReportsToRootDirectory")
             .build()
-    } verifyAnd {
-        assertTrue(directory.resolve("build/test-output/results/test-results/TEST.xml").isFile)
-    } teardown {
-        directory.deleteRecursively()
+    } verify {
+        assertFalse(cleanedCopy.exists())
+        assertEquals("results", preservedCopy.readText())
     }
 }

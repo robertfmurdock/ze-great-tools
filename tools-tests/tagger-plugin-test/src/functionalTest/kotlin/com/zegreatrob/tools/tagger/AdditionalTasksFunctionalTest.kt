@@ -11,6 +11,14 @@ import java.io.File
 import kotlin.test.Test
 
 class AdditionalTasksFunctionalTest {
+    private open class TemporaryProject : AutoCloseable {
+        val projectDir = createTempDirectory()
+
+        override fun close() {
+            removeDirectory(projectDir)
+        }
+    }
+
     private data class ConfigurationCacheRun(
         val first: BuildResult,
         val reused: BuildResult,
@@ -40,8 +48,7 @@ class AdditionalTasksFunctionalTest {
         draft: Boolean,
         expectedOutcome: String,
         expectedArguments: List<String>,
-    ) = setup(object {
-        val projectDir = createTempDirectory()
+    ) = setup(object : TemporaryProject() {
         val output = File(projectDir, "gh-called.txt")
     }) {
         writeSettings(projectDir)
@@ -80,17 +87,14 @@ class AdditionalTasksFunctionalTest {
             .withProjectDir(File(projectDir))
             .withArguments("githubReleasePublish", "-x", "githubReleaseUpload", "-Pversion=1.2.3", "--configuration-cache", "--console=plain")
             .build()
-    } verifyAnd { result ->
+    } verify { result ->
         result.task(":generateDraftSetting")?.outcome?.name.assertIsEqualTo("SUCCESS")
         result.task(":githubReleasePublish")?.outcome?.name.assertIsEqualTo(expectedOutcome)
         (output.takeIf { it.exists() }?.readLines() ?: emptyList()).assertIsEqualTo(expectedArguments)
-    } teardown {
-        removeDirectory(projectDir)
     }
 
     @Test
-    fun generatedDraftSettingControlsReleaseCreation() = setup(object {
-        val projectDir = createTempDirectory()
+    fun generatedDraftSettingControlsReleaseCreation() = setup(object : TemporaryProject() {
         val output = File(projectDir, "gh-create-arguments.txt")
     }) {
         writeSettings(projectDir)
@@ -131,21 +135,17 @@ class AdditionalTasksFunctionalTest {
         val first = runner.build()
         val firstArguments = output.takeIf { it.exists() }?.readLines().orEmpty()
         ConfigurationCacheRun(first, runner.build(), firstArguments)
-    } verifyAnd { (first, second, firstArguments) ->
+    } verify { (first, second, firstArguments) ->
         first.task(":generateDraftSetting")?.outcome?.name.assertIsEqualTo("SUCCESS")
         second.output.contains("Reusing configuration cache.").assertIsEqualTo(true)
         val expectedArguments = listOf("release", "create", "1.2.3", "--verify-tag", "--draft", "--title", "1.2.3", "--notes", "1.2.3")
         firstArguments.assertIsEqualTo(expectedArguments)
         output.takeIf { it.exists() }?.readLines().orEmpty().drop(firstArguments.size)
             .assertIsEqualTo(expectedArguments)
-    } teardown {
-        removeDirectory(projectDir)
     }
 
     @Test
-    fun uploadSkipsWhenNoReleaseAssetsExist() = setup(object {
-        val projectDir = createTempDirectory()
-    }) {
+    fun uploadSkipsWhenNoReleaseAssetsExist() = setup(TemporaryProject()) {
         writeSettings(projectDir)
         File(projectDir, "distributions").apply { mkdirs() }
             .resolve("unmatched.txt").writeText("unmatched")
@@ -164,17 +164,14 @@ class AdditionalTasksFunctionalTest {
             .withProjectDir(File(projectDir))
             .withArguments("githubReleaseUpload", "-x", "githubRelease", "-Pversion=1.2.3", "--console=plain")
             .build()
-    } verifyAnd { result ->
+    } verify { result ->
         result.task(":validateGithubReleaseAssets")?.outcome?.name.assertIsEqualTo("SUCCESS")
         result.output.contains("No GitHub release assets configured").assertIsEqualTo(true, result.output)
         result.task(":githubReleaseUpload")?.outcome?.name.assertIsEqualTo("SKIPPED")
-    } teardown {
-        removeDirectory(projectDir)
     }
 
     @Test
-    fun generatedReleaseAssetIsUploaded() = setup(object {
-        val projectDir = createTempDirectory()
+    fun generatedReleaseAssetIsUploaded() = setup(object : TemporaryProject() {
         val output = File(projectDir, "gh-arguments.txt")
     }) {
         writeSettings(projectDir)
@@ -219,7 +216,7 @@ class AdditionalTasksFunctionalTest {
         val first = runner.build()
         val firstArguments = output.takeIf { it.exists() }?.readLines().orEmpty()
         ConfigurationCacheRun(first, runner.build(), firstArguments)
-    } verifyAnd { (first, second, firstArguments) ->
+    } verify { (first, second, firstArguments) ->
         first.task(":generateReleaseAsset")?.outcome?.name.assertIsEqualTo("SUCCESS")
         first.task(":githubReleaseUpload")?.outcome?.name.assertIsEqualTo("SUCCESS")
         second.output.contains("Reusing configuration cache.").assertIsEqualTo(true)
@@ -227,13 +224,10 @@ class AdditionalTasksFunctionalTest {
         firstArguments.assertIsEqualTo(expectedArguments)
         output.takeIf { it.exists() }?.readLines().orEmpty().drop(firstArguments.size)
             .assertIsEqualTo(expectedArguments)
-    } teardown {
-        removeDirectory(projectDir)
     }
 
     @Test
-    fun githubReleaseWaitsForDistributionsAndRunsAfterPublicationRetry() = setup(object {
-        val projectDir = createTempDirectory()
+    fun githubReleaseWaitsForDistributionsAndRunsAfterPublicationRetry() = setup(object : TemporaryProject() {
         val events = File(projectDir, "events.txt")
         val createArguments = File(projectDir, "create-arguments")
     }) {
@@ -294,19 +288,16 @@ class AdditionalTasksFunctionalTest {
         val firstAttempt = runner.buildAndFail()
         val retry = runner.build()
         PublicationRetryRun(firstAttempt, retry)
-    } verifyAnd { (firstAttempt, retry) ->
+    } verify { (firstAttempt, retry) ->
         firstAttempt.output.contains("simulated Maven publication failure")
             .assertIsEqualTo(true, "Expected the first attempt to fail at the simulated Maven publication")
         retry.task(":githubRelease")?.outcome?.name.assertIsEqualTo("SUCCESS")
         createArguments.readLines().assertIsEqualTo(listOf("release", "create", "1.2.3", "--verify-tag", "--title", "1.2.3", "--notes", "1.2.3"))
         events.readLines().assertIsEqualTo(listOf("maven-failure", "maven", "npm", "portal", "github"))
-    } teardown {
-        removeDirectory(projectDir)
     }
 
     @Test
-    fun versionAndReportTasksReadTheConfiguredRepository() = setup(object {
-        val projectDir = createTempDirectory()
+    fun versionAndReportTasksReadTheConfiguredRepository() = setup(object : TemporaryProject() {
         val initialTag = "1.2.3"
     }) {
         writeSettings(projectDir)
@@ -324,20 +315,17 @@ class AdditionalTasksFunctionalTest {
             .withProjectDir(File(projectDir))
             .withArguments("previousVersion", "commitReport", "-q", "--console=plain")
             .build()
-    } verifyAnd { result ->
+    } verify { result ->
         result.task(":previousVersion")?.outcome?.name.assertIsEqualTo("SUCCESS")
         result.task(":commitReport")?.outcome?.name.assertIsEqualTo("SUCCESS")
         val lines = result.output.trim().lines()
         lines.contains(initialTag).assertIsEqualTo(true, result.output)
         lines.contains("COMMIT REPORT-------").assertIsEqualTo(true, result.output)
         lines.contains("COMMIT REPORT OVAH--").assertIsEqualTo(true, result.output)
-    } teardown {
-        removeDirectory(projectDir)
     }
 
     @Test
-    fun releaseDryRunAvoidsImplicitGitHeadDependency() = setup(object {
-        val projectDir = createTempDirectory()
+    fun releaseDryRunAvoidsImplicitGitHeadDependency() = setup(object : TemporaryProject() {
         val addFileNames = setOf("build.gradle.kts", "settings.gradle", ".gitignore")
     }) {
         writeSettings(projectDir)
@@ -356,13 +344,11 @@ class AdditionalTasksFunctionalTest {
             .withArguments("release", "--dry-run", "--warning-mode=all", "--console=plain")
             .build()
             .output
-    } verifyAnd { output ->
+    } verify { output ->
         output.contains("implicit dependency")
             .assertIsEqualTo(false, "Unexpected implicit dependency warning.\n$output")
         output.contains("validation_problems")
             .assertIsEqualTo(false, "Unexpected validation problems output.\n$output")
-    } teardown {
-        removeDirectory(projectDir)
     }
 
     private fun writeSettings(projectDir: String) {
@@ -404,8 +390,7 @@ class AdditionalTasksFunctionalTest {
     }
 
     @Test
-    fun missingReleaseAssetBlocksUpload() = setup(object {
-        val projectDir = createTempDirectory()
+    fun missingReleaseAssetBlocksUpload() = setup(object : TemporaryProject() {
         val missingAsset = File(projectDir, "missing.zip")
         val invocations = File(projectDir, "gh-invocations.txt")
     }) {
@@ -437,13 +422,11 @@ class AdditionalTasksFunctionalTest {
             .withProjectDir(File(projectDir))
             .withArguments("githubReleaseUpload", "-x", "githubRelease", "-Pversion=1.2.3", "--console=plain")
         runCatching { runner.buildAndFail() }
-    } verifyAnd { build ->
+    } verify { build ->
         val result = build.getOrThrow()
         result.task(":validateGithubReleaseAssets")?.outcome?.name.assertIsEqualTo("FAILED")
         result.output.contains(missingAsset.absolutePath).assertIsEqualTo(true, result.output)
         result.task(":githubReleaseUpload").assertIsEqualTo(null)
         invocations.exists().assertIsEqualTo(false)
-    } teardown {
-        removeDirectory(projectDir)
     }
 }

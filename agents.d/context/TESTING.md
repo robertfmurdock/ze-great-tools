@@ -66,6 +66,11 @@ Use regex for help text that may wrap: `result.output.contains(Regex("\\(default
 - Verify outcomes and effects, not presence
 - Avoid symbolic tests (`assertNotNull`, type checks) without verifying actual behavior
 
+### When to Suggest a New Test
+- Suggest a new scenario when production-code review identifies a credible failure path, or when concrete evidence makes the failure highly likely in normal use.
+- Name the failure, explain why it could occur, and identify the observable result that would catch it. A coverage gap alone is insufficient.
+- Strengthen an existing assertion when it would otherwise pass without demonstrating the behavior its test already claims.
+
 ### Test Spec Hierarchy
 - **Spec-level tests**: Feature behavior across implementations (CLI, config, DSL)
 - **Implementation tests**: Format, output details, help text, mechanics unique to that layer

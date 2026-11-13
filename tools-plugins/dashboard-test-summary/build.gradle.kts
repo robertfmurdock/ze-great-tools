@@ -9,8 +9,8 @@ dependencies {
     implementation(gradleApi())
     testImplementation(gradleTestKit())
     testImplementation(kotlin("test-junit5", embeddedKotlinVersion))
-    testImplementation("com.zegreatrob.testmints:minassert:12.6.70")
-    testImplementation("com.zegreatrob.testmints:standard:12.6.70")
+    testImplementation("com.zegreatrob.testmints:minassert:12.7.0")
+    testImplementation("com.zegreatrob.testmints:standard:12.7.0")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.13.4")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.13.4")
 }

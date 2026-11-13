@@ -3,16 +3,19 @@ package com.zegreatrob.tools.plugins
 import com.zegreatrob.testmints.setup
 import groovy.json.JsonSlurper
 import org.gradle.testkit.runner.GradleRunner
-import java.nio.file.Files
+import org.junit.jupiter.api.io.TempDir
+import java.io.File
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class NpmCliPluginTest {
+    @TempDir
+    lateinit var directory: File
+
     @Test
     fun npmTasksCanBeConfiguredBeforeKotlinTargetsAreDeclared() = setup(object {
-        val directory = Files.createTempDirectory("npm-cli-plugin-order").toFile()
-
         init {
             directory.resolve("settings.gradle.kts").writeText(
                 """
@@ -46,13 +49,11 @@ class NpmCliPluginTest {
     }) exercise {
         build.build()
         build.build()
-    } verifyAnd { result ->
+    } verify { result ->
         assertTrue(result.output.contains("Reusing configuration cache."))
         val packageJson = JsonSlurper().parse(directory.resolve("build/js/packages/fixture/package.json")) as Map<*, *>
         assertEquals("@continuous-excellence/fixture", packageJson["name"])
         assertEquals("Fixture CLI", packageJson["description"])
-    } teardown {
-        directory.deleteRecursively()
     }
 
     @Test
@@ -68,7 +69,6 @@ class NpmCliPluginTest {
     )
 
     private fun publishReusesConfigurationCache(version: String, expectedArguments: List<String>) = setup(object {
-        val directory = Files.createTempDirectory("npm-cli-publish").toFile()
         val bin = directory.resolve("bin").apply { mkdirs() }
         val output = directory.resolve("npm-args.txt")
 
@@ -107,16 +107,15 @@ class NpmCliPluginTest {
     }) exercise {
         build.build()
         build.build()
-    } verifyAnd { result ->
+    } verify { result ->
         assertTrue(result.output.contains("Reusing configuration cache."))
         assertEquals(expectedArguments, output.readLines())
-    } teardown {
-        directory.deleteRecursively()
     }
 
     @Test
-    fun cleaningReadmePreservesLicense() = setup(object {
-        val directory = Files.createTempDirectory("npm-cli-plugin-test").toFile()
+    fun cleaningReadmeRemovesReadmeAndPreservesLicense() = setup(object {
+        val cleanedCopy = directory.resolve("build/js/packages/fixture/README.md")
+        val preservedCopy = directory.resolve("build/js/packages/fixture/LICENSE")
 
         init {
             directory.resolve("settings.gradle.kts").writeText("rootProject.name = \"fixture\"")
@@ -141,6 +140,8 @@ class NpmCliPluginTest {
                 .withPluginClasspath()
                 .withArguments("copyReadme", "copyLicense", "-x", "jsPackageJson", "-x", "kotlinNpmInstall")
                 .build()
+            check(cleanedCopy.isFile) { "Expected a copied file at $cleanedCopy" }
+            check(preservedCopy.readText() == "license") { "Expected original contents at $preservedCopy" }
         }
     }) exercise {
         GradleRunner.create()
@@ -148,9 +149,8 @@ class NpmCliPluginTest {
             .withPluginClasspath()
             .withArguments("cleanCopyReadme")
             .build()
-    } verifyAnd {
-        assertTrue(directory.resolve("build/js/packages/fixture/LICENSE").isFile)
-    } teardown {
-        directory.deleteRecursively()
+    } verify {
+        assertFalse(cleanedCopy.exists())
+        assertEquals("license", preservedCopy.readText())
     }
 }

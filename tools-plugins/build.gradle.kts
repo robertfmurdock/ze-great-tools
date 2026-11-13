@@ -38,7 +38,7 @@ dependencies {
     }
     testImplementation(gradleTestKit())
     testImplementation(kotlin("test-junit5"))
-    testImplementation("com.zegreatrob.testmints:standard:12.6.67")
+    testImplementation("com.zegreatrob.testmints:standard:12.7.0")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.13.4")
 }
 

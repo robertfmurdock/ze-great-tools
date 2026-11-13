@@ -9,162 +9,117 @@ import kotlin.test.Test
 
 class GithubReleaseCreateCommandTest {
     @Test
-    fun retriesReleaseCreationAfterRemoteTlsFailure() = setup(object {
-        val release = ReleaseCreationFixture()
-    }) {
-        release.respondWith("view:release not found", "create:remote error: tls: internal error", "view:release not found", "create:")
+    fun retriesReleaseCreationAfterRemoteTlsFailure() = setup(ReleaseCreationFixture()) {
+        respondWith("view:release not found", "create:remote error: tls: internal error", "view:release not found", "create:")
     } exercise {
-        release.runReleaseCommand()
-    } verifyAnd { result ->
+        runReleaseCommand()
+    } verify { result ->
         result.exitCode.assertIsEqualTo(0)
-        release.events().assertIsEqualTo(listOf("view", "create", "sleep", "view", "create"))
-    } teardown {
-        release.close()
+        events().assertIsEqualTo(listOf("view", "create", "sleep", "view", "create"))
     }
 
     @Test
-    fun existingReleaseSkipsCreation() = setup(object {
-        val release = ReleaseCreationFixture()
-    }) {
-        release.respondWith("view:")
+    fun existingReleaseSkipsCreation() = setup(ReleaseCreationFixture()) {
+        respondWith("view:")
     } exercise {
-        release.runReleaseCommand()
-    } verifyAnd { result ->
+        runReleaseCommand()
+    } verify { result ->
         result.exitCode.assertIsEqualTo(0)
-        release.events().assertIsEqualTo(listOf("view"))
-    } teardown {
-        release.close()
+        events().assertIsEqualTo(listOf("view"))
     }
 
     @Test
-    fun retryFindsReleaseCreatedBeforeResponseWasLost() = setup(object {
-        val release = ReleaseCreationFixture()
-    }) {
-        release.respondWith("view:release not found", "create:published:connection reset by peer")
+    fun retryFindsReleaseCreatedBeforeResponseWasLost() = setup(ReleaseCreationFixture()) {
+        respondWith("view:release not found", "create:published:connection reset by peer")
     } exercise {
-        release.runReleaseCommand()
-    } verifyAnd { result ->
+        runReleaseCommand()
+    } verify { result ->
         result.exitCode.assertIsEqualTo(0)
-        release.events().assertIsEqualTo(listOf("view", "create", "sleep", "view"))
-    } teardown {
-        release.close()
+        events().assertIsEqualTo(listOf("view", "create", "sleep", "view"))
     }
 
     @Test
-    fun retriesLookupBeforeCreatingRelease() = setup(object {
-        val release = ReleaseCreationFixture()
-    }) {
-        release.respondWith("view:HTTP 502: Bad Gateway", "view:release not found", "create:")
+    fun retriesLookupBeforeCreatingRelease() = setup(ReleaseCreationFixture()) {
+        respondWith("view:HTTP 502: Bad Gateway", "view:release not found", "create:")
     } exercise {
-        release.runReleaseCommand()
-    } verifyAnd { result ->
+        runReleaseCommand()
+    } verify { result ->
         result.exitCode.assertIsEqualTo(0)
-        release.events().assertIsEqualTo(listOf("view", "sleep", "view", "create"))
-    } teardown {
-        release.close()
+        events().assertIsEqualTo(listOf("view", "sleep", "view", "create"))
     }
 
     @Test
-    fun waitsAtLeastOneMinuteForSecondaryRateLimit() = setup(object {
-        val release = ReleaseCreationFixture()
-    }) {
-        release.respondWith("view:HTTP 403: You have exceeded a secondary rate limit.", "view:")
+    fun waitsAtLeastOneMinuteForSecondaryRateLimit() = setup(ReleaseCreationFixture()) {
+        respondWith("view:HTTP 403: You have exceeded a secondary rate limit.", "view:")
     } exercise {
-        release.runReleaseCommand()
-    } verifyAnd { result ->
+        runReleaseCommand()
+    } verify { result ->
         result.exitCode.assertIsEqualTo(0)
-        release.events().assertIsEqualTo(listOf("view", "sleep", "view"))
-        release.delays().assertIsEqualTo(listOf(60.5))
-    } teardown {
-        release.close()
+        events().assertIsEqualTo(listOf("view", "sleep", "view"))
+        delays().assertIsEqualTo(listOf(60.5))
     }
 
     @Test
-    fun failsImmediatelyWhenLookupIsUnauthorized() = setup(object {
-        val diagnostic = "HTTP 401: Bad credentials"
-        val release = ReleaseCreationFixture()
-    }) {
-        release.respondWith("view:$diagnostic")
+    fun failsImmediatelyWhenLookupIsUnauthorized() = setup(ReleaseCreationFixture("HTTP 401: Bad credentials")) {
+        respondWith("view:$diagnostic")
     } exercise {
-        release.runReleaseCommand()
-    } verifyAnd { result ->
+        runReleaseCommand()
+    } verify { result ->
         result.exitCode.assertIsEqualTo(1)
         result.output.lineSequence().any { it == diagnostic }.assertIsEqualTo(true)
-        release.events().assertIsEqualTo(listOf("view"))
-    } teardown {
-        release.close()
+        events().assertIsEqualTo(listOf("view"))
     }
 
     @Test
-    fun failsImmediatelyWhenCreationIsInvalid() = setup(object {
-        val diagnostic = "HTTP 422: Validation Failed"
-        val release = ReleaseCreationFixture()
-    }) {
-        release.respondWith("view:release not found", "create:$diagnostic")
+    fun failsImmediatelyWhenCreationIsInvalid() = setup(ReleaseCreationFixture("HTTP 422: Validation Failed")) {
+        respondWith("view:release not found", "create:$diagnostic")
     } exercise {
-        release.runReleaseCommand()
-    } verifyAnd { result ->
+        runReleaseCommand()
+    } verify { result ->
         result.exitCode.assertIsEqualTo(1)
         result.output.lineSequence().any { it == diagnostic }.assertIsEqualTo(true)
-        release.events().assertIsEqualTo(listOf("view", "create"))
-    } teardown {
-        release.close()
+        events().assertIsEqualTo(listOf("view", "create"))
     }
 
     @Test
-    fun failsImmediatelyOnGenericForbiddenResponse() = setup(object {
-        val diagnostic = "HTTP 403: Resource not accessible by integration"
-        val release = ReleaseCreationFixture()
-    }) {
-        release.respondWith("view:$diagnostic")
+    fun failsImmediatelyOnGenericForbiddenResponse() = setup(ReleaseCreationFixture("HTTP 403: Resource not accessible by integration")) {
+        respondWith("view:$diagnostic")
     } exercise {
-        release.runReleaseCommand()
-    } verifyAnd { result ->
+        runReleaseCommand()
+    } verify { result ->
         result.exitCode.assertIsEqualTo(1)
         result.output.lineSequence().any { it == diagnostic }.assertIsEqualTo(true)
-        release.events().assertIsEqualTo(listOf("view"))
-    } teardown {
-        release.close()
+        events().assertIsEqualTo(listOf("view"))
     }
 
     @Test
-    fun failsImmediatelyWhenCertificateVerificationFails() = setup(object {
-        val diagnostic = "tls: failed to verify certificate: x509: certificate signed by unknown authority"
-        val release = ReleaseCreationFixture()
-    }) {
-        release.respondWith("view:$diagnostic")
+    fun failsImmediatelyWhenCertificateVerificationFails() = setup(
+        ReleaseCreationFixture("tls: failed to verify certificate: x509: certificate signed by unknown authority"),
+    ) {
+        respondWith("view:$diagnostic")
     } exercise {
-        release.runReleaseCommand()
-    } verifyAnd { result ->
+        runReleaseCommand()
+    } verify { result ->
         result.exitCode.assertIsEqualTo(1)
         result.output.lineSequence().any { it == diagnostic }.assertIsEqualTo(true)
-        release.events().assertIsEqualTo(listOf("view"))
-    } teardown {
-        release.close()
+        events().assertIsEqualTo(listOf("view"))
     }
 
     @Test
-    fun reportsTheFinalFailureAfterFourAttempts() = setup(object {
-        val diagnostic = "net/http: TLS handshake timeout"
-        val release = ReleaseCreationFixture()
-    }) {
-        release.respondWith("view:HTTP 500", "view:HTTP 503", "view:HTTP 504", "view:$diagnostic")
+    fun reportsTheFinalFailureAfterFourAttempts() = setup(ReleaseCreationFixture("net/http: TLS handshake timeout")) {
+        respondWith("view:HTTP 500", "view:HTTP 503", "view:HTTP 504", "view:$diagnostic")
     } exercise {
-        release.runReleaseCommand()
-    } verifyAnd { result ->
+        runReleaseCommand()
+    } verify { result ->
         result.exitCode.assertIsEqualTo(1)
         result.output.lineSequence().any { it == diagnostic }.assertIsEqualTo(true)
-        release.events().assertIsEqualTo(listOf("view", "sleep", "view", "sleep", "view", "sleep", "view"))
-        release.delays().assertIsEqualTo(listOf(1.5, 2.5, 4.5))
-    } teardown {
-        release.close()
+        events().assertIsEqualTo(listOf("view", "sleep", "view", "sleep", "view", "sleep", "view"))
+        delays().assertIsEqualTo(listOf(1.5, 2.5, 4.5))
     }
 
     @Test
-    fun reconcilesReleaseAfterTheFinalCreateLosesItsResponse() = setup(object {
-        val release = ReleaseCreationFixture()
-    }) {
-        release.respondWith(
+    fun reconcilesReleaseAfterTheFinalCreateLosesItsResponse() = setup(ReleaseCreationFixture()) {
+        respondWith(
             "view:HTTP 500",
             "view:HTTP 503",
             "view:HTTP 504",
@@ -172,40 +127,33 @@ class GithubReleaseCreateCommandTest {
             "create:published:connection reset by peer",
         )
     } exercise {
-        release.runReleaseCommand()
-    } verifyAnd { result ->
+        runReleaseCommand()
+    } verify { result ->
         result.exitCode.assertIsEqualTo(0)
-        release.events().assertIsEqualTo(listOf("view", "sleep", "view", "sleep", "view", "sleep", "view", "create", "view"))
-    } teardown {
-        release.close()
+        events().assertIsEqualTo(listOf("view", "sleep", "view", "sleep", "view", "sleep", "view", "create", "view"))
     }
 
     @Test
-    fun doesNotMakeAnotherRequestAfterFinalCreateIsRateLimited() = setup(object {
-        val release = ReleaseCreationFixture()
-        val diagnostic = "HTTP 403: You have exceeded a secondary rate limit."
-    }) {
-        release.respondWith("view:HTTP 500", "view:HTTP 503", "view:HTTP 504", "view:release not found", "create:$diagnostic")
+    fun doesNotMakeAnotherRequestAfterFinalCreateIsRateLimited() = setup(ReleaseCreationFixture("HTTP 403: You have exceeded a secondary rate limit.")) {
+        respondWith("view:HTTP 500", "view:HTTP 503", "view:HTTP 504", "view:release not found", "create:$diagnostic")
     } exercise {
-        release.runReleaseCommand()
-    } verifyAnd { result ->
+        runReleaseCommand()
+    } verify { result ->
         result.exitCode.assertIsEqualTo(1)
         result.output.lineSequence().any { it == diagnostic }.assertIsEqualTo(true)
-        release.events().assertIsEqualTo(listOf("view", "sleep", "view", "sleep", "view", "sleep", "view", "create"))
-    } teardown {
-        release.close()
+        events().assertIsEqualTo(listOf("view", "sleep", "view", "sleep", "view", "sleep", "view", "create"))
     }
 
     private data class CommandResult(val exitCode: Int, val output: String)
 
-    private class ReleaseCreationFixture {
+    private class ReleaseCreationFixture(val diagnostic: String = "") : AutoCloseable {
         private val projectDir = createTempDirectory().toFile()
         private val events = File(projectDir, "events")
         private val waits = File(projectDir, "waits")
         private val released = File(projectDir, "released")
 
         private val bin = File(projectDir, "bin").apply { mkdirs() }
-        private val project = ProjectBuilder.builder().withProjectDir(projectDir).build()
+        private val project by lazy { ProjectBuilder.builder().withProjectDir(projectDir).build() }
 
         fun runReleaseCommand(): CommandResult {
             val arguments = project.objects.newInstance(GithubReleaseCreateArguments::class.java).apply {
@@ -266,7 +214,7 @@ class GithubReleaseCreateCommandTest {
 
         fun delays() = waits.readLines().map(String::toDouble)
 
-        fun close() {
+        override fun close() {
             projectDir.deleteRecursively()
         }
     }

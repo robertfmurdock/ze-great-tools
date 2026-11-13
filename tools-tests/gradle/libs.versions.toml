@@ -1,7 +1,7 @@
 [versions]
 kotlin = "2.4.21"
 kotlinx-coroutines = "1.11.0"
-testmints = "12.6.72"
+testmints = "12.7.0"
 
 [libraries]
 org-jetbrains-kotlin-kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin" }
