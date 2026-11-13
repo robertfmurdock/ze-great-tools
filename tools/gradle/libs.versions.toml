@@ -15,4 +15,4 @@ nl-littlerobots-version-catalog-update = "nl.littlerobots.version-catalog-update
 
 [versions]
 org-jetbrains-kotlinx = "1.11.0"
-testmints = "12.7.0"
+testmints = "12.7.5"
