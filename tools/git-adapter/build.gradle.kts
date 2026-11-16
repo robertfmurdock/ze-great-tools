@@ -28,7 +28,6 @@ kotlin {
 
 dependencies {
     commonMainApi(platform(project(":plugin-dependency-bom")))
-    commonMainApi("org.jetbrains.kotlinx:kotlinx-datetime")
     commonTestImplementation(kotlin("test", embeddedKotlinVersion))
     commonTestImplementation(project(":git-test"))
     commonTestImplementation(libs.testmints.minassert)

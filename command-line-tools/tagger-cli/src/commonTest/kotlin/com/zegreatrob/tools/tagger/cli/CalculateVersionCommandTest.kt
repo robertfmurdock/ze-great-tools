@@ -3,9 +3,12 @@ package com.zegreatrob.tools.tagger.cli
 import com.github.ajalt.clikt.testing.test
 import com.zegreatrob.minassert.assertIsEqualTo
 import com.zegreatrob.testmints.setup
+import com.zegreatrob.tools.adapter.git.GitAdapter
 import com.zegreatrob.tools.tagger.CalculateVersionTestSpec
 import com.zegreatrob.tools.tagger.TestResult
 import com.zegreatrob.tools.tagger.core.SnapshotReason
+import com.zegreatrob.tools.tagger.core.TaggerCore
+import com.zegreatrob.tools.tagger.core.tagReport
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.boolean
 import kotlinx.serialization.json.jsonArray
@@ -16,6 +19,19 @@ import kotlin.test.assertNotNull
 import kotlin.test.fail
 
 class CalculateVersionCommandTest : CalculateVersionTestSpec {
+    @Test
+    fun tagReportGroupsTagsByLocalYearAndWeek() = setup(object {
+        val tagName = "1.2.3"
+    }) {
+        initializeGitRepo(commits = listOf("init"), initialTag = null)
+        GitAdapter(projectDir, env = mapOf("GIT_COMMITTER_DATE" to "2024-01-10T12:00:00Z"))
+            .newAnnotatedTag(tagName, "HEAD", "Tagger Test", "tagger@example.com")
+    } exercise {
+        TaggerCore(GitAdapter(projectDir)).tagReport()
+    } verify { report ->
+        report.assertIsEqualTo("2024 Week 01 has 1 tags [$tagName]")
+    }
+
     @Test
     fun helpTextDocumentsEverySnapshotReasonEnum() = setup(object {
         val command = cli()
