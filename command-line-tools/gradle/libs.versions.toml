@@ -1,5 +1,5 @@
 [versions]
-com-github-ajalt-clikt = "5.2.0"
+com-github-ajalt-clikt = "5.2.1"
 kotlin = "2.4.21"
 testmints = "12.7.7"
 
