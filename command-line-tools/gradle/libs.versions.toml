@@ -1,7 +1,7 @@
 [versions]
 com-github-ajalt-clikt = "5.2.1"
 kotlin = "2.4.21"
-testmints = "12.7.7"
+testmints = "12.7.9"
 
 [libraries]
 com-github-ajalt-clikt-clikt = { module = "com.github.ajalt.clikt:clikt", version.ref = "com-github-ajalt-clikt" }
